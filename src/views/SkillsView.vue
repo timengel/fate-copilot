@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useSkillsStore } from '../stores/skills'
 import FateButton from '../components/shared/FateButton.vue'
+import type { SkillInfo } from '../types'
 
 const store = useSkillsStore()
 const newSkillName = ref('')
@@ -20,11 +21,6 @@ function resetToDefaults() {
   if (confirm('Liste auf Fate-Core-Standardfertigkeiten zurücksetzen?')) {
     store.resetToDefaults()
   }
-}
-
-interface SkillInfo {
-  description: string
-  actions: { name: string; note?: string }[]
 }
 
 const SKILL_INFO: Record<string, SkillInfo> = {

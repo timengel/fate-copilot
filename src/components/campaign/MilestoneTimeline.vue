@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Milestone } from '../../types'
+import type { Milestone, MilestoneType } from '../../types'
 import FateButton from '../shared/FateButton.vue'
 
 const props = defineProps<{
@@ -14,17 +14,17 @@ const emit = defineEmits<{
   update: [milestone: Milestone]
 }>()
 
-const TYPE_LABELS: Record<Milestone['type'], string> = {
+const TYPE_LABELS: Record<MilestoneType, string> = {
   small: 'Kleiner Meilenstein',
   significant: 'Bedeutender Meilenstein',
   major: 'Großer Meilenstein',
 }
 
-const newType = ref<Milestone['type']>('small')
+const newType = ref<MilestoneType>('small')
 const newDescription = ref('')
 
 const editingId = ref<string | null>(null)
-const editType = ref<Milestone['type']>('small')
+const editType = ref<MilestoneType>('small')
 const editDescription = ref('')
 
 function submit() {

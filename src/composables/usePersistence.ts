@@ -1,12 +1,12 @@
 import { watch } from 'vue'
-import type { AppData } from '../types'
+import type { AppData, AppDataVersion } from '../types'
 import { SKILL_LIST } from '../types'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useSkillsStore } from '../stores/skills'
 
 const STORAGE_KEY = 'fate-copilot-data'
-const FORMAT_VERSION = '1.1' as const
+const FORMAT_VERSION: AppDataVersion = '1.1'
 
 export function initPersistence() {
   const charactersStore = useCharactersStore()

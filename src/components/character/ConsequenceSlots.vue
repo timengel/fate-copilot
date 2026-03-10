@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Consequence } from '../../types'
+import type { Consequence, ConsequenceLabel } from '../../types'
 
 const props = defineProps<{
   consequences: Consequence[]
@@ -10,7 +10,7 @@ const emit = defineEmits<{
   update: [consequences: Consequence[]]
 }>()
 
-const LABELS: Record<string, string> = {
+const LABELS: Record<ConsequenceLabel, string> = {
   mild: 'Leicht',
   moderate: 'Mittel',
   severe: 'Schwer',

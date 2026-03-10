@@ -1,11 +1,11 @@
-import type { AppData } from '../types'
+import type { AppData, AppDataVersion } from '../types'
 import { SKILL_LIST } from '../types'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useSkillsStore } from '../stores/skills'
 
-const FORMAT_VERSION = '1.1' as const
-const SUPPORTED_VERSIONS = ['1.0', '1.1']
+const FORMAT_VERSION: AppDataVersion = '1.1'
+const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0', '1.1']
 
 export function useImportExport() {
   function exportJSON() {
@@ -36,7 +36,7 @@ export function useImportExport() {
   function validateImportData(data: unknown): data is AppData {
     if (typeof data !== 'object' || data === null) return false
     const d = data as Record<string, unknown>
-    if (!SUPPORTED_VERSIONS.includes(d.formatVersion as string)) {
+    if (!SUPPORTED_VERSIONS.includes(d.formatVersion as AppDataVersion)) {
       throw new Error(`Unbekannte Formatversion: "${d.formatVersion}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`)
     }
     if (!Array.isArray(d.campaigns)) throw new Error('Fehlende oder ungültige "campaigns"-Liste')

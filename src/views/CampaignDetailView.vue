@@ -6,7 +6,7 @@ import { useCharactersStore } from '../stores/characters'
 import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
 import FateButton from '../components/shared/FateButton.vue'
-import type { Campaign, Milestone } from '../types'
+import type { Campaign, CampaignStatus, Milestone } from '../types'
 
 const props = defineProps<{
   isNew?: boolean
@@ -43,7 +43,7 @@ const availableCharacters = computed(() =>
   )
 )
 
-const STATUS_LABEL: Record<string, string> = {
+const STATUS_LABEL: Record<CampaignStatus, string> = {
   active: 'Aktiv',
   inactive: 'Inaktiv',
   completed: 'Abgeschlossen',

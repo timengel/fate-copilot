@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { ButtonVariant, ButtonSize } from '../../types'
+
 withDefaults(defineProps<{
-  variant?: 'primary' | 'secondary' | 'danger' | 'danger-outline' | 'link' | 'outline' | 'add' | 'info' | 'counter' | 'ghost'
-  size?: 'sm' | 'md'
+  variant?: ButtonVariant
+  size?: ButtonSize
   type?: 'button' | 'submit' | 'reset'
 }>(), {
   variant: 'primary',

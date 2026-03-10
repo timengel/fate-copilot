@@ -2,11 +2,12 @@
 import { useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
 import FateButton from '../components/shared/FateButton.vue'
+import type { CampaignStatus } from '../types'
 
 const router = useRouter()
 const store = useCampaignsStore()
 
-const STATUS_LABEL: Record<string, string> = {
+const STATUS_LABEL: Record<CampaignStatus, string> = {
   active: 'Aktiv',
   inactive: 'Inaktiv',
   completed: 'Abgeschlossen',
