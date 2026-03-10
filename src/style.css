@@ -1077,7 +1077,8 @@ button {
   align-items: center;
   width: 12px;
   flex-shrink: 0;
-  padding-top: 11px;
+  align-self: stretch;
+  padding-top: 6px;
 }
 
 .timeline-dot {

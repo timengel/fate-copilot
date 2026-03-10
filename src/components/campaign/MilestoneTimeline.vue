@@ -86,18 +86,16 @@ function cancelEdit() {
             @keydown.enter="saveEdit(m.id)"
             @keydown.escape="cancelEdit"
           />
-          <FateButton variant="add" @click="saveEdit(m.id)">✓</FateButton>
-          <FateButton variant="ghost" class="milestone-remove" @click="cancelEdit">✕</FateButton>
+          <FateButton variant="add" size="S" @click="saveEdit(m.id)">✓</FateButton>
+          <FateButton variant="ghost" size="S" class="milestone-remove" @click="cancelEdit">✕</FateButton>
         </div>
 
         <!-- View mode -->
         <div v-else class="timeline-content">
           <span class="milestone-badge" :class="`badge--${m.type}`">{{ TYPE_LABELS[m.type] }}</span>
           <span class="milestone-desc">{{ m.description }}</span>
-          <template v-if="!readonly">
-            <FateButton variant="ghost" class="milestone-edit" @click="startEdit(m)">✎</FateButton>
-            <FateButton variant="ghost" class="milestone-remove" @click="emit('remove', m.id)">✕</FateButton>
-          </template>
+          <FateButton v-if="!readonly && i === milestones.length - 1" variant="danger-outline" size="S" class="milestone-remove" @click="emit('remove', m.id)">✕</FateButton>
+          <FateButton v-if="!readonly" variant="ghost" size="S" class="milestone-edit" @click="startEdit(m)">✎</FateButton>
         </div>
       </div>
     </div>
