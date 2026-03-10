@@ -8,12 +8,6 @@ Verlasse dich nicht ausschließlich auf dein Trainingswissen. Nutze Thinking-Mod
 2. [Toolkits](#toolkits) = Erweiterungen/Varianten, Inspiration- und Modulbaukästen. Nutze sie immer, wenn das Thema passt, und markiere Regeln/Varianten sauber als "Toolkit-Option", wenn sie über Core hinausgehen.
 3. [Book of Hanz](https://bookofhanz.com/) = Design-/Spielphilosophie (Leitlinie, z.B. für besseres Spielgefühl, aber nicht “Regelüberschreibung”)
 
-## Warhammer 40k Lore
-
-Nutze das [40k Lexicanum](https://wh40k.lexicanum.com/wiki/Main_Page) als primäre Quelle für 40k Lore, z.B. um Atmosphäre, Fraktionen, Charaktere, Waffen, oder Fahrzeuge darzustellen. 40k Lore liefert nur Setting/Ästhetik, überschreibt aber keine Fate-Regeln.
-
-Falls du einen deutschen Begriff nicht im englischen Lexicanum finden kannst, suche im [deutschen Lexicanum](https://wh40k-de.lexicanum.com/wiki/Hauptseite).
-
 # Toolkits
 
 ## Fate System Toolkit

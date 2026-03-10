@@ -1,79 +1,1562 @@
+/* ============================================================
+   FATE COPILOT – Global Styles
+   Primary color: #1c9ed6 (Fate teal/blue)
+   ============================================================ */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --fate-blue: #1c9ed6;
+  --fate-blue-dark: #1480b0;
+  --fate-blue-light: #e8f4fb;
+  --fate-text: #1a2a35;
+  --fate-text-light: #5a7080;
+  --fate-border: #b0ccd8;
+  --fate-bg: #f5f8fa;
+  --fate-white: #ffffff;
+  --fate-red: #c0392b;
+  --fate-green: #27ae60;
+
+  font-family: 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: var(--fate-text);
+  background-color: var(--fate-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
+  background-color: var(--fate-bg);
 }
 
 #app {
-  max-width: 1280px;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--fate-text);
+}
+
+a {
+  color: var(--fate-blue);
+  text-decoration: none;
+}
+
+/* ============================================================
+   APP LAYOUT
+   ============================================================ */
+
+#app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  background-color: var(--fate-blue);
+  color: white;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  height: 56px;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: white !important;
+  letter-spacing: -1px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.fate-plus, .fate-logo-plus {
+  color: white;
+  font-weight: 900;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.nav-link {
+  color: rgba(255,255,255,0.9) !important;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.nav-link:hover,
+.nav-link.router-link-active {
+  background: rgba(255,255,255,0.2);
+  color: white !important;
+}
+
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.dashboard-view {
+  width: 100%;
+}
+
+.dashboard-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-card-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-empty {
+  text-align: center;
+  color: var(--fate-text-muted);
+  padding: 3rem;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.15s, opacity 0.15s;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: var(--fate-blue);
+  color: white;
+  padding: 0.5rem 1rem;
+}
+.btn-primary:hover { background: var(--fate-blue-dark); }
+
+.btn-secondary {
+  background: #e0e8ed;
+  color: var(--fate-text);
+  padding: 0.5rem 1rem;
+}
+.btn-secondary:hover { background: #c8d8e0; }
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--fate-red);
+  border: 1px solid var(--fate-red);
+  padding: 0.5rem 1rem;
+}
+.btn-danger-outline:hover { background: #fde8e6; }
+
+.btn-danger {
+  background: var(--fate-red);
+  color: white;
+}
+.btn-danger:hover { background: #a93226; }
+
+.btn-sm {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  background: #e0e8ed;
+  color: var(--fate-text);
+}
+.btn-sm:hover { background: #c8d8e0; }
+.btn-sm.btn-danger { background: var(--fate-red); color: white; }
+.btn-sm.btn-danger:hover { background: #a93226; }
+.btn-sm.btn-add {
+  background: transparent;
+  border: 1px dashed var(--fate-blue);
+  color: var(--fate-blue);
+  margin-top: 0.5rem;
+}
+.btn-sm.btn-add:hover { background: var(--fate-blue-light); }
+
+.btn-link {
+  background: transparent;
+  color: var(--fate-blue);
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+.btn-link:hover { text-decoration: underline; }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.7);
+  color: white;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.15); }
+
+/* ============================================================
+   IMPORT/EXPORT BAR
+   ============================================================ */
+
+.import-export-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.import-error {
+  color: #ffe0e0;
+  font-size: 0.8rem;
+  max-width: 200px;
+}
+
+/* ============================================================
+   LIST VIEWS (Characters, Campaigns)
+   ============================================================ */
+
+.list-view {
+  padding-top: 0.5rem;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.list-header h1 {
+  font-size: 1.75rem;
+  color: var(--fate-blue);
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  color: var(--fate-text);
+  background: white;
+}
+
+.empty-state {
+  color: var(--fate-text-light);
   padding: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.character-card,
+.campaign-card {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  overflow: hidden;
+}
+
+.character-card:hover,
+.campaign-card:hover {
+  box-shadow: 0 2px 12px rgba(28,158,214,0.15);
+  border-color: var(--fate-blue);
+}
+
+.card-header {
+  background: var(--fate-blue);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.card-concept {
+  padding: 0.5rem 0.9rem 0.25rem;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+}
+
+.card-trouble {
+  padding: 0 0.9rem 0.25rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-description {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-status {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-meta {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem 0.75rem;
+}
+
+/* ============================================================
+   HOME VIEW
+   ============================================================ */
+
+.home-view {
+  padding-top: 0.5rem;
+}
+
+.home-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.fate-logo {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.fate-logo .fate-plus {
+  color: var(--fate-blue);
+}
+
+.home-header h1 {
+  font-size: 1.25rem;
+  color: var(--fate-text-light);
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.subtitle {
+  color: var(--fate-text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .home-grid { grid-template-columns: 1fr; }
+}
+
+.home-section {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--fate-blue);
+  color: white;
+  padding: 0.6rem 0.9rem;
+}
+
+.section-header h2 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.home-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.home-list-item:hover { background: var(--fate-blue-light); }
+.home-list-item:last-child { border-bottom: none; }
+
+.item-name { font-weight: 600; font-size: 0.9rem; }
+.item-meta { font-size: 0.8rem; color: var(--fate-text-light); }
+
+/* ============================================================
+   DETAIL VIEW
+   ============================================================ */
+
+.detail-view {
+  padding-top: 0.5rem;
+}
+
+.detail-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.not-found {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fate-text-light);
+}
+
+/* ============================================================
+   CHARACTER SHEET – Fate Core Layout
+   ============================================================ */
+
+.character-sheet {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.875rem;
+}
+
+/* Section header – matches the blue header bars on the original sheet */
+.sheet-section-header {
+  background: var(--fate-blue);
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+
+.sheet-section {
+  border-bottom: 1px solid var(--fate-border);
+}
+
+/* ALLGEMEINES */
+.allgemeines-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.allgemeines-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.field-value {
+  border-bottom: 1px solid var(--fate-border);
+  min-width: 120px;
+  min-height: 1.4em;
+  padding: 1px 2px;
+  color: var(--fate-text);
+  font-size: 0.875rem;
+}
+
+.field-value.field-description {
+  min-height: 2.8em;
+  white-space: pre-wrap;
+}
+
+.field-input {
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  width: 100%;
+  outline: none;
+}
+
+.field-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 3em;
+  border: 1px solid var(--fate-border);
+  border-radius: 3px;
+  padding: 4px;
+}
+
+.field-number {
+  width: 60px;
   text-align: center;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.refresh-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: center;
+  min-width: 40px;
+}
+
+.fate-points {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: center;
+  min-width: 40px;
+}
+
+.fate-points-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.counter-btn {
+  background: var(--fate-blue);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fate-logo-corner {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  letter-spacing: -1px;
+  line-height: 1;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.fate-logo-sub {
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: right;
+}
+
+/* TWO-COLUMN LAYOUT (Aspekte | Fertigkeiten, Extras | Stunts) */
+.sheet-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.sheet-two-col .sheet-section {
+  border-bottom: none;
+}
+
+.sheet-two-col .sheet-section:first-child {
+  border-right: 1px solid var(--fate-border);
+}
+
+/* ASPEKTE */
+.aspect-fields {
+  padding: 0.25rem 0;
+}
+
+.aspect-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0.75rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.aspect-row:last-child { border-bottom: none; }
+
+.aspect-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.aspect-value {
+  flex: 1;
+  min-height: 1.4em;
+  padding: 1px 2px;
+  color: var(--fate-text);
+}
+
+.aspect-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.aspect-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+/* SKILL PYRAMID */
+.skill-pyramid {
+  padding: 0.5rem 0.75rem;
+}
+
+.pyramid-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 4px;
+}
+
+.level-label {
+  display: flex;
+  gap: 0.25rem;
+  align-items: baseline;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.level-plus {
+  color: var(--fate-blue);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.level-name {
+  font-size: 0.75rem;
+  color: var(--fate-text);
+  font-weight: 500;
+}
+
+.level-slots {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.skill-slot {
+  flex: 1;
+}
+
+.skill-value {
+  display: block;
+  border-bottom: 1px solid var(--fate-border);
+  min-height: 1.4em;
+  padding: 1px 3px;
+  font-size: 0.8rem;
+  color: var(--fate-text);
+  text-align: center;
+}
+
+.skill-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 3px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  text-align: center;
+}
+
+.skill-input:focus {
+  border-bottom-color: var(--fate-blue);
+  background: var(--fate-blue-light);
+}
+
+.skill-slot--locked {
+  border-bottom: 1px solid var(--fate-border);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.skill-select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 2px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.skill-select:focus {
+  border-bottom-color: var(--fate-blue);
+  background: var(--fate-blue-light);
+}
+
+/* SKILLS VIEW */
+.skills-hint {
+  color: var(--fate-text-light);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.skills-manage {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 480px;
+}
+
+.skills-list-box {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.skill-manage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.skill-manage-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.btn-info {
+  background: var(--fate-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.btn-info:hover { background: #1787bb; }
+
+/* Skill info modal */
+.skill-info-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.skill-info-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 480px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+
+.skill-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid var(--fate-blue);
+  padding-bottom: 0.5rem;
+}
+
+.skill-info-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  margin: 0;
+}
+
+.skill-info-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--fate-muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+.skill-info-close:hover { background: var(--fate-blue-light); }
+
+.skill-info-description {
+  font-size: 0.9rem;
+  color: var(--fate-text);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.skill-info-actions h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fate-muted);
+  margin: 0 0 0.5rem;
+}
+
+.skill-info-actions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.skill-info-actions li {
+  font-size: 0.875rem;
+  color: var(--fate-text);
+  padding: 0.4rem 0.6rem;
+  background: var(--fate-blue-light);
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+.skill-info-actions li strong {
+  color: var(--fate-blue);
+}
+
+.skill-manage-row:last-child { border-bottom: none; }
+
+.skill-manage-name {
+  font-size: 0.875rem;
+  color: var(--fate-text);
+}
+
+.skill-add-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+
+.skill-add-input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  outline: none;
+}
+
+.skill-add-input:focus { border-color: var(--fate-blue); }
+
+/* MILESTONE TIMELINE */
+.milestone-timeline {
+  padding: 0.5rem 0.75rem;
+}
+
+.milestone-empty {
+  font-size: 0.8rem;
+  color: var(--fate-text-muted);
+  padding: 0.25rem 0;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.timeline-line-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 12px;
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot--small    { background: #888; }
+.dot--significant { background: var(--fate-blue); }
+.dot--major    { background: #c9a84c; }
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  min-height: 12px;
+  background: var(--fate-border);
+  margin: 3px 0;
+}
+
+.timeline-content {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex: 1;
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.milestone-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge--small       { background: #e8e8e8; color: #555; }
+.badge--significant { background: var(--fate-blue-light); color: var(--fate-blue); }
+.badge--major       { background: #fdf3d8; color: #9a7020; }
+
+.milestone-desc {
+  font-size: 0.82rem;
+  color: var(--fate-text);
+  flex: 1;
+}
+
+.milestone-remove {
+  background: none;
+  border: none;
+  color: var(--fate-text-muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.milestone-remove:hover { color: var(--fate-red); }
+
+.milestone-edit {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.milestone-edit:hover { color: var(--fate-blue); }
+
+.timeline-content--edit {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex: 1;
+}
+
+.milestone-add-form {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--fate-border);
+}
+
+.milestone-type-select {
+  font-size: 0.78rem;
+  padding: 3px 6px;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  background: var(--fate-surface);
+  color: var(--fate-text);
+  font-family: inherit;
+}
+
+.milestone-desc-input {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fate-text);
+  font-family: inherit;
+}
+.milestone-desc-input:focus {
+  outline: none;
+  border-color: var(--fate-blue);
+}
+
+/* EXTRAS / STUNTS */
+.extras,
+.stunts {
+  padding: 0;
+}
+
+.text-area-display {
+  padding: 0.5rem 0.75rem;
+  min-height: 120px;
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+}
+
+.text-area-input {
+  width: 100%;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  resize: vertical;
+  outline: none;
+  min-height: 120px;
+}
+
+.stunts-list {
+  padding: 0.5rem 0.75rem;
+  min-height: 120px;
+}
+
+.stunt-item {
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+.stunt-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stunt-edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.stunt-name-input {
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.stunt-desc-input {
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--fate-text-light);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.stunt-name-input:focus,
+.stunt-desc-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+/* BOTTOM: STRESS + KONSEQUENZEN */
+.sheet-bottom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.stress-section {
+  border-right: 1px solid var(--fate-border);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 220px;
+}
+
+/* STRESS TRACK */
+.stress-track {}
+
+.stress-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--fate-blue);
+  background: var(--fate-blue-light);
+  padding: 2px 4px;
+  margin-bottom: 4px;
+}
+
+.stress-boxes {
+  display: flex;
+  gap: 4px;
+}
+
+.stress-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stress-box input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  border: 2px solid var(--fate-blue);
+  border-radius: 2px;
+  background: white;
+  position: relative;
+  transition: background 0.1s;
+}
+
+.stress-box input[type="checkbox"]:checked {
+  background: var(--fate-blue);
+}
+
+.stress-box input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  top: -1px;
+  left: 2px;
+}
+
+.stress-box.readonly input[type="checkbox"] {
+  cursor: default;
+}
+
+.box-value {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  margin-top: 1px;
+}
+
+/* KONSEQUENZEN */
+.konsequenzen {
+  border-bottom: none;
+}
+
+.consequence-slots {
+  padding: 0.4rem 0.75rem;
+}
+
+.consequence-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.consequence-row:last-child { border-bottom: none; }
+
+.consequence-severity {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  min-width: 20px;
+  text-align: center;
+}
+
+.consequence-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--fate-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 55px;
+}
+
+.consequence-value {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+  border-bottom: 1px solid var(--fate-border);
+  min-height: 1.4em;
+  padding: 1px 2px;
+}
+
+.consequence-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+}
+
+.consequence-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+/* FORM ACTIONS */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+
+/* ============================================================
+   CAMPAIGN DETAIL
+   ============================================================ */
+
+.campaign-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.campaign-detail-header h1 {
+  font-size: 1.75rem;
+  color: var(--fate-blue);
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active { background: #d4edda; color: var(--fate-green); }
+.status-inactive { background: #f0f0f0; color: #666; }
+.status-completed { background: #d1ecf1; color: #0c5460; }
+
+.campaign-description {
+  color: var(--fate-text);
+  margin-bottom: 0.75rem;
+}
+
+.campaign-notes {
+  background: #fffbea;
+  border-left: 3px solid #f0c040;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   ASSIGNMENT ROWS
+   ============================================================ */
+
+.campaign-characters,
+.campaign-assignments {
+  padding: 0.5rem 0.75rem;
+}
+
+.assignment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.assignment-row:last-of-type { border-bottom: none; }
+
+.assignment-name {
+  cursor: pointer;
+  color: var(--fate-blue);
+  font-weight: 500;
+}
+
+.assignment-name:hover { text-decoration: underline; }
+
+.assignment-info {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.assignment-info strong {
+  color: var(--fate-blue);
+}
+
+.assignment-info strong:hover { text-decoration: underline; }
+
+.assignment-concept {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.assign-row {
+  padding-top: 0.5rem;
+}
+
+.assign-select {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  cursor: pointer;
+}
+
+.assign-select:focus { outline: none; border-color: var(--fate-blue); }
+
+/* CAMPAIGNS SECTION on character detail */
+.campaigns-section {
+  margin-top: 1rem;
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   CAMPAIGN FORM
+   ============================================================ */
+
+.campaign-form {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fate-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  outline: none;
+}
+
+.form-control:focus { border-color: var(--fate-blue); }
+
+/* ============================================================
+   CONFIRM DIALOG
+   ============================================================ */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.dialog-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--fate-text);
+  margin-bottom: 0.75rem;
+}
+
+.dialog-message {
+  font-size: 0.9rem;
+  color: var(--fate-text);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+
+.empty-text {
+  color: var(--fate-text-light);
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .sheet-two-col {
+    grid-template-columns: 1fr;
   }
-  a:hover {
-    color: #747bff;
+  .sheet-two-col .sheet-section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
   }
-  button {
-    background-color: #f9f9f9;
+  .sheet-bottom {
+    grid-template-columns: 1fr;
+  }
+  .stress-section {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+  }
+  .allgemeines-grid {
+    grid-template-columns: 1fr;
   }
 }

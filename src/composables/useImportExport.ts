@@ -1,0 +1,77 @@
+import type { AppData } from '../types'
+import { SKILL_LIST } from '../types'
+import { useCharactersStore } from '../stores/characters'
+import { useCampaignsStore } from '../stores/campaigns'
+import { useSkillsStore } from '../stores/skills'
+
+const FORMAT_VERSION = '1.1' as const
+const SUPPORTED_VERSIONS = ['1.0', '1.1']
+
+export function useImportExport() {
+  function exportJSON() {
+    const charactersStore = useCharactersStore()
+    const campaignsStore = useCampaignsStore()
+    const skillsStore = useSkillsStore()
+
+    const data: AppData = {
+      formatVersion: FORMAT_VERSION,
+      exportDate: new Date().toISOString(),
+      campaigns: campaignsStore.campaigns,
+      characters: charactersStore.characters,
+      campaignCharacterAssignments: campaignsStore.assignments,
+      skills: skillsStore.skills,
+    }
+
+    const json = JSON.stringify(data, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const date = new Date().toISOString().split('T')[0]
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `fate-copilot-export-${date}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function validateImportData(data: unknown): data is AppData {
+    if (typeof data !== 'object' || data === null) return false
+    const d = data as Record<string, unknown>
+    if (!SUPPORTED_VERSIONS.includes(d.formatVersion as string)) {
+      throw new Error(`Unbekannte Formatversion: "${d.formatVersion}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`)
+    }
+    if (!Array.isArray(d.campaigns)) throw new Error('Fehlende oder ungültige "campaigns"-Liste')
+    if (!Array.isArray(d.characters)) throw new Error('Fehlende oder ungültige "characters"-Liste')
+    if (!Array.isArray(d.campaignCharacterAssignments))
+      throw new Error('Fehlende oder ungültige "campaignCharacterAssignments"-Liste')
+    return true
+  }
+
+  function importJSON(file: File): Promise<AppData> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const raw = JSON.parse(e.target?.result as string)
+          if (validateImportData(raw)) {
+            resolve(raw)
+          }
+        } catch (err) {
+          reject(err instanceof Error ? err : new Error('Ungültige JSON-Datei'))
+        }
+      }
+      reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'))
+      reader.readAsText(file)
+    })
+  }
+
+  function applyImport(data: AppData) {
+    const charactersStore = useCharactersStore()
+    const campaignsStore = useCampaignsStore()
+    const skillsStore = useSkillsStore()
+    charactersStore.replaceAll(data.characters)
+    campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments)
+    skillsStore.replaceAll(data.skills ?? [...SKILL_LIST])
+  }
+
+  return { exportJSON, importJSON, applyImport }
+}

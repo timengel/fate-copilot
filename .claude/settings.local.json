@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm build:*)",
+      "WebFetch(domain:srd.faterpg.de)"
+    ]
+  }
+}
