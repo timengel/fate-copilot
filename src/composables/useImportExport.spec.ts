@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useImportExport } from './useImportExport'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useSkillsStore } from '../stores/skills'
-import type { AppData, Character, Campaign } from '../types'
+import type { AppData, Character, Campaign, CampaignCharacterAssignment } from '../types'
 
 const validV11: AppData = {
   formatVersion: '1.1',
@@ -106,6 +106,105 @@ describe('useImportExport', () => {
       const { skills: _s, ...data } = validV11
       applyImport(data as AppData)
       expect(useSkillsStore().skills.length).toBeGreaterThan(0)
+    })
+
+    it('applies campaign-character assignments to the store', () => {
+      const { applyImport } = useImportExport()
+      const assignment: CampaignCharacterAssignment = { campaignId: 'camp1', characterId: 'c1' }
+      applyImport({ ...validV11, campaignCharacterAssignments: [assignment] })
+      expect(useCampaignsStore().assignments).toEqual([assignment])
+    })
+
+    it('clears previous store data before applying new import', () => {
+      const { applyImport } = useImportExport()
+      const existingChar: Character = {
+        id: 'old', name: 'Altcharakter', description: '', highConcept: '', trouble: '',
+        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
+        stressPhysical: [], stressMental: [], consequences: [], notes: '',
+      }
+      useCharactersStore().addCharacter(existingChar)
+      applyImport({ ...validV11, characters: [] })
+      expect(useCharactersStore().characters).toHaveLength(0)
+    })
+
+    it('preserves character type field (nsc)', () => {
+      const { applyImport } = useImportExport()
+      const nsc: Character = {
+        id: 'n1', name: 'Bösewicht', type: 'nsc', description: '', highConcept: '', trouble: '',
+        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
+        stressPhysical: [], stressMental: [], consequences: [], notes: '',
+      }
+      applyImport({ ...validV11, characters: [nsc] })
+      expect(useCharactersStore().characters[0].type).toBe('nsc')
+    })
+  })
+
+  describe('exportJSON', () => {
+    let createObjectURL: ReturnType<typeof vi.fn>
+    let revokeObjectURL: ReturnType<typeof vi.fn>
+    let fakeLink: { href: string; download: string; click: ReturnType<typeof vi.fn> }
+
+    beforeEach(() => {
+      createObjectURL = vi.fn(() => 'blob:fake-url')
+      revokeObjectURL = vi.fn()
+      vi.spyOn(URL, 'createObjectURL').mockImplementation(createObjectURL)
+      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(revokeObjectURL)
+
+      fakeLink = { href: '', download: '', click: vi.fn() }
+      vi.spyOn(document, 'createElement').mockReturnValueOnce(fakeLink as unknown as HTMLElement)
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('triggers a file download (link.click is called)', () => {
+      const { exportJSON } = useImportExport()
+      exportJSON()
+      expect(fakeLink.click).toHaveBeenCalledOnce()
+    })
+
+    it('sets download filename matching fate-copilot-export-YYYY-MM-DD.json', () => {
+      const { exportJSON } = useImportExport()
+      exportJSON()
+      expect(fakeLink.download).toMatch(/^fate-copilot-export-\d{4}-\d{2}-\d{2}\.json$/)
+    })
+
+    it('exported JSON contains characters from the store', async () => {
+      const char: Character = {
+        id: 'c1', name: 'Aragorn', description: '', highConcept: '', trouble: '',
+        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
+        stressPhysical: [], stressMental: [], consequences: [], notes: '',
+      }
+      useCharactersStore().addCharacter(char)
+
+      let capturedBlob: Blob | undefined
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        capturedBlob = blob
+        return 'blob:fake-url'
+      })
+
+      const { exportJSON } = useImportExport()
+      exportJSON()
+
+      const text = await capturedBlob!.text()
+      const parsed = JSON.parse(text)
+      expect(parsed.characters[0].name).toBe('Aragorn')
+    })
+
+    it('exported JSON has formatVersion 1.1', async () => {
+      let capturedBlob: Blob | undefined
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        capturedBlob = blob
+        return 'blob:fake-url'
+      })
+
+      const { exportJSON } = useImportExport()
+      exportJSON()
+
+      const text = await capturedBlob!.text()
+      const parsed = JSON.parse(text)
+      expect(parsed.formatVersion).toBe('1.1')
     })
   })
 })
