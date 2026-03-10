@@ -87,6 +87,7 @@ export interface Character {
   notes: string
   pyramidMaxLevel?: number
   pyramidMaxCols?: number
+  color?: string
 }
 
 export interface Milestone {
@@ -123,9 +124,30 @@ export interface SkillInfo {
   actions: { name: string; note?: string }[]
 }
 
+export interface CharacterColor {
+  id: string
+  label: string
+  primary: string
+  dark: string
+  light: string
+}
+
 // ============================================================
 // Constants
 // ============================================================
+
+export const CHARACTER_COLORS: CharacterColor[] = [
+  { id: 'pfau',        label: 'Pfau',        primary: '#1c9ed6', dark: '#1480b0', light: '#e8f4fb' },
+  { id: 'heidelbeere', label: 'Heidelbeere', primary: '#3F51B5', dark: '#2C3E8C', light: '#E8EAF6' },
+  { id: 'lavendel',    label: 'Lavendel',    primary: '#7986CB', dark: '#5C6BC0', light: '#EDE7F6' },
+  { id: 'weintraube',  label: 'Weintraube',  primary: '#8E24AA', dark: '#6A1B7A', light: '#F3E5F5' },
+  { id: 'tomate',      label: 'Tomate',      primary: '#D50000', dark: '#B71C1C', light: '#FDECEA' },
+  { id: 'flamingo',    label: 'Flamingo',    primary: '#E67C73', dark: '#C0392B', light: '#FCE8E6' },
+  { id: 'mandarine',   label: 'Mandarine',   primary: '#E67A17', dark: '#BF6010', light: '#FEF3E2' },
+  { id: 'banane',      label: 'Banane',      primary: '#C9A84C', dark: '#A07830', light: '#FEF9E3' },
+  { id: 'salbei',      label: 'Salbei',      primary: '#57A05C', dark: '#3D7A41', light: '#EAF5EA' },
+  { id: 'basilikum',   label: 'Basilikum',   primary: '#0B8043', dark: '#076030', light: '#E6F4EC' },
+]
 
 export const SKILL_LEVEL_LABELS: Record<number, string> = {
   1: 'Durchschnittlich',

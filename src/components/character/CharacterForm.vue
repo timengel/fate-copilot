@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import type { Character, Stunt } from '../../types'
+import { CHARACTER_COLORS } from '../../types'
 import AspectFields from './AspectFields.vue'
 import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
@@ -33,11 +34,21 @@ function save() {
   emit('save', JSON.parse(JSON.stringify(form)))
 }
 
+const colorVars = computed(() => {
+  const found = CHARACTER_COLORS.find(c => c.id === (form.color ?? 'pfau'))
+  const c = found ?? CHARACTER_COLORS[0]!
+  return {
+    '--fate-blue': c.primary,
+    '--fate-blue-dark': c.dark,
+    '--fate-blue-light': c.light,
+  }
+})
+
 defineExpose({ save })
 </script>
 
 <template>
-  <div class="character-form character-sheet">
+  <div class="character-form character-sheet" :style="colorVars">
 
     <!-- ALLGEMEINES -->
     <section class="sheet-section allgemeines">
@@ -50,7 +61,22 @@ defineExpose({ save })
           </div>
           <div class="field-row">
             <label class="field-label">Beschreibung</label>
-            <textarea class="field-input field-textarea" v-model="form.description" placeholder="Kurzbeschreibung" rows="2" />
+            <textarea class="field-input field-textarea" v-model="form.description" placeholder="Kurzbeschreibung" />
+          </div>
+          <div class="field-row">
+            <label class="field-label">Farbe</label>
+            <div class="color-picker">
+              <button
+                v-for="c in CHARACTER_COLORS"
+                :key="c.id"
+                class="color-swatch"
+                :class="{ active: (form.color ?? 'pfau') === c.id }"
+                :style="{ background: c.primary }"
+                :title="c.label"
+                type="button"
+                @click="form.color = c.id"
+              />
+            </div>
           </div>
         </div>
         <div class="allgemeines-right">
@@ -100,7 +126,7 @@ defineExpose({ save })
     <div class="sheet-two-col">
       <section class="sheet-section extras">
         <div class="sheet-section-header">EXTRAS</div>
-        <textarea class="text-area-input" v-model="form.extras" placeholder="Extras beschreiben..." rows="6" />
+        <textarea class="text-area-input" v-model="form.extras" placeholder="Extras beschreiben..." />
       </section>
 
       <section class="sheet-section stunts">
@@ -114,11 +140,12 @@ defineExpose({ save })
                 placeholder="Name des Stunts"
                 @input="updateStunt(i, 'name', ($event.target as HTMLInputElement).value)"
               />
-              <input
-                class="stunt-desc-input"
+              <textarea
+                class="stunt-desc-textarea"
                 :value="stunt.description"
                 placeholder="Beschreibung"
-                @input="updateStunt(i, 'description', ($event.target as HTMLInputElement).value)"
+                rows="1"
+                @input="updateStunt(i, 'description', ($event.target as HTMLTextAreaElement).value)"
               />
             </div>
             <FateButton variant="danger" size="S" @click="removeStunt(i)">✕</FateButton>

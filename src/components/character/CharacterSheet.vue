@@ -1,17 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Character } from '../../types'
+import { CHARACTER_COLORS } from '../../types'
 import AspectFields from './AspectFields.vue'
 import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
 import ConsequenceSlots from './ConsequenceSlots.vue'
 
-defineProps<{
+const props = defineProps<{
   character: Character
 }>()
+
+const colorVars = computed(() => {
+  const found = CHARACTER_COLORS.find(c => c.id === (props.character.color ?? 'pfau'))
+  const c = found ?? CHARACTER_COLORS[0]!
+  return {
+    '--fate-blue': c.primary,
+    '--fate-blue-dark': c.dark,
+    '--fate-blue-light': c.light,
+  }
+})
 </script>
 
 <template>
-  <div class="character-sheet">
+  <div class="character-sheet" :style="colorVars">
 
     <!-- ALLGEMEINES -->
     <section class="sheet-section allgemeines">

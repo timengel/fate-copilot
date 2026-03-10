@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { SKILL_LIST } from '../types'
+import { useCharactersStore } from './characters'
 
 export const useSkillsStore = defineStore('skills', () => {
   const skills = ref<string[]>([...SKILL_LIST])
@@ -14,6 +15,14 @@ export const useSkillsStore = defineStore('skills', () => {
 
   function removeSkill(name: string) {
     skills.value = skills.value.filter(s => s !== name)
+
+    const charactersStore = useCharactersStore()
+    for (const character of charactersStore.characters) {
+      const filtered = character.skills.filter(e => e.skill !== name)
+      if (filtered.length !== character.skills.length) {
+        charactersStore.updateCharacter({ ...character, skills: filtered })
+      }
+    }
   }
 
   function replaceAll(incoming: string[]) {

@@ -1,7 +1,30 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useSkillsStore } from './skills'
+import { useCharactersStore } from './characters'
 import { SKILL_LIST } from '../types'
+import type { Character } from '../types'
+
+function makeChar(overrides: Partial<Character> = {}): Character {
+  return {
+    id: 'c1',
+    name: 'Test',
+    description: '',
+    highConcept: '',
+    trouble: '',
+    aspects: ['', '', ''],
+    skills: [],
+    stunts: [],
+    extras: '',
+    refresh: 3,
+    fatePoints: 3,
+    stressPhysical: [],
+    stressMental: [],
+    consequences: [],
+    notes: '',
+    ...overrides,
+  }
+}
 
 describe('useSkillsStore', () => {
   beforeEach(() => {
@@ -50,6 +73,28 @@ describe('useSkillsStore', () => {
     const store = useSkillsStore()
     store.removeSkill('Athletik')
     expect(store.skills).not.toContain('Athletik')
+  })
+
+  it('removes the skill from all characters when deleted', () => {
+    const skillsStore = useSkillsStore()
+    const charactersStore = useCharactersStore()
+    charactersStore.addCharacter(
+      makeChar({ id: 'c1', skills: [{ skill: 'Athletik', level: 2 }, { skill: 'Kämpfen', level: 3 }] }),
+    )
+    skillsStore.removeSkill('Athletik')
+    const character = charactersStore.getById('c1')!
+    expect(character.skills.find(e => e.skill === 'Athletik')).toBeUndefined()
+    expect(character.skills.find(e => e.skill === 'Kämpfen')).toBeDefined()
+  })
+
+  it('does not modify characters that do not have the deleted skill', () => {
+    const skillsStore = useSkillsStore()
+    const charactersStore = useCharactersStore()
+    charactersStore.addCharacter(
+      makeChar({ id: 'c1', skills: [{ skill: 'Kämpfen', level: 3 }] }),
+    )
+    skillsStore.removeSkill('Athletik')
+    expect(charactersStore.getById('c1')!.skills).toHaveLength(1)
   })
 
   it('replaceAll replaces all skills', () => {

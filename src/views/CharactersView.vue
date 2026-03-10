@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
+import { CHARACTER_COLORS } from '../types'
 import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
@@ -14,6 +15,11 @@ const filtered = computed(() =>
     c.highConcept.toLowerCase().includes(search.value.toLowerCase())
   )
 )
+
+function cardHeaderStyle(colorId?: string) {
+  const c = CHARACTER_COLORS.find(c => c.id === (colorId ?? 'pfau')) ?? CHARACTER_COLORS[0]!
+  return { background: c.primary }
+}
 
 function deleteCharacter(id: string, name: string) {
   if (confirm(`Charakter "${name || 'Unbenannt'}" wirklich löschen?`)) {
@@ -47,7 +53,7 @@ function deleteCharacter(id: string, name: string) {
         class="character-card"
         @click="router.push(`/characters/${char.id}`)"
       >
-        <div class="card-header">{{ char.name || '(Unbenannt)' }}</div>
+        <div class="card-header" :style="cardHeaderStyle(char.color)">{{ char.name || '(Unbenannt)' }}</div>
         <div class="card-concept">{{ char.highConcept || '—' }}</div>
         <div class="card-trouble" v-if="char.trouble">
           <em>{{ char.trouble }}</em>
