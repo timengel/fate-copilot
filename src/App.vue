@@ -2,12 +2,16 @@
 import { ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import ImportExportBar from './components/shared/ImportExportBar.vue'
+import FateToggle from './components/shared/FateToggle.vue'
 import { initPersistence } from './composables/usePersistence'
+import { useGMModeStore } from './stores/gmMode'
 
 initPersistence()
 
 const navOpen = ref(false)
 const router = useRouter()
+const gmModeStore = useGMModeStore()
+
 watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
 </script>
 
@@ -39,6 +43,10 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
           </div>
           <ImportExportBar />
         </div>
+
+        <div class="nav-gm-toggle">
+          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" />
+        </div>
       </nav>
     </header>
 
@@ -49,3 +57,12 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
     </div>
   </div>
 </template>
+
+<style>
+.nav-gm-toggle {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+</style>

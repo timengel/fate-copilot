@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useCharactersStore } from '../stores/characters'
+import { useGMModeStore } from '../stores/gmMode'
 import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
 import FateButton from '../components/shared/FateButton.vue'
@@ -22,6 +23,7 @@ const route = useRoute()
 const router = useRouter()
 const campaignsStore = useCampaignsStore()
 const charactersStore = useCharactersStore()
+const gmModeStore = useGMModeStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
@@ -154,6 +156,11 @@ function updateMilestone(milestone: Milestone) {
             <p>{{ campaign.notes }}</p>
           </div>
 
+          <div v-if="gmModeStore.isGMMode && campaign.gmNotes" class="campaign-gm-notes">
+            <strong>GM-Notizen:</strong>
+            <p>{{ campaign.gmNotes }}</p>
+          </div>
+
           <!-- MEILENSTEINE -->
           <section class="sheet-section">
             <div class="sheet-section-header">MEILENSTEINE</div>
@@ -184,15 +191,17 @@ function updateMilestone(milestone: Milestone) {
                   <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
                 </div>
 
-                <div class="char-group-header">Nicht-Spieler-Charaktere (NSC)</div>
-                <div v-if="nscCharacters.length === 0" class="empty-text">Keine NSC zugeordnet.</div>
-                <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
-                  <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                    <strong>{{ char.name || '(Unbenannt)' }}</strong>
-                    <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                <template v-if="gmModeStore.isGMMode">
+                  <div class="char-group-header">Nicht-Spieler-Charaktere (NSC)</div>
+                  <div v-if="nscCharacters.length === 0" class="empty-text">Keine NSC zugeordnet.</div>
+                  <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
+                    <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
+                      <strong>{{ char.name || '(Unbenannt)' }}</strong>
+                      <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                    </div>
+                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
                   </div>
-                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
-                </div>
+                </template>
               </template>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">
@@ -203,7 +212,7 @@ function updateMilestone(milestone: Milestone) {
                       {{ c.name || '(Unbenannt)' }}
                     </option>
                   </optgroup>
-                  <optgroup v-if="availableNsc.length > 0" label="Nicht-Spieler-Charaktere (NSC)">
+                  <optgroup v-if="gmModeStore.isGMMode && availableNsc.length > 0" label="Nicht-Spieler-Charaktere (NSC)">
                     <option v-for="c in availableNsc" :key="c.id" :value="c.id">
                       {{ c.name || '(Unbenannt)' }}
                     </option>
@@ -275,6 +284,14 @@ function updateMilestone(milestone: Milestone) {
 .campaign-notes {
   background: #fffbea;
   border-left: 3px solid #f0c040;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.campaign-gm-notes {
+  background: #f0f4ff;
+  border-left: 3px solid var(--fate-blue);
   padding: 0.5rem 0.75rem;
   margin-bottom: 1rem;
   font-size: 0.875rem;

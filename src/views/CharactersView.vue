@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
+import { useGMModeStore } from '../stores/gmMode'
 import type { CharacterType } from '../types'
 import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
@@ -11,6 +12,7 @@ import { useConfirmDialog } from '../composables/useConfirmDialog'
 const router = useRouter()
 const route = useRoute()
 const store = useCharactersStore()
+const gmModeStore = useGMModeStore()
 const search = ref('')
 const { confirmDialog, showConfirmDialog } = useConfirmDialog()
 
@@ -22,6 +24,10 @@ function setTab(tab: CharacterType) {
   router.replace({ query: tab === 'sc' ? {} : { tab } })
   search.value = ''
 }
+
+watch(() => gmModeStore.isGMMode, (val) => {
+  if (!val && activeTab.value === 'nsc') setTab('sc')
+})
 
 const filtered = computed(() =>
   store.characters.filter(c => {
@@ -65,6 +71,7 @@ function deleteCharacter(id: string, name: string) {
         @click="setTab('sc')"
       >Spielercharaktere (SC)</button>
       <button
+        v-if="gmModeStore.isGMMode"
         class="tab-btn"
         :class="{ 'tab-btn--active': activeTab === 'nsc' }"
         @click="setTab('nsc')"
@@ -82,6 +89,7 @@ function deleteCharacter(id: string, name: string) {
       {{ tabTotal === 0
         ? `Noch keine ${activeTab === 'sc' ? 'Spielercharaktere' : 'NSCs'} vorhanden.`
         : 'Keine Treffer gefunden.' }}
+      <span v-if="!gmModeStore.isGMMode && tabTotal === 0 && activeTab === 'sc'" class="empty-hint">NSCs sind im Spieler-Modus ausgeblendet.</span>
     </div>
 
     <div v-else class="card-grid">

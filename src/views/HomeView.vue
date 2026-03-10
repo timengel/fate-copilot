@@ -3,11 +3,13 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
+import { useGMModeStore } from '../stores/gmMode'
 import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
 const charactersStore = useCharactersStore()
 const campaignsStore = useCampaignsStore()
+const gmModeStore = useGMModeStore()
 
 const recentSc = computed(() =>
   charactersStore.characters.filter(c => (c.type ?? 'sc') === 'sc').slice(-3).reverse()
@@ -15,7 +17,7 @@ const recentSc = computed(() =>
 const recentNsc = computed(() =>
   charactersStore.characters.filter(c => c.type === 'nsc').slice(-3).reverse()
 )
-const hasCharacters = computed(() => recentSc.value.length > 0 || recentNsc.value.length > 0)
+const hasCharacters = computed(() => recentSc.value.length > 0 || (gmModeStore.isGMMode && recentNsc.value.length > 0))
 const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4))
 </script>
 
@@ -66,15 +68,17 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
               <span class="item-meta">{{ char.highConcept || '—' }}</span>
             </li>
           </ul>
-          <div class="char-group-label">NSC</div>
-          <div v-if="recentNsc.length === 0" class="empty-state empty-state--small">Keine Nicht-Spieler-Charaktere.</div>
-          <ul v-else class="home-list">
-            <li v-for="char in recentNsc" :key="char.id"
-                class="home-list-item" @click="router.push(`/characters/${char.id}`)">
-              <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
-              <span class="item-meta">{{ char.highConcept || '—' }}</span>
-            </li>
-          </ul>
+          <template v-if="gmModeStore.isGMMode">
+            <div class="char-group-label">NSC</div>
+            <div v-if="recentNsc.length === 0" class="empty-state empty-state--small">Keine Nicht-Spieler-Charaktere.</div>
+            <ul v-else class="home-list">
+              <li v-for="char in recentNsc" :key="char.id"
+                  class="home-list-item" @click="router.push(`/characters/${char.id}`)">
+                <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
+                <span class="item-meta">{{ char.highConcept || '—' }}</span>
+              </li>
+            </ul>
+          </template>
         </template>
         <FateButton variant="link" @click="router.push('/characters')">Alle Charaktere ansehen →</FateButton>
       </section>

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Character } from '../../types'
 import { CHARACTER_COLORS } from '../../types'
+import { useGMModeStore } from '../../stores/gmMode'
 import AspectFields from './AspectFields.vue'
 import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
@@ -10,6 +11,12 @@ import ConsequenceSlots from './ConsequenceSlots.vue'
 const props = defineProps<{
   character: Character
 }>()
+
+const gmModeStore = useGMModeStore()
+
+const isNscHidden = computed(() =>
+  !gmModeStore.isGMMode && props.character.type === 'nsc'
+)
 
 const colorVars = computed(() => {
   const found = CHARACTER_COLORS.find(c => c.id === (props.character.color ?? 'pfau'))
@@ -25,99 +32,122 @@ const colorVars = computed(() => {
 <template>
   <div class="character-sheet" :style="colorVars">
 
-    <!-- ALLGEMEINES -->
-    <section class="sheet-section allgemeines">
-      <div class="sheet-section-header">ALLGEMEINES</div>
-      <div class="allgemeines-grid">
-        <div class="allgemeines-left">
-          <div class="field-row">
-            <label class="field-label">Name</label>
-            <span class="field-value">{{ character.name || '—' }}</span>
-          </div>
-          <div class="field-row">
-            <label class="field-label">Beschreibung</label>
-            <span class="field-value field-description">{{ character.description || '—' }}</span>
-          </div>
-        </div>
-        <div class="allgemeines-right">
-          <div class="field-row">
-            <label class="field-label">Erholungsrate</label>
-            <span class="field-value refresh-value">{{ character.refresh }}</span>
-          </div>
-          <div class="field-row">
-            <label class="field-label">Fate-Punkte</label>
-            <span class="field-value fate-points">{{ character.fatePoints }}</span>
-          </div>
-          <div class="fate-logo-corner">
-            <span class="fate-logo-plus">+</span>FATE
-            <div class="fate-logo-sub">CORE SYSTEM</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ASPEKTE / FERTIGKEITEN -->
-    <div class="sheet-two-col">
-      <section class="sheet-section aspekte">
-        <div class="sheet-section-header">ASPEKTE</div>
-        <AspectFields
-          :highConcept="character.highConcept"
-          :trouble="character.trouble"
-          :aspects="character.aspects"
-          :readonly="true"
-        />
-      </section>
-
-      <section class="sheet-section fertigkeiten">
-        <div class="sheet-section-header">FERTIGKEITEN</div>
-        <SkillPyramid
-          :skills="character.skills"
-          :maxLevel="character.pyramidMaxLevel ?? 5"
-          :maxCols="character.pyramidMaxCols ?? 5"
-          :readonly="true"
-        />
-      </section>
-    </div>
-
-    <!-- EXTRAS / STUNTS -->
-    <div class="sheet-two-col">
-      <section class="sheet-section extras">
-        <div class="sheet-section-header">EXTRAS</div>
-        <div class="text-area-display">{{ character.extras || '' }}</div>
-      </section>
-
-      <section class="sheet-section stunts">
-        <div class="sheet-section-header">STUNTS</div>
-        <div class="stunts-list">
-          <div v-for="(stunt, i) in character.stunts" :key="i" class="stunt-item">
-            <strong>{{ stunt.name }}</strong>
-            <span v-if="stunt.description">: {{ stunt.description }}</span>
-          </div>
-          <div v-if="character.stunts.length === 0" class="empty-text"></div>
+    <!-- NSC in Player View: show only name + High Concept -->
+    <template v-if="isNscHidden">
+      <section class="sheet-section allgemeines">
+        <div class="sheet-section-header">NSC</div>
+        <div class="nsc-hidden-body">
+          <div class="nsc-hidden-name">{{ character.name || '(Unbenannt)' }}</div>
+          <div v-if="character.highConcept" class="nsc-hidden-concept">{{ character.highConcept }}</div>
+          <div class="nsc-hidden-label">Details sind im GM-Modus sichtbar.</div>
         </div>
       </section>
-    </div>
+    </template>
 
-    <!-- STRESS / KONSEQUENZEN -->
-    <div class="sheet-bottom">
-      <div class="stress-section">
-        <StressTrack
-          label="KÖRPERLICHER STRESS (KRAFT)"
-          :boxes="character.stressPhysical"
-          :readonly="true"
-        />
-        <StressTrack
-          label="GEISTIGER STRESS (WILLE)"
-          :boxes="character.stressMental"
-          :readonly="true"
-        />
+    <!-- Full sheet (GM Mode or SC) -->
+    <template v-else>
+
+      <!-- ALLGEMEINES -->
+      <section class="sheet-section allgemeines">
+        <div class="sheet-section-header">ALLGEMEINES</div>
+        <div class="allgemeines-grid">
+          <div class="allgemeines-left">
+            <div class="field-row">
+              <label class="field-label">Name</label>
+              <span class="field-value">{{ character.name || '—' }}</span>
+            </div>
+            <div class="field-row">
+              <label class="field-label">Beschreibung</label>
+              <span class="field-value field-description">{{ character.description || '—' }}</span>
+            </div>
+          </div>
+          <div class="allgemeines-right">
+            <div class="field-row">
+              <label class="field-label">Erholungsrate</label>
+              <span class="field-value refresh-value">{{ character.refresh }}</span>
+            </div>
+            <div class="field-row">
+              <label class="field-label">Fate-Punkte</label>
+              <span class="field-value fate-points">{{ character.fatePoints }}</span>
+            </div>
+            <div class="fate-logo-corner">
+              <span class="fate-logo-plus">+</span>FATE
+              <div class="fate-logo-sub">CORE SYSTEM</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ASPEKTE / FERTIGKEITEN -->
+      <div class="sheet-two-col">
+        <section class="sheet-section aspekte">
+          <div class="sheet-section-header">ASPEKTE</div>
+          <AspectFields
+            :highConcept="character.highConcept"
+            :trouble="character.trouble"
+            :aspects="character.aspects"
+            :readonly="true"
+          />
+        </section>
+
+        <section class="sheet-section fertigkeiten">
+          <div class="sheet-section-header">FERTIGKEITEN</div>
+          <SkillPyramid
+            :skills="character.skills"
+            :maxLevel="character.pyramidMaxLevel ?? 5"
+            :maxCols="character.pyramidMaxCols ?? 5"
+            :readonly="true"
+          />
+        </section>
       </div>
 
-      <section class="sheet-section konsequenzen">
-        <div class="sheet-section-header">KONSEQUENZEN</div>
-        <ConsequenceSlots :consequences="character.consequences" :readonly="true" />
+      <!-- EXTRAS / STUNTS -->
+      <div class="sheet-two-col">
+        <section class="sheet-section extras">
+          <div class="sheet-section-header">EXTRAS</div>
+          <div class="text-area-display">{{ character.extras || '' }}</div>
+        </section>
+
+        <section class="sheet-section stunts">
+          <div class="sheet-section-header">STUNTS</div>
+          <div class="stunts-list">
+            <div v-for="(stunt, i) in character.stunts" :key="i" class="stunt-item">
+              <strong>{{ stunt.name }}</strong>
+              <span v-if="stunt.description">: {{ stunt.description }}</span>
+            </div>
+            <div v-if="character.stunts.length === 0" class="empty-text"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- STRESS / KONSEQUENZEN -->
+      <div class="sheet-bottom">
+        <div class="stress-section">
+          <StressTrack
+            label="KÖRPERLICHER STRESS (KRAFT)"
+            :boxes="character.stressPhysical"
+            :readonly="true"
+          />
+          <StressTrack
+            label="GEISTIGER STRESS (WILLE)"
+            :boxes="character.stressMental"
+            :readonly="true"
+          />
+        </div>
+
+        <section class="sheet-section konsequenzen">
+          <div class="sheet-section-header">KONSEQUENZEN</div>
+          <ConsequenceSlots :consequences="character.consequences" :readonly="true" />
+        </section>
+      </div>
+
+      <!-- GM-NOTIZEN (nur im GM-Modus) -->
+      <section v-if="gmModeStore.isGMMode && character.gmNotes" class="sheet-section gm-notes-section">
+        <div class="sheet-section-header">GM-NOTIZEN</div>
+        <div class="text-area-display gm-notes-display">{{ character.gmNotes }}</div>
       </section>
-    </div>
+
+    </template>
 
   </div>
 </template>
@@ -288,5 +318,38 @@ const colorVars = computed(() => {
     align-items: flex-start;
     min-width: 0;
   }
+}
+
+/* NSC hidden in Player View */
+.nsc-hidden-body {
+  padding: 0.75rem;
+}
+
+.nsc-hidden-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--fate-text);
+  margin-bottom: 0.25rem;
+}
+
+.nsc-hidden-concept {
+  font-size: 0.875rem;
+  color: var(--fate-text-light);
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.nsc-hidden-label {
+  font-size: 0.75rem;
+  color: var(--fate-text-muted);
+}
+
+/* GM notes section */
+.gm-notes-section {
+  background: #f0f4ff;
+}
+
+.gm-notes-display {
+  background: transparent;
 }
 </style>

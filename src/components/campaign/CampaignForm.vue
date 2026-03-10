@@ -49,6 +49,11 @@ function save() {
       <textarea class="form-control" v-model="form.notes" placeholder="Kampagnennotizen" rows="4" />
     </div>
 
+    <div class="form-group">
+      <label class="form-label">GM-Notizen</label>
+      <textarea class="form-control" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" rows="4" />
+    </div>
+
     <div class="form-actions">
       <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
       <FateButton @click="save">Speichern</FateButton>

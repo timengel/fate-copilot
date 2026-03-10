@@ -230,6 +230,12 @@ defineExpose({ save })
       </section>
     </div>
 
+    <!-- GM-NOTIZEN -->
+    <section class="sheet-section gm-notes-section">
+      <div class="sheet-section-header">GM-NOTIZEN</div>
+      <textarea class="text-area-input" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" />
+    </section>
+
     <!-- FORM ACTIONS -->
     <div v-if="!hideActions" class="form-actions">
       <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>

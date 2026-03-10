@@ -88,6 +88,7 @@ export interface Character {
   stressMental: StressBox[]
   consequences: Consequence[]
   notes: string
+  gmNotes?: string
   pyramidMaxLevel?: number
   pyramidMaxCols?: number
   color?: string
@@ -105,6 +106,7 @@ export interface Campaign {
   description: string
   status: CampaignStatus
   notes: string
+  gmNotes?: string
   color?: string
   milestones: Milestone[]
 }
