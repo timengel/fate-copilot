@@ -21,7 +21,7 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
     <header class="app-header">
       <nav class="app-nav">
         <RouterLink to="/" class="nav-logo">
-          <span class="fate-plus">+</span>FATE
+          <span class="fate-plus">FATE+</span>
         </RouterLink>
 
         <button

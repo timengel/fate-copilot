@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { createPinia, setActivePinia } from 'pinia'
-import CharacterForm from './CharacterForm.vue'
+import CharacterSheet from './CharacterSheet.vue'
 import { createDefaultCharacter } from '../../composables/useCharacterDefaults'
 import type { Character, Consequence } from '../../types'
 
 function renderForm(character?: Character, extraProps: Record<string, unknown> = {}) {
   const pinia = createPinia()
   setActivePinia(pinia)
-  return render(CharacterForm, {
-    props: { character: character ?? createDefaultCharacter(), ...extraProps },
+  return render(CharacterSheet, {
+    props: { character: character ?? createDefaultCharacter(), mode: 'edit', ...extraProps },
     global: {
       plugins: [pinia],
       stubs: { SkillPyramid: true },
@@ -17,7 +17,7 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   })
 }
 
-describe('CharacterForm', () => {
+describe('CharacterSheet (edit mode)', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
   })
@@ -64,7 +64,7 @@ describe('CharacterForm', () => {
   it('updates the name input when the character prop changes', async () => {
     const char = createDefaultCharacter()
     const { rerender, container } = renderForm(char)
-    await rerender({ character: { ...char, name: 'Updated Name' } })
+    await rerender({ character: { ...char, name: 'Updated Name' }, mode: 'edit' })
     const nameInput = container.querySelector<HTMLInputElement>('input[placeholder="Charaktername"]')!
     expect(nameInput.value).toBe('Updated Name')
   })

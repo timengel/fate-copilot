@@ -25,10 +25,9 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
   <div class="home-view">
     <div class="home-header">
       <div class="fate-logo">
-        <span class="fate-plus">+</span>FATE
+        FATE+
       </div>
-      <h1>Fate Copilot</h1>
-      <p class="subtitle">Digitale Charakterverwaltung für Fate Core</p>
+      <h1>Digitaler Copilot für Fate Core</h1>
     </div>
 
     <div class="home-grid">
@@ -104,21 +103,11 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
   line-height: 1;
 }
 
-.fate-logo .fate-plus {
-  color: var(--fate-blue);
-}
-
 .home-header h1 {
   font-size: 1.25rem;
   color: var(--fate-text-light);
   font-weight: 400;
   margin-top: 0.25rem;
-}
-
-.subtitle {
-  color: var(--fate-text-light);
-  font-size: 0.9rem;
-  margin: 0;
 }
 
 .home-grid {

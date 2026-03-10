@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
-import CharacterForm from '../components/character/CharacterForm.vue'
 import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Character, CharacterType } from '../types'
@@ -116,8 +115,9 @@ function unassignFromCampaign(campaignId: string) {
         </div>
       </div>
 
-      <CharacterForm
+      <CharacterSheet
         v-if="isEditing"
+        mode="edit"
         :key="character.id"
         :character="character"
         @save="handleSave"

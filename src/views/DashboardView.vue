@@ -5,7 +5,6 @@ import { useCharactersStore } from '../stores/characters'
 import { useGMModeStore } from '../stores/gmMode'
 import { useToastStore } from '../stores/toast'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
-import CharacterForm from '../components/character/CharacterForm.vue'
 import FateButton from '../components/shared/FateButton.vue'
 import type { Character } from '../types'
 
@@ -16,7 +15,7 @@ const toastStore = useToastStore()
 
 const sidebarCollapsed = ref(false)
 const editingId = ref<string | null>(null)
-const formRef = ref<InstanceType<typeof CharacterForm>[]>([])
+const formRef = ref<InstanceType<typeof CharacterSheet>[]>([])
 const selectedCampaignId = ref<string | null>(null)
 const showSC = ref(true)
 const showNSC = ref(true)
@@ -204,9 +203,10 @@ onUnmounted(() => {
     </div>
     <div v-else class="dashboard-stack">
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
-        <CharacterForm
+        <CharacterSheet
           v-if="editingId === character.id"
           ref="formRef"
+          mode="edit"
           :character="character"
           :hideActions="true"
           @save="handleSave"
