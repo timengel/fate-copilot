@@ -152,8 +152,8 @@ function removeCol() {
   display: flex;
   gap: 0.25rem;
   align-items: baseline;
-  min-width: 130px;
-  flex-shrink: 0;
+  flex: 0 0 130px;
+  overflow: hidden;
 }
 
 .level-plus {

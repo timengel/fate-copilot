@@ -23,6 +23,7 @@ const props = defineProps<{
     stunts?: boolean
     stress?: boolean
     konsequenzen?: boolean
+    gmNotes?: boolean
   }
 }>()
 
@@ -349,7 +350,7 @@ defineExpose({ save })
       </div>
 
       <!-- GM-NOTIZEN -->
-      <section v-if="gmModeStore.isGMMode && (isEditing || data.gmNotes)" class="sheet-section gm-notes-section">
+      <section v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)" class="sheet-section gm-notes-section">
         <div class="sheet-section-header">GM-NOTIZEN</div>
         <textarea v-if="isEditing" class="text-area-input" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" />
         <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>

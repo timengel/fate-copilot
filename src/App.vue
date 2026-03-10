@@ -45,7 +45,7 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
           <ImportExportBar />
         </div>
 
-        <div class="nav-gm-toggle">
+        <div class="nav-gm-toggle" :class="{ 'gm-active': gmModeStore.isGMMode }">
           <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" />
         </div>
       </nav>
@@ -66,5 +66,12 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 6px;
   flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-gm-toggle.gm-active {
+  background: rgba(220, 38, 38, 0.25);
+  border-color: #dc2626;
+  box-shadow: 0 0 0 1px #dc2626;
 }
 </style>

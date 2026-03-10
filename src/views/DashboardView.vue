@@ -28,6 +28,7 @@ const visibleSections = reactive({
   stunts: true,
   stress: true,
   konsequenzen: true,
+  gmNotes: true,
 })
 
 watchEffect(() => {
@@ -130,6 +131,10 @@ onUnmounted(() => {
             <input type="checkbox" v-model="visibleSections.konsequenzen" />
             Konsequenzen
           </label>
+          <label class="filter-label" v-if="gmModeStore.isGMMode">
+            <input type="checkbox" v-model="visibleSections.gmNotes" />
+            GM-Notizen
+          </label>
         </div>
       </div>
     </aside>
@@ -188,6 +193,10 @@ onUnmounted(() => {
         <label class="filter-label">
           <input type="checkbox" v-model="visibleSections.konsequenzen" />
           Konsequenzen
+        </label>
+        <label class="filter-label" v-if="gmModeStore.isGMMode">
+          <input type="checkbox" v-model="visibleSections.gmNotes" />
+          GM-Notizen
         </label>
       </div>
     </div>
