@@ -19,6 +19,7 @@ const formRef = ref<InstanceType<typeof CharacterSheet>[]>([])
 const selectedCampaignId = ref<string | null>(null)
 const showSC = ref(true)
 const showNSC = ref(true)
+const showEditButton = ref(true)
 
 const visibleSections = reactive({
   allgemeines: true,
@@ -136,6 +137,14 @@ onUnmounted(() => {
             GM-Notizen
           </label>
         </div>
+
+        <div class="sidebar-group">
+          <div class="sidebar-group-label">Aktionen</div>
+          <label class="filter-label">
+            <input type="checkbox" v-model="showEditButton" />
+            Bearbeiten
+          </label>
+        </div>
       </div>
     </aside>
 
@@ -198,6 +207,10 @@ onUnmounted(() => {
           <input type="checkbox" v-model="visibleSections.gmNotes" />
           GM-Notizen
         </label>
+        <label class="filter-label">
+          <input type="checkbox" v-model="showEditButton" />
+          Bearbeiten
+        </label>
       </div>
     </div>
 
@@ -222,7 +235,7 @@ onUnmounted(() => {
           @cancel="editingId = null"
         />
         <CharacterSheet v-else :character="character" :sections="visibleSections" />
-        <div class="dashboard-entry-toolbar">
+        <div v-if="editingId === character.id || showEditButton" class="dashboard-entry-toolbar">
           <template v-if="editingId === character.id">
             <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>
             <FateButton variant="primary" size="S" @click="saveEditing">Speichern</FateButton>
