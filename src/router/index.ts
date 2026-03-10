@@ -19,6 +19,7 @@ const router = createRouter({
     { path: '/campaigns', component: CampaignsView },
     { path: '/campaigns/new', component: CampaignDetailView, props: { isNew: true } },
     { path: '/campaigns/:id', component: CampaignDetailView },
+    { path: '/campaigns/:id/edit', component: CampaignDetailView, props: { editMode: true } },
     { path: '/skills', component: SkillsView },
   ],
 })

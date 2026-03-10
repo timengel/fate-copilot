@@ -81,4 +81,43 @@ describe('initPersistence', () => {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
     expect(saved.formatVersion).toBe('1.1')
   })
+
+  it('persists character color through save/load cycle', async () => {
+    initPersistence()
+    useCharactersStore().addCharacter({ ...baseChar, id: 'c2', color: 'tomate' })
+    await nextTick()
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
+    expect(saved.characters[0].color).toBe('tomate')
+  })
+
+  it('loads character color from localStorage correctly', () => {
+    setStorage({
+      formatVersion: '1.1',
+      exportDate: '',
+      characters: [{ ...baseChar, color: 'salbei' }],
+      campaigns: [],
+      campaignCharacterAssignments: [],
+      skills: [...SKILL_LIST],
+    })
+    initPersistence()
+    expect(useCharactersStore().characters[0].color).toBe('salbei')
+  })
+
+  it('character without color field does not corrupt other characters color on reload', () => {
+    setStorage({
+      formatVersion: '1.1',
+      exportDate: '',
+      characters: [
+        { ...baseChar, id: 'c1', color: 'mandarine' },
+        { ...baseChar, id: 'c2' },
+      ],
+      campaigns: [],
+      campaignCharacterAssignments: [],
+      skills: [...SKILL_LIST],
+    })
+    initPersistence()
+    const store = useCharactersStore()
+    expect(store.getById('c1')?.color).toBe('mandarine')
+    expect(store.getById('c2')?.color).toBeUndefined()
+  })
 })

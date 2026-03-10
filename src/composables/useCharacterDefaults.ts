@@ -1,12 +1,13 @@
-import type { Character, Consequence } from '../types'
+import type { Character, CharacterType, Consequence } from '../types'
 
 function generateId(): string {
   return crypto.randomUUID()
 }
 
-export function createDefaultCharacter(): Character {
+export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
   return {
     id: generateId(),
+    type,
     name: '',
     description: '',
     highConcept: '',
@@ -36,6 +37,7 @@ export function createDefaultCharacter(): Character {
       { severity: 8, label: 'extreme', value: '' },
     ] as Consequence[],
     notes: '',
+    color: 'pfau',
   }
 }
 

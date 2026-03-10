@@ -10,6 +10,7 @@ import type { Campaign, CampaignStatus, Milestone } from '../types'
 
 const props = defineProps<{
   isNew?: boolean
+  editMode?: boolean
 }>()
 
 const route = useRoute()
@@ -18,7 +19,7 @@ const campaignsStore = useCampaignsStore()
 const charactersStore = useCharactersStore()
 
 const id = computed(() => route.params.id as string)
-const isEditing = ref(props.isNew || false)
+const isEditing = ref(props.isNew || props.editMode || false)
 
 const campaign = computed(() => {
   if (props.isNew) {

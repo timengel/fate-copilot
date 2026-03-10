@@ -44,6 +44,8 @@ export type SkillLevel = number
 
 export type AppDataVersion = '1.0' | '1.1'
 
+export type CharacterType = 'sc' | 'nsc'
+
 // ============================================================
 // Interfaces
 // ============================================================
@@ -71,6 +73,7 @@ export interface Consequence {
 
 export interface Character {
   id: string
+  type?: CharacterType
   name: string
   description: string
   highConcept: string

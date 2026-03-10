@@ -268,7 +268,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
-  max-width: 640px;
+  margin: 0 auto;
 }
 
 .skills-list-box {

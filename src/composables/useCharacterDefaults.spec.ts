@@ -48,6 +48,10 @@ describe('createDefaultCharacter', () => {
   it('returns 3 empty aspect slots', () => {
     expect(createDefaultCharacter().aspects).toEqual(['', '', ''])
   })
+
+  it("returns default color 'pfau'", () => {
+    expect(createDefaultCharacter().color).toBe('pfau')
+  })
 })
 
 describe('generateId', () => {

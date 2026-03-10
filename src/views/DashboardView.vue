@@ -44,15 +44,6 @@ function saveEditing() {
     </div>
     <div v-else class="dashboard-stack">
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
-        <div class="dashboard-entry-toolbar">
-          <template v-if="editingId === character.id">
-            <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>
-            <FateButton variant="primary" size="S" @click="saveEditing">Speichern</FateButton>
-          </template>
-          <template v-else>
-            <FateButton icon="edit" variant="secondary" size="S" @click="editingId = character.id">Bearbeiten</FateButton>
-          </template>
-        </div>
         <CharacterForm
           v-if="editingId === character.id"
           ref="formRef"
@@ -62,6 +53,15 @@ function saveEditing() {
           @cancel="editingId = null"
         />
         <CharacterSheet v-else :character="character" />
+        <div class="dashboard-entry-toolbar">
+          <template v-if="editingId === character.id">
+            <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>
+            <FateButton variant="primary" size="S" @click="saveEditing">Speichern</FateButton>
+          </template>
+          <template v-else>
+            <FateButton icon="edit" variant="secondary" size="S" @click="editingId = character.id">Bearbeiten</FateButton>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -93,7 +93,7 @@ function saveEditing() {
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   min-height: 2.75rem;
-  border-bottom: 1px solid var(--fate-border);
+  border-top: 1px solid var(--fate-border);
   background: var(--fate-blue-light);
 }
 

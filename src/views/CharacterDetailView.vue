@@ -6,7 +6,7 @@ import { useCampaignsStore } from '../stores/campaigns'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
 import CharacterForm from '../components/character/CharacterForm.vue'
 import FateButton from '../components/shared/FateButton.vue'
-import type { Character } from '../types'
+import type { Character, CharacterType } from '../types'
 import { createDefaultCharacter } from '../composables/useCharacterDefaults'
 
 const props = defineProps<{
@@ -23,8 +23,18 @@ const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
 
 const character = computed(() => {
-  if (props.isNew) return createDefaultCharacter()
+  if (props.isNew) {
+    const type = (route.query.type as CharacterType) ?? 'sc'
+    return createDefaultCharacter(type)
+  }
   return charactersStore.getById(id.value)
+})
+
+const backPath = computed(() => {
+  if (props.isNew) {
+    return route.query.type === 'nsc' ? '/characters?tab=nsc' : '/characters'
+  }
+  return (character.value?.type ?? 'sc') === 'nsc' ? '/characters?tab=nsc' : '/characters'
 })
 
 const characterCampaigns = computed(() =>
@@ -49,7 +59,7 @@ function handleSave(updated: Character) {
 
 function handleCancel() {
   if (props.isNew) {
-    router.push('/characters')
+    router.push(backPath.value)
   } else {
     isEditing.value = false
   }
@@ -63,7 +73,7 @@ function deleteCharacter() {
   if (!character.value) return
   if (confirm(`Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`)) {
     charactersStore.deleteCharacter(character.value.id)
-    router.push('/characters')
+    router.push(backPath.value)
   }
 }
 
@@ -82,12 +92,12 @@ function unassignFromCampaign(campaignId: string) {
   <div class="detail-view">
     <div v-if="!character && !isNew" class="not-found">
       Charakter nicht gefunden.
-      <FateButton variant="link" @click="router.push('/characters')">← Zurück</FateButton>
+      <FateButton variant="link" @click="router.push(backPath)">← Zurück</FateButton>
     </div>
 
     <template v-else-if="character">
       <div class="detail-toolbar">
-        <FateButton variant="link" @click="router.push('/characters')">← Charaktere</FateButton>
+        <FateButton variant="link" @click="router.push(backPath)">← Charaktere</FateButton>
         <div class="toolbar-actions">
           <template v-if="!isNew">
             <FateButton v-if="!isEditing" icon="edit" @click="toggleEdit">Bearbeiten</FateButton>
@@ -98,6 +108,7 @@ function unassignFromCampaign(campaignId: string) {
 
       <CharacterForm
         v-if="isEditing"
+        :key="character.id"
         :character="character"
         @save="handleSave"
         @cancel="handleCancel"

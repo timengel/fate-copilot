@@ -113,9 +113,9 @@ function removeCol() {
     </div>
     <div v-if="!readonly" class="pyramid-actions">
       <FateButton variant="secondary" size="S" :disabled="effectiveMaxLevel <= 1" @click="removeRow">− Zeile</FateButton>
-      <FateButton variant="add" size="S" :disabled="!canAddRow" @click="addRow">+ Zeile</FateButton>
+      <FateButton variant="secondary" size="S" class="btn-flavor" :disabled="!canAddRow" @click="addRow">+ Zeile</FateButton>
       <FateButton variant="secondary" size="S" :disabled="effectiveCols <= 1" @click="removeCol">− Spalte</FateButton>
-      <FateButton variant="add" size="S" @click="addCol">+ Spalte</FateButton>
+      <FateButton variant="secondary" size="S" class="btn-flavor" @click="addCol">+ Spalte</FateButton>
     </div>
   </div>
 </template>
@@ -125,8 +125,18 @@ function removeCol() {
   padding: 0.5rem 0.75rem;
 }
 
+.btn-flavor {
+  background: var(--fate-blue) !important;
+  color: white !important;
+}
+.btn-flavor:hover {
+  background: var(--fate-blue-dark) !important;
+}
+
 .pyramid-actions {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
   padding: 0.5rem 0 0.25rem;
 }

@@ -1,19 +1,38 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
 import { CHARACTER_COLORS } from '../types'
+import type { CharacterType } from '../types'
 import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
+const route = useRoute()
 const store = useCharactersStore()
 const search = ref('')
 
+const activeTab = computed<CharacterType>(() =>
+  route.query.tab === 'nsc' ? 'nsc' : 'sc'
+)
+
+function setTab(tab: CharacterType) {
+  router.replace({ query: tab === 'sc' ? {} : { tab } })
+  search.value = ''
+}
+
 const filtered = computed(() =>
-  store.characters.filter(c =>
-    c.name.toLowerCase().includes(search.value.toLowerCase()) ||
-    c.highConcept.toLowerCase().includes(search.value.toLowerCase())
-  )
+  store.characters.filter(c => {
+    const type = c.type ?? 'sc'
+    return (
+      type === activeTab.value &&
+      (c.name.toLowerCase().includes(search.value.toLowerCase()) ||
+        c.highConcept.toLowerCase().includes(search.value.toLowerCase()))
+    )
+  })
+)
+
+const tabTotal = computed(() =>
+  store.characters.filter(c => (c.type ?? 'sc') === activeTab.value).length
 )
 
 function cardHeaderStyle(colorId?: string) {
@@ -32,7 +51,20 @@ function deleteCharacter(id: string, name: string) {
   <div class="list-view">
     <div class="list-header">
       <h1>Charaktere</h1>
-      <FateButton @click="router.push('/characters/new')">+ Neuer Charakter</FateButton>
+      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)">+ Neuer Charakter</FateButton>
+    </div>
+
+    <div class="tab-bar">
+      <button
+        class="tab-btn"
+        :class="{ 'tab-btn--active': activeTab === 'sc' }"
+        @click="setTab('sc')"
+      >Spielercharaktere (SC)</button>
+      <button
+        class="tab-btn"
+        :class="{ 'tab-btn--active': activeTab === 'nsc' }"
+        @click="setTab('nsc')"
+      >Nicht-Spieler-Charaktere (NSC)</button>
     </div>
 
     <input
@@ -43,7 +75,9 @@ function deleteCharacter(id: string, name: string) {
     />
 
     <div v-if="filtered.length === 0" class="empty-state">
-      {{ store.characters.length === 0 ? 'Noch keine Charaktere vorhanden.' : 'Keine Treffer gefunden.' }}
+      {{ tabTotal === 0
+        ? `Noch keine ${activeTab === 'sc' ? 'Spielercharaktere' : 'NSCs'} vorhanden.`
+        : 'Keine Treffer gefunden.' }}
     </div>
 
     <div v-else class="card-grid">
@@ -123,5 +157,37 @@ function deleteCharacter(id: string, name: string) {
   margin-bottom: 1rem;
   color: var(--fate-text);
   background: white;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--fate-border);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -2px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--fate-text-light);
+  cursor: pointer;
+  box-shadow: none;
+  transition: color 0.15s, border-bottom-color 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--fate-blue);
+}
+
+.tab-btn--active {
+  color: var(--fate-blue);
+  border-bottom-color: var(--fate-blue);
+  font-weight: 700;
 }
 </style>

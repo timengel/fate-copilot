@@ -66,12 +66,12 @@ describe('MilestoneTimeline', () => {
       expect(onAdd).not.toHaveBeenCalled()
     })
 
-    it('calls onRemove with the milestone id when ✕ is clicked', async () => {
+    it('calls onRemove with the last milestone id when ✕ is clicked', async () => {
       const onRemove = vi.fn()
       const { container } = renderTimeline({ milestones, readonly: false, onRemove })
       const removeBtn = container.querySelector<HTMLButtonElement>('.milestone-remove')!
       await fireEvent.click(removeBtn)
-      expect(onRemove).toHaveBeenCalledWith('m1')
+      expect(onRemove).toHaveBeenCalledWith('m2')
     })
 
     it('switches to edit mode when ✎ is clicked', async () => {
