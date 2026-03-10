@@ -237,37 +237,13 @@ button {
   background: #a93226;
 }
 
-/* SIZE CLASSES – only control padding, font-size, and --btn-size (for counter) */
-.fate-btn--XS {
-  padding: 0.1rem 0.3rem;
-  font-size: 0.7rem;
-  --btn-size: 20px;
-}
-.fate-btn--S {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  --btn-size: 24px;
-}
-.fate-btn--M {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  --btn-size: 32px;
-}
-.fate-btn--L {
-  padding: 0.65rem 1.25rem;
-  font-size: 1rem;
-  --btn-size: 40px;
-}
-.fate-btn--XL {
-  padding: 0.85rem 1.6rem;
-  font-size: 1.1rem;
-  --btn-size: 48px;
-}
-.fate-btn--XXL {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  --btn-size: 56px;
-}
+/* SIZE CLASSES – control padding, font-size, height and --btn-size */
+.fate-btn--XS  { padding: 0 0.3rem;  font-size: 0.7rem;   --btn-size: 20px; height: var(--btn-size); }
+.fate-btn--S   { padding: 0 0.6rem;  font-size: 0.8rem;   --btn-size: 24px; height: var(--btn-size); }
+.fate-btn--M   { padding: 0 1rem;    font-size: 0.875rem; --btn-size: 32px; height: var(--btn-size); }
+.fate-btn--L   { padding: 0 1.25rem; font-size: 1rem;     --btn-size: 40px; height: var(--btn-size); }
+.fate-btn--XL  { padding: 0 1.6rem;  font-size: 1.1rem;   --btn-size: 48px; height: var(--btn-size); }
+.fate-btn--XXL { padding: 0 2rem;    font-size: 1.2rem;   --btn-size: 56px; height: var(--btn-size); }
 
 .fate-btn--icon-only {
   padding: 0;
@@ -916,7 +892,7 @@ button {
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
-  max-width: 480px;
+  max-width: 640px;
 }
 
 .skills-list-box {
@@ -928,8 +904,12 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 0.75rem;
+  padding: 0.65rem 1rem;
   border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.skill-manage-row:hover {
+  background: var(--fate-blue-light);
 }
 
 .skill-manage-actions {
@@ -1038,7 +1018,8 @@ button {
 }
 
 .skill-manage-name {
-  font-size: 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: var(--fate-text);
 }
 
