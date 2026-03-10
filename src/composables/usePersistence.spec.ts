@@ -63,7 +63,7 @@ describe('initPersistence', () => {
       campaignCharacterAssignments: [],
     })
     initPersistence()
-    expect(useCampaignsStore().campaigns[0].milestones).toEqual([])
+    expect(useCampaignsStore().campaigns[0]!.milestones).toEqual([])
   })
 
   it('saves to localStorage when a store changes', async () => {

@@ -61,7 +61,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     const index = campaigns.value.findIndex(c => c.id === campaignId)
     if (index !== -1) {
       const c = campaigns.value[index]
-      campaigns.value[index] = { ...c, milestones: [...(c.milestones ?? []), milestone] }
+      campaigns.value[index] = { ...c, milestones: [...c.milestones, milestone] }
     }
   }
 
@@ -69,7 +69,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     const index = campaigns.value.findIndex(c => c.id === campaignId)
     if (index !== -1) {
       const c = campaigns.value[index]
-      campaigns.value[index] = { ...c, milestones: (c.milestones ?? []).filter(m => m.id !== milestoneId) }
+      campaigns.value[index] = { ...c, milestones: c.milestones.filter(m => m.id !== milestoneId) }
     }
   }
 
@@ -79,7 +79,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
       const c = campaigns.value[index]
       campaigns.value[index] = {
         ...c,
-        milestones: (c.milestones ?? []).map(m => m.id === updated.id ? updated : m),
+        milestones: c.milestones.map(m => m.id === updated.id ? updated : m),
       }
     }
   }

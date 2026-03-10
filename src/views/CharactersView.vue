@@ -2,16 +2,17 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
-import { CHARACTER_COLORS } from '../types'
 import type { CharacterType } from '../types'
 import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
+import { getColorVars } from '../composables/useColorVars'
+import { useConfirmDialog } from '../composables/useConfirmDialog'
 
 const router = useRouter()
 const route = useRoute()
 const store = useCharactersStore()
 const search = ref('')
-const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
+const { confirmDialog, showConfirmDialog } = useConfirmDialog()
 
 const activeTab = computed<CharacterType>(() =>
   route.query.tab === 'nsc' ? 'nsc' : 'sc'
@@ -38,16 +39,15 @@ const tabTotal = computed(() =>
 )
 
 function cardHeaderStyle(colorId?: string) {
-  const c = CHARACTER_COLORS.find(c => c.id === (colorId ?? 'pfau')) ?? CHARACTER_COLORS[0]!
-  return { background: c.primary }
+  return { background: getColorVars(colorId)['--fate-blue'] }
 }
 
 function deleteCharacter(id: string, name: string) {
-  confirmDialog.value = {
-    title: 'Charakter löschen',
-    message: `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,
-    onConfirm: () => store.deleteCharacter(id),
-  }
+  showConfirmDialog(
+    'Charakter löschen',
+    `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,
+    () => store.deleteCharacter(id),
+  )
 }
 </script>
 

@@ -7,8 +7,11 @@ import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
 import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import type { Campaign, CampaignStatus, Milestone } from '../types'
-import { CHARACTER_COLORS } from '../types'
+import type { Campaign, Milestone } from '../types'
+import { CAMPAIGN_STATUS_LABEL } from '../types'
+import { getColorVars } from '../composables/useColorVars'
+import { useConfirmDialog } from '../composables/useConfirmDialog'
+import { createDefaultCampaign } from '../composables/useCharacterDefaults'
 
 const props = defineProps<{
   isNew?: boolean
@@ -22,23 +25,12 @@ const charactersStore = useCharactersStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
-const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
+const { confirmDialog, showConfirmDialog } = useConfirmDialog()
 
-const colorVars = computed(() => {
-  const c = CHARACTER_COLORS.find(c => c.id === campaign.value?.color) ?? CHARACTER_COLORS[0]!
-  return { '--fate-blue': c.primary, '--fate-blue-dark': c.dark, '--fate-blue-light': c.light }
-})
+const colorVars = computed(() => getColorVars(campaign.value?.color))
 
 const campaign = computed(() => {
-  if (props.isNew) {
-    return {
-      id: crypto.randomUUID(),
-      name: '',
-      description: '',
-      status: 'active' as const,
-      notes: '',
-    }
-  }
+  if (props.isNew) return createDefaultCampaign()
   return campaignsStore.getById(id.value)
 })
 
@@ -65,12 +57,6 @@ const availableNsc = computed(() =>
   availableCharacters.value.filter(c => c.type === 'nsc')
 )
 
-const STATUS_LABEL: Record<CampaignStatus, string> = {
-  active: 'Aktiv',
-  inactive: 'Inaktiv',
-  completed: 'Abgeschlossen',
-}
-
 function handleSave(updated: Campaign) {
   if (props.isNew) {
     campaignsStore.addCampaign(updated)
@@ -91,14 +77,14 @@ function handleCancel() {
 
 function deleteCampaign() {
   if (!campaign.value) return
-  confirmDialog.value = {
-    title: 'Kampagne löschen',
-    message: `Kampagne "${campaign.value.name}" wirklich löschen?`,
-    onConfirm: () => {
+  showConfirmDialog(
+    'Kampagne löschen',
+    `Kampagne "${campaign.value.name}" wirklich löschen?`,
+    () => {
       campaignsStore.deleteCampaign(campaign.value!.id)
       router.push('/campaigns')
     },
-  }
+  )
 }
 
 function assignCharacter(characterId: string) {
@@ -157,7 +143,7 @@ function updateMilestone(milestone: Milestone) {
           <div class="campaign-detail-header">
             <h1>{{ campaign.name }}</h1>
             <span class="badge" :class="`status-${campaign.status}`">
-              {{ STATUS_LABEL[campaign.status] }}
+              {{ CAMPAIGN_STATUS_LABEL[campaign.status] }}
             </span>
           </div>
 
@@ -172,7 +158,7 @@ function updateMilestone(milestone: Milestone) {
           <section class="sheet-section">
             <div class="sheet-section-header">MEILENSTEINE</div>
             <MilestoneTimeline
-              :milestones="campaign.milestones ?? []"
+              :milestones="campaign.milestones"
               @add="addMilestone"
               @remove="removeMilestone"
               @update="updateMilestone"

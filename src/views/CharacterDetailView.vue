@@ -9,6 +9,7 @@ import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Character, CharacterType } from '../types'
 import { createDefaultCharacter } from '../composables/useCharacterDefaults'
+import { useConfirmDialog } from '../composables/useConfirmDialog'
 
 const props = defineProps<{
   isNew?: boolean
@@ -22,7 +23,7 @@ const campaignsStore = useCampaignsStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
-const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
+const { confirmDialog, showConfirmDialog } = useConfirmDialog()
 
 const character = computed(() => {
   if (props.isNew) {
@@ -73,14 +74,14 @@ function toggleEdit() {
 
 function deleteCharacter() {
   if (!character.value) return
-  confirmDialog.value = {
-    title: 'Charakter löschen',
-    message: `Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`,
-    onConfirm: () => {
+  showConfirmDialog(
+    'Charakter löschen',
+    `Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`,
+    () => {
       charactersStore.deleteCharacter(character.value!.id)
       router.push(backPath.value)
     },
-  }
+  )
 }
 
 function assignToCampaign(campaignId: string) {

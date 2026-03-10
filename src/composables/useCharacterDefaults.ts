@@ -1,4 +1,4 @@
-import type { Character, CharacterType, Consequence } from '../types'
+import type { Campaign, Character, CharacterType, Consequence } from '../types'
 
 function generateId(): string {
   return crypto.randomUUID()
@@ -53,6 +53,17 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
   }
 }
 
+export function createDefaultCampaign(): Campaign {
+  return {
+    id: generateId(),
+    name: '',
+    description: '',
+    status: 'active',
+    notes: '',
+    milestones: [],
+  }
+}
+
 export function useCharacterDefaults() {
-  return { createDefaultCharacter, generateId }
+  return { createDefaultCharacter, createDefaultCampaign, generateId }
 }

@@ -106,7 +106,7 @@ export interface Campaign {
   status: CampaignStatus
   notes: string
   color?: string
-  milestones?: Milestone[]
+  milestones: Milestone[]
 }
 
 export interface CampaignCharacterAssignment {
@@ -139,6 +139,12 @@ export interface CharacterColor {
 // ============================================================
 // Constants
 // ============================================================
+
+export const CAMPAIGN_STATUS_LABEL: Record<CampaignStatus, string> = {
+  active: 'Aktiv',
+  inactive: 'Inaktiv',
+  completed: 'Abgeschlossen',
+}
 
 export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'pfau',        label: 'Pfau',        primary: '#1c9ed6', dark: '#1480b0', light: '#e8f4fb' },

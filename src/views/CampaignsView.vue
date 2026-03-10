@@ -1,33 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
 import FateButton from '../components/shared/FateButton.vue'
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import type { Campaign, CampaignStatus } from '../types'
-import { CHARACTER_COLORS } from '../types'
-
-function colorVarsFor(campaign: Campaign) {
-  const c = CHARACTER_COLORS.find(c => c.id === campaign.color) ?? CHARACTER_COLORS[0]!
-  return { '--fate-blue': c.primary, '--fate-blue-dark': c.dark, '--fate-blue-light': c.light }
-}
+import { CAMPAIGN_STATUS_LABEL } from '../types'
+import { getColorVars } from '../composables/useColorVars'
+import { useConfirmDialog } from '../composables/useConfirmDialog'
 
 const router = useRouter()
 const store = useCampaignsStore()
-const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
-
-const STATUS_LABEL: Record<CampaignStatus, string> = {
-  active: 'Aktiv',
-  inactive: 'Inaktiv',
-  completed: 'Abgeschlossen',
-}
+const { confirmDialog, showConfirmDialog } = useConfirmDialog()
 
 function deleteCampaign(id: string, name: string) {
-  confirmDialog.value = {
-    title: 'Kampagne löschen',
-    message: `Kampagne "${name}" wirklich löschen?`,
-    onConfirm: () => store.deleteCampaign(id),
-  }
+  showConfirmDialog(
+    'Kampagne löschen',
+    `Kampagne "${name}" wirklich löschen?`,
+    () => store.deleteCampaign(id),
+  )
 }
 </script>
 
@@ -47,12 +36,12 @@ function deleteCampaign(id: string, name: string) {
         v-for="campaign in store.campaigns"
         :key="campaign.id"
         class="campaign-card"
-        :style="colorVarsFor(campaign)"
+        :style="getColorVars(campaign.color)"
         @click="router.push(`/campaigns/${campaign.id}`)"
       >
         <div class="card-header">{{ campaign.name }}</div>
         <div class="card-status" :class="`status-${campaign.status}`">
-          {{ STATUS_LABEL[campaign.status] }}
+          {{ CAMPAIGN_STATUS_LABEL[campaign.status] }}
         </div>
         <div class="card-description" v-if="campaign.description">{{ campaign.description }}</div>
         <div class="card-meta">
