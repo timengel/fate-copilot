@@ -30,12 +30,15 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
       { value: 3, checked: false },
       { value: 4, checked: false },
     ],
-    consequences: [
-      { severity: 2, label: 'mild', value: '' },
-      { severity: 4, label: 'moderate', value: '' },
-      { severity: 6, label: 'severe', value: '' },
-      { severity: 8, label: 'extreme', value: '' },
-    ] as Consequence[],
+    consequences: (type === 'nsc'
+      ? [{ severity: 2, label: 'mild', value: '' }]
+      : [
+          { severity: 2, label: 'mild', value: '' },
+          { severity: 4, label: 'moderate', value: '' },
+          { severity: 6, label: 'severe', value: '' },
+          { severity: 8, label: 'extreme', value: '' },
+        ]
+    ) as Consequence[],
     notes: '',
     color: 'pfau',
   }

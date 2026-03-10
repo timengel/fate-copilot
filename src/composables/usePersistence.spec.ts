@@ -40,7 +40,7 @@ describe('initPersistence', () => {
       skills: [...SKILL_LIST],
     })
     initPersistence()
-    expect(useCharactersStore().characters[0].name).toBe('Alice')
+    expect(useCharactersStore().characters[0]!.name).toBe('Alice')
   })
 
   it('does not throw with empty localStorage', () => {
@@ -101,7 +101,7 @@ describe('initPersistence', () => {
       skills: [...SKILL_LIST],
     })
     initPersistence()
-    expect(useCharactersStore().characters[0].color).toBe('salbei')
+    expect(useCharactersStore().characters[0]!.color).toBe('salbei')
   })
 
   it('character without color field does not corrupt other characters color on reload', () => {

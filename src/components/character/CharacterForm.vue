@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue'
-import type { Character, Stunt } from '../../types'
+import { computed, reactive, ref, watch } from 'vue'
+import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types'
 import { CHARACTER_COLORS } from '../../types'
 import ColorPicker from '../shared/ColorPicker.vue'
 import AspectFields from './AspectFields.vue'
@@ -8,6 +8,7 @@ import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
 import ConsequenceSlots from './ConsequenceSlots.vue'
 import FateButton from '../shared/FateButton.vue'
+import FateCounter from '../shared/FateCounter.vue'
 
 const props = defineProps<{ character: Character; hideActions?: boolean }>()
 const emit = defineEmits<{ save: [character: Character]; cancel: [] }>()
@@ -33,6 +34,43 @@ function updateStunt(index: number, field: keyof Stunt, value: string) {
 
 function save() {
   emit('save', JSON.parse(JSON.stringify(form)))
+}
+
+// NSC: collapsible sections
+const showExtras = ref(form.type !== 'nsc' || !!form.extras?.trim())
+const showStunts = ref(form.type !== 'nsc' || form.stunts.length > 0)
+
+// NSC: consequence configuration
+const CONSEQUENCE_TYPES: { label: string; severity: ConsequenceSeverity; labelKey: ConsequenceLabel }[] = [
+  { label: 'Leicht',  severity: 2, labelKey: 'mild' },
+  { label: 'Mittel',  severity: 4, labelKey: 'moderate' },
+  { label: 'Schwer',  severity: 6, labelKey: 'severe' },
+  { label: 'Extrem',  severity: 8, labelKey: 'extreme' },
+]
+
+function countConsequences(severity: ConsequenceSeverity) {
+  return form.consequences.filter(c => c.severity === severity).length
+}
+
+function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: ConsequenceLabel) {
+  const idx = form.consequences.map(c => c.severity).lastIndexOf(severity)
+  form.consequences.splice(idx === -1 ? form.consequences.length : idx + 1, 0, { severity, label: labelKey, value: '' })
+}
+
+function removeConsequenceSlot(severity: ConsequenceSeverity) {
+  const idx = form.consequences.map(c => c.severity).lastIndexOf(severity)
+  if (idx !== -1) form.consequences.splice(idx, 1)
+}
+
+function addStressBox(track: 'physical' | 'mental') {
+  const arr = track === 'physical' ? form.stressPhysical : form.stressMental
+  const nextValue = arr.length > 0 ? arr[arr.length - 1]!.value + 1 : 1
+  arr.push({ value: nextValue, checked: false })
+}
+
+function removeStressBox(track: 'physical' | 'mental') {
+  const arr = track === 'physical' ? form.stressPhysical : form.stressMental
+  if (arr.length > 0) arr.pop()
 }
 
 const colorVars = computed(() => {
@@ -76,11 +114,7 @@ defineExpose({ save })
           </div>
           <div class="field-row">
             <label class="field-label">Fate-Punkte</label>
-            <div class="fate-points-ctrl">
-              <FateButton variant="counter" @click="form.fatePoints = Math.max(0, form.fatePoints - 1)">−</FateButton>
-              <span class="fate-points">{{ form.fatePoints }}</span>
-              <FateButton variant="counter" @click="form.fatePoints++">+</FateButton>
-            </div>
+            <FateCounter v-model="form.fatePoints" />
           </div>
         </div>
       </div>
@@ -115,13 +149,21 @@ defineExpose({ save })
     <!-- EXTRAS / STUNTS -->
     <div class="sheet-two-col">
       <section class="sheet-section extras">
-        <div class="sheet-section-header">EXTRAS</div>
-        <textarea class="text-area-input" v-model="form.extras" placeholder="Extras beschreiben..." />
+        <div class="sheet-section-header" :class="{ 'section-header-toggle': form.type === 'nsc' }" @click="form.type === 'nsc' && (showExtras = !showExtras)">
+          EXTRAS
+          <span v-if="form.type === 'nsc'" class="section-toggle">{{ showExtras ? '▼' : '▶' }}</span>
+        </div>
+        <div v-show="showExtras">
+          <textarea class="text-area-input" v-model="form.extras" placeholder="Extras beschreiben..." />
+        </div>
       </section>
 
       <section class="sheet-section stunts">
-        <div class="sheet-section-header">STUNTS</div>
-        <div class="stunts-list">
+        <div class="sheet-section-header" :class="{ 'section-header-toggle': form.type === 'nsc' }" @click="form.type === 'nsc' && (showStunts = !showStunts)">
+          STUNTS
+          <span v-if="form.type === 'nsc'" class="section-toggle">{{ showStunts ? '▼' : '▶' }}</span>
+        </div>
+        <div v-show="showStunts" class="stunts-list">
           <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
             <div class="stunt-edit-fields">
               <input
@@ -148,20 +190,39 @@ defineExpose({ save })
     <!-- STRESS / KONSEQUENZEN -->
     <div class="sheet-bottom">
       <div class="stress-section">
-        <StressTrack
-          label="KÖRPERLICHER STRESS (KRAFT)"
-          :boxes="form.stressPhysical"
-          @update="form.stressPhysical = $event"
-        />
-        <StressTrack
-          label="GEISTIGER STRESS (WILLE)"
-          :boxes="form.stressMental"
-          @update="form.stressMental = $event"
-        />
+        <div class="stress-track-row">
+          <StressTrack
+            label="KÖRPERLICHER STRESS (KRAFT)"
+            :boxes="form.stressPhysical"
+            @update="form.stressPhysical = $event"
+          />
+          <div class="stress-track-controls">
+            <button type="button" class="stress-ctrl-btn" :disabled="form.stressPhysical.length === 0" @click="removeStressBox('physical')">−</button>
+            <button type="button" class="stress-ctrl-btn" :disabled="form.stressPhysical.length >= 6" @click="addStressBox('physical')">+</button>
+          </div>
+        </div>
+        <div class="stress-track-row">
+          <StressTrack
+            label="GEISTIGER STRESS (WILLE)"
+            :boxes="form.stressMental"
+            @update="form.stressMental = $event"
+          />
+          <div class="stress-track-controls">
+            <button type="button" class="stress-ctrl-btn" :disabled="form.stressMental.length === 0" @click="removeStressBox('mental')">−</button>
+            <button type="button" class="stress-ctrl-btn" :disabled="form.stressMental.length >= 6" @click="addStressBox('mental')">+</button>
+          </div>
+        </div>
       </div>
 
       <section class="sheet-section konsequenzen">
         <div class="sheet-section-header">KONSEQUENZEN</div>
+        <div v-if="form.type === 'nsc'" class="consequence-config">
+          <span v-for="ct in CONSEQUENCE_TYPES" :key="ct.severity" class="consequence-config-item">
+            <button type="button" class="consequence-config-btn" :disabled="countConsequences(ct.severity) === 0" @click="removeConsequenceSlot(ct.severity)">−</button>
+            <span class="consequence-config-label">{{ ct.label }} ({{ countConsequences(ct.severity) }})</span>
+            <button type="button" class="consequence-config-btn" @click="addConsequenceSlot(ct.severity, ct.labelKey)">+</button>
+          </span>
+        </div>
         <ConsequenceSlots
           :consequences="form.consequences"
           @update="form.consequences = $event"
@@ -251,19 +312,6 @@ defineExpose({ save })
   text-align: center;
 }
 
-.fate-points {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--fate-blue);
-  text-align: center;
-  min-width: 40px;
-}
-
-.fate-points-ctrl {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 /* TWO-COLUMN LAYOUT (Aspekte | Fertigkeiten, Extras | Stunts) */
 .sheet-two-col {
@@ -367,6 +415,117 @@ defineExpose({ save })
   flex-direction: column;
   gap: 0.75rem;
   min-width: 220px;
+}
+
+/* SECTION TOGGLE (NSC) */
+.sheet-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-header-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header-toggle:hover .section-toggle {
+  color: #fff;
+}
+
+.section-toggle {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1;
+}
+
+/* STRESS TRACK CONTROLS */
+.stress-track-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.stress-track-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  padding-bottom: 2px;
+}
+
+.stress-ctrl-btn {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--fate-border);
+  border-radius: 3px;
+  background: white;
+  color: var(--fate-text);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stress-ctrl-btn:hover:not(:disabled) {
+  border-color: var(--fate-blue);
+  color: var(--fate-blue);
+}
+
+.stress-ctrl-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* CONSEQUENCE CONFIG (NSC) */
+.consequence-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.consequence-config-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.consequence-config-btn {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--fate-border);
+  border-radius: 3px;
+  background: white;
+  color: var(--fate-text);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consequence-config-btn:hover:not(:disabled) {
+  border-color: var(--fate-blue);
+  color: var(--fate-blue);
+}
+
+.consequence-config-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.consequence-config-label {
+  font-size: 0.7rem;
+  color: var(--fate-text-light);
+  min-width: 70px;
+  text-align: center;
 }
 
 /* FORM ACTIONS */
