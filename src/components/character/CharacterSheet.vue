@@ -402,13 +402,13 @@ defineExpose({ save })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 0.75rem;
-  background: var(--fate-blue);
+  padding: 0.6rem 0.75rem;
+  background: var(--fate-blue-dark);
   gap: 0.5rem;
 }
 
 .character-name-text {
-  font-size: 0.875rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: white;
   white-space: nowrap;
