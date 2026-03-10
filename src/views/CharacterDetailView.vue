@@ -90,7 +90,7 @@ function unassignFromCampaign(campaignId: string) {
         <FateButton variant="link" @click="router.push('/characters')">← Charaktere</FateButton>
         <div class="toolbar-actions">
           <template v-if="!isNew">
-            <FateButton v-if="!isEditing" @click="toggleEdit">Bearbeiten</FateButton>
+            <FateButton v-if="!isEditing" icon="edit" @click="toggleEdit">Bearbeiten</FateButton>
             <FateButton variant="danger-outline" @click="deleteCharacter">Löschen</FateButton>
           </template>
         </div>
@@ -117,7 +117,7 @@ function unassignFromCampaign(campaignId: string) {
               <span class="assignment-name" @click="router.push(`/campaigns/${campaign.id}`)">
                 {{ campaign.name }}
               </span>
-              <FateButton variant="danger" size="sm" @click="unassignFromCampaign(campaign.id)">Entfernen</FateButton>
+              <FateButton variant="danger" size="S" @click="unassignFromCampaign(campaign.id)">Entfernen</FateButton>
             </div>
 
             <div v-if="availableCampaigns.length > 0" class="assign-row">

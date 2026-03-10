@@ -2,42 +2,42 @@
 
 ## Fate Regeln
 
-Verlasse dich nicht ausschließlich auf dein Trainingswissen. Nutze Thinking-Models und Deep Research! Studiere die folgenden Quellen online (priorisiert):
+Verlasse dich nicht ausschließlich auf dein Trainingswissen. Nutze Thinking-Models und Deep Research! Studiere das folgende File, wenn es um Fate Regeln und Mechaniken geht: [Fate Regeln](./FATE.md)
 
-1. [Fate Core SRD](https://fate-srd.com/fate-core) = Primäre Referenz für alle Regeln und Mechaniken, z.B. Aspekte, Fertigkeiten, Stunts, Extras, Konsequenzen, die vier Aktionen (Überwinden, Vorteil erschaffen, Angreifen, Verteidigen), etc.
-2. [Toolkits](#toolkits) = Erweiterungen/Varianten, Inspiration- und Modulbaukästen. Nutze sie immer, wenn das Thema passt, und markiere Regeln/Varianten sauber als "Toolkit-Option", wenn sie über Core hinausgehen.
-3. [Book of Hanz](https://bookofhanz.com/) = Design-/Spielphilosophie (Leitlinie, z.B. für besseres Spielgefühl, aber nicht “Regelüberschreibung”)
+# Tech Stack & Projektkonventionen
 
-# Toolkits
+## Package Manager
 
-## Fate System Toolkit
+- Nutze **pnpm** (`pnpm install`, `pnpm add`, `pnpm run dev`, etc.)
 
-Wenn du Infos nicht im Core Regelwerk finden kannst
-ODER Regelmechaniken über Core hinaus nötig sind
-ODER wenn es um Waffen, Rüstungen, Artefakte oder besondere Gegenstände geht
-ODER wenn es um Magie, Psionik, oder andere erweiterte Systeme/Fertigkeiten geht:
-—> [Fate System Toolkit](https://fate-srd.com/fate-system-toolkit)
+## Dev-Server & Build
 
-## Fate Adversary Toolkit
+- Dev: `pnpm run dev`
+- Build: `pnpm run build`
+- Preview: `pnpm run preview`
 
-Wenn es um Gegner, Hindernisse, Fallen, Constraints, oppositionelle Elemente geht:
-—> [Fate Adversary Toolkit](https://fate-srd.com/fate-adversary-toolkit)
+## Tech Stack
 
-## Fate Space Toolkit
+- **Vue 3** mit `<script setup lang="ts">` (Composition API mit script setup, kein Options API)
+- **TypeScript** — alle neuen Dateien als `.ts` / `.vue` mit TypeScript
+- **Pinia** für State Management
+- **Vue Router** für Routing
+- **Vite** als Build-Tool (Config: `vite.config.ts`)
+- Globales CSS in `src/style.css` (kein SCSS, keine CSS Modules)
 
-Wenn es um den Weltraum (Space) geht, z.B. Spaceships, Space Travel, Space Combat:
-—> [Fate Space Toolkit](https://fate-srd.com/fate-space-toolkit/introduction)
+## Tests
 
-## Fate Horror Toolkit
+- Test-Framework: **Vitest** mit **happy-dom** Environment
+- Komponenten-Tests: **@testing-library/vue** + **@vue/test-utils**
+- Testdateien: `*.spec.ts`, direkt neben der zu testenden Datei (z.B. `FateButton.spec.ts` neben `FateButton.vue`)
+- Tests ausführen: `pnpm run test` (watch) oder `pnpm run test:run` (einmalig)
+- Pinia in Tests: `setActivePinia(createPinia())` im `beforeEach`
+- Vitest globals sind aktiviert (`globals: true`) — kein Import von `vi`, `describe`, `it`, `expect` nötig (außer für Typen)
 
-Wenn es um Horror-Elemente wie Angst, Eskalation, unheimliche Gegner, Methoden zur Reduktion der Spieler-Sicherheit, etc. geht:
-—> [Fate Horror Toolkit](https://fate-srd.com/fate-horror-toolkit)
+## Komponenten-Konventionen
 
-# Wichtige Fate Regelbausteine
-
-- [Aspekte](https://fate-srd.com/fate-core/aspects-fate-points) (Situationsaspekte/Charakteraspekte), Boosts, freie Einsätze
-- [Fertigkeiten](https://fate-srd.com/fate-core/skills-stunts) (siehe [Standard Fertigkeiten Liste](https://fate-srd.com/fate-core/default-skill-list))
-- [Aktionen](https://fate-srd.com/fate-core/actions-outcomes): Überwinden, Vorteil erschaffen, Angreifen, Verteidigen
-- [Stress & Konsequenzen](https://fate-srd.com/fate-core/stress-consequences) (falls Konflikt/Schaden)
-- [Stunts](https://fate-srd.com/fate-core/skills-stunts)
-- [Extras](https://fate-srd.com/fate-core/extras) (falls Sonderregeln nötig)
+- Shared/wiederverwendbare Komponenten: `src/components/shared/`
+  - Z.B. Buttons über `FateButton.vue` mit `variant`-Prop (statt nativen `<button>` direkt stylen)
+- Charakter-Komponenten: `src/components/character/`
+- Kampagnen-Komponenten: `src/components/campaign/`
+- Geteilte Typen zentral in `src/types/`

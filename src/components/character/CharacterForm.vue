@@ -88,7 +88,10 @@ defineExpose({ save })
         <div class="sheet-section-header">FERTIGKEITEN</div>
         <SkillPyramid
           :skills="form.skills"
+          :maxLevel="form.pyramidMaxLevel ?? 5"
+          :maxCols="form.pyramidMaxCols ?? 5"
           @update="form.skills = $event"
+          @updateLayout="(p) => { form.pyramidMaxLevel = p.maxLevel; form.pyramidMaxCols = p.maxCols }"
         />
       </section>
     </div>
@@ -118,7 +121,7 @@ defineExpose({ save })
                 @input="updateStunt(i, 'description', ($event.target as HTMLInputElement).value)"
               />
             </div>
-            <FateButton variant="danger" size="sm" @click="removeStunt(i)">✕</FateButton>
+            <FateButton variant="danger" size="S" @click="removeStunt(i)">✕</FateButton>
           </div>
           <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
         </div>

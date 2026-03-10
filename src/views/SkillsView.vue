@@ -208,10 +208,11 @@ const selectedInfo = computed<SkillInfo | null>(() =>
             <FateButton
               v-if="SKILL_INFO[skill]"
               variant="info"
+              size="S"
               :title="`Info zu ${skill}`"
               @click="infoSkill = skill"
             >ℹ</FateButton>
-            <FateButton variant="danger" size="sm" @click="store.removeSkill(skill)">✕</FateButton>
+            <FateButton variant="danger" size="S" @click="store.removeSkill(skill)">✕</FateButton>
           </div>
         </div>
         <div v-if="store.skills.length === 0" class="empty-state">

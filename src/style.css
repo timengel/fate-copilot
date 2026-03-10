@@ -15,7 +15,7 @@
   --fate-red: #c0392b;
   --fate-green: #27ae60;
 
-  font-family: 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Segoe UI", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: var(--fate-text);
@@ -25,21 +25,30 @@
   -webkit-font-smoothing: antialiased;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   background-color: var(--fate-bg);
 }
 
 #app {
-  min-height: 100vh;
+  height: 100%;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 0;
   font-weight: 700;
   color: var(--fate-text);
@@ -57,16 +66,16 @@ a {
 #app-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
 }
 
 .app-header {
   background-color: var(--fate-blue);
   color: white;
   padding: 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  position: sticky;
-  top: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+  flex-shrink: 0;
   z-index: 100;
   container-type: inline-size;
   container-name: header;
@@ -94,7 +103,8 @@ a {
   gap: 1px;
 }
 
-.fate-plus, .fate-logo-plus {
+.fate-plus,
+.fate-logo-plus {
   color: white;
   font-weight: 900;
 }
@@ -105,7 +115,7 @@ a {
 }
 
 .nav-link {
-  color: rgba(255,255,255,0.9) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
@@ -115,12 +125,18 @@ a {
 
 .nav-link:hover,
 .nav-link.router-link-active {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: white !important;
 }
 
-.app-main {
+.app-scroll-area {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.app-main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.5rem;
@@ -143,7 +159,7 @@ a {
   background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(28,158,214,0.08);
+  box-shadow: 0 1px 4px rgba(28, 158, 214, 0.08);
   overflow: hidden;
 }
 
@@ -176,87 +192,126 @@ button {
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: background 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    opacity 0.15s,
+    box-shadow 0.15s;
   line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
 }
 
 .fate-btn--primary {
   background: var(--fate-blue);
   color: white;
-  padding: 0.5rem 1rem;
 }
-.fate-btn--primary:hover { background: var(--fate-blue-dark); }
+.fate-btn--primary:hover {
+  background: #3ab5e4;
+}
 
 .fate-btn--secondary {
   background: #e0e8ed;
   color: var(--fate-text);
-  padding: 0.5rem 1rem;
 }
-.fate-btn--secondary:hover { background: #c8d8e0; }
+.fate-btn--secondary:hover {
+  background: #c8d8e0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
 
 .fate-btn--danger-outline {
-  background: transparent;
+  background: #fde8e6;
   color: var(--fate-red);
-  border: 1px solid var(--fate-red);
-  padding: 0.5rem 1rem;
 }
-.fate-btn--danger-outline:hover { background: #fde8e6; }
+.fate-btn--danger-outline:hover {
+  background: #f9c8c3;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
 
 .fate-btn--danger {
   background: var(--fate-red);
   color: white;
-  padding: 0.5rem 1rem;
 }
-.fate-btn--danger:hover { background: #a93226; }
+.fate-btn--danger:hover {
+  background: #a93226;
+}
 
-.fate-btn--sm {
+/* SIZE CLASSES – only control padding, font-size, and --btn-size (for counter) */
+.fate-btn--XS {
+  padding: 0.1rem 0.3rem;
+  font-size: 0.7rem;
+  --btn-size: 20px;
+}
+.fate-btn--S {
   padding: 0.25rem 0.6rem;
   font-size: 0.8rem;
-  background: #e0e8ed;
-  color: var(--fate-text);
+  --btn-size: 24px;
 }
-.fate-btn--sm:hover { background: #c8d8e0; }
-.fate-btn--sm.fate-btn--danger { background: var(--fate-red); color: white; padding: 0.25rem 0.6rem; }
-.fate-btn--sm.fate-btn--danger:hover { background: #a93226; }
-.fate-btn--sm.fate-btn--primary { padding: 0.25rem 0.6rem; }
+.fate-btn--M {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  --btn-size: 32px;
+}
+.fate-btn--L {
+  padding: 0.65rem 1.25rem;
+  font-size: 1rem;
+  --btn-size: 40px;
+}
+.fate-btn--XL {
+  padding: 0.85rem 1.6rem;
+  font-size: 1.1rem;
+  --btn-size: 48px;
+}
+.fate-btn--XXL {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  --btn-size: 56px;
+}
+
+.fate-btn--icon-only {
+  padding: 0;
+  width: var(--btn-size, 32px);
+  height: var(--btn-size, 32px);
+  justify-content: center;
+}
 
 .fate-btn--add {
-  background: transparent;
-  border: 1px dashed var(--fate-blue);
+  background: var(--fate-blue-light);
   color: var(--fate-blue);
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
   margin-top: 0.5rem;
 }
-.fate-btn--add:hover { background: var(--fate-blue-light); }
+.fate-btn--add:hover {
+  background: #cce5f5;
+}
 
 .fate-btn--link {
   background: transparent;
   color: var(--fate-blue);
-  padding: 0.25rem 0;
-  font-size: 0.875rem;
 }
-.fate-btn--link:hover { text-decoration: underline; }
+.fate-btn--link:hover {
+  text-decoration: underline;
+}
 
 .fate-btn--outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.7);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  padding: 0.35rem 0.8rem;
-  font-size: 0.8rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
-.fate-btn--outline:hover { background: rgba(255,255,255,0.15); }
+.fate-btn--outline:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
 
 .fate-btn--ghost {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 2px;
   line-height: 1;
-  font-size: 0.85rem;
   flex-shrink: 0;
 }
-.fate-btn--ghost:hover { opacity: 0.7; }
+.fate-btn--ghost:hover {
+  opacity: 0.7;
+}
 
 /* ============================================================
    IMPORT/EXPORT BAR
@@ -327,13 +382,15 @@ button {
   border-radius: 6px;
   padding: 0;
   cursor: pointer;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
   overflow: hidden;
 }
 
 .character-card:hover,
 .campaign-card:hover {
-  box-shadow: 0 2px 12px rgba(28,158,214,0.15);
+  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
   border-color: var(--fate-blue);
 }
 
@@ -429,7 +486,9 @@ button {
 }
 
 @container main (width < 640px) {
-  .home-grid { grid-template-columns: 1fr; }
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-section {
@@ -472,11 +531,21 @@ button {
   transition: background 0.1s;
 }
 
-.home-list-item:hover { background: var(--fate-blue-light); }
-.home-list-item:last-child { border-bottom: none; }
+.home-list-item:hover {
+  background: var(--fate-blue-light);
+}
+.home-list-item:last-child {
+  border-bottom: none;
+}
 
-.item-name { font-weight: 600; font-size: 0.9rem; }
-.item-meta { font-size: 0.8rem; color: var(--fate-text-light); }
+.item-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.item-meta {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
 
 /* ============================================================
    DETAIL VIEW
@@ -636,8 +705,8 @@ button {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: var(--btn-size, 32px);
+  height: var(--btn-size, 32px);
   font-size: 1rem;
   line-height: 1;
   display: flex;
@@ -693,7 +762,9 @@ button {
   border-bottom: 1px solid var(--fate-blue-light);
 }
 
-.aspect-row:last-child { border-bottom: none; }
+.aspect-row:last-child {
+  border-bottom: none;
+}
 
 .aspect-label {
   font-size: 0.7rem;
@@ -732,6 +803,12 @@ button {
 /* SKILL PYRAMID */
 .skill-pyramid {
   padding: 0.5rem 0.75rem;
+}
+
+.pyramid-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0 0.25rem;
 }
 
 .pyramid-row {
@@ -778,7 +855,7 @@ button {
   padding: 1px 3px;
   font-size: 0.8rem;
   color: var(--fate-text);
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -864,15 +941,11 @@ button {
 .fate-btn--info {
   background: var(--fate-blue);
   color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.15rem 0.45rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  line-height: 1.4;
 }
 
-.fate-btn--info:hover { background: #1787bb; }
+.fate-btn--info:hover {
+  background: #1787bb;
+}
 
 /* Skill info modal */
 .skill-info-overlay {
@@ -893,7 +966,7 @@ button {
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 }
 
 .skill-info-header {
@@ -912,8 +985,15 @@ button {
   margin: 0;
 }
 
-.skill-info-close { font-size: 1.1rem; color: var(--fate-muted); padding: 0.2rem 0.4rem; border-radius: 4px; }
-.skill-info-close:hover { background: var(--fate-blue-light); }
+.skill-info-close {
+  font-size: 1.1rem;
+  color: var(--fate-muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.skill-info-close:hover {
+  background: var(--fate-blue-light);
+}
 
 .skill-info-description {
   font-size: 0.9rem;
@@ -953,7 +1033,9 @@ button {
   color: var(--fate-blue);
 }
 
-.skill-manage-row:last-child { border-bottom: none; }
+.skill-manage-row:last-child {
+  border-bottom: none;
+}
 
 .skill-manage-name {
   font-size: 0.875rem;
@@ -980,7 +1062,9 @@ button {
   outline: none;
 }
 
-.skill-add-input:focus { border-color: var(--fate-blue); }
+.skill-add-input:focus {
+  border-color: var(--fate-blue);
+}
 
 /* MILESTONE TIMELINE */
 .milestone-timeline {
@@ -1021,9 +1105,15 @@ button {
   flex-shrink: 0;
 }
 
-.dot--small    { background: #888; }
-.dot--significant { background: var(--fate-blue); }
-.dot--major    { background: #c9a84c; }
+.dot--small {
+  background: #888;
+}
+.dot--significant {
+  background: var(--fate-blue);
+}
+.dot--major {
+  background: #c9a84c;
+}
 
 .timeline-line {
   width: 2px;
@@ -1053,9 +1143,18 @@ button {
   flex-shrink: 0;
 }
 
-.badge--small       { background: #e8e8e8; color: #555; }
-.badge--significant { background: var(--fate-blue-light); color: var(--fate-blue); }
-.badge--major       { background: #fdf3d8; color: #9a7020; }
+.badge--small {
+  background: #e8e8e8;
+  color: #555;
+}
+.badge--significant {
+  background: var(--fate-blue-light);
+  color: var(--fate-blue);
+}
+.badge--major {
+  background: #fdf3d8;
+  color: #9a7020;
+}
 
 .milestone-desc {
   font-size: 0.82rem;
@@ -1063,11 +1162,20 @@ button {
   flex: 1;
 }
 
-.milestone-remove { color: #888; font-size: 0.7rem; }
-.milestone-remove:hover { color: var(--fate-red); }
+.milestone-remove {
+  color: #888;
+  font-size: 0.7rem;
+}
+.milestone-remove:hover {
+  color: var(--fate-red);
+}
 
-.milestone-edit { color: #888; }
-.milestone-edit:hover { color: var(--fate-blue); }
+.milestone-edit {
+  color: #888;
+}
+.milestone-edit:hover {
+  color: var(--fate-blue);
+}
 
 .timeline-content--edit {
   display: flex;
@@ -1210,7 +1318,8 @@ button {
 }
 
 /* STRESS TRACK */
-.stress-track {}
+.stress-track {
+}
 
 .stress-label {
   font-size: 0.65rem;
@@ -1254,7 +1363,7 @@ button {
 }
 
 .stress-box input[type="checkbox"]:checked::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   color: white;
   font-size: 14px;
@@ -1291,7 +1400,9 @@ button {
   border-bottom: 1px solid var(--fate-blue-light);
 }
 
-.consequence-row:last-child { border-bottom: none; }
+.consequence-row:last-child {
+  border-bottom: none;
+}
 
 .consequence-severity {
   font-size: 1rem;
@@ -1370,9 +1481,18 @@ button {
   letter-spacing: 0.5px;
 }
 
-.status-active { background: #d4edda; color: var(--fate-green); }
-.status-inactive { background: #f0f0f0; color: #666; }
-.status-completed { background: #d1ecf1; color: #0c5460; }
+.status-active {
+  background: #d4edda;
+  color: var(--fate-green);
+}
+.status-inactive {
+  background: #f0f0f0;
+  color: #666;
+}
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
 
 .campaign-description {
   color: var(--fate-text);
@@ -1404,7 +1524,9 @@ button {
   border-bottom: 1px solid var(--fate-blue-light);
 }
 
-.assignment-row:last-of-type { border-bottom: none; }
+.assignment-row:last-of-type {
+  border-bottom: none;
+}
 
 .assignment-name {
   cursor: pointer;
@@ -1412,7 +1534,9 @@ button {
   font-weight: 500;
 }
 
-.assignment-name:hover { text-decoration: underline; }
+.assignment-name:hover {
+  text-decoration: underline;
+}
 
 .assignment-info {
   display: flex;
@@ -1424,7 +1548,9 @@ button {
   color: var(--fate-blue);
 }
 
-.assignment-info strong:hover { text-decoration: underline; }
+.assignment-info strong:hover {
+  text-decoration: underline;
+}
 
 .assignment-concept {
   font-size: 0.8rem;
@@ -1446,7 +1572,10 @@ button {
   cursor: pointer;
 }
 
-.assign-select:focus { outline: none; border-color: var(--fate-blue); }
+.assign-select:focus {
+  outline: none;
+  border-color: var(--fate-blue);
+}
 
 /* CAMPAIGNS SECTION on character detail */
 .campaigns-section {
@@ -1495,7 +1624,9 @@ button {
   outline: none;
 }
 
-.form-control:focus { border-color: var(--fate-blue); }
+.form-control:focus {
+  border-color: var(--fate-blue);
+}
 
 /* ============================================================
    CONFIRM DIALOG
@@ -1504,7 +1635,7 @@ button {
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1517,7 +1648,7 @@ button {
   padding: 1.5rem;
   max-width: 440px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .dialog-title {
@@ -1603,18 +1734,14 @@ button {
   border-radius: 2px;
 }
 
-/* Counter-Buttons: 32px für bessere Touch-Targets (Desktop + Mobile) */
-.counter-btn {
-  width: 32px;
-  height: 32px;
-}
-
 /* ============================================================
    CONTAINER: header — Mobile Navigation
    ============================================================ */
 
 @container header (width < 768px) {
-  .nav-hamburger { display: flex; }
+  .nav-hamburger {
+    display: flex;
+  }
 
   .nav-drawer {
     display: none;
@@ -1626,12 +1753,14 @@ button {
     right: 0;
     background-color: var(--fate-blue);
     padding: 0.5rem 1rem 0.75rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 99;
     gap: 0.25rem;
   }
 
-  .nav-drawer.nav-open { display: flex; }
+  .nav-drawer.nav-open {
+    display: flex;
+  }
 
   /* Nav-Links im Drawer: vertikal, volle Breite */
   .nav-drawer .nav-links {
@@ -1650,7 +1779,7 @@ button {
   .nav-drawer .import-export-bar {
     margin-left: 0;
     padding-top: 0.5rem;
-    border-top: 1px solid rgba(255,255,255,0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     width: 100%;
   }
 }
@@ -1667,8 +1796,14 @@ button {
   }
 
   /* Detail-Toolbar + Form-Actions: Wrap erlauben */
-  .detail-toolbar  { flex-wrap: wrap; gap: 0.5rem; }
-  .form-actions    { flex-wrap: wrap; justify-content: flex-end; }
+  .detail-toolbar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 }
 
 /* ============================================================
@@ -1680,10 +1815,22 @@ button {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 
-  .list-header            { flex-wrap: wrap; gap: 0.5rem; }
-  .campaign-detail-header { flex-wrap: wrap; gap: 0.5rem; }
-  .section-header         { flex-wrap: wrap; gap: 0.25rem; }
-  .toolbar-actions        { flex-wrap: wrap; gap: 0.5rem; }
+  .list-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .campaign-detail-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .section-header {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .toolbar-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 }
 
 /* ============================================================
@@ -1691,7 +1838,9 @@ button {
    ============================================================ */
 
 @container main (width < 360px) {
-  .card-grid { grid-template-columns: 1fr; }
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ============================================================
@@ -1699,7 +1848,9 @@ button {
    ============================================================ */
 
 @container header (width < 360px) {
-  .nav-logo { font-size: 1.25rem; }
+  .nav-logo {
+    font-size: 1.25rem;
+  }
 }
 
 /* ============================================================
@@ -1715,16 +1866,30 @@ button {
     margin-bottom: 8px;
   }
 
-  .level-label  { min-width: 0; }
-  .level-slots  { width: 100%; }
+  .level-label {
+    min-width: 0;
+  }
+  .level-slots {
+    width: 100%;
+  }
 
   /* Stress-Boxen: größere Tap-Area via Padding */
-  .stress-box { padding: 6px 4px; }
+  .stress-box {
+    padding: 6px 4px;
+  }
 }
 
 /* ============================================================
    .app-main padding — kann sich nicht selbst per @container stylen
    ============================================================ */
 
-@media (max-width: 480px) { .app-main { padding: 0.75rem; } }
-@media (max-width: 360px) { .app-main { padding: 0.5rem; } }
+@media (max-width: 480px) {
+  .app-main {
+    padding: 0.75rem;
+  }
+}
+@media (max-width: 360px) {
+  .app-main {
+    padding: 0.5rem;
+  }
+}

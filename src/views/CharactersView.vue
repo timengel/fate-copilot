@@ -53,8 +53,8 @@ function deleteCharacter(id: string, name: string) {
           <em>{{ char.trouble }}</em>
         </div>
         <div class="card-actions" @click.stop>
-          <FateButton variant="secondary" size="sm" @click="router.push(`/characters/${char.id}/edit`)">Bearbeiten</FateButton>
-          <FateButton variant="danger" size="sm" @click="deleteCharacter(char.id, char.name)">Löschen</FateButton>
+          <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/characters/${char.id}/edit`)">Bearbeiten</FateButton>
+          <FateButton variant="danger" size="S" @click="deleteCharacter(char.id, char.name)">Löschen</FateButton>
         </div>
       </div>
     </div>

@@ -14,7 +14,19 @@ export type ButtonVariant =
   | 'counter'
   | 'ghost'
 
-export type ButtonSize = 'sm' | 'md'
+export type ButtonSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'
+
+export type ButtonIcon =
+  | 'delete'
+  | 'edit'
+  | 'add'
+  | 'close'
+  | 'check'
+  | 'info'
+  | 'arrow-left'
+  | 'arrow-right'
+  | 'download'
+  | 'upload'
 
 // ============================================================
 // Domain Types
@@ -28,7 +40,7 @@ export type ConsequenceLabel = 'mild' | 'moderate' | 'severe' | 'extreme'
 
 export type ConsequenceSeverity = 2 | 4 | 6 | 8
 
-export type SkillLevel = 1 | 2 | 3 | 4 | 5
+export type SkillLevel = number
 
 export type AppDataVersion = '1.0' | '1.1'
 
@@ -73,6 +85,8 @@ export interface Character {
   stressMental: StressBox[]
   consequences: Consequence[]
   notes: string
+  pyramidMaxLevel?: number
+  pyramidMaxCols?: number
 }
 
 export interface Milestone {
@@ -119,6 +133,9 @@ export const SKILL_LEVEL_LABELS: Record<number, string> = {
   3: 'Gut',
   4: 'Großartig',
   5: 'Hervorragend',
+  6: 'Fantastisch',
+  7: 'Episch',
+  8: 'Legendär',
 }
 
 export const SKILL_LIST = [

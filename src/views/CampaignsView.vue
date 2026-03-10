@@ -47,8 +47,8 @@ function deleteCampaign(id: string, name: string) {
           {{ store.getCharactersForCampaign(campaign.id).length }} Charaktere
         </div>
         <div class="card-actions" @click.stop>
-          <FateButton variant="secondary" size="sm" @click="router.push(`/campaigns/${campaign.id}`)">Ansehen</FateButton>
-          <FateButton variant="danger" size="sm" @click="deleteCampaign(campaign.id, campaign.name)">Löschen</FateButton>
+          <FateButton variant="secondary" size="S" @click="router.push(`/campaigns/${campaign.id}`)">Ansehen</FateButton>
+          <FateButton variant="danger" size="S" @click="deleteCampaign(campaign.id, campaign.name)">Löschen</FateButton>
         </div>
       </div>
     </div>

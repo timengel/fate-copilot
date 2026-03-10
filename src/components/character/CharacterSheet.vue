@@ -58,7 +58,12 @@ defineProps<{
 
       <section class="sheet-section fertigkeiten">
         <div class="sheet-section-header">FERTIGKEITEN</div>
-        <SkillPyramid :skills="character.skills" :readonly="true" />
+        <SkillPyramid
+          :skills="character.skills"
+          :maxLevel="character.pyramidMaxLevel ?? 5"
+          :maxCols="character.pyramidMaxCols ?? 5"
+          :readonly="true"
+        />
       </section>
     </div>
 

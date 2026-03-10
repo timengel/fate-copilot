@@ -42,8 +42,10 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
       </nav>
     </header>
 
-    <main class="app-main">
-      <RouterView />
-    </main>
+    <div class="app-scroll-area">
+      <main class="app-main">
+        <RouterView />
+      </main>
+    </div>
   </div>
 </template>

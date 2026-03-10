@@ -113,7 +113,7 @@ function updateMilestone(milestone: Milestone) {
         <FateButton variant="link" @click="router.push('/campaigns')">← Kampagnen</FateButton>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
-            <FateButton @click="isEditing = true">Bearbeiten</FateButton>
+            <FateButton icon="edit" @click="isEditing = true">Bearbeiten</FateButton>
             <FateButton variant="danger-outline" @click="deleteCampaign">Löschen</FateButton>
           </template>
         </div>
@@ -165,7 +165,7 @@ function updateMilestone(milestone: Milestone) {
                   <strong>{{ char.name || '(Unbenannt)' }}</strong>
                   <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
                 </div>
-                <FateButton variant="danger" size="sm" @click="unassignCharacter(char.id)">Entfernen</FateButton>
+                <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
               </div>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">
