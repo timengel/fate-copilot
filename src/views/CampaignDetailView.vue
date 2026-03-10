@@ -6,6 +6,7 @@ import { useCharactersStore } from '../stores/characters'
 import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
 import FateButton from '../components/shared/FateButton.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Campaign, CampaignStatus, Milestone } from '../types'
 import { CHARACTER_COLORS } from '../types'
 
@@ -21,6 +22,7 @@ const charactersStore = useCharactersStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
+const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
 
 const colorVars = computed(() => {
   const c = CHARACTER_COLORS.find(c => c.id === campaign.value?.color) ?? CHARACTER_COLORS[0]!
@@ -76,9 +78,13 @@ function handleCancel() {
 
 function deleteCampaign() {
   if (!campaign.value) return
-  if (confirm(`Kampagne "${campaign.value.name}" wirklich löschen?`)) {
-    campaignsStore.deleteCampaign(campaign.value.id)
-    router.push('/campaigns')
+  confirmDialog.value = {
+    title: 'Kampagne löschen',
+    message: `Kampagne "${campaign.value.name}" wirklich löschen?`,
+    onConfirm: () => {
+      campaignsStore.deleteCampaign(campaign.value!.id)
+      router.push('/campaigns')
+    },
   }
 }
 
@@ -189,6 +195,14 @@ function updateMilestone(milestone: Milestone) {
       </template>
     </template>
   </div>
+
+  <ConfirmDialog
+    v-if="confirmDialog"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @cancel="confirmDialog = null"
+  />
 </template>
 
 <style scoped>

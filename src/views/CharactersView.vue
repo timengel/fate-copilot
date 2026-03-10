@@ -5,11 +5,13 @@ import { useCharactersStore } from '../stores/characters'
 import { CHARACTER_COLORS } from '../types'
 import type { CharacterType } from '../types'
 import FateButton from '../components/shared/FateButton.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
 const store = useCharactersStore()
 const search = ref('')
+const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
 
 const activeTab = computed<CharacterType>(() =>
   route.query.tab === 'nsc' ? 'nsc' : 'sc'
@@ -41,8 +43,10 @@ function cardHeaderStyle(colorId?: string) {
 }
 
 function deleteCharacter(id: string, name: string) {
-  if (confirm(`Charakter "${name || 'Unbenannt'}" wirklich löschen?`)) {
-    store.deleteCharacter(id)
+  confirmDialog.value = {
+    title: 'Charakter löschen',
+    message: `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,
+    onConfirm: () => store.deleteCharacter(id),
   }
 }
 </script>
@@ -99,6 +103,14 @@ function deleteCharacter(id: string, name: string) {
       </div>
     </div>
   </div>
+
+  <ConfirmDialog
+    v-if="confirmDialog"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @cancel="confirmDialog = null"
+  />
 </template>
 
 <style scoped>

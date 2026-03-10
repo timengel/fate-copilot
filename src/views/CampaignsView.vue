@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
 import FateButton from '../components/shared/FateButton.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Campaign, CampaignStatus } from '../types'
 import { CHARACTER_COLORS } from '../types'
 
@@ -12,6 +14,7 @@ function colorVarsFor(campaign: Campaign) {
 
 const router = useRouter()
 const store = useCampaignsStore()
+const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
 
 const STATUS_LABEL: Record<CampaignStatus, string> = {
   active: 'Aktiv',
@@ -20,8 +23,10 @@ const STATUS_LABEL: Record<CampaignStatus, string> = {
 }
 
 function deleteCampaign(id: string, name: string) {
-  if (confirm(`Kampagne "${name}" wirklich löschen?`)) {
-    store.deleteCampaign(id)
+  confirmDialog.value = {
+    title: 'Kampagne löschen',
+    message: `Kampagne "${name}" wirklich löschen?`,
+    onConfirm: () => store.deleteCampaign(id),
   }
 }
 </script>
@@ -60,6 +65,14 @@ function deleteCampaign(id: string, name: string) {
       </div>
     </div>
   </div>
+
+  <ConfirmDialog
+    v-if="confirmDialog"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @cancel="confirmDialog = null"
+  />
 </template>
 
 <style scoped>

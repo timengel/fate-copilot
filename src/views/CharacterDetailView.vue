@@ -6,6 +6,7 @@ import { useCampaignsStore } from '../stores/campaigns'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
 import CharacterForm from '../components/character/CharacterForm.vue'
 import FateButton from '../components/shared/FateButton.vue'
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Character, CharacterType } from '../types'
 import { createDefaultCharacter } from '../composables/useCharacterDefaults'
 
@@ -21,6 +22,7 @@ const campaignsStore = useCampaignsStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
+const confirmDialog = ref<{ title: string; message: string; onConfirm: () => void } | null>(null)
 
 const character = computed(() => {
   if (props.isNew) {
@@ -71,9 +73,13 @@ function toggleEdit() {
 
 function deleteCharacter() {
   if (!character.value) return
-  if (confirm(`Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`)) {
-    charactersStore.deleteCharacter(character.value.id)
-    router.push(backPath.value)
+  confirmDialog.value = {
+    title: 'Charakter löschen',
+    message: `Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`,
+    onConfirm: () => {
+      charactersStore.deleteCharacter(character.value!.id)
+      router.push(backPath.value)
+    },
   }
 }
 
@@ -144,6 +150,14 @@ function unassignFromCampaign(campaignId: string) {
       </template>
     </template>
   </div>
+
+  <ConfirmDialog
+    v-if="confirmDialog"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @cancel="confirmDialog = null"
+  />
 </template>
 
 <style scoped>
