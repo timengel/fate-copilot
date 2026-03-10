@@ -7,7 +7,7 @@ import StressTrack from './StressTrack.vue'
 import ConsequenceSlots from './ConsequenceSlots.vue'
 import FateButton from '../shared/FateButton.vue'
 
-const props = defineProps<{ character: Character }>()
+const props = defineProps<{ character: Character; hideActions?: boolean }>()
 const emit = defineEmits<{ save: [character: Character]; cancel: [] }>()
 
 const form = reactive<Character>(JSON.parse(JSON.stringify(props.character)))
@@ -32,6 +32,8 @@ function updateStunt(index: number, field: keyof Stunt, value: string) {
 function save() {
   emit('save', JSON.parse(JSON.stringify(form)))
 }
+
+defineExpose({ save })
 </script>
 
 <template>
@@ -148,7 +150,7 @@ function save() {
     </div>
 
     <!-- FORM ACTIONS -->
-    <div class="form-actions">
+    <div v-if="!hideActions" class="form-actions">
       <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
       <FateButton @click="save">Speichern</FateButton>
     </div>

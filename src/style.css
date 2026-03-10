@@ -136,13 +136,26 @@ a {
 .dashboard-stack {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-.dashboard-card-toolbar {
+.dashboard-entry {
+  background: var(--fate-white);
+  border: 1px solid var(--fate-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(28,158,214,0.08);
+  overflow: hidden;
+}
+
+.dashboard-entry-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-height: 2.75rem;
+  border-bottom: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
 }
 
 .dashboard-empty {
@@ -761,11 +774,14 @@ button {
 .skill-value {
   display: block;
   border-bottom: 1px solid var(--fate-border);
-  min-height: 1.4em;
+  height: 1.6em;
   padding: 1px 3px;
   font-size: 0.8rem;
   color: var(--fate-text);
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .skill-input {

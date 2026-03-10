@@ -11,6 +11,7 @@ const campaignsStore = useCampaignsStore()
 const charactersStore = useCharactersStore()
 
 const editingId = ref<string | null>(null)
+const formRef = ref<InstanceType<typeof CharacterForm> | null>(null)
 
 const characters = computed(() => {
   const seen = new Set<string>()
@@ -30,6 +31,10 @@ function handleSave(updated: Character) {
   charactersStore.updateCharacter(updated)
   editingId.value = null
 }
+
+function saveEditing() {
+  formRef.value?.save()
+}
 </script>
 
 <template>
@@ -39,12 +44,20 @@ function handleSave(updated: Character) {
     </div>
     <div v-else class="dashboard-stack">
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
-        <div v-if="editingId !== character.id" class="dashboard-card-toolbar">
-          <FateButton size="sm" @click="editingId = character.id">Bearbeiten</FateButton>
+        <div class="dashboard-entry-toolbar">
+          <template v-if="editingId === character.id">
+            <FateButton variant="secondary" size="sm" @click="editingId = null">Abbrechen</FateButton>
+            <FateButton size="sm" @click="saveEditing">Speichern</FateButton>
+          </template>
+          <template v-else>
+            <FateButton size="sm" @click="editingId = character.id">Bearbeiten</FateButton>
+          </template>
         </div>
         <CharacterForm
           v-if="editingId === character.id"
+          ref="formRef"
           :character="character"
+          :hideActions="true"
           @save="handleSave"
           @cancel="editingId = null"
         />
