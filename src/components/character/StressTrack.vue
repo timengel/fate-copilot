@@ -41,3 +41,77 @@ function toggle(index: number) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.stress-track {
+}
+
+.stress-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--fate-blue);
+  background: var(--fate-blue-light);
+  padding: 2px 4px;
+  margin-bottom: 4px;
+}
+
+.stress-boxes {
+  display: flex;
+  gap: 4px;
+}
+
+.stress-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stress-box input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  border: 2px solid var(--fate-blue);
+  border-radius: 2px;
+  background: white;
+  position: relative;
+  transition: background 0.1s;
+}
+
+.stress-box input[type="checkbox"]:checked {
+  background: var(--fate-blue);
+}
+
+.stress-box input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  top: -1px;
+  left: 2px;
+}
+
+.stress-box.readonly input[type="checkbox"] {
+  cursor: default;
+}
+
+.box-value {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  margin-top: 1px;
+}
+
+@container (width < 350px) {
+  /* Stress-Boxen: größere Tap-Area via Padding */
+  .stress-box {
+    padding: 6px 4px;
+  }
+}
+</style>

@@ -121,3 +121,179 @@ const colorVars = computed(() => {
 
   </div>
 </template>
+
+<style scoped>
+.character-sheet {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: clip;
+  font-size: 0.875rem;
+}
+
+/* ALLGEMEINES */
+.allgemeines-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.allgemeines-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.field-value {
+  border-bottom: 1px solid var(--fate-border);
+  min-width: 120px;
+  min-height: 1.4em;
+  padding: 1px 2px;
+  color: var(--fate-text);
+  font-size: 0.875rem;
+}
+
+.field-value.field-description {
+  min-height: 2.8em;
+  white-space: pre-wrap;
+}
+
+.refresh-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: center;
+  min-width: 40px;
+}
+
+.fate-points {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: center;
+  min-width: 40px;
+}
+
+.fate-logo-corner {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  letter-spacing: -1px;
+  line-height: 1;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.fate-logo-sub {
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: right;
+}
+
+/* TWO-COLUMN LAYOUT (Aspekte | Fertigkeiten, Extras | Stunts) */
+.sheet-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.sheet-two-col .sheet-section {
+  border-bottom: none;
+}
+
+.sheet-two-col .sheet-section:first-child {
+  border-right: 1px solid var(--fate-border);
+}
+
+/* EXTRAS / STUNTS */
+.extras,
+.stunts {
+  padding: 0;
+}
+
+.text-area-display {
+  padding: 0.5rem 0.75rem;
+  min-height: 120px;
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+}
+
+.stunts-list {
+  padding: 0.5rem 0.75rem;
+  min-height: 120px;
+}
+
+.stunt-item {
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+/* BOTTOM: STRESS + KONSEQUENZEN */
+.sheet-bottom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.stress-section {
+  border-right: 1px solid var(--fate-border);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 220px;
+}
+
+@container main (width < 768px) {
+  .sheet-two-col {
+    grid-template-columns: 1fr;
+  }
+  .sheet-two-col .sheet-section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+  }
+  .sheet-bottom {
+    grid-template-columns: 1fr;
+  }
+  .stress-section {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+  }
+  .allgemeines-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container main (width < 768px) {
+  /* allgemeines-right: nach Grid-Kollaps normal left-aligned */
+  .allgemeines-right {
+    align-items: flex-start;
+    min-width: 0;
+  }
+}
+</style>

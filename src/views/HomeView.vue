@@ -62,3 +62,108 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
     </div>
   </div>
 </template>
+
+<style scoped>
+.home-view {
+  padding-top: 0.5rem;
+}
+
+.home-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.fate-logo {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.fate-logo .fate-plus {
+  color: var(--fate-blue);
+}
+
+.home-header h1 {
+  font-size: 1.25rem;
+  color: var(--fate-text-light);
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.subtitle {
+  color: var(--fate-text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@container main (width < 640px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-section {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--fate-blue);
+  color: white;
+  padding: 0.6rem 0.9rem;
+}
+
+.section-header h2 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.home-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.home-list-item:hover {
+  background: var(--fate-blue-light);
+}
+.home-list-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.item-meta {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+</style>

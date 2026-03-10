@@ -41,3 +41,10 @@ Verlasse dich nicht ausschließlich auf dein Trainingswissen. Nutze Thinking-Mod
 - Charakter-Komponenten: `src/components/character/`
 - Kampagnen-Komponenten: `src/components/campaign/`
 - Geteilte Typen zentral in `src/types/`
+
+## Scoped Styles
+
+- Jede Vue-Komponente bekommt ihr eigenes **`<style scoped>`** Tag für ihre eigenen CSS-Regeln
+- Komponentenspezifisches CSS gehört **nicht** in `src/style.css`
+- `src/style.css` enthält ausschließlich: globale CSS-Variablen (`:root`), Resets, App-Layout-Grundstruktur, und Utility-Klassen die in 3+ Komponenten genutzt werden
+- Für Styling von Kind-Komponenten-Elementen aus der Eltern-Komponente: `:deep()` Selector nutzen

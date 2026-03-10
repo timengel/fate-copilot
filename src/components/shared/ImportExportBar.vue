@@ -66,3 +66,18 @@ function cancelImport() {
     />
   </div>
 </template>
+
+<style scoped>
+.import-export-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.import-error {
+  color: #ffe0e0;
+  font-size: 0.8rem;
+  max-width: 200px;
+}
+</style>

@@ -183,3 +183,121 @@ function updateMilestone(milestone: Milestone) {
     </template>
   </div>
 </template>
+
+<style scoped>
+.not-found {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fate-text-light);
+}
+
+.campaign-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.campaign-detail-header h1 {
+  font-size: 1.75rem;
+  color: var(--fate-blue);
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: #d4edda;
+  color: var(--fate-green);
+}
+.status-inactive {
+  background: #f0f0f0;
+  color: #666;
+}
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.campaign-description {
+  color: var(--fate-text);
+  margin-bottom: 0.75rem;
+}
+
+.campaign-notes {
+  background: #fffbea;
+  border-left: 3px solid #f0c040;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.campaign-characters,
+.campaign-assignments {
+  padding: 0.5rem 0.75rem;
+}
+
+.assignment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.assignment-row:last-of-type {
+  border-bottom: none;
+}
+
+.assignment-info {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.assignment-info strong {
+  color: var(--fate-blue);
+}
+
+.assignment-info strong:hover {
+  text-decoration: underline;
+}
+
+.assignment-concept {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.assign-row {
+  padding-top: 0.5rem;
+}
+
+.assign-select {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  cursor: pointer;
+}
+
+.assign-select:focus {
+  outline: none;
+  border-color: var(--fate-blue);
+}
+
+@container main (width < 480px) {
+  .campaign-detail-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+</style>

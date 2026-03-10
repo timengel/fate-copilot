@@ -66,3 +66,62 @@ function deleteCharacter(id: string, name: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.character-card,
+.campaign-card {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+  overflow: hidden;
+}
+
+.character-card:hover,
+.campaign-card:hover {
+  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
+  border-color: var(--fate-blue);
+}
+
+.card-header {
+  background: var(--fate-blue);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.card-concept {
+  padding: 0.5rem 0.9rem 0.25rem;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+}
+
+.card-trouble {
+  padding: 0 0.9rem 0.25rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem 0.75rem;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  color: var(--fate-text);
+  background: white;
+}
+</style>

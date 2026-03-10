@@ -255,3 +255,162 @@ const selectedInfo = computed<SkillInfo | null>(() =>
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.skills-hint {
+  color: var(--fate-text-light);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.skills-manage {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 640px;
+}
+
+.skills-list-box {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.skill-manage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.skill-manage-row:hover {
+  background: var(--fate-blue-light);
+}
+
+.skill-manage-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+/* Skill info modal */
+.skill-info-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.skill-info-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 480px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+
+.skill-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid var(--fate-blue);
+  padding-bottom: 0.5rem;
+}
+
+.skill-info-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  margin: 0;
+}
+
+.skill-info-close {
+  font-size: 1.1rem;
+  color: var(--fate-muted);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.skill-info-close:hover {
+  background: var(--fate-blue-light);
+}
+
+.skill-info-description {
+  font-size: 0.9rem;
+  color: var(--fate-text);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.skill-info-actions h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fate-muted);
+  margin: 0 0 0.5rem;
+}
+
+.skill-info-actions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.skill-info-actions li {
+  font-size: 0.875rem;
+  color: var(--fate-text);
+  padding: 0.4rem 0.6rem;
+  background: var(--fate-blue-light);
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+.skill-info-actions li strong {
+  color: var(--fate-blue);
+}
+
+.skill-manage-row:last-child {
+  border-bottom: none;
+}
+
+.skill-manage-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--fate-text);
+}
+
+.skill-add-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+
+.skill-add-input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  outline: none;
+}
+
+.skill-add-input:focus {
+  border-color: var(--fate-blue);
+}
+</style>

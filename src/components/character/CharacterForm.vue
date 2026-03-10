@@ -187,3 +187,271 @@ defineExpose({ save })
 
   </div>
 </template>
+
+<style scoped>
+.character-sheet {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: clip;
+  font-size: 0.875rem;
+}
+
+/* ALLGEMEINES */
+.allgemeines-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.allgemeines-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.field-input {
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  width: 100%;
+  outline: none;
+}
+
+.field-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+.field-textarea {
+  field-sizing: content;
+  resize: vertical;
+  min-height: 3em;
+  border: 1px solid var(--fate-border);
+  border-radius: 3px;
+  padding: 4px;
+}
+
+.field-number {
+  width: 60px;
+  text-align: center;
+}
+
+.fate-points {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--fate-blue);
+  text-align: center;
+  min-width: 40px;
+}
+
+.fate-points-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* TWO-COLUMN LAYOUT (Aspekte | Fertigkeiten, Extras | Stunts) */
+.sheet-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.sheet-two-col .sheet-section {
+  border-bottom: none;
+}
+
+.sheet-two-col .sheet-section:first-child {
+  border-right: 1px solid var(--fate-border);
+}
+
+/* EXTRAS / STUNTS */
+.extras,
+.stunts {
+  padding: 0;
+}
+
+.text-area-input {
+  field-sizing: content;
+  width: 100%;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  resize: vertical;
+  outline: none;
+  min-height: 80px;
+}
+
+.stunts-list {
+  padding: 0.5rem 0.75rem;
+  min-height: 120px;
+}
+
+.stunt-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stunt-edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.stunt-name-input {
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.stunt-desc-textarea {
+  field-sizing: content;
+  resize: none;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--fate-text-light);
+  background: transparent;
+  outline: none;
+  width: 100%;
+  min-height: 1.5em;
+  overflow: hidden;
+}
+
+.stunt-name-input:focus,
+.stunt-desc-textarea:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+/* BOTTOM: STRESS + KONSEQUENZEN */
+.sheet-bottom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  border-bottom: 1px solid var(--fate-border);
+}
+
+.stress-section {
+  border-right: 1px solid var(--fate-border);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 220px;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+
+/* COLOR PICKER */
+.color-picker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  outline: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: transform 0.15s, outline-color 0.15s, border-color 0.15s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+  outline-color: rgba(0, 0, 0, 0.2);
+}
+
+.color-swatch.active {
+  border-color: #fff;
+  outline-color: var(--fate-text);
+  transform: scale(1.1);
+}
+
+@container main (width < 768px) {
+  .sheet-two-col {
+    grid-template-columns: 1fr;
+  }
+  .sheet-two-col .sheet-section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+  }
+  .sheet-bottom {
+    grid-template-columns: 1fr;
+  }
+  .stress-section {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+  }
+  .allgemeines-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container main (width < 768px) {
+  /* allgemeines-right: nach Grid-Kollaps normal left-aligned */
+  .allgemeines-right {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  /* Detail-Toolbar + Form-Actions: Wrap erlauben */
+  .form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+</style>

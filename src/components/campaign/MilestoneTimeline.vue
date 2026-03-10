@@ -116,3 +116,158 @@ function cancelEdit() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.milestone-timeline {
+  padding: 0.5rem 0.75rem;
+}
+
+.milestone-empty {
+  font-size: 0.8rem;
+  color: var(--fate-text-muted);
+  padding: 0.25rem 0;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.timeline-line-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 12px;
+  flex-shrink: 0;
+  align-self: stretch;
+  padding-top: 6px;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot--small {
+  background: #888;
+}
+.dot--significant {
+  background: var(--fate-blue);
+}
+.dot--major {
+  background: #c9a84c;
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  min-height: 12px;
+  background: var(--fate-border);
+  margin: 3px 0;
+}
+
+.timeline-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.milestone-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge--small {
+  background: #e8e8e8;
+  color: #555;
+}
+.badge--significant {
+  background: var(--fate-blue-light);
+  color: var(--fate-blue);
+}
+.badge--major {
+  background: #fdf3d8;
+  color: #9a7020;
+}
+
+.milestone-desc {
+  font-size: 0.82rem;
+  color: var(--fate-text);
+  flex: 1;
+}
+
+.milestone-remove {
+  color: #888;
+  font-size: 0.7rem;
+}
+.milestone-remove:hover {
+  color: var(--fate-red);
+}
+
+.milestone-edit {
+  color: #888;
+}
+.milestone-edit:hover {
+  color: var(--fate-blue);
+}
+
+.timeline-content--edit {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex: 1;
+}
+
+.milestone-add-form {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--fate-border);
+}
+
+.milestone-type-select {
+  font-size: 0.78rem;
+  padding: 3px 6px;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  background: var(--fate-surface);
+  color: var(--fate-text);
+  font-family: inherit;
+}
+
+.milestone-desc-input {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fate-text);
+  font-family: inherit;
+}
+.milestone-desc-input:focus {
+  outline: none;
+  border-color: var(--fate-blue);
+}
+</style>

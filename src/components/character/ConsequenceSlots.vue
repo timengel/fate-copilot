@@ -41,3 +41,63 @@ function updateValue(index: number, value: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.consequence-slots {
+  padding: 0.4rem 0.75rem;
+}
+
+.consequence-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.consequence-row:last-child {
+  border-bottom: none;
+}
+
+.consequence-severity {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--fate-blue);
+  min-width: 20px;
+  text-align: center;
+}
+
+.consequence-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--fate-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 55px;
+}
+
+.consequence-value {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--fate-text);
+  border-bottom: 1px solid var(--fate-border);
+  min-height: 1.4em;
+  padding: 1px 2px;
+}
+
+.consequence-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+}
+
+.consequence-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+</style>

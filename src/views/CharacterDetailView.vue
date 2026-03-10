@@ -134,3 +134,65 @@ function unassignFromCampaign(campaignId: string) {
     </template>
   </div>
 </template>
+
+<style scoped>
+.not-found {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fate-text-light);
+}
+
+.campaigns-section {
+  margin-top: 1rem;
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.campaign-assignments {
+  padding: 0.5rem 0.75rem;
+}
+
+.assignment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.assignment-row:last-of-type {
+  border-bottom: none;
+}
+
+.assignment-name {
+  cursor: pointer;
+  color: var(--fate-blue);
+  font-weight: 500;
+}
+
+.assignment-name:hover {
+  text-decoration: underline;
+}
+
+.assign-row {
+  padding-top: 0.5rem;
+}
+
+.assign-select {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  cursor: pointer;
+}
+
+.assign-select:focus {
+  outline: none;
+  border-color: var(--fate-blue);
+}
+</style>

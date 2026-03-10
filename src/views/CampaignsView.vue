@@ -54,3 +54,56 @@ function deleteCampaign(id: string, name: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.campaign-card {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+  overflow: hidden;
+}
+
+.campaign-card:hover {
+  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
+  border-color: var(--fate-blue);
+}
+
+.card-header {
+  background: var(--fate-blue);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.card-status {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-description {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-meta {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem 0.75rem;
+}
+</style>

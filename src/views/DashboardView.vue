@@ -66,3 +66,41 @@ function saveEditing() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.dashboard-view {
+  width: 100%;
+}
+
+.dashboard-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-entry {
+  background: var(--fate-white);
+  border: 1px solid var(--fate-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(28, 158, 214, 0.08);
+  overflow: hidden;
+}
+
+.dashboard-entry-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-height: 2.75rem;
+  border-bottom: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+
+.dashboard-empty {
+  text-align: center;
+  color: var(--fate-text-muted);
+  padding: 3rem;
+  font-size: 0.9rem;
+}
+</style>

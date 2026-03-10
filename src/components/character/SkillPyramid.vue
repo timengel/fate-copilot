@@ -119,3 +119,125 @@ function removeCol() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.skill-pyramid {
+  padding: 0.5rem 0.75rem;
+}
+
+.pyramid-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.pyramid-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 4px;
+}
+
+.level-label {
+  display: flex;
+  gap: 0.25rem;
+  align-items: baseline;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.level-plus {
+  color: var(--fate-blue);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.level-name {
+  font-size: 0.75rem;
+  color: var(--fate-text);
+  font-weight: 500;
+}
+
+.level-slots {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.skill-slot {
+  flex: 1;
+}
+
+.skill-value {
+  display: block;
+  border-bottom: 1px solid var(--fate-border);
+  height: 1.6em;
+  padding: 1px 3px;
+  font-size: 0.8rem;
+  color: var(--fate-text);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 3px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  text-align: center;
+}
+
+.skill-input:focus {
+  border-bottom-color: var(--fate-blue);
+  background: var(--fate-blue-light);
+}
+
+.skill-slot--locked {
+  border-bottom: 1px solid var(--fate-border);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.skill-select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 2px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.skill-select:focus {
+  border-bottom-color: var(--fate-blue);
+  background: var(--fate-blue-light);
+}
+
+@container (width < 350px) {
+  /* Skill-Pyramide: Label über den Slots stapeln */
+  .pyramid-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    margin-bottom: 8px;
+  }
+
+  .level-label {
+    min-width: 0;
+  }
+  .level-slots {
+    width: 100%;
+  }
+}
+</style>

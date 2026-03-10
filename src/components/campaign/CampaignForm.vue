@@ -49,3 +49,52 @@ function save() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.campaign-form {
+  background: white;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fate-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: white;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--fate-blue);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--fate-border);
+  background: var(--fate-blue-light);
+}
+</style>

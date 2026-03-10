@@ -58,3 +58,55 @@ function updateAspect(index: number, value: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.aspect-fields {
+  padding: 0.25rem 0;
+}
+
+.aspect-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0.75rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.aspect-row:last-child {
+  border-bottom: none;
+}
+
+.aspect-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.aspect-value {
+  flex: 1;
+  min-height: 1.4em;
+  padding: 1px 2px;
+  color: var(--fate-text);
+}
+
+.aspect-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.aspect-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+</style>
