@@ -46,10 +46,23 @@ const campaignCharacters = computed(() =>
   campaign.value ? campaignsStore.getCharactersForCampaign(campaign.value.id) : []
 )
 
+const scCharacters = computed(() =>
+  campaignCharacters.value.filter(c => (c.type ?? 'sc') === 'sc')
+)
+const nscCharacters = computed(() =>
+  campaignCharacters.value.filter(c => c.type === 'nsc')
+)
+
 const availableCharacters = computed(() =>
   charactersStore.characters.filter(c =>
     !campaignCharacters.value.some(cc => cc.id === c.id)
   )
+)
+const availableSc = computed(() =>
+  availableCharacters.value.filter(c => (c.type ?? 'sc') === 'sc')
+)
+const availableNsc = computed(() =>
+  availableCharacters.value.filter(c => c.type === 'nsc')
 )
 
 const STATUS_LABEL: Record<CampaignStatus, string> = {
@@ -173,20 +186,42 @@ function updateMilestone(milestone: Milestone) {
               <div v-if="campaignCharacters.length === 0" class="empty-text">
                 Noch keine Charaktere zugeordnet.
               </div>
-              <div v-for="char in campaignCharacters" :key="char.id" class="assignment-row">
-                <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                  <strong>{{ char.name || '(Unbenannt)' }}</strong>
-                  <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+
+              <template v-else>
+                <div class="char-group-header">Spielercharaktere (SC)</div>
+                <div v-if="scCharacters.length === 0" class="empty-text">Keine SC zugeordnet.</div>
+                <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
+                  <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
+                    <strong>{{ char.name || '(Unbenannt)' }}</strong>
+                    <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                  </div>
+                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
                 </div>
-                <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
-              </div>
+
+                <div class="char-group-header">Nicht-Spieler-Charaktere (NSC)</div>
+                <div v-if="nscCharacters.length === 0" class="empty-text">Keine NSC zugeordnet.</div>
+                <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
+                  <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
+                    <strong>{{ char.name || '(Unbenannt)' }}</strong>
+                    <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                  </div>
+                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
+                </div>
+              </template>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">
                 <select class="assign-select" @change="assignCharacter(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''">
                   <option value="">Charakter hinzufügen...</option>
-                  <option v-for="c in availableCharacters" :key="c.id" :value="c.id">
-                    {{ c.name || '(Unbenannt)' }}
-                  </option>
+                  <optgroup v-if="availableSc.length > 0" label="Spielercharaktere (SC)">
+                    <option v-for="c in availableSc" :key="c.id" :value="c.id">
+                      {{ c.name || '(Unbenannt)' }}
+                    </option>
+                  </optgroup>
+                  <optgroup v-if="availableNsc.length > 0" label="Nicht-Spieler-Charaktere (NSC)">
+                    <option v-for="c in availableNsc" :key="c.id" :value="c.id">
+                      {{ c.name || '(Unbenannt)' }}
+                    </option>
+                  </optgroup>
                 </select>
               </div>
             </div>
@@ -280,19 +315,39 @@ function updateMilestone(milestone: Milestone) {
   display: flex;
   flex-direction: column;
   cursor: pointer;
+  flex: 1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.assignment-info:hover {
+  background: var(--fate-blue-light);
 }
 
 .assignment-info strong {
   color: var(--fate-blue);
 }
 
-.assignment-info strong:hover {
-  text-decoration: underline;
-}
 
 .assignment-concept {
   font-size: 0.8rem;
   color: var(--fate-text-light);
+}
+
+.char-group-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fate-text-light);
+  padding: 0.5rem 0 0.25rem;
+  border-bottom: 1px solid var(--fate-border);
+  margin-bottom: 0.25rem;
+}
+
+.char-group-header:first-child {
+  padding-top: 0;
 }
 
 .assign-row {
