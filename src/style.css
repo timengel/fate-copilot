@@ -68,6 +68,8 @@ a {
   position: sticky;
   top: 0;
   z-index: 100;
+  container-type: inline-size;
+  container-name: header;
 }
 
 .app-nav {
@@ -100,7 +102,6 @@ a {
 .nav-links {
   display: flex;
   gap: 0.5rem;
-  flex: 1;
 }
 
 .nav-link {
@@ -124,6 +125,8 @@ a {
   margin: 0 auto;
   padding: 1.5rem;
   width: 100%;
+  container-type: inline-size;
+  container-name: main;
 }
 
 .dashboard-view {
@@ -412,7 +415,7 @@ button {
   margin-top: 1rem;
 }
 
-@media (max-width: 640px) {
+@container main (width < 640px) {
   .home-grid { grid-template-columns: 1fr; }
 }
 
@@ -513,6 +516,7 @@ button {
 
 .sheet-section {
   border-bottom: 1px solid var(--fate-border);
+  container-type: inline-size;
 }
 
 /* ALLGEMEINES */
@@ -1530,7 +1534,7 @@ button {
   padding: 0.5rem 0;
 }
 
-@media (max-width: 768px) {
+@container main (width < 768px) {
   .sheet-two-col {
     grid-template-columns: 1fr;
   }
@@ -1549,3 +1553,162 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   RESPONSIVE BASE — neue Elemente + kleine Anpassungen
+   ============================================================ */
+
+/* Nav-Drawer: unsichtbarer Flex-Wrapper auf Desktop */
+.nav-drawer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Hamburger-Button: auf Desktop versteckt */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  margin-left: auto;
+}
+
+.hamburger-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+}
+
+/* Counter-Buttons: 32px für bessere Touch-Targets (Desktop + Mobile) */
+.counter-btn {
+  width: 32px;
+  height: 32px;
+}
+
+/* ============================================================
+   CONTAINER: header — Mobile Navigation
+   ============================================================ */
+
+@container header (width < 768px) {
+  .nav-hamburger { display: flex; }
+
+  .nav-drawer {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background-color: var(--fate-blue);
+    padding: 0.5rem 1rem 0.75rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 99;
+    gap: 0.25rem;
+  }
+
+  .nav-drawer.nav-open { display: flex; }
+
+  /* Nav-Links im Drawer: vertikal, volle Breite */
+  .nav-drawer .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  /* 44px Touch-Targets für Nav-Links */
+  .nav-drawer .nav-link {
+    display: block;
+    padding: 0.7rem 0.8rem;
+  }
+
+  /* Import/Export-Bar im Drawer */
+  .nav-drawer .import-export-bar {
+    margin-left: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CONTAINER: main — 768px Ergänzungen
+   ============================================================ */
+
+@container main (width < 768px) {
+  /* allgemeines-right: nach Grid-Kollaps normal left-aligned */
+  .allgemeines-right {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  /* Detail-Toolbar + Form-Actions: Wrap erlauben */
+  .detail-toolbar  { flex-wrap: wrap; gap: 0.5rem; }
+  .form-actions    { flex-wrap: wrap; justify-content: flex-end; }
+}
+
+/* ============================================================
+   CONTAINER: main — 480px (Smartphones)
+   ============================================================ */
+
+@container main (width < 480px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .list-header            { flex-wrap: wrap; gap: 0.5rem; }
+  .campaign-detail-header { flex-wrap: wrap; gap: 0.5rem; }
+  .section-header         { flex-wrap: wrap; gap: 0.25rem; }
+  .toolbar-actions        { flex-wrap: wrap; gap: 0.5rem; }
+}
+
+/* ============================================================
+   CONTAINER: main — 360px (sehr kleine Phones)
+   ============================================================ */
+
+@container main (width < 360px) {
+  .card-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   CONTAINER: header — 360px (sehr kleine Phones)
+   ============================================================ */
+
+@container header (width < 360px) {
+  .nav-logo { font-size: 1.25rem; }
+}
+
+/* ============================================================
+   CONTAINER: sheet-section — Skill-Pyramide & Stress-Boxen
+   ============================================================ */
+
+@container (width < 350px) {
+  /* Skill-Pyramide: Label über den Slots stapeln */
+  .pyramid-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    margin-bottom: 8px;
+  }
+
+  .level-label  { min-width: 0; }
+  .level-slots  { width: 100%; }
+
+  /* Stress-Boxen: größere Tap-Area via Padding */
+  .stress-box { padding: 6px 4px; }
+}
+
+/* ============================================================
+   .app-main padding — kann sich nicht selbst per @container stylen
+   ============================================================ */
+
+@media (max-width: 480px) { .app-main { padding: 0.75rem; } }
+@media (max-width: 360px) { .app-main { padding: 0.5rem; } }
