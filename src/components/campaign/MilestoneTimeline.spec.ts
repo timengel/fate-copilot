@@ -97,5 +97,59 @@ describe('MilestoneTimeline', () => {
       expect(onUpdate).not.toHaveBeenCalled()
       expect(container.querySelector('.timeline-content--edit')).toBeNull()
     })
+
+    it('trims whitespace from description before emitting add', async () => {
+      const onAdd = vi.fn()
+      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd })
+      const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!
+      await fireEvent.update(input, '  trimmed  ')
+      await fireEvent.click(screen.getByText('+ Hinzufügen'))
+      expect(onAdd.mock.calls[0][0].description).toBe('trimmed')
+    })
+
+    it('does not call onAdd when description is whitespace only', async () => {
+      const onAdd = vi.fn()
+      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd })
+      const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!
+      await fireEvent.update(input, '   ')
+      await fireEvent.click(screen.getByText('+ Hinzufügen'))
+      expect(onAdd).not.toHaveBeenCalled()
+    })
+
+    it('clears the description input after a successful submit', async () => {
+      const { container } = renderTimeline({ milestones: [], readonly: false })
+      const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!
+      await fireEvent.update(input, 'A new milestone')
+      await fireEvent.click(screen.getByText('+ Hinzufügen'))
+      expect(input.value).toBe('')
+    })
+
+    it('does not call onUpdate when saving edit with empty description', async () => {
+      const onUpdate = vi.fn()
+      const { container } = renderTimeline({ milestones, readonly: false, onUpdate })
+      await fireEvent.click(container.querySelector('.milestone-edit')!)
+      const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!
+      await fireEvent.update(editInput, '')
+      await fireEvent.click(screen.getByText('✓'))
+      expect(onUpdate).not.toHaveBeenCalled()
+    })
+
+    it('trims description when saving an edit', async () => {
+      const onUpdate = vi.fn()
+      const { container } = renderTimeline({ milestones, readonly: false, onUpdate })
+      await fireEvent.click(container.querySelector('.milestone-edit')!)
+      const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!
+      await fireEvent.update(editInput, '  updated  ')
+      await fireEvent.click(screen.getByText('✓'))
+      expect(onUpdate.mock.calls[0][0].description).toBe('updated')
+    })
+
+    it('remove button is only present on the last milestone', () => {
+      const { container } = renderTimeline({ milestones, readonly: false })
+      // Only the last milestone's view row should have the danger-outline remove button
+      const viewRows = container.querySelectorAll('.timeline-content:not(.timeline-content--edit)')
+      const rowsWithRemove = Array.from(viewRows).filter(row => row.querySelector('.milestone-remove'))
+      expect(rowsWithRemove).toHaveLength(1)
+    })
   })
 })

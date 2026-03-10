@@ -58,4 +58,16 @@ describe('ConsequenceSlots', () => {
       expect(screen.getByText('Broken leg')).toBeTruthy()
     })
   })
+
+  it('emits a new array (immutable pattern) leaving other values unchanged', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(ConsequenceSlots, { props: { consequences, readonly: false, onUpdate } })
+    const input = container.querySelectorAll<HTMLInputElement>('input.consequence-input')[0]
+    await fireEvent.update(input, 'Sprained ankle')
+    const updated: Consequence[] = onUpdate.mock.calls[0][0]
+    expect(updated[0].value).toBe('Sprained ankle')
+    expect(updated[1].value).toBe('')
+    expect(updated[2].value).toBe('')
+    expect(updated[3].value).toBe('Broken leg') // unchanged
+  })
 })

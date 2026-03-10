@@ -185,4 +185,23 @@ describe('useCampaignsStore', () => {
     expect(store.campaigns[0].id).toBe('new')
     expect(store.assignments[0].campaignId).toBe('new')
   })
+
+  it('addMilestone with non-existent campaignId does nothing', () => {
+    const store = useCampaignsStore()
+    const milestone: Milestone = { id: 'm1', type: 'small', description: 'Ghost' }
+    expect(() => store.addMilestone('ghost', milestone)).not.toThrow()
+    expect(store.campaigns).toHaveLength(0)
+  })
+
+  it('removeMilestone with non-existent campaignId does nothing', () => {
+    const store = useCampaignsStore()
+    expect(() => store.removeMilestone('ghost', 'm1')).not.toThrow()
+  })
+
+  it('unassignCharacter when assignment does not exist does nothing', () => {
+    const store = useCampaignsStore()
+    store.addCampaign(makeCampaign({ id: 'c1' }))
+    expect(() => store.unassignCharacter('c1', 'nobody')).not.toThrow()
+    expect(store.assignments).toHaveLength(0)
+  })
 })

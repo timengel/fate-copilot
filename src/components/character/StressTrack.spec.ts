@@ -42,4 +42,15 @@ describe('StressTrack', () => {
     await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0])
     expect(onUpdate).not.toHaveBeenCalled()
   })
+
+  it('emits full updated array with only the toggled box changed', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(StressTrack, { props: { boxes, label: 'Test', readonly: false, onUpdate } })
+    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0])
+    const updated: StressBox[] = onUpdate.mock.calls[0][0]
+    expect(updated[0].checked).toBe(true)  // was false → toggled
+    expect(updated[1].checked).toBe(true)  // unchanged
+    expect(updated[2].checked).toBe(false) // unchanged
+    expect(updated.map(b => b.value)).toEqual([1, 2, 3]) // values preserved
+  })
 })

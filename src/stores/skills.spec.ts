@@ -109,4 +109,17 @@ describe('useSkillsStore', () => {
     store.resetToDefaults()
     expect(store.skills).toEqual(SKILL_LIST)
   })
+
+  it('replaceAll with empty array clears all skills', () => {
+    const store = useSkillsStore()
+    store.replaceAll([])
+    expect(store.skills).toHaveLength(0)
+  })
+
+  it('removeSkill with non-existent name does nothing', () => {
+    const store = useSkillsStore()
+    const before = [...store.skills]
+    store.removeSkill('DoesNotExist')
+    expect(store.skills).toEqual(before)
+  })
 })
