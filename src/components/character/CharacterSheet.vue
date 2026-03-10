@@ -93,51 +93,72 @@ const colorVars = computed(() => {
         </div>
       </section>
 
-      <!-- ASPEKTE / FERTIGKEITEN -->
-      <div v-if="sections?.aspekte !== false || sections?.fertigkeiten !== false" class="sheet-two-col">
-        <section v-if="sections?.aspekte !== false" class="sheet-section aspekte">
-          <div class="sheet-section-header">ASPEKTE</div>
-          <AspectFields
-            :highConcept="character.highConcept"
-            :trouble="character.trouble"
-            :aspects="character.aspects"
-            :readonly="true"
-          />
-        </section>
+      <!-- ASPEKTE -->
+      <section
+        v-if="sections?.aspekte !== false"
+        class="sheet-section aspekte"
+        :class="{ 'span-full': sections?.fertigkeiten === false }"
+      >
+        <div class="sheet-section-header">ASPEKTE</div>
+        <AspectFields
+          :highConcept="character.highConcept"
+          :trouble="character.trouble"
+          :aspects="character.aspects"
+          :readonly="true"
+        />
+      </section>
 
-        <section v-if="sections?.fertigkeiten !== false" class="sheet-section fertigkeiten">
-          <div class="sheet-section-header">FERTIGKEITEN</div>
-          <SkillPyramid
-            :skills="character.skills"
-            :maxLevel="character.pyramidMaxLevel ?? 5"
-            :maxCols="character.pyramidMaxCols ?? 5"
-            :readonly="true"
-          />
-        </section>
-      </div>
+      <!-- FERTIGKEITEN -->
+      <section
+        v-if="sections?.fertigkeiten !== false"
+        class="sheet-section fertigkeiten"
+        :class="{ 'span-full': sections?.aspekte === false }"
+      >
+        <div class="sheet-section-header">FERTIGKEITEN</div>
+        <SkillPyramid
+          :skills="character.skills"
+          :maxLevel="character.pyramidMaxLevel ?? 5"
+          :maxCols="character.pyramidMaxCols ?? 5"
+          :readonly="true"
+        />
+      </section>
 
-      <!-- EXTRAS / STUNTS -->
-      <div v-if="sections?.extras !== false || sections?.stunts !== false" class="sheet-two-col">
-        <section v-if="sections?.extras !== false" class="sheet-section extras">
-          <div class="sheet-section-header">EXTRAS</div>
-          <div class="text-area-display">{{ character.extras || '' }}</div>
-        </section>
+      <!-- EXTRAS -->
+      <section
+        v-if="sections?.extras !== false"
+        class="sheet-section extras"
+        :class="{ 'span-full': sections?.stunts === false }"
+      >
+        <div class="sheet-section-header">EXTRAS</div>
+        <div class="text-area-display">{{ character.extras || '' }}</div>
+      </section>
 
-        <section v-if="sections?.stunts !== false" class="sheet-section stunts">
-          <div class="sheet-section-header">STUNTS</div>
-          <div class="stunts-list">
-            <div v-for="(stunt, i) in character.stunts" :key="i" class="stunt-item">
-              <strong>{{ stunt.name }}</strong>
-              <span v-if="stunt.description">: {{ stunt.description }}</span>
-            </div>
-            <div v-if="character.stunts.length === 0" class="empty-text"></div>
+      <!-- STUNTS -->
+      <section
+        v-if="sections?.stunts !== false"
+        class="sheet-section stunts"
+        :class="{ 'span-full': sections?.extras === false }"
+      >
+        <div class="sheet-section-header">STUNTS</div>
+        <div class="stunts-list">
+          <div v-for="(stunt, i) in character.stunts" :key="i" class="stunt-item">
+            <strong>{{ stunt.name }}</strong>
+            <span v-if="stunt.description">: {{ stunt.description }}</span>
           </div>
-        </section>
-      </div>
+          <div v-if="character.stunts.length === 0" class="empty-text"></div>
+        </div>
+      </section>
 
-      <!-- STRESS / KONSEQUENZEN -->
-      <div v-if="sections?.stress !== false || sections?.konsequenzen !== false" class="sheet-bottom">
-        <div v-if="sections?.stress !== false" class="stress-section">
+      <!-- STRESS + KONSEQUENZEN -->
+      <div
+        v-if="sections?.stress !== false || sections?.konsequenzen !== false"
+        class="sheet-stress-row"
+      >
+        <div
+          v-if="sections?.stress !== false"
+          class="stress-section"
+          :class="{ 'span-full': sections?.konsequenzen === false }"
+        >
           <StressTrack
             label="KÖRPERLICHER STRESS (KRAFT)"
             :boxes="character.stressPhysical"
@@ -150,7 +171,11 @@ const colorVars = computed(() => {
           />
         </div>
 
-        <section v-if="sections?.konsequenzen !== false" class="sheet-section konsequenzen">
+        <section
+          v-if="sections?.konsequenzen !== false"
+          class="sheet-section konsequenzen"
+          :class="{ 'span-full': sections?.stress === false }"
+        >
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <ConsequenceSlots :consequences="character.consequences" :readonly="true" />
         </section>
@@ -169,11 +194,32 @@ const colorVars = computed(() => {
 
 <style scoped>
 .character-sheet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   background: white;
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
+}
+
+/* Full-width grid children */
+.character-name-bar,
+.allgemeines,
+.gm-notes-section {
+  grid-column: 1 / -1;
+}
+
+/* Left-column sections get a right-side divider */
+.aspekte,
+.extras {
+  border-right: 1px solid var(--fate-border);
+}
+
+/* When a section is alone in its row, span both columns */
+.span-full {
+  grid-column: 1 / -1;
+  border-right: none;
 }
 
 /* NAME BAR (always visible in full sheet) */
@@ -281,27 +327,7 @@ const colorVars = computed(() => {
   text-align: right;
 }
 
-/* TWO-COLUMN LAYOUT (Aspekte | Fertigkeiten, Extras | Stunts) */
-.sheet-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid var(--fate-border);
-}
-
-.sheet-two-col .sheet-section {
-  border-bottom: none;
-}
-
-.sheet-two-col .sheet-section:first-child {
-  border-right: 1px solid var(--fate-border);
-}
-
 /* EXTRAS / STUNTS */
-.extras,
-.stunts {
-  padding: 0;
-}
-
 .text-area-display {
   padding: 0.5rem 0.75rem;
   min-height: 120px;
@@ -321,44 +347,49 @@ const colorVars = computed(() => {
   line-height: 1.4;
 }
 
-/* BOTTOM: STRESS + KONSEQUENZEN */
-.sheet-bottom {
+/* STRESS + KONSEQUENZEN row */
+.sheet-stress-row {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: max-content 1fr;
   border-bottom: 1px solid var(--fate-border);
 }
 
 .stress-section {
-  border-right: 1px solid var(--fate-border);
   padding: 0.5rem 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-width: 220px;
+  border-right: 1px solid var(--fate-border);
+}
+
+.konsequenzen {
+  border-bottom: none;
 }
 
 @container main (width < 768px) {
-  .sheet-two-col {
+  .character-sheet {
     grid-template-columns: 1fr;
   }
-  .sheet-two-col .sheet-section:first-child {
+
+  .aspekte,
+  .extras {
     border-right: none;
-    border-bottom: 1px solid var(--fate-border);
   }
-  .sheet-bottom {
+
+  .sheet-stress-row {
     grid-template-columns: 1fr;
   }
+
   .stress-section {
     border-right: none;
     border-bottom: 1px solid var(--fate-border);
   }
+
   .allgemeines-grid {
     grid-template-columns: 1fr;
   }
-}
 
-@container main (width < 768px) {
-  /* allgemeines-right: nach Grid-Kollaps normal left-aligned */
   .allgemeines-right {
     align-items: flex-start;
     min-width: 0;
