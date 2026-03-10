@@ -10,6 +10,7 @@ import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
 import type { Character, CharacterType } from '../types'
 import { createDefaultCharacter } from '../composables/useCharacterDefaults'
 import { useConfirmDialog } from '../composables/useConfirmDialog'
+import { useToastStore } from '../stores/toast'
 
 const props = defineProps<{
   isNew?: boolean
@@ -24,6 +25,7 @@ const campaignsStore = useCampaignsStore()
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
 const { confirmDialog, showConfirmDialog } = useConfirmDialog()
+const toastStore = useToastStore()
 
 const character = computed(() => {
   if (props.isNew) {
@@ -58,6 +60,7 @@ function handleSave(updated: Character) {
     charactersStore.updateCharacter(updated)
     isEditing.value = false
   }
+  toastStore.show('Charakter gespeichert')
 }
 
 function handleCancel() {

@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import ImportExportBar from './components/shared/ImportExportBar.vue'
 import FateToggle from './components/shared/FateToggle.vue'
+import FateToast from './components/shared/FateToast.vue'
 import { initPersistence } from './composables/usePersistence'
 import { useGMModeStore } from './stores/gmMode'
 
@@ -55,6 +56,7 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
         <RouterView />
       </main>
     </div>
+    <FateToast />
   </div>
 </template>
 

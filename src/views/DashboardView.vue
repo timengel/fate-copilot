@@ -3,6 +3,7 @@ import { computed, ref, watchEffect } from 'vue'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useCharactersStore } from '../stores/characters'
 import { useGMModeStore } from '../stores/gmMode'
+import { useToastStore } from '../stores/toast'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
 import CharacterForm from '../components/character/CharacterForm.vue'
 import FateButton from '../components/shared/FateButton.vue'
@@ -11,6 +12,7 @@ import type { Character } from '../types'
 const campaignsStore = useCampaignsStore()
 const charactersStore = useCharactersStore()
 const gmModeStore = useGMModeStore()
+const toastStore = useToastStore()
 
 const editingId = ref<string | null>(null)
 const formRef = ref<InstanceType<typeof CharacterForm>[]>([])
@@ -46,6 +48,7 @@ const characters = computed(() => {
 function handleSave(updated: Character) {
   charactersStore.updateCharacter(updated)
   editingId.value = null
+  toastStore.show('Charakter gespeichert')
 }
 
 function saveEditing() {
