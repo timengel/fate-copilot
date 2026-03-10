@@ -203,16 +203,18 @@ const selectedInfo = computed<SkillInfo | null>(() =>
           :key="skill"
           class="skill-manage-row"
         >
-          <span class="skill-manage-name">{{ skill }}</span>
-          <div class="skill-manage-actions">
+          <div class="skill-manage-label">
+            <span class="skill-manage-name">{{ skill }}</span>
             <FateButton
               v-if="SKILL_INFO[skill]"
               icon="info"
-              variant="info"
+              variant="secondary"
               size="S"
               :title="`Info zu ${skill}`"
               @click="infoSkill = skill"
             />
+          </div>
+          <div class="skill-manage-actions">
             <FateButton icon="close" variant="danger" size="S" @click="store.removeSkill(skill)" />
           </div>
         </div>
@@ -382,6 +384,12 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
 .skill-manage-row:last-child {
   border-bottom: none;
+}
+
+.skill-manage-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .skill-manage-name {
