@@ -31,7 +31,7 @@ export function initPersistence() {
 
   // Bei jeder Änderung: in localStorage schreiben
   watch(
-    [charactersStore.characters, campaignsStore.campaigns, campaignsStore.assignments, skillsStore.skills],
+    [() => charactersStore.characters, () => campaignsStore.campaigns, () => campaignsStore.assignments, () => skillsStore.skills],
     () => {
       const data: AppData = {
         formatVersion: FORMAT_VERSION,

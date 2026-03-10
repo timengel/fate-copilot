@@ -169,6 +169,26 @@ describe('initPersistence', () => {
     expect(useCharactersStore().getById('n1')?.type).toBe('nsc')
   })
 
+  it('persists assignment when character is assigned to campaign', async () => {
+    initPersistence()
+    const campaignsStore = useCampaignsStore()
+    campaignsStore.assignCharacter('camp1', 'c1')
+    await nextTick()
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
+    expect(saved.campaignCharacterAssignments).toEqual([{ campaignId: 'camp1', characterId: 'c1' }])
+  })
+
+  it('persists removal when character is unassigned from campaign', async () => {
+    initPersistence()
+    const campaignsStore = useCampaignsStore()
+    campaignsStore.assignCharacter('camp1', 'c1')
+    await nextTick()
+    campaignsStore.unassignCharacter('camp1', 'c1')
+    await nextTick()
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
+    expect(saved.campaignCharacterAssignments).toEqual([])
+  })
+
   it('v1.0 data without skills field falls back to SKILL_LIST on init', () => {
     setStorage({
       formatVersion: '1.0',
