@@ -5,6 +5,7 @@ import AspectFields from './AspectFields.vue'
 import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
 import ConsequenceSlots from './ConsequenceSlots.vue'
+import FateButton from '../shared/FateButton.vue'
 
 const props = defineProps<{ character: Character }>()
 const emit = defineEmits<{ save: [character: Character]; cancel: [] }>()
@@ -58,9 +59,9 @@ function save() {
           <div class="field-row">
             <label class="field-label">Fate-Punkte</label>
             <div class="fate-points-ctrl">
-              <button type="button" class="counter-btn" @click="form.fatePoints = Math.max(0, form.fatePoints - 1)">−</button>
+              <FateButton variant="counter" @click="form.fatePoints = Math.max(0, form.fatePoints - 1)">−</FateButton>
               <span class="fate-points">{{ form.fatePoints }}</span>
-              <button type="button" class="counter-btn" @click="form.fatePoints++">+</button>
+              <FateButton variant="counter" @click="form.fatePoints++">+</FateButton>
             </div>
           </div>
         </div>
@@ -115,9 +116,9 @@ function save() {
                 @input="updateStunt(i, 'description', ($event.target as HTMLInputElement).value)"
               />
             </div>
-            <button type="button" class="btn-sm btn-danger" @click="removeStunt(i)">✕</button>
+            <FateButton variant="danger" size="sm" @click="removeStunt(i)">✕</FateButton>
           </div>
-          <button type="button" class="btn-sm btn-add" @click="addStunt">+ Stunt hinzufügen</button>
+          <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
         </div>
       </section>
     </div>
@@ -148,8 +149,8 @@ function save() {
 
     <!-- FORM ACTIONS -->
     <div class="form-actions">
-      <button type="button" class="btn-secondary" @click="emit('cancel')">Abbrechen</button>
-      <button type="button" class="btn-primary" @click="save">Speichern</button>
+      <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
+      <FateButton @click="save">Speichern</FateButton>
     </div>
 
   </div>

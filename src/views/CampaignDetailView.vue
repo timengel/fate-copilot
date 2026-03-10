@@ -5,6 +5,7 @@ import { useCampaignsStore } from '../stores/campaigns'
 import { useCharactersStore } from '../stores/characters'
 import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
+import FateButton from '../components/shared/FateButton.vue'
 import type { Campaign, Milestone } from '../types'
 
 const props = defineProps<{
@@ -104,16 +105,16 @@ function updateMilestone(milestone: Milestone) {
   <div class="detail-view">
     <div v-if="!campaign && !isNew" class="not-found">
       Kampagne nicht gefunden.
-      <button class="btn-link" @click="router.push('/campaigns')">← Zurück</button>
+      <FateButton variant="link" @click="router.push('/campaigns')">← Zurück</FateButton>
     </div>
 
     <template v-else-if="campaign">
       <div class="detail-toolbar">
-        <button class="btn-link" @click="router.push('/campaigns')">← Kampagnen</button>
+        <FateButton variant="link" @click="router.push('/campaigns')">← Kampagnen</FateButton>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
-            <button class="btn-primary" @click="isEditing = true">Bearbeiten</button>
-            <button class="btn-danger-outline" @click="deleteCampaign">Löschen</button>
+            <FateButton @click="isEditing = true">Bearbeiten</FateButton>
+            <FateButton variant="danger-outline" @click="deleteCampaign">Löschen</FateButton>
           </template>
         </div>
       </div>
@@ -164,7 +165,7 @@ function updateMilestone(milestone: Milestone) {
                   <strong>{{ char.name || '(Unbenannt)' }}</strong>
                   <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
                 </div>
-                <button class="btn-sm btn-danger" @click="unassignCharacter(char.id)">Entfernen</button>
+                <FateButton variant="danger" size="sm" @click="unassignCharacter(char.id)">Entfernen</FateButton>
               </div>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">

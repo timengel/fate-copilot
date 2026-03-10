@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
+import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
 const store = useCampaignsStore()
@@ -22,7 +23,7 @@ function deleteCampaign(id: string, name: string) {
   <div class="list-view">
     <div class="list-header">
       <h1>Kampagnen</h1>
-      <button class="btn-primary" @click="router.push('/campaigns/new')">+ Neue Kampagne</button>
+      <FateButton @click="router.push('/campaigns/new')">+ Neue Kampagne</FateButton>
     </div>
 
     <div v-if="store.campaigns.length === 0" class="empty-state">
@@ -45,8 +46,8 @@ function deleteCampaign(id: string, name: string) {
           {{ store.getCharactersForCampaign(campaign.id).length }} Charaktere
         </div>
         <div class="card-actions" @click.stop>
-          <button class="btn-sm" @click="router.push(`/campaigns/${campaign.id}`)">Ansehen</button>
-          <button class="btn-sm btn-danger" @click="deleteCampaign(campaign.id, campaign.name)">Löschen</button>
+          <FateButton variant="secondary" size="sm" @click="router.push(`/campaigns/${campaign.id}`)">Ansehen</FateButton>
+          <FateButton variant="danger" size="sm" @click="deleteCampaign(campaign.id, campaign.name)">Löschen</FateButton>
         </div>
       </div>
     </div>

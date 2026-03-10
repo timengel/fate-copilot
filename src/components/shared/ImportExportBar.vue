@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useImportExport } from '../../composables/useImportExport'
 import ConfirmDialog from './ConfirmDialog.vue'
+import FateButton from './FateButton.vue'
 import type { AppData } from '../../types'
 
 const { exportJSON, importJSON, applyImport } = useImportExport()
@@ -45,12 +46,8 @@ function cancelImport() {
 
 <template>
   <div class="import-export-bar">
-    <button class="btn-outline" @click="exportJSON" title="Alle Daten als JSON exportieren">
-      ↓ Exportieren
-    </button>
-    <button class="btn-outline" @click="triggerImport" title="JSON-Datei importieren">
-      ↑ Importieren
-    </button>
+    <FateButton variant="outline" @click="exportJSON" title="Alle Daten als JSON exportieren">↓ Exportieren</FateButton>
+    <FateButton variant="outline" @click="triggerImport" title="JSON-Datei importieren">↑ Importieren</FateButton>
     <input
       ref="fileInput"
       type="file"

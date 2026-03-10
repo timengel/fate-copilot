@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
+import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
 const charactersStore = useCharactersStore()
@@ -26,7 +27,7 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
       <section class="home-section">
         <div class="section-header">
           <h2>Kampagnen</h2>
-          <button class="btn-primary" @click="router.push('/campaigns/new')">+ Neu</button>
+          <FateButton @click="router.push('/campaigns/new')">+ Neu</FateButton>
         </div>
         <div v-if="activeCampaigns.length === 0" class="empty-state">
           Keine aktiven Kampagnen vorhanden.
@@ -38,13 +39,13 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
             <span class="item-meta">{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span>
           </li>
         </ul>
-        <button class="btn-link" @click="router.push('/campaigns')">Alle Kampagnen ansehen →</button>
+        <FateButton variant="link" @click="router.push('/campaigns')">Alle Kampagnen ansehen →</FateButton>
       </section>
 
       <section class="home-section">
         <div class="section-header">
           <h2>Charaktere</h2>
-          <button class="btn-primary" @click="router.push('/characters/new')">+ Neu</button>
+          <FateButton @click="router.push('/characters/new')">+ Neu</FateButton>
         </div>
         <div v-if="recentCharacters.length === 0" class="empty-state">
           Noch keine Charaktere vorhanden.
@@ -56,7 +57,7 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4
             <span class="item-meta">{{ char.highConcept || '—' }}</span>
           </li>
         </ul>
-        <button class="btn-link" @click="router.push('/characters')">Alle Charaktere ansehen →</button>
+        <FateButton variant="link" @click="router.push('/characters')">Alle Charaktere ansehen →</FateButton>
       </section>
     </div>
   </div>

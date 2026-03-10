@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
 import CharacterForm from '../components/character/CharacterForm.vue'
+import FateButton from '../components/shared/FateButton.vue'
 import type { Character } from '../types'
 import { createDefaultCharacter } from '../composables/useCharacterDefaults'
 
@@ -81,16 +82,16 @@ function unassignFromCampaign(campaignId: string) {
   <div class="detail-view">
     <div v-if="!character && !isNew" class="not-found">
       Charakter nicht gefunden.
-      <button class="btn-link" @click="router.push('/characters')">← Zurück</button>
+      <FateButton variant="link" @click="router.push('/characters')">← Zurück</FateButton>
     </div>
 
     <template v-else-if="character">
       <div class="detail-toolbar">
-        <button class="btn-link" @click="router.push('/characters')">← Charaktere</button>
+        <FateButton variant="link" @click="router.push('/characters')">← Charaktere</FateButton>
         <div class="toolbar-actions">
           <template v-if="!isNew">
-            <button v-if="!isEditing" class="btn-primary" @click="toggleEdit">Bearbeiten</button>
-            <button class="btn-danger-outline" @click="deleteCharacter">Löschen</button>
+            <FateButton v-if="!isEditing" @click="toggleEdit">Bearbeiten</FateButton>
+            <FateButton variant="danger-outline" @click="deleteCharacter">Löschen</FateButton>
           </template>
         </div>
       </div>
@@ -116,7 +117,7 @@ function unassignFromCampaign(campaignId: string) {
               <span class="assignment-name" @click="router.push(`/campaigns/${campaign.id}`)">
                 {{ campaign.name }}
               </span>
-              <button class="btn-sm btn-danger" @click="unassignFromCampaign(campaign.id)">Entfernen</button>
+              <FateButton variant="danger" size="sm" @click="unassignFromCampaign(campaign.id)">Entfernen</FateButton>
             </div>
 
             <div v-if="availableCampaigns.length > 0" class="assign-row">

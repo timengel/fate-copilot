@@ -4,6 +4,7 @@ import { useCampaignsStore } from '../stores/campaigns'
 import { useCharactersStore } from '../stores/characters'
 import CharacterSheet from '../components/character/CharacterSheet.vue'
 import CharacterForm from '../components/character/CharacterForm.vue'
+import FateButton from '../components/shared/FateButton.vue'
 import type { Character } from '../types'
 
 const campaignsStore = useCampaignsStore()
@@ -39,7 +40,7 @@ function handleSave(updated: Character) {
     <div v-else class="dashboard-stack">
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
         <div v-if="editingId !== character.id" class="dashboard-card-toolbar">
-          <button class="btn-primary btn-sm" @click="editingId = character.id">Bearbeiten</button>
+          <FateButton size="sm" @click="editingId = character.id">Bearbeiten</FateButton>
         </div>
         <CharacterForm
           v-if="editingId === character.id"

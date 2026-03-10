@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useSkillsStore } from '../stores/skills'
+import FateButton from '../components/shared/FateButton.vue'
 
 const store = useSkillsStore()
 const newSkillName = ref('')
@@ -192,7 +193,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   <div class="list-view">
     <div class="list-header">
       <h1>Fertigkeiten</h1>
-      <button class="btn-secondary" @click="resetToDefaults">Auf Standard zurücksetzen</button>
+      <FateButton variant="secondary" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
     </div>
 
     <p class="skills-hint">
@@ -208,13 +209,13 @@ const selectedInfo = computed<SkillInfo | null>(() =>
         >
           <span class="skill-manage-name">{{ skill }}</span>
           <div class="skill-manage-actions">
-            <button
+            <FateButton
               v-if="SKILL_INFO[skill]"
-              class="btn-sm btn-info"
+              variant="info"
               :title="`Info zu ${skill}`"
               @click="infoSkill = skill"
-            >ℹ</button>
-            <button class="btn-sm btn-danger" @click="store.removeSkill(skill)">✕</button>
+            >ℹ</FateButton>
+            <FateButton variant="danger" size="sm" @click="store.removeSkill(skill)">✕</FateButton>
           </div>
         </div>
         <div v-if="store.skills.length === 0" class="empty-state">
@@ -229,7 +230,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
           placeholder="Neue Fertigkeit..."
           @keydown.enter="add"
         />
-        <button class="btn-primary" @click="add">Hinzufügen</button>
+        <FateButton @click="add">Hinzufügen</FateButton>
       </div>
     </div>
   </div>
@@ -240,7 +241,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
-          <button class="skill-info-close" @click="infoSkill = null">✕</button>
+          <FateButton variant="ghost" class="skill-info-close" @click="infoSkill = null">✕</FateButton>
         </div>
         <p class="skill-info-description">{{ selectedInfo.description }}</p>
         <div class="skill-info-actions">

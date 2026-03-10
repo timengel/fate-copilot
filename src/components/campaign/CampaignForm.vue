@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { Campaign } from '../../types'
+import FateButton from '../shared/FateButton.vue'
 
 const props = defineProps<{ campaign: Campaign }>()
 const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>()
@@ -43,8 +44,8 @@ function save() {
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn-secondary" @click="emit('cancel')">Abbrechen</button>
-      <button type="button" class="btn-primary" @click="save">Speichern</button>
+      <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
+      <FateButton @click="save">Speichern</FateButton>
     </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Milestone } from '../../types'
+import FateButton from '../shared/FateButton.vue'
 
 const props = defineProps<{
   milestones: Milestone[]
@@ -85,8 +86,8 @@ function cancelEdit() {
             @keydown.enter="saveEdit(m.id)"
             @keydown.escape="cancelEdit"
           />
-          <button class="btn-sm btn-add" @click="saveEdit(m.id)">✓</button>
-          <button class="milestone-remove" @click="cancelEdit">✕</button>
+          <FateButton variant="add" @click="saveEdit(m.id)">✓</FateButton>
+          <FateButton variant="ghost" class="milestone-remove" @click="cancelEdit">✕</FateButton>
         </div>
 
         <!-- View mode -->
@@ -94,8 +95,8 @@ function cancelEdit() {
           <span class="milestone-badge" :class="`badge--${m.type}`">{{ TYPE_LABELS[m.type] }}</span>
           <span class="milestone-desc">{{ m.description }}</span>
           <template v-if="!readonly">
-            <button class="milestone-edit" @click="startEdit(m)">✎</button>
-            <button class="milestone-remove" @click="emit('remove', m.id)">✕</button>
+            <FateButton variant="ghost" class="milestone-edit" @click="startEdit(m)">✎</FateButton>
+            <FateButton variant="ghost" class="milestone-remove" @click="emit('remove', m.id)">✕</FateButton>
           </template>
         </div>
       </div>
@@ -113,7 +114,7 @@ function cancelEdit() {
         placeholder="Beschreibung..."
         @keydown.enter="submit"
       />
-      <button class="btn-sm btn-add" @click="submit">+ Hinzufügen</button>
+      <FateButton variant="add" @click="submit">+ Hinzufügen</FateButton>
     </div>
   </div>
 </template>

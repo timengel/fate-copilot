@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FateButton from './FateButton.vue'
+
 defineProps<{
   title: string
   message: string
@@ -16,8 +18,8 @@ const emit = defineEmits<{
       <div class="dialog-title">{{ title }}</div>
       <div class="dialog-message">{{ message }}</div>
       <div class="dialog-actions">
-        <button class="btn-secondary" @click="emit('cancel')">Abbrechen</button>
-        <button class="btn-primary btn-danger" @click="emit('confirm')">Bestätigen</button>
+        <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
+        <FateButton variant="danger" @click="emit('confirm')">Bestätigen</FateButton>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCharactersStore } from '../stores/characters'
+import FateButton from '../components/shared/FateButton.vue'
 
 const router = useRouter()
 const store = useCharactersStore()
@@ -25,7 +26,7 @@ function deleteCharacter(id: string, name: string) {
   <div class="list-view">
     <div class="list-header">
       <h1>Charaktere</h1>
-      <button class="btn-primary" @click="router.push('/characters/new')">+ Neuer Charakter</button>
+      <FateButton @click="router.push('/characters/new')">+ Neuer Charakter</FateButton>
     </div>
 
     <input
@@ -52,8 +53,8 @@ function deleteCharacter(id: string, name: string) {
           <em>{{ char.trouble }}</em>
         </div>
         <div class="card-actions" @click.stop>
-          <button class="btn-sm" @click="router.push(`/characters/${char.id}/edit`)">Bearbeiten</button>
-          <button class="btn-sm btn-danger" @click="deleteCharacter(char.id, char.name)">Löschen</button>
+          <FateButton variant="secondary" size="sm" @click="router.push(`/characters/${char.id}/edit`)">Bearbeiten</FateButton>
+          <FateButton variant="danger" size="sm" @click="deleteCharacter(char.id, char.name)">Löschen</FateButton>
         </div>
       </div>
     </div>
