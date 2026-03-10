@@ -2,7 +2,13 @@
 import { useRouter } from 'vue-router'
 import { useCampaignsStore } from '../stores/campaigns'
 import FateButton from '../components/shared/FateButton.vue'
-import type { CampaignStatus } from '../types'
+import type { Campaign, CampaignStatus } from '../types'
+import { CHARACTER_COLORS } from '../types'
+
+function colorVarsFor(campaign: Campaign) {
+  const c = CHARACTER_COLORS.find(c => c.id === campaign.color) ?? CHARACTER_COLORS[0]!
+  return { '--fate-blue': c.primary, '--fate-blue-dark': c.dark, '--fate-blue-light': c.light }
+}
 
 const router = useRouter()
 const store = useCampaignsStore()
@@ -36,6 +42,7 @@ function deleteCampaign(id: string, name: string) {
         v-for="campaign in store.campaigns"
         :key="campaign.id"
         class="campaign-card"
+        :style="colorVarsFor(campaign)"
         @click="router.push(`/campaigns/${campaign.id}`)"
       >
         <div class="card-header">{{ campaign.name }}</div>

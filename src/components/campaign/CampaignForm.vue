@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { Campaign } from '../../types'
+import ColorPicker from '../shared/ColorPicker.vue'
 import FateButton from '../shared/FateButton.vue'
 
 const props = defineProps<{ campaign: Campaign }>()
@@ -27,6 +28,11 @@ function save() {
     <div class="form-group">
       <label class="form-label">Beschreibung</label>
       <textarea class="form-control" v-model="form.description" placeholder="Kurzbeschreibung der Kampagne" rows="3" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Farbe</label>
+      <ColorPicker v-model="form.color" />
     </div>
 
     <div class="form-group">

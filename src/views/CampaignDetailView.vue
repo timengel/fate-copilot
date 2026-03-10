@@ -7,6 +7,7 @@ import CampaignForm from '../components/campaign/CampaignForm.vue'
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
 import FateButton from '../components/shared/FateButton.vue'
 import type { Campaign, CampaignStatus, Milestone } from '../types'
+import { CHARACTER_COLORS } from '../types'
 
 const props = defineProps<{
   isNew?: boolean
@@ -20,6 +21,11 @@ const charactersStore = useCharactersStore()
 
 const id = computed(() => route.params.id as string)
 const isEditing = ref(props.isNew || props.editMode || false)
+
+const colorVars = computed(() => {
+  const c = CHARACTER_COLORS.find(c => c.id === campaign.value?.color) ?? CHARACTER_COLORS[0]!
+  return { '--fate-blue': c.primary, '--fate-blue-dark': c.dark, '--fate-blue-light': c.light }
+})
 
 const campaign = computed(() => {
   if (props.isNew) {
@@ -103,7 +109,7 @@ function updateMilestone(milestone: Milestone) {
 </script>
 
 <template>
-  <div class="detail-view">
+  <div class="detail-view" :style="colorVars">
     <div v-if="!campaign && !isNew" class="not-found">
       Kampagne nicht gefunden.
       <FateButton variant="link" @click="router.push('/campaigns')">← Zurück</FateButton>

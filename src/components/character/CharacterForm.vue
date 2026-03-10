@@ -2,6 +2,7 @@
 import { computed, reactive, watch } from 'vue'
 import type { Character, Stunt } from '../../types'
 import { CHARACTER_COLORS } from '../../types'
+import ColorPicker from '../shared/ColorPicker.vue'
 import AspectFields from './AspectFields.vue'
 import SkillPyramid from './SkillPyramid.vue'
 import StressTrack from './StressTrack.vue'
@@ -65,18 +66,7 @@ defineExpose({ save })
           </div>
           <div class="field-row">
             <label class="field-label">Farbe</label>
-            <div class="color-picker">
-              <button
-                v-for="c in CHARACTER_COLORS"
-                :key="c.id"
-                class="color-swatch"
-                :class="{ active: (form.color ?? 'pfau') === c.id }"
-                :style="{ background: c.primary }"
-                :title="c.label"
-                type="button"
-                @click="form.color = c.id"
-              />
-            </div>
+            <ColorPicker v-model="form.color" />
           </div>
         </div>
         <div class="allgemeines-right">
@@ -389,37 +379,6 @@ defineExpose({ save })
   background: var(--fate-blue-light);
 }
 
-/* COLOR PICKER */
-.color-picker {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  padding: 4px 0;
-}
-
-.color-swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  outline: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  transition: transform 0.15s, outline-color 0.15s, border-color 0.15s;
-}
-
-.color-swatch:hover {
-  transform: scale(1.15);
-  outline-color: rgba(0, 0, 0, 0.2);
-}
-
-.color-swatch.active {
-  border-color: #fff;
-  outline-color: var(--fate-text);
-  transform: scale(1.1);
-}
 
 @container main (width < 768px) {
   .sheet-two-col {

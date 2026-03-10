@@ -105,6 +105,7 @@ export interface Campaign {
   description: string
   status: CampaignStatus
   notes: string
+  color?: string
   milestones?: Milestone[]
 }
 
