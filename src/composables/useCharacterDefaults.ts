@@ -18,18 +18,27 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     extras: '',
     refresh: 3,
     fatePoints: 3,
-    stressPhysical: [
-      { value: 1, checked: false },
-      { value: 2, checked: false },
-      { value: 3, checked: false },
-      { value: 4, checked: false },
-    ],
-    stressMental: [
-      { value: 1, checked: false },
-      { value: 2, checked: false },
-      { value: 3, checked: false },
-      { value: 4, checked: false },
-    ],
+    stressPhysical: type === 'nsc'
+      ? [
+          { value: 1, checked: false },
+          { value: 2, checked: false },
+        ]
+      : [
+          { value: 1, checked: false },
+          { value: 2, checked: false },
+          { value: 3, checked: false },
+          { value: 4, checked: false },
+        ],
+    stressMental: type === 'nsc'
+      ? [
+          { value: 1, checked: false },
+        ]
+      : [
+          { value: 1, checked: false },
+          { value: 2, checked: false },
+          { value: 3, checked: false },
+          { value: 4, checked: false },
+        ],
     consequences: (type === 'nsc'
       ? [{ severity: 2, label: 'mild', value: '' }]
       : [

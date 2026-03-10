@@ -110,7 +110,7 @@ defineExpose({ save })
         <div class="allgemeines-right">
           <div class="field-row">
             <label class="field-label">Erholungsrate</label>
-            <input class="field-input field-number" type="number" v-model.number="form.refresh" min="1" max="10" />
+            <FateCounter v-model="form.refresh" :min="1" :max="10" />
           </div>
           <div class="field-row">
             <label class="field-label">Fate-Punkte</label>
@@ -216,7 +216,7 @@ defineExpose({ save })
 
       <section class="sheet-section konsequenzen">
         <div class="sheet-section-header">KONSEQUENZEN</div>
-        <div v-if="form.type === 'nsc'" class="consequence-config">
+        <div class="consequence-config">
           <span v-for="ct in CONSEQUENCE_TYPES" :key="ct.severity" class="consequence-config-item">
             <button type="button" class="consequence-config-btn" :disabled="countConsequences(ct.severity) === 0" @click="removeConsequenceSlot(ct.severity)">−</button>
             <span class="consequence-config-label">{{ ct.label }} ({{ countConsequences(ct.severity) }})</span>

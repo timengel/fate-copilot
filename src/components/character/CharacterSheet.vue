@@ -179,20 +179,13 @@ const colorVars = computed(() => {
   white-space: pre-wrap;
 }
 
-.refresh-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--fate-blue);
-  text-align: center;
-  min-width: 40px;
-}
-
+.refresh-value,
 .fate-points {
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--fate-blue);
   text-align: center;
-  min-width: 40px;
+  min-width: 28px;
 }
 
 .fate-logo-corner {
