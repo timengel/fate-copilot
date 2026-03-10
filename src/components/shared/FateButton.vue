@@ -56,7 +56,7 @@ button {
   color: white;
 }
 .fate-btn--primary:hover {
-  background: #3ab5e4;
+  background: var(--fate-blue-dark);
 }
 
 .fate-btn--secondary {
@@ -106,7 +106,7 @@ button {
   margin-top: 0.5rem;
 }
 .fate-btn--add:hover {
-  background: #cce5f5;
+  background: color-mix(in srgb, var(--fate-blue-light) 60%, var(--fate-blue) 40%);
 }
 
 .fate-btn--link {
@@ -159,6 +159,6 @@ button {
 }
 
 .fate-btn--info:hover {
-  background: #1787bb;
+  background: var(--fate-blue-dark);
 }
 </style>
