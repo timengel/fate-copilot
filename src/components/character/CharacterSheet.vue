@@ -10,6 +10,15 @@ import ConsequenceSlots from './ConsequenceSlots.vue'
 
 const props = defineProps<{
   character: Character
+  sections?: {
+    allgemeines?: boolean
+    aspekte?: boolean
+    fertigkeiten?: boolean
+    extras?: boolean
+    stunts?: boolean
+    stress?: boolean
+    konsequenzen?: boolean
+  }
 }>()
 
 const gmModeStore = useGMModeStore()
@@ -47,8 +56,14 @@ const colorVars = computed(() => {
     <!-- Full sheet (GM Mode or SC) -->
     <template v-else>
 
+      <!-- Immer sichtbar: Name -->
+      <div class="character-name-bar">
+        <span class="character-name-text">{{ character.name || '(Unbenannt)' }}</span>
+        <span class="character-type-badge">{{ character.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+      </div>
+
       <!-- ALLGEMEINES -->
-      <section class="sheet-section allgemeines">
+      <section v-if="sections?.allgemeines !== false" class="sheet-section allgemeines">
         <div class="sheet-section-header">ALLGEMEINES</div>
         <div class="allgemeines-grid">
           <div class="allgemeines-left">
@@ -79,8 +94,8 @@ const colorVars = computed(() => {
       </section>
 
       <!-- ASPEKTE / FERTIGKEITEN -->
-      <div class="sheet-two-col">
-        <section class="sheet-section aspekte">
+      <div v-if="sections?.aspekte !== false || sections?.fertigkeiten !== false" class="sheet-two-col">
+        <section v-if="sections?.aspekte !== false" class="sheet-section aspekte">
           <div class="sheet-section-header">ASPEKTE</div>
           <AspectFields
             :highConcept="character.highConcept"
@@ -90,7 +105,7 @@ const colorVars = computed(() => {
           />
         </section>
 
-        <section class="sheet-section fertigkeiten">
+        <section v-if="sections?.fertigkeiten !== false" class="sheet-section fertigkeiten">
           <div class="sheet-section-header">FERTIGKEITEN</div>
           <SkillPyramid
             :skills="character.skills"
@@ -102,13 +117,13 @@ const colorVars = computed(() => {
       </div>
 
       <!-- EXTRAS / STUNTS -->
-      <div class="sheet-two-col">
-        <section class="sheet-section extras">
+      <div v-if="sections?.extras !== false || sections?.stunts !== false" class="sheet-two-col">
+        <section v-if="sections?.extras !== false" class="sheet-section extras">
           <div class="sheet-section-header">EXTRAS</div>
           <div class="text-area-display">{{ character.extras || '' }}</div>
         </section>
 
-        <section class="sheet-section stunts">
+        <section v-if="sections?.stunts !== false" class="sheet-section stunts">
           <div class="sheet-section-header">STUNTS</div>
           <div class="stunts-list">
             <div v-for="(stunt, i) in character.stunts" :key="i" class="stunt-item">
@@ -121,8 +136,8 @@ const colorVars = computed(() => {
       </div>
 
       <!-- STRESS / KONSEQUENZEN -->
-      <div class="sheet-bottom">
-        <div class="stress-section">
+      <div v-if="sections?.stress !== false || sections?.konsequenzen !== false" class="sheet-bottom">
+        <div v-if="sections?.stress !== false" class="stress-section">
           <StressTrack
             label="KÖRPERLICHER STRESS (KRAFT)"
             :boxes="character.stressPhysical"
@@ -135,7 +150,7 @@ const colorVars = computed(() => {
           />
         </div>
 
-        <section class="sheet-section konsequenzen">
+        <section v-if="sections?.konsequenzen !== false" class="sheet-section konsequenzen">
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <ConsequenceSlots :consequences="character.consequences" :readonly="true" />
         </section>
@@ -159,6 +174,36 @@ const colorVars = computed(() => {
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
+}
+
+/* NAME BAR (always visible in full sheet) */
+.character-name-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  background: var(--fate-blue);
+  gap: 0.5rem;
+}
+
+.character-name-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.character-type-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: white;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 
 /* ALLGEMEINES */

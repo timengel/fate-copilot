@@ -136,6 +136,17 @@ a {
   scrollbar-gutter: stable;
 }
 
+@media (min-width: 901px) {
+  body.has-dashboard-sidebar .app-scroll-area {
+    padding-left: 160px;
+    transition: padding-left 0.2s ease;
+  }
+
+  body.has-dashboard-sidebar.sidebar-collapsed .app-scroll-area {
+    padding-left: 36px;
+  }
+}
+
 .app-main {
   max-width: 1200px;
   margin: 0 auto;
