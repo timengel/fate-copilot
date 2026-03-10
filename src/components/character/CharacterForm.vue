@@ -9,6 +9,9 @@ import StressTrack from './StressTrack.vue'
 import ConsequenceSlots from './ConsequenceSlots.vue'
 import FateButton from '../shared/FateButton.vue'
 import FateCounter from '../shared/FateCounter.vue'
+import { useGMModeStore } from '../../stores/gmMode'
+
+const gmModeStore = useGMModeStore()
 
 const props = defineProps<{ character: Character; hideActions?: boolean }>()
 const emit = defineEmits<{ save: [character: Character]; cancel: [] }>()
@@ -231,7 +234,7 @@ defineExpose({ save })
     </div>
 
     <!-- GM-NOTIZEN -->
-    <section class="sheet-section gm-notes-section">
+    <section v-if="gmModeStore.isGMMode" class="sheet-section gm-notes-section">
       <div class="sheet-section-header">GM-NOTIZEN</div>
       <textarea class="text-area-input" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" />
     </section>
