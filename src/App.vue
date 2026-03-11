@@ -51,8 +51,8 @@ watch(
           <ImportExportBar />
         </div>
 
-        <div class="nav-gm-toggle" :class="{ 'gm-active': gmModeStore.isGMMode }">
-          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" />
+        <div class="nav-gm-toggle" :class="{ 'gm-active': gmModeStore.isGMMode }" @click="gmModeStore.isGMMode = !gmModeStore.isGMMode">
+          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" @click.stop />
         </div>
       </nav>
     </header>
@@ -148,6 +148,7 @@ watch(
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 6px;
   flex-shrink: 0;
+  cursor: pointer;
   transition:
     background 0.2s ease,
     border-color 0.2s ease;

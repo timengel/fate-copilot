@@ -108,13 +108,25 @@ function getCharCampaign(charId: string): string | null {
             >
               <div class="item-main">
                 <span class="item-name">{{ campaign.name }}</span>
-                <span v-if="campaign.description" class="item-desc">{{
+                <span v-if="campaign.description" class="item-desc campaign-desc">{{
                   campaign.description
                 }}</span>
               </div>
-              <span class="item-meta"
-                >{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span
-              >
+              <div class="item-meta campaign-meta">
+                {{
+                  (() => {
+                    const chars = campaignsStore.getCharactersForCampaign(campaign.id);
+                    const sc = chars.filter((c) => (c.type ?? 'sc') === 'sc').length;
+                    return `${sc} SC`;
+                  })()
+                }}<template v-if="gmModeStore.isGMMode"><br />{{
+                  (() => {
+                    const chars = campaignsStore.getCharactersForCampaign(campaign.id);
+                    const nsc = chars.filter((c) => c.type === 'nsc').length;
+                    return `${nsc} NSC`;
+                  })()
+                }}</template>
+              </div>
             </li>
           </ul>
         </div>
@@ -326,6 +338,13 @@ function getCharCampaign(charId: string): string | null {
   letter-spacing: 0.5px;
 }
 
+.item-desc.campaign-desc {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.4;
+}
+
 .home-list-item {
   display: flex;
   align-items: flex-start;
@@ -380,6 +399,12 @@ function getCharCampaign(charId: string): string | null {
   white-space: nowrap;
   flex-shrink: 0;
   align-self: center;
+}
+
+.campaign-meta {
+  text-align: left;
+  align-self: flex-start;
+  line-height: 1.6;
 }
 
 /* ---- Character specifics ---- */
