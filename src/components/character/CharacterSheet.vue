@@ -789,6 +789,41 @@ defineExpose({ save })
 }
 
 /* RESPONSIVE */
+@container character-card (width < 768px) {
+  .character-sheet {
+    grid-template-columns: 1fr;
+  }
+
+  .aspekte,
+  .extras {
+    border-right: none;
+  }
+
+  .sheet-stress-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stress-section {
+    border-right: none;
+    border-bottom: 1px solid var(--fate-border);
+    min-width: 0;
+  }
+
+  .allgemeines-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .allgemeines-right {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
 @container main (width < 768px) {
   .character-sheet {
     grid-template-columns: 1fr;

@@ -133,6 +133,7 @@ function removeCol() {
 <style scoped>
 .skill-pyramid {
   padding: 0.5rem 0.75rem;
+  container-type: inline-size;
 }
 
 .btn-flavor {
@@ -244,20 +245,42 @@ function removeCol() {
   background: var(--fate-blue-light);
 }
 
+@container (width < 500px) {
+  .level-label {
+    flex: 0 0 32px;
+    overflow: hidden;
+  }
+  .level-name {
+    display: none;
+  }
+  .pyramid-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
 @container (width < 350px) {
-  /* Skill-Pyramide: Label über den Slots stapeln */
   .pyramid-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
     margin-bottom: 8px;
   }
-
   .level-label {
+    flex: none;
     min-width: 0;
+    overflow: visible;
+  }
+  .level-name {
+    display: inline;
   }
   .level-slots {
     width: 100%;
+    flex-wrap: wrap;
+  }
+  .skill-slot {
+    flex: 1 1 55px;
+    min-width: 55px;
   }
 }
 </style>

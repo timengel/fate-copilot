@@ -450,6 +450,8 @@ onUnmounted(() => {
 }
 
 .dashboard-entry {
+  container-type: inline-size;
+  container-name: character-card;
   background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 8px;
