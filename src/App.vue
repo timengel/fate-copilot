@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import ImportExportBar from './components/shared/ImportExportBar.vue'
+import FatePlusLogo from './components/shared/FatePlusLogo.vue'
 import FateToggle from './components/shared/FateToggle.vue'
 import FateToast from './components/shared/FateToast.vue'
 import { initPersistence } from './composables/usePersistence'
@@ -21,7 +22,7 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
     <header class="app-header">
       <nav class="app-nav">
         <RouterLink to="/" class="nav-logo">
-          <span class="fate-plus">FATE+</span>
+          <FatePlusLogo />
         </RouterLink>
 
         <button
@@ -101,11 +102,6 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
   gap: 1px;
 }
 
-.fate-plus,
-.fate-logo-plus {
-  color: white;
-  font-weight: 900;
-}
 
 .nav-links {
   display: flex;

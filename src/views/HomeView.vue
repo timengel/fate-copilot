@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useGMModeStore } from '../stores/gmMode'
 import FateButton from '../components/shared/FateButton.vue'
+import FatePlusLogo from '../components/shared/FatePlusLogo.vue'
 
 const router = useRouter()
 const charactersStore = useCharactersStore()
@@ -32,17 +33,13 @@ const statsLine = computed(() => {
   return parts.join(' · ')
 })
 
-const activeCampaigns = computed(() => campaignsStore.activeCampaigns.slice(0, 4))
+const activeCampaigns = computed(() => campaignsStore.activeCampaigns)
 
 const recentChars = computed(() => {
-  const sc = charactersStore.characters
-    .filter(c => (c.type ?? 'sc') === 'sc')
-    .slice(-5).reverse()
-  if (!gmModeStore.isGMMode) return sc.slice(0, 5)
-  const nsc = charactersStore.characters
-    .filter(c => c.type === 'nsc')
-    .slice(-3).reverse()
-  return [...sc, ...nsc].slice(0, 5)
+  const sc = charactersStore.characters.filter(c => (c.type ?? 'sc') === 'sc')
+  if (!gmModeStore.isGMMode) return sc
+  const nsc = charactersStore.characters.filter(c => c.type === 'nsc')
+  return [...sc, ...nsc]
 })
 
 function getCharCampaign(charId: string): string | null {
@@ -53,7 +50,7 @@ function getCharCampaign(charId: string): string | null {
 <template>
   <div class="home-view">
     <div class="home-header">
-      <div class="fate-logo">FATE+</div>
+      <div class="fate-logo"><FatePlusLogo /></div>
       <p class="fate-subtitle">Digitaler Copilot für Fate Core</p>
     </div>
 
@@ -85,23 +82,25 @@ function getCharCampaign(charId: string): string | null {
           <h2>Kampagnen</h2>
           <FateButton variant="outline" size="S" @click.stop="router.push('/campaigns/new')">+ Neu</FateButton>
         </div>
-        <div v-if="activeCampaigns.length === 0" class="empty-state">
-          Keine aktiven Kampagnen vorhanden.
+        <div class="section-scroll">
+          <div v-if="activeCampaigns.length === 0" class="empty-state">
+            Keine aktiven Kampagnen vorhanden.
+          </div>
+          <ul v-else class="home-list">
+            <li
+              v-for="campaign in activeCampaigns"
+              :key="campaign.id"
+              class="home-list-item"
+              @click="router.push(`/campaigns/${campaign.id}`)"
+            >
+              <div class="item-main">
+                <span class="item-name">{{ campaign.name }}</span>
+                <span v-if="campaign.description" class="item-desc">{{ campaign.description }}</span>
+              </div>
+              <span class="item-meta">{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span>
+            </li>
+          </ul>
         </div>
-        <ul v-else class="home-list">
-          <li
-            v-for="campaign in activeCampaigns"
-            :key="campaign.id"
-            class="home-list-item"
-            @click="router.push(`/campaigns/${campaign.id}`)"
-          >
-            <div class="item-main">
-              <span class="item-name">{{ campaign.name }}</span>
-              <span v-if="campaign.description" class="item-desc">{{ campaign.description }}</span>
-            </div>
-            <span class="item-meta">{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span>
-          </li>
-        </ul>
         <FateButton variant="link" @click="router.push('/campaigns')">Alle Kampagnen ansehen →</FateButton>
       </section>
 
@@ -110,35 +109,37 @@ function getCharCampaign(charId: string): string | null {
           <h2>Charaktere</h2>
           <FateButton variant="outline" size="S" @click.stop="router.push('/characters/new')">+ Neu</FateButton>
         </div>
-        <div v-if="recentChars.length === 0" class="empty-state">
-          Noch keine Charaktere vorhanden.
-        </div>
-        <ul v-else class="home-list">
-          <li
-            v-for="char in recentChars"
-            :key="char.id"
-            class="home-list-item"
-            @click="router.push(`/characters/${char.id}`)"
-          >
-            <div
-              class="char-color-dot"
-              :style="{ background: char.color || 'var(--fate-blue)' }"
-            ></div>
-            <div class="item-main">
-              <div class="item-name-row">
-                <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
-                <span
-                  class="char-type-badge"
-                  :class="char.type === 'nsc' ? 'badge-nsc' : 'badge-sc'"
-                >{{ char.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+        <div class="section-scroll">
+          <div v-if="recentChars.length === 0" class="empty-state">
+            Noch keine Charaktere vorhanden.
+          </div>
+          <ul v-else class="home-list">
+            <li
+              v-for="char in recentChars"
+              :key="char.id"
+              class="home-list-item"
+              @click="router.push(`/characters/${char.id}`)"
+            >
+              <div
+                class="char-color-dot"
+                :style="{ background: char.color || 'var(--fate-blue)' }"
+              ></div>
+              <div class="item-main">
+                <div class="item-name-row">
+                  <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
+                  <span
+                    class="char-type-badge"
+                    :class="char.type === 'nsc' ? 'badge-nsc' : 'badge-sc'"
+                  >{{ char.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+                </div>
+                <span v-if="char.highConcept" class="item-desc">{{ char.highConcept }}</span>
+                <span v-if="getCharCampaign(char.id)" class="char-campaign">
+                  {{ getCharCampaign(char.id) }}
+                </span>
               </div>
-              <span v-if="char.highConcept" class="item-desc">{{ char.highConcept }}</span>
-              <span v-if="getCharCampaign(char.id)" class="char-campaign">
-                {{ getCharCampaign(char.id) }}
-              </span>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
         <FateButton variant="link" @click="router.push('/characters')">Alle Charaktere ansehen →</FateButton>
       </section>
     </div>
@@ -258,13 +259,26 @@ function getCharCampaign(charId: string): string | null {
   background: white;
   border: 1px solid var(--fate-border);
   border-radius: 6px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: 520px;
+}
+
+.section-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.home-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .home-section :deep(.fate-btn--link) {
-  margin-top: auto;
+  flex-shrink: 0;
+  border-top: 1px solid var(--fate-border);
 }
 
 .section-header {
@@ -274,6 +288,8 @@ function getCharCampaign(charId: string): string | null {
   background: var(--fate-blue);
   color: white;
   padding: 0.5rem 0.9rem;
+  border-radius: 6px 6px 0 0;
+  flex-shrink: 0;
 }
 
 .section-header h2 {
@@ -282,12 +298,6 @@ function getCharCampaign(charId: string): string | null {
   color: white;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.home-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .home-list-item {
