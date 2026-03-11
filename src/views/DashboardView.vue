@@ -20,6 +20,7 @@ const selectedCampaignId = ref<string | null>(null)
 const showSC = ref(true)
 const showNSC = ref(true)
 const showEditButton = ref(true)
+const dashboardLayout = ref<'list' | 'grid'>('list')
 
 const visibleSections = reactive({
   allgemeines: true,
@@ -71,6 +72,10 @@ watch(sidebarCollapsed, (val) => {
   document.body.classList.toggle('sidebar-collapsed', val)
 })
 
+watch(dashboardLayout, (val) => {
+  document.body.classList.toggle('dashboard-grid-active', val === 'grid')
+})
+
 onMounted(() => {
   // sidebar-no-transition disables the CSS transition on mount so the initial
   // padding-left jump is not animated. Double rAF ensures at least one frame
@@ -85,6 +90,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.body.classList.remove('has-dashboard-sidebar')
   document.body.classList.remove('sidebar-collapsed')
+  document.body.classList.remove('dashboard-grid-active')
 })
 </script>
 
@@ -155,6 +161,18 @@ onUnmounted(() => {
             Bearbeiten
           </label>
         </div>
+
+        <div class="sidebar-group">
+          <div class="sidebar-group-label">Layout</div>
+          <label class="filter-label">
+            <input type="radio" v-model="dashboardLayout" value="list" />
+            Liste
+          </label>
+          <label class="filter-label">
+            <input type="radio" v-model="dashboardLayout" value="grid" />
+            Zwei Spalten
+          </label>
+        </div>
       </div>
     </aside>
 
@@ -222,6 +240,17 @@ onUnmounted(() => {
           Bearbeiten
         </label>
       </div>
+      <div class="filters-inline-row">
+        <span class="filters-inline-label">Layout:</span>
+        <label class="filter-label">
+          <input type="radio" v-model="dashboardLayout" value="list" />
+          Liste
+        </label>
+        <label class="filter-label">
+          <input type="radio" v-model="dashboardLayout" value="grid" />
+          Zwei Spalten
+        </label>
+      </div>
     </div>
 
     <div v-if="!selectedCampaignId" class="dashboard-empty">
@@ -233,7 +262,7 @@ onUnmounted(() => {
     <div v-else-if="characters.length === 0" class="dashboard-empty">
       Alle Charaktere sind ausgeblendet.
     </div>
-    <div v-else class="dashboard-stack">
+    <div v-else class="dashboard-stack" :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }">
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
         <CharacterSheet
           v-if="editingId === character.id"
@@ -406,6 +435,18 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.dashboard-stack--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+@container main (width < 800px) {
+  .dashboard-stack--grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dashboard-entry {
