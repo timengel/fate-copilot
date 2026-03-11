@@ -13,9 +13,10 @@ export const useCampaignsStore = defineStore('campaigns', () => {
 
   function updateCampaign(updated: Campaign) {
     const index = campaigns.value.findIndex((c) => c.id === updated.id);
-    if (index !== -1) {
-      campaigns.value[index] = updated;
-    }
+
+    if (index === -1) return;
+
+    campaigns.value[index] = updated;
   }
 
   function deleteCampaign(id: string) {
@@ -59,32 +60,36 @@ export const useCampaignsStore = defineStore('campaigns', () => {
 
   function addMilestone(campaignId: string, milestone: Milestone) {
     const index = campaigns.value.findIndex((c) => c.id === campaignId);
-    if (index !== -1) {
-      const c = campaigns.value[index];
-      campaigns.value[index] = { ...c, milestones: [...c.milestones, milestone] };
-    }
+
+    if (index === -1) return;
+
+    const campaign = campaigns.value[index]!;
+
+    campaigns.value[index] = { ...campaign, milestones: [...campaign.milestones, milestone] };
   }
 
   function removeMilestone(campaignId: string, milestoneId: string) {
     const index = campaigns.value.findIndex((c) => c.id === campaignId);
-    if (index !== -1) {
-      const c = campaigns.value[index];
-      campaigns.value[index] = {
-        ...c,
-        milestones: c.milestones.filter((m) => m.id !== milestoneId),
-      };
-    }
+    
+    if (index === -1) return;
+
+    const campaign = campaigns.value[index]!;
+    campaigns.value[index] = {
+      ...campaign,
+      milestones: campaign.milestones.filter((m) => m.id !== milestoneId),
+    };
   }
 
   function updateMilestone(campaignId: string, updated: Milestone) {
     const index = campaigns.value.findIndex((c) => c.id === campaignId);
-    if (index !== -1) {
-      const c = campaigns.value[index];
-      campaigns.value[index] = {
-        ...c,
-        milestones: c.milestones.map((m) => (m.id === updated.id ? updated : m)),
-      };
-    }
+
+    if (index === -1) return;
+
+    const campaign = campaigns.value[index]!;
+    campaigns.value[index] = {
+      ...campaign,
+      milestones: campaign.milestones.map((m) => (m.id === updated.id ? updated : m)),
+    };
   }
 
   function replaceAll(
@@ -97,10 +102,19 @@ export const useCampaignsStore = defineStore('campaigns', () => {
 
   const activeCampaigns = computed(() => campaigns.value.filter((c) => c.status === 'active'));
 
+  const characterCountsForCampaign = computed(() => (campaignId: string) => {
+    const chars = getCharactersForCampaign(campaignId);
+    return {
+      sc: chars.filter((c) => (c.type ?? 'sc') === 'sc').length,
+      nsc: chars.filter((c) => c.type === 'nsc').length,
+    };
+  });
+
   return {
     campaigns,
     assignments,
     activeCampaigns,
+    characterCountsForCampaign,
     addCampaign,
     updateCampaign,
     deleteCampaign,

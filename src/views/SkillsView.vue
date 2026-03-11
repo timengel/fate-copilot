@@ -404,7 +404,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 }
 
 .skill-manage-row:hover {
-  background: var(--fate-blue-light);
+  background: var(--fate-hover-bg);
 }
 
 .skill-manage-actions {

@@ -148,6 +148,19 @@ export const CAMPAIGN_STATUS_LABEL: Record<CampaignStatus, string> = {
   completed: 'Abgeschlossen',
 };
 
+export type TagColor =
+  | 'pfau'
+  | 'heidelbeere'
+  | 'lavendel'
+  | 'weintraube'
+  | 'tomate'
+  | 'flamingo'
+  | 'mandarine'
+  | 'banane'
+  | 'salbei'
+  | 'basilikum'
+  | 'gray';
+
 export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'pfau', label: 'Pfau', primary: '#1c9ed6', dark: '#1480b0', light: '#e8f4fb' },
   {

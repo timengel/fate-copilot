@@ -341,7 +341,7 @@ function updateMilestone(milestone: Milestone) {
 }
 
 .assignment-info:hover {
-  background: var(--fate-blue-light);
+  background: var(--fate-hover-bg);
 }
 
 .assignment-info strong {

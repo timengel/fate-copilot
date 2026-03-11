@@ -6,6 +6,7 @@ import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
 import FateButton from '../components/shared/FateButton.vue';
 import FatePlusLogo from '../components/shared/FatePlusLogo.vue';
+import FateTag from '../components/shared/FateTag.vue';
 
 const router = useRouter();
 const charactersStore = useCharactersStore();
@@ -113,19 +114,10 @@ function getCharCampaign(charId: string): string | null {
                 }}</span>
               </div>
               <div class="item-meta campaign-meta">
-                {{
-                  (() => {
-                    const chars = campaignsStore.getCharactersForCampaign(campaign.id);
-                    const sc = chars.filter((c) => (c.type ?? 'sc') === 'sc').length;
-                    return `${sc} SC`;
-                  })()
-                }}<template v-if="gmModeStore.isGMMode"><br />{{
-                  (() => {
-                    const chars = campaignsStore.getCharactersForCampaign(campaign.id);
-                    const nsc = chars.filter((c) => c.type === 'nsc').length;
-                    return `${nsc} NSC`;
-                  })()
-                }}</template>
+                {{ campaignsStore.characterCountsForCampaign(campaign.id).sc }} SC
+                <template v-if="gmModeStore.isGMMode">
+                  <br />{{ campaignsStore.characterCountsForCampaign(campaign.id).nsc }} NSC
+                </template>
               </div>
             </li>
           </ul>
@@ -160,11 +152,10 @@ function getCharCampaign(charId: string): string | null {
               <div class="item-main">
                 <div class="item-name-row">
                   <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
-                  <span
-                    class="char-type-badge"
-                    :class="char.type === 'nsc' ? 'badge-nsc' : 'badge-sc'"
-                    >{{ char.type === 'nsc' ? 'NSC' : 'SC' }}</span
-                  >
+                  <FateTag
+                    :color="char.type === 'nsc' ? 'banane' : 'pfau'"
+                    :label="char.type === 'nsc' ? 'NSC' : 'SC'"
+                  />
                 </div>
                 <span v-if="char.highConcept" class="item-desc">{{ char.highConcept }}</span>
                 <span v-if="getCharCampaign(char.id)" class="char-campaign">
@@ -356,7 +347,7 @@ function getCharCampaign(charId: string): string | null {
 }
 
 .home-list-item:hover {
-  background: var(--fate-blue-light);
+  background: var(--fate-hover-bg);
 }
 
 .home-list-item:last-child {
@@ -415,25 +406,6 @@ function getCharCampaign(charId: string): string | null {
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 0.35rem;
-}
-
-.char-type-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 3px;
-  letter-spacing: 0.04em;
-  flex-shrink: 0;
-}
-
-.badge-sc {
-  background: var(--fate-blue-light);
-  color: var(--fate-blue);
-}
-
-.badge-nsc {
-  background: #fef3cd;
-  color: #856404;
 }
 
 .char-campaign {

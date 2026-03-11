@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Milestone, MilestoneType } from '../../types';
+import type { Milestone, MilestoneType, TagColor } from '../../types';
 import FateButton from '../shared/FateButton.vue';
+import FateTag from '../shared/FateTag.vue';
 
 const props = defineProps<{
   milestones: Milestone[];
@@ -18,6 +19,12 @@ const TYPE_LABELS: Record<MilestoneType, string> = {
   small: 'Kleiner Meilenstein',
   significant: 'Bedeutender Meilenstein',
   major: 'Großer Meilenstein',
+};
+
+const TYPE_COLORS: Record<MilestoneType, TagColor> = {
+  small: 'gray',
+  significant: 'pfau',
+  major: 'banane',
 };
 
 const newType = ref<MilestoneType>('small');
@@ -90,7 +97,7 @@ function cancelEdit() {
 
         <!-- View mode -->
         <div v-else class="timeline-content">
-          <span class="milestone-badge" :class="`badge--${m.type}`">{{ TYPE_LABELS[m.type] }}</span>
+          <FateTag :color="TYPE_COLORS[m.type]" :label="TYPE_LABELS[m.type]" />
           <span class="milestone-desc">{{ m.description }}</span>
           <FateButton
             v-if="!readonly && i === milestones.length - 1"
@@ -194,30 +201,6 @@ function cancelEdit() {
   flex: 1;
   padding-bottom: 10px;
   flex-wrap: wrap;
-}
-
-.milestone-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 5px;
-  border-radius: 3px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.badge--small {
-  background: #e8e8e8;
-  color: #555;
-}
-.badge--significant {
-  background: var(--fate-blue-light);
-  color: var(--fate-blue);
-}
-.badge--major {
-  background: #fdf3d8;
-  color: #9a7020;
 }
 
 .milestone-desc {
