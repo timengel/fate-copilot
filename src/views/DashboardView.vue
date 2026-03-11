@@ -273,7 +273,7 @@ onUnmounted(() => {
           @save="handleSave"
           @cancel="editingId = null"
         />
-        <CharacterSheet v-else :character="character" :sections="visibleSections" />
+        <CharacterSheet v-else :character="character" :sections="visibleSections" @save="handleSave" />
         <div v-if="editingId === character.id || showEditButton" class="dashboard-entry-toolbar">
           <template v-if="editingId === character.id">
             <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>

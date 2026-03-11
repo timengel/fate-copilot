@@ -125,7 +125,7 @@ function unassignFromCampaign(campaignId: string) {
       />
 
       <template v-else>
-        <CharacterSheet :character="character" />
+        <CharacterSheet :character="character" @save="handleSave" />
 
         <!-- KAMPAGNEN-ZUORDNUNG -->
         <section class="sheet-section campaigns-section">
