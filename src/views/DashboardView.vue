@@ -34,14 +34,18 @@ const visibleSections = useSessionStorage('dashboard-sections', {
   gmNotes: true,
 })
 
+const allCampaigns = computed(() =>
+  gmModeStore.isGMMode
+    ? campaignsStore.campaigns
+    : campaignsStore.campaigns.filter(c => c.status === 'active')
+)
+
 watchEffect(() => {
-  if (!selectedCampaignId.value) {
-    const first = campaignsStore.activeCampaigns[0]
-    if (first) selectedCampaignId.value = first.id
+  const visible = allCampaigns.value
+  if (!selectedCampaignId.value || !visible.find(c => c.id === selectedCampaignId.value)) {
+    selectedCampaignId.value = visible[0]?.id ?? null
   }
 })
-
-const allCampaigns = computed(() => campaignsStore.campaigns)
 
 const allCharactersInCampaign = computed(() =>
   selectedCampaignId.value
@@ -107,6 +111,19 @@ onUnmounted(() => {
       </div>
 
       <div v-show="!sidebarCollapsed">
+        <div class="sidebar-group">
+          <div class="sidebar-group-label">Kampagne</div>
+          <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
+            Keine Kampagnen vorhanden.
+          </div>
+          <select v-else v-model="selectedCampaignId" class="campaign-select">
+            <option :value="null" disabled>Wählen…</option>
+            <option v-for="campaign in allCampaigns" :key="campaign.id" :value="campaign.id">
+              {{ campaign.name }}
+            </option>
+          </select>
+        </div>
+
         <div class="sidebar-group">
           <div class="sidebar-group-label">Charaktere</div>
           <label class="filter-label">
@@ -177,20 +194,20 @@ onUnmounted(() => {
       </div>
     </aside>
 
-    <div class="dashboard-header">
-      <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
-        Noch keine Kampagnen angelegt.
-      </div>
-      <select v-else v-model="selectedCampaignId" class="campaign-select">
-        <option :value="null" disabled>Kampagne wählen…</option>
-        <option v-for="campaign in allCampaigns" :key="campaign.id" :value="campaign.id">
-          {{ campaign.name }}
-        </option>
-      </select>
-    </div>
-
     <!-- Inline filters for small screens -->
     <div class="dashboard-filters-inline">
+      <div class="filters-inline-row">
+        <span class="filters-inline-label">Kampagne:</span>
+        <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
+          Keine Kampagnen vorhanden.
+        </div>
+        <select v-else v-model="selectedCampaignId" class="campaign-select-inline">
+          <option :value="null" disabled>Wählen…</option>
+          <option v-for="campaign in allCampaigns" :key="campaign.id" :value="campaign.id">
+            {{ campaign.name }}
+          </option>
+        </select>
+      </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Charaktere:</span>
         <label class="filter-label">
@@ -294,20 +311,16 @@ onUnmounted(() => {
   width: 100%;
 }
 
-.dashboard-header {
-  margin-bottom: 1.25rem;
-}
-
 .campaign-select {
   width: 100%;
-  max-width: 400px;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.85rem;
   border: 1px solid var(--fate-border);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--fate-white);
   color: var(--fate-text);
   cursor: pointer;
+  margin-top: 0.25rem;
 }
 
 .campaign-select:focus {
@@ -315,9 +328,27 @@ onUnmounted(() => {
   outline-offset: 2px;
 }
 
+.campaign-select-inline {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  background: var(--fate-white);
+  color: var(--fate-text);
+  cursor: pointer;
+}
+
+.campaign-select-inline:focus {
+  outline: 2px solid var(--fate-blue);
+  outline-offset: 2px;
+}
+
 .campaign-select-empty {
   color: var(--fate-text-light);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  margin-top: 0.25rem;
 }
 
 .dashboard-sidebar {
