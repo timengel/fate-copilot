@@ -199,10 +199,6 @@ defineExpose({ save });
               <FateCounter v-if="isEditing" v-model="form.fatePoints" />
               <span v-else class="field-value fate-points">{{ data.fatePoints }}</span>
             </div>
-            <div v-if="!isEditing" class="fate-logo-corner">
-              <span class="fate-logo-plus">+</span>FATE
-              <div class="fate-logo-sub">CORE SYSTEM</div>
-            </div>
           </div>
         </div>
       </section>
@@ -600,24 +596,6 @@ defineExpose({ save });
   color: var(--fate-blue);
   text-align: center;
   min-width: 28px;
-}
-
-.fate-logo-corner {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--fate-blue);
-  letter-spacing: -1px;
-  line-height: 1;
-  text-align: right;
-  margin-top: 0.25rem;
-}
-
-.fate-logo-sub {
-  font-size: 0.55rem;
-  letter-spacing: 2px;
-  font-weight: 700;
-  color: var(--fate-blue);
-  text-align: right;
 }
 
 /* Edit mode field inputs */
