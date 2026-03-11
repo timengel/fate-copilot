@@ -61,7 +61,15 @@ function deleteCampaign(id: string, name: string) {
               {{ campaign.description }}
             </div>
             <div class="card-meta">
-              {{ store.getCharactersForCampaign(campaign.id).length }} Charaktere
+              <span>
+                {{ store.getCharactersForCampaign(campaign.id).filter((c) => (c.type ?? 'sc') === 'sc').length }} SC
+              </span>
+              <span v-if="gmModeStore.isGMMode">
+                · {{ store.getCharactersForCampaign(campaign.id).filter((c) => c.type === 'nsc').length }} NSC
+              </span>
+              <span v-if="campaign.milestones.length > 0">
+                · {{ campaign.milestones.length }} Meilenstein{{ campaign.milestones.length !== 1 ? 'e' : '' }}
+              </span>
             </div>
             <div class="card-actions" @click.stop>
               <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/campaigns/${campaign.id}/edit`)" />
