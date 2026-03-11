@@ -25,11 +25,14 @@ const hasAnyData = computed(() =>
 
 const statsLine = computed(() => {
   if (!hasAnyData.value) return null
+
   const parts: string[] = []
   const campCount = campaignsStore.campaigns.length
+
   if (campCount > 0) parts.push(`${campCount} Kampagne${campCount !== 1 ? 'n' : ''}`)
-  if (scCount.value > 0) parts.push(`${scCount.value} Spielercharakter${scCount.value !== 1 ? 'e' : ''}`)
+  if (scCount.value > 0) parts.push(`${scCount.value} SC`)
   if (gmModeStore.isGMMode && nscCount.value > 0) parts.push(`${nscCount.value} NSC`)
+
   return parts.join(' · ')
 })
 
@@ -37,7 +40,9 @@ const activeCampaigns = computed(() => campaignsStore.activeCampaigns)
 
 const recentChars = computed(() => {
   const sc = charactersStore.characters.filter(c => (c.type ?? 'sc') === 'sc')
+  
   if (!gmModeStore.isGMMode) return sc
+
   const nsc = charactersStore.characters.filter(c => c.type === 'nsc')
   return [...sc, ...nsc]
 })

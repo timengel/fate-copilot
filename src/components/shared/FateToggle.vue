@@ -76,5 +76,6 @@ const emit = defineEmits<{
   color: rgba(255, 255, 255, 0.75);
   min-width: 2rem;
   letter-spacing: 0.04em;
+  text-align: center;
 }
 </style>
