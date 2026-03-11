@@ -88,13 +88,14 @@ function toggle(index: number) {
 }
 
 .stress-box input[type="checkbox"]:checked::after {
-  content: "✓";
+  content: "✕";
   position: absolute;
   color: white;
   font-size: 14px;
   font-weight: 700;
-  top: -1px;
-  left: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .stress-box.readonly input[type="checkbox"] {
