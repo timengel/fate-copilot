@@ -71,7 +71,17 @@ watch(sidebarCollapsed, (val) => {
   document.body.classList.toggle('sidebar-collapsed', val)
 })
 
-onMounted(() => document.body.classList.add('has-dashboard-sidebar'))
+onMounted(() => {
+  // sidebar-no-transition disables the CSS transition on mount so the initial
+  // padding-left jump is not animated. Double rAF ensures at least one frame
+  // has been painted before re-enabling the transition.
+  document.body.classList.add('has-dashboard-sidebar', 'sidebar-no-transition')
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.body.classList.remove('sidebar-no-transition')
+    })
+  })
+})
 onUnmounted(() => {
   document.body.classList.remove('has-dashboard-sidebar')
   document.body.classList.remove('sidebar-collapsed')

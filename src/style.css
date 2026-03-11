@@ -142,6 +142,10 @@ a {
     transition: padding-left 0.2s ease;
   }
 
+  body.has-dashboard-sidebar.sidebar-no-transition .app-scroll-area {
+    transition: none;
+  }
+
   body.has-dashboard-sidebar.sidebar-collapsed .app-scroll-area {
     padding-left: 36px;
   }
