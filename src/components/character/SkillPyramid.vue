@@ -26,6 +26,16 @@ const rows = computed(() =>
   Array.from({ length: effectiveMaxLevel.value }, (_, i) => effectiveMaxLevel.value - i)
 )
 
+const maxOccupiedLevel = computed(() => {
+  if (!props.readonly) return effectiveMaxLevel.value
+  const levels = props.skills.map(s => s.level)
+  return levels.length > 0 ? Math.max(...levels) : 0
+})
+
+const visibleRows = computed(() =>
+  rows.value.filter(level => level <= maxOccupiedLevel.value)
+)
+
 const skillsAtLevel = computed(() => {
   const map: Record<number, string[]> = {}
   for (let l = 1; l <= effectiveMaxLevel.value; l++) map[l] = []
@@ -86,7 +96,7 @@ function removeCol() {
 
 <template>
   <div class="skill-pyramid">
-    <div v-for="level in rows" :key="level" class="pyramid-row">
+    <div v-for="level in visibleRows" :key="level" class="pyramid-row">
       <div class="level-label">
         <span class="level-plus">+{{ level }}</span>
         <span class="level-name">{{ SKILL_LEVEL_LABELS[level] ?? '' }}</span>

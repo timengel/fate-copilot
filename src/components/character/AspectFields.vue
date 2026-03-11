@@ -21,9 +21,9 @@ function updateAspect(index: number, value: string) {
 
 <template>
   <div class="aspect-fields">
-    <div class="aspect-row">
+    <div v-if="!readonly || highConcept" class="aspect-row">
       <label class="aspect-label">Konzept</label>
-      <span v-if="readonly" class="aspect-value">{{ highConcept || '—' }}</span>
+      <span v-if="readonly" class="aspect-value">{{ highConcept }}</span>
       <input
         v-else
         class="aspect-input"
@@ -33,9 +33,9 @@ function updateAspect(index: number, value: string) {
       />
     </div>
 
-    <div class="aspect-row">
+    <div v-if="!readonly || trouble" class="aspect-row">
       <label class="aspect-label">Dilemma</label>
-      <span v-if="readonly" class="aspect-value">{{ trouble || '—' }}</span>
+      <span v-if="readonly" class="aspect-value">{{ trouble }}</span>
       <input
         v-else
         class="aspect-input"
@@ -45,17 +45,19 @@ function updateAspect(index: number, value: string) {
       />
     </div>
 
-    <div v-for="(aspect, i) in aspects" :key="i" class="aspect-row">
-      <label class="aspect-label"></label>
-      <span v-if="readonly" class="aspect-value">{{ aspect || '—' }}</span>
-      <input
-        v-else
-        class="aspect-input"
-        :value="aspect"
-        placeholder="Weiterer Aspekt"
-        @input="updateAspect(i, ($event.target as HTMLInputElement).value)"
-      />
-    </div>
+    <template v-for="(aspect, i) in aspects" :key="i">
+      <div v-if="!readonly || aspect" class="aspect-row">
+        <label class="aspect-label"></label>
+        <span v-if="readonly" class="aspect-value">{{ aspect }}</span>
+        <input
+          v-else
+          class="aspect-input"
+          :value="aspect"
+          placeholder="Weiterer Aspekt"
+          @input="updateAspect(i, ($event.target as HTMLInputElement).value)"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
