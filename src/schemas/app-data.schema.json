@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "app-data.schema.json",
+  "title": "Fate Copilot AppData",
+  "description": "Export/Import-Format für Fate Copilot Anwendungsdaten",
+  "type": "object",
+  "required": [
+    "formatVersion",
+    "exportDate",
+    "campaigns",
+    "characters",
+    "campaignCharacterAssignments"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "formatVersion": {
+      "type": "string",
+      "enum": ["1.0", "1.1"],
+      "description": "Version des Export-Formats"
+    },
+    "exportDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt des Exports als ISO-8601-Datum"
+    },
+    "campaigns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Campaign" }
+    },
+    "characters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Character" }
+    },
+    "campaignCharacterAssignments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CampaignCharacterAssignment" }
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Benutzerdefinierte Fertigkeitenliste (ab v1.1)"
+    }
+  },
+  "$defs": {
+    "Campaign": {
+      "type": "object",
+      "required": ["id", "name", "description", "status", "notes", "milestones"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "inactive", "completed"]
+        },
+        "notes": { "type": "string" },
+        "gmNotes": { "type": "string" },
+        "color": {
+          "type": "string",
+          "enum": [
+            "pfau", "heidelbeere", "lavendel", "weintraube",
+            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
+          ]
+        },
+        "milestones": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Milestone" }
+        }
+      }
+    },
+    "Milestone": {
+      "type": "object",
+      "required": ["id", "type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["small", "significant", "major"]
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "Character": {
+      "type": "object",
+      "required": [
+        "id", "name", "description", "highConcept", "trouble",
+        "aspects", "skills", "stunts", "extras",
+        "refresh", "fatePoints",
+        "stressPhysical", "stressMental", "consequences", "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["sc", "nsc"]
+        },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "highConcept": { "type": "string" },
+        "trouble": { "type": "string" },
+        "aspects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "skills": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SkillEntry" }
+        },
+        "stunts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Stunt" }
+        },
+        "extras": { "type": "string" },
+        "refresh": { "type": "integer", "minimum": 1 },
+        "fatePoints": { "type": "integer", "minimum": 0 },
+        "stressPhysical": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressBox" }
+        },
+        "stressMental": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressBox" }
+        },
+        "consequences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Consequence" }
+        },
+        "notes": { "type": "string" },
+        "gmNotes": { "type": "string" },
+        "pyramidMaxLevel": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "pyramidMaxCols": { "type": "integer", "minimum": 1 },
+        "color": {
+          "type": "string",
+          "enum": [
+            "pfau", "heidelbeere", "lavendel", "weintraube",
+            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
+          ]
+        }
+      }
+    },
+    "SkillEntry": {
+      "type": "object",
+      "required": ["skill", "level"],
+      "additionalProperties": false,
+      "properties": {
+        "skill": { "type": "string" },
+        "level": { "type": "integer", "minimum": 1, "maximum": 8 }
+      }
+    },
+    "Stunt": {
+      "type": "object",
+      "required": ["name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "StressBox": {
+      "type": "object",
+      "required": ["value", "checked"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": "integer", "minimum": 1 },
+        "checked": { "type": "boolean" }
+      }
+    },
+    "Consequence": {
+      "type": "object",
+      "required": ["severity", "label", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "type": "integer",
+          "enum": [2, 4, 6, 8],
+          "description": "2=Leicht, 4=Mittel, 6=Schwer, 8=Extrem"
+        },
+        "label": {
+          "type": "string",
+          "enum": ["mild", "moderate", "severe", "extreme"]
+        },
+        "value": { "type": "string" }
+      }
+    },
+    "CampaignCharacterAssignment": {
+      "type": "object",
+      "required": ["campaignId", "characterId"],
+      "additionalProperties": false,
+      "properties": {
+        "campaignId": { "type": "string" },
+        "characterId": { "type": "string" }
+      }
+    }
+  }
+}
