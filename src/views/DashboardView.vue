@@ -77,7 +77,7 @@ watch(sidebarCollapsed, (val) => {
 
 watch(dashboardLayout, (val) => {
   document.body.classList.toggle('dashboard-grid-active', val === 'grid');
-});
+}, { immediate: true });
 
 onMounted(() => {
   // sidebar-no-transition disables the CSS transition on mount so the initial
