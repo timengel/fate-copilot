@@ -113,16 +113,8 @@ function deleteCharacter(id: string, name: string) {
           <em>{{ char.trouble }}</em>
         </div>
         <div class="card-actions" @click.stop>
-          <FateButton
-            icon="edit"
-            variant="secondary"
-            size="S"
-            @click="router.push(`/characters/${char.id}/edit`)"
-            >Bearbeiten</FateButton
-          >
-          <FateButton variant="danger" size="S" @click="deleteCharacter(char.id, char.name)"
-            >Löschen</FateButton
-          >
+          <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/characters/${char.id}/edit`)" />
+          <FateButton icon="delete" variant="danger" size="S" @click="deleteCharacter(char.id, char.name)" />
         </div>
       </div>
     </div>
@@ -152,6 +144,8 @@ function deleteCharacter(id: string, name: string) {
     box-shadow 0.15s,
     border-color 0.15s;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .character-card:hover,
@@ -184,6 +178,8 @@ function deleteCharacter(id: string, name: string) {
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem 0.9rem 0.75rem;
+  margin-top: auto;
+  justify-content: flex-end;
 }
 
 .search-input {
