@@ -326,13 +326,13 @@ defineExpose({ save })
           <template v-else>
             <StressTrack
               label="KÖRPERLICHER STRESS (KRAFT)"
-              :boxes="data.stressPhysical"
-              @update="emit('save', { ...props.character, stressPhysical: $event })"
+              :boxes="form.stressPhysical"
+              @update="form.stressPhysical = $event"
             />
             <StressTrack
               label="GEISTIGER STRESS (WILLE)"
-              :boxes="data.stressMental"
-              @update="emit('save', { ...props.character, stressMental: $event })"
+              :boxes="form.stressMental"
+              @update="form.stressMental = $event"
             />
           </template>
         </div>

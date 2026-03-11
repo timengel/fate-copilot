@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
+import { useSessionStorage } from '@vueuse/core'
 import { useCampaignsStore } from '../stores/campaigns'
 import { useCharactersStore } from '../stores/characters'
 import { useGMModeStore } from '../stores/gmMode'
@@ -16,13 +17,13 @@ const toastStore = useToastStore()
 const sidebarCollapsed = ref(false)
 const editingId = ref<string | null>(null)
 const formRef = ref<InstanceType<typeof CharacterSheet>[]>([])
-const selectedCampaignId = ref<string | null>(null)
-const showSC = ref(true)
-const showNSC = ref(true)
-const showEditButton = ref(true)
-const dashboardLayout = ref<'list' | 'grid'>('list')
+const selectedCampaignId = useSessionStorage<string | null>('dashboard-campaign', null)
+const showSC = useSessionStorage('dashboard-show-sc', true)
+const showNSC = useSessionStorage('dashboard-show-nsc', true)
+const showEditButton = useSessionStorage('dashboard-show-edit-btn', true)
+const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list')
 
-const visibleSections = reactive({
+const visibleSections = useSessionStorage('dashboard-sections', {
   allgemeines: true,
   aspekte: true,
   fertigkeiten: true,
@@ -273,7 +274,7 @@ onUnmounted(() => {
           @save="handleSave"
           @cancel="editingId = null"
         />
-        <CharacterSheet v-else :character="character" :sections="visibleSections" @save="handleSave" />
+        <CharacterSheet v-else :character="character" :sections="visibleSections" />
         <div v-if="editingId === character.id || showEditButton" class="dashboard-entry-toolbar">
           <template v-if="editingId === character.id">
             <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>
