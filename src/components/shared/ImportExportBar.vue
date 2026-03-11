@@ -1,53 +1,57 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useImportExport } from '../../composables/useImportExport'
-import ConfirmDialog from './ConfirmDialog.vue'
-import FateButton from './FateButton.vue'
-import type { AppData } from '../../types'
+import { ref } from 'vue';
+import { useImportExport } from '../../composables/useImportExport';
+import ConfirmDialog from './ConfirmDialog.vue';
+import FateButton from './FateButton.vue';
+import type { AppData } from '../../types';
 
-const { exportJSON, importJSON, applyImport } = useImportExport()
+const { exportJSON, importJSON, applyImport } = useImportExport();
 
-const showConfirm = ref(false)
-const pendingData = ref<AppData | null>(null)
-const importError = ref('')
-const fileInput = ref<HTMLInputElement | null>(null)
+const showConfirm = ref(false);
+const pendingData = ref<AppData | null>(null);
+const importError = ref('');
+const fileInput = ref<HTMLInputElement | null>(null);
 
 function triggerImport() {
-  fileInput.value?.click()
+  fileInput.value?.click();
 }
 
 async function onFileSelected(event: Event) {
-  importError.value = ''
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
+  importError.value = '';
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
   try {
-    pendingData.value = await importJSON(file)
-    showConfirm.value = true
+    pendingData.value = await importJSON(file);
+    showConfirm.value = true;
   } catch (e) {
-    importError.value = e instanceof Error ? e.message : 'Unbekannter Fehler'
+    importError.value = e instanceof Error ? e.message : 'Unbekannter Fehler';
   } finally {
-    ;(event.target as HTMLInputElement).value = ''
+    (event.target as HTMLInputElement).value = '';
   }
 }
 
 function confirmImport() {
   if (pendingData.value) {
-    applyImport(pendingData.value)
+    applyImport(pendingData.value);
   }
-  showConfirm.value = false
-  pendingData.value = null
+  showConfirm.value = false;
+  pendingData.value = null;
 }
 
 function cancelImport() {
-  showConfirm.value = false
-  pendingData.value = null
+  showConfirm.value = false;
+  pendingData.value = null;
 }
 </script>
 
 <template>
   <div class="import-export-bar">
-    <FateButton variant="outline" @click="exportJSON" title="Alle Daten als JSON exportieren">↓ Exportieren</FateButton>
-    <FateButton variant="outline" @click="triggerImport" title="JSON-Datei importieren">↑ Importieren</FateButton>
+    <FateButton variant="outline" @click="exportJSON" title="Alle Daten als JSON exportieren"
+      >↓ Exportieren</FateButton
+    >
+    <FateButton variant="outline" @click="triggerImport" title="JSON-Datei importieren"
+      >↑ Importieren</FateButton
+    >
     <input
       ref="fileInput"
       type="file"

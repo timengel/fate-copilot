@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
-import { useSessionStorage } from '@vueuse/core'
-import { useCampaignsStore } from '../stores/campaigns'
-import { useCharactersStore } from '../stores/characters'
-import { useGMModeStore } from '../stores/gmMode'
-import { useToastStore } from '../stores/toast'
-import CharacterSheet from '../components/character/CharacterSheet.vue'
-import FateButton from '../components/shared/FateButton.vue'
-import type { Character } from '../types'
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { useSessionStorage } from '@vueuse/core';
+import { useCampaignsStore } from '../stores/campaigns';
+import { useCharactersStore } from '../stores/characters';
+import { useGMModeStore } from '../stores/gmMode';
+import { useToastStore } from '../stores/toast';
+import CharacterSheet from '../components/character/CharacterSheet.vue';
+import FateButton from '../components/shared/FateButton.vue';
+import type { Character } from '../types';
 
-const campaignsStore = useCampaignsStore()
-const charactersStore = useCharactersStore()
-const gmModeStore = useGMModeStore()
-const toastStore = useToastStore()
+const campaignsStore = useCampaignsStore();
+const charactersStore = useCharactersStore();
+const gmModeStore = useGMModeStore();
+const toastStore = useToastStore();
 
-const sidebarCollapsed = ref(false)
-const editingId = ref<string | null>(null)
-const formRef = ref<InstanceType<typeof CharacterSheet>[]>([])
-const selectedCampaignId = useSessionStorage<string | null>('dashboard-campaign', null)
-const showSC = useSessionStorage('dashboard-show-sc', true)
-const showNSC = useSessionStorage('dashboard-show-nsc', true)
-const showEditButton = useSessionStorage('dashboard-show-edit-btn', true)
-const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list')
+const sidebarCollapsed = ref(false);
+const editingId = ref<string | null>(null);
+const formRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
+const selectedCampaignId = useSessionStorage<string | null>('dashboard-campaign', null);
+const showSC = useSessionStorage('dashboard-show-sc', true);
+const showNSC = useSessionStorage('dashboard-show-nsc', true);
+const showEditButton = useSessionStorage('dashboard-show-edit-btn', true);
+const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list');
 
 const visibleSections = useSessionStorage('dashboard-sections', {
   allgemeines: true,
@@ -32,71 +32,69 @@ const visibleSections = useSessionStorage('dashboard-sections', {
   stress: true,
   konsequenzen: true,
   gmNotes: true,
-})
+});
 
 const allCampaigns = computed(() =>
   gmModeStore.isGMMode
     ? campaignsStore.campaigns
-    : campaignsStore.campaigns.filter(c => c.status === 'active')
-)
+    : campaignsStore.campaigns.filter((c) => c.status === 'active'),
+);
 
 watchEffect(() => {
-  const visible = allCampaigns.value
-  if (!selectedCampaignId.value || !visible.find(c => c.id === selectedCampaignId.value)) {
-    selectedCampaignId.value = visible[0]?.id ?? null
+  const visible = allCampaigns.value;
+  if (!selectedCampaignId.value || !visible.find((c) => c.id === selectedCampaignId.value)) {
+    selectedCampaignId.value = visible[0]?.id ?? null;
   }
-})
+});
 
 const allCharactersInCampaign = computed(() =>
-  selectedCampaignId.value
-    ? campaignsStore.getCharactersForCampaign(selectedCampaignId.value)
-    : []
-)
+  selectedCampaignId.value ? campaignsStore.getCharactersForCampaign(selectedCampaignId.value) : [],
+);
 
 const characters = computed(() => {
-  return allCharactersInCampaign.value.filter(c => {
-    const type = c.type ?? 'sc'
-    if (!gmModeStore.isGMMode && type === 'nsc') return false
-    if (type === 'sc' && !showSC.value) return false
-    if (type === 'nsc' && !showNSC.value) return false
-    return true
-  })
-})
+  return allCharactersInCampaign.value.filter((c) => {
+    const type = c.type ?? 'sc';
+    if (!gmModeStore.isGMMode && type === 'nsc') return false;
+    if (type === 'sc' && !showSC.value) return false;
+    if (type === 'nsc' && !showNSC.value) return false;
+    return true;
+  });
+});
 
 function handleSave(updated: Character) {
-  charactersStore.updateCharacter(updated)
-  editingId.value = null
-  toastStore.show('Charakter gespeichert')
+  charactersStore.updateCharacter(updated);
+  editingId.value = null;
+  toastStore.show('Charakter gespeichert');
 }
 
 function saveEditing() {
-  formRef.value?.[0]?.save()
+  formRef.value?.[0]?.save();
 }
 
 watch(sidebarCollapsed, (val) => {
-  document.body.classList.toggle('sidebar-collapsed', val)
-})
+  document.body.classList.toggle('sidebar-collapsed', val);
+});
 
 watch(dashboardLayout, (val) => {
-  document.body.classList.toggle('dashboard-grid-active', val === 'grid')
-})
+  document.body.classList.toggle('dashboard-grid-active', val === 'grid');
+});
 
 onMounted(() => {
   // sidebar-no-transition disables the CSS transition on mount so the initial
   // padding-left jump is not animated. Double rAF ensures at least one frame
   // has been painted before re-enabling the transition.
-  document.body.classList.add('has-dashboard-sidebar', 'sidebar-no-transition')
+  document.body.classList.add('has-dashboard-sidebar', 'sidebar-no-transition');
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.body.classList.remove('sidebar-no-transition')
-    })
-  })
-})
+      document.body.classList.remove('sidebar-no-transition');
+    });
+  });
+});
 onUnmounted(() => {
-  document.body.classList.remove('has-dashboard-sidebar')
-  document.body.classList.remove('sidebar-collapsed')
-  document.body.classList.remove('dashboard-grid-active')
-})
+  document.body.classList.remove('has-dashboard-sidebar');
+  document.body.classList.remove('sidebar-collapsed');
+  document.body.classList.remove('dashboard-grid-active');
+});
 </script>
 
 <template>
@@ -105,7 +103,11 @@ onUnmounted(() => {
     <aside class="dashboard-sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-header">
         <h3 class="sidebar-title" v-show="!sidebarCollapsed">Filter</h3>
-        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed" :title="sidebarCollapsed ? 'Sidebar öffnen' : 'Sidebar schließen'">
+        <button
+          class="sidebar-toggle"
+          @click="sidebarCollapsed = !sidebarCollapsed"
+          :title="sidebarCollapsed ? 'Sidebar öffnen' : 'Sidebar schließen'"
+        >
           {{ sidebarCollapsed ? '›' : '‹' }}
         </button>
       </div>
@@ -271,16 +273,18 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="!selectedCampaignId" class="dashboard-empty">
-      Keine Kampagne ausgewählt.
-    </div>
+    <div v-if="!selectedCampaignId" class="dashboard-empty">Keine Kampagne ausgewählt.</div>
     <div v-else-if="allCharactersInCampaign.length === 0" class="dashboard-empty">
       Keine Charaktere in dieser Kampagne.
     </div>
     <div v-else-if="characters.length === 0" class="dashboard-empty">
       Alle Charaktere sind ausgeblendet.
     </div>
-    <div v-else class="dashboard-stack" :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }">
+    <div
+      v-else
+      class="dashboard-stack"
+      :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
+    >
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
         <CharacterSheet
           v-if="editingId === character.id"
@@ -292,13 +296,19 @@ onUnmounted(() => {
           @cancel="editingId = null"
         >
           <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="S" @click="editingId = null">Abbrechen</FateButton>
-            <FateButton icon="check" variant="outline" size="S" @click="saveEditing">Speichern</FateButton>
+            <FateButton icon="close" variant="outline" size="S" @click="editingId = null"
+              >Abbrechen</FateButton
+            >
+            <FateButton icon="check" variant="outline" size="S" @click="saveEditing"
+              >Speichern</FateButton
+            >
           </template>
         </CharacterSheet>
         <CharacterSheet v-else :character="character" :sections="visibleSections">
           <template v-if="showEditButton" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="S" @click="editingId = character.id">Bearbeiten</FateButton>
+            <FateButton icon="edit" variant="outline" size="S" @click="editingId = character.id"
+              >Bearbeiten</FateButton
+            >
           </template>
         </CharacterSheet>
       </div>
@@ -362,7 +372,9 @@ onUnmounted(() => {
   padding: 1.25rem 1rem;
   overflow-y: auto;
   z-index: 10;
-  transition: width 0.2s ease, padding 0.2s ease;
+  transition:
+    width 0.2s ease,
+    padding 0.2s ease;
 }
 
 .dashboard-sidebar.collapsed {

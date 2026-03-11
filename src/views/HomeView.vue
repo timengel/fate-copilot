@@ -1,54 +1,52 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCharactersStore } from '../stores/characters'
-import { useCampaignsStore } from '../stores/campaigns'
-import { useGMModeStore } from '../stores/gmMode'
-import FateButton from '../components/shared/FateButton.vue'
-import FatePlusLogo from '../components/shared/FatePlusLogo.vue'
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCharactersStore } from '../stores/characters';
+import { useCampaignsStore } from '../stores/campaigns';
+import { useGMModeStore } from '../stores/gmMode';
+import FateButton from '../components/shared/FateButton.vue';
+import FatePlusLogo from '../components/shared/FatePlusLogo.vue';
 
-const router = useRouter()
-const charactersStore = useCharactersStore()
-const campaignsStore = useCampaignsStore()
-const gmModeStore = useGMModeStore()
+const router = useRouter();
+const charactersStore = useCharactersStore();
+const campaignsStore = useCampaignsStore();
+const gmModeStore = useGMModeStore();
 
-const scCount = computed(() =>
-  charactersStore.characters.filter(c => (c.type ?? 'sc') === 'sc').length
-)
-const nscCount = computed(() =>
-  charactersStore.characters.filter(c => c.type === 'nsc').length
-)
+const scCount = computed(
+  () => charactersStore.characters.filter((c) => (c.type ?? 'sc') === 'sc').length,
+);
+const nscCount = computed(() => charactersStore.characters.filter((c) => c.type === 'nsc').length);
 
-const hasAnyData = computed(() =>
-  campaignsStore.campaigns.length > 0 || charactersStore.characters.length > 0
-)
+const hasAnyData = computed(
+  () => campaignsStore.campaigns.length > 0 || charactersStore.characters.length > 0,
+);
 
 const statsLine = computed(() => {
-  if (!hasAnyData.value) return null
+  if (!hasAnyData.value) return null;
 
-  const parts: string[] = []
-  const campCount = campaignsStore.campaigns.length
+  const parts: string[] = [];
+  const campCount = campaignsStore.campaigns.length;
 
-  if (campCount > 0) parts.push(`${campCount} Kampagne${campCount !== 1 ? 'n' : ''}`)
-  if (scCount.value > 0) parts.push(`${scCount.value} SC`)
-  if (gmModeStore.isGMMode && nscCount.value > 0) parts.push(`${nscCount.value} NSC`)
+  if (campCount > 0) parts.push(`${campCount} Kampagne${campCount !== 1 ? 'n' : ''}`);
+  if (scCount.value > 0) parts.push(`${scCount.value} SC`);
+  if (gmModeStore.isGMMode && nscCount.value > 0) parts.push(`${nscCount.value} NSC`);
 
-  return parts.join(' · ')
-})
+  return parts.join(' · ');
+});
 
-const activeCampaigns = computed(() => campaignsStore.activeCampaigns)
+const activeCampaigns = computed(() => campaignsStore.activeCampaigns);
 
 const recentChars = computed(() => {
-  const sc = charactersStore.characters.filter(c => (c.type ?? 'sc') === 'sc')
-  
-  if (!gmModeStore.isGMMode) return sc
+  const sc = charactersStore.characters.filter((c) => (c.type ?? 'sc') === 'sc');
 
-  const nsc = charactersStore.characters.filter(c => c.type === 'nsc')
-  return [...sc, ...nsc]
-})
+  if (!gmModeStore.isGMMode) return sc;
+
+  const nsc = charactersStore.characters.filter((c) => c.type === 'nsc');
+  return [...sc, ...nsc];
+});
 
 function getCharCampaign(charId: string): string | null {
-  return campaignsStore.getCampaignsForCharacter(charId)[0]?.name ?? null
+  return campaignsStore.getCampaignsForCharacter(charId)[0]?.name ?? null;
 }
 </script>
 
@@ -61,18 +59,26 @@ function getCharCampaign(charId: string): string | null {
 
     <div class="quick-actions">
       <FateButton @click="router.push('/dashboard')">Dashboard öffnen →</FateButton>
-      <FateButton variant="secondary" @click="router.push('/campaigns/new')">+ Neue Kampagne</FateButton>
-      <FateButton variant="secondary" @click="router.push('/characters/new')">+ Neuer Charakter</FateButton>
+      <FateButton variant="secondary" @click="router.push('/campaigns/new')"
+        >+ Neue Kampagne</FateButton
+      >
+      <FateButton variant="secondary" @click="router.push('/characters/new')"
+        >+ Neuer Charakter</FateButton
+      >
     </div>
 
     <p v-if="statsLine" class="stats-line">{{ statsLine }}</p>
 
     <div v-if="!hasAnyData" class="welcome">
-      <p class="welcome-text">Willkommen bei FATE+ &ndash; deinem digitalen Copiloten für Fate Core.</p>
+      <p class="welcome-text">
+        Willkommen bei FATE+ &ndash; deinem digitalen Copiloten für Fate Core.
+      </p>
       <div class="welcome-cards">
         <div class="welcome-card" @click="router.push('/campaigns/new')">
           <div class="welcome-card-title">Neue Kampagne</div>
-          <div class="welcome-card-desc">Erstelle deine erste Kampagne und lade Charaktere ein.</div>
+          <div class="welcome-card-desc">
+            Erstelle deine erste Kampagne und lade Charaktere ein.
+          </div>
         </div>
         <div class="welcome-card" @click="router.push('/characters/new')">
           <div class="welcome-card-title">Neuer Charakter</div>
@@ -85,7 +91,9 @@ function getCharCampaign(charId: string): string | null {
       <section class="home-section">
         <div class="section-header">
           <h2>Kampagnen</h2>
-          <FateButton variant="outline" size="S" @click.stop="router.push('/campaigns/new')">+ Neu</FateButton>
+          <FateButton variant="outline" size="S" @click.stop="router.push('/campaigns/new')"
+            >+ Neu</FateButton
+          >
         </div>
         <div class="section-scroll">
           <div v-if="activeCampaigns.length === 0" class="empty-state">
@@ -100,19 +108,27 @@ function getCharCampaign(charId: string): string | null {
             >
               <div class="item-main">
                 <span class="item-name">{{ campaign.name }}</span>
-                <span v-if="campaign.description" class="item-desc">{{ campaign.description }}</span>
+                <span v-if="campaign.description" class="item-desc">{{
+                  campaign.description
+                }}</span>
               </div>
-              <span class="item-meta">{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span>
+              <span class="item-meta"
+                >{{ campaignsStore.getCharactersForCampaign(campaign.id).length }} Charaktere</span
+              >
             </li>
           </ul>
         </div>
-        <FateButton variant="link" @click="router.push('/campaigns')">Alle Kampagnen ansehen →</FateButton>
+        <FateButton variant="link" @click="router.push('/campaigns')"
+          >Alle Kampagnen ansehen →</FateButton
+        >
       </section>
 
       <section class="home-section">
         <div class="section-header">
           <h2>Charaktere</h2>
-          <FateButton variant="outline" size="S" @click.stop="router.push('/characters/new')">+ Neu</FateButton>
+          <FateButton variant="outline" size="S" @click.stop="router.push('/characters/new')"
+            >+ Neu</FateButton
+          >
         </div>
         <div class="section-scroll">
           <div v-if="recentChars.length === 0" class="empty-state">
@@ -135,7 +151,8 @@ function getCharCampaign(charId: string): string | null {
                   <span
                     class="char-type-badge"
                     :class="char.type === 'nsc' ? 'badge-nsc' : 'badge-sc'"
-                  >{{ char.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+                    >{{ char.type === 'nsc' ? 'NSC' : 'SC' }}</span
+                  >
                 </div>
                 <span v-if="char.highConcept" class="item-desc">{{ char.highConcept }}</span>
                 <span v-if="getCharCampaign(char.id)" class="char-campaign">
@@ -145,7 +162,9 @@ function getCharCampaign(charId: string): string | null {
             </li>
           </ul>
         </div>
-        <FateButton variant="link" @click="router.push('/characters')">Alle Charaktere ansehen →</FateButton>
+        <FateButton variant="link" @click="router.push('/characters')"
+          >Alle Charaktere ansehen →</FateButton
+        >
       </section>
     </div>
   </div>
@@ -222,7 +241,9 @@ function getCharCampaign(charId: string): string | null {
   padding: 1.25rem;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 .welcome-card:hover {

@@ -1,20 +1,23 @@
 <script setup lang="ts">
-import { useSlots } from 'vue'
-import type { ButtonVariant, ButtonSize, ButtonIcon } from '../../types'
-import FateIcon from './FateIcon.vue'
+import { useSlots } from 'vue';
+import type { ButtonVariant, ButtonSize, ButtonIcon } from '../../types';
+import FateIcon from './FateIcon.vue';
 
-const slots = useSlots()
+const slots = useSlots();
 
-withDefaults(defineProps<{
-  variant?: ButtonVariant
-  size?: ButtonSize
-  type?: 'button' | 'submit' | 'reset'
-  icon?: ButtonIcon
-}>(), {
-  variant: 'primary',
-  size: 'M',
-  type: 'button',
-})
+withDefaults(
+  defineProps<{
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    type?: 'button' | 'submit' | 'reset';
+    icon?: ButtonIcon;
+  }>(),
+  {
+    variant: 'primary',
+    size: 'M',
+    type: 'button',
+  },
+);
 </script>
 
 <template>
@@ -86,12 +89,42 @@ button {
 }
 
 /* SIZE CLASSES – control padding, font-size, height and --btn-size */
-.fate-btn--XS  { padding: 0 0.3rem;  font-size: 0.7rem;   --btn-size: 20px; height: var(--btn-size); }
-.fate-btn--S   { padding: 0 0.6rem;  font-size: 0.8rem;   --btn-size: 24px; height: var(--btn-size); }
-.fate-btn--M   { padding: 0 1rem;    font-size: 0.875rem; --btn-size: 32px; height: var(--btn-size); }
-.fate-btn--L   { padding: 0 1.25rem; font-size: 1rem;     --btn-size: 40px; height: var(--btn-size); }
-.fate-btn--XL  { padding: 0 1.6rem;  font-size: 1.1rem;   --btn-size: 48px; height: var(--btn-size); }
-.fate-btn--XXL { padding: 0 2rem;    font-size: 1.2rem;   --btn-size: 56px; height: var(--btn-size); }
+.fate-btn--XS {
+  padding: 0 0.3rem;
+  font-size: 0.7rem;
+  --btn-size: 20px;
+  height: var(--btn-size);
+}
+.fate-btn--S {
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
+  --btn-size: 24px;
+  height: var(--btn-size);
+}
+.fate-btn--M {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  --btn-size: 32px;
+  height: var(--btn-size);
+}
+.fate-btn--L {
+  padding: 0 1.25rem;
+  font-size: 1rem;
+  --btn-size: 40px;
+  height: var(--btn-size);
+}
+.fate-btn--XL {
+  padding: 0 1.6rem;
+  font-size: 1.1rem;
+  --btn-size: 48px;
+  height: var(--btn-size);
+}
+.fate-btn--XXL {
+  padding: 0 2rem;
+  font-size: 1.2rem;
+  --btn-size: 56px;
+  height: var(--btn-size);
+}
 
 .fate-btn--icon-only {
   padding: 0;

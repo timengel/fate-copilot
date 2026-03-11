@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { CHARACTER_COLORS } from '../../types'
+import { CHARACTER_COLORS } from '../../types';
 
-const props = defineProps<{ modelValue?: string }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const props = defineProps<{ modelValue?: string }>();
+const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 </script>
 
 <template>
@@ -38,7 +38,10 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: transform 0.15s, outline-color 0.15s, border-color 0.15s;
+  transition:
+    transform 0.15s,
+    outline-color 0.15s,
+    border-color 0.15s;
 }
 
 .color-swatch:hover {

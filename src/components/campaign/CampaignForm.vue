@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import type { Campaign } from '../../types'
-import ColorPicker from '../shared/ColorPicker.vue'
-import FateButton from '../shared/FateButton.vue'
+import { reactive } from 'vue';
+import type { Campaign } from '../../types';
+import ColorPicker from '../shared/ColorPicker.vue';
+import FateButton from '../shared/FateButton.vue';
 
-const props = defineProps<{ campaign: Campaign }>()
-const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>()
+const props = defineProps<{ campaign: Campaign }>();
+const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>();
 
-const form = reactive<Campaign>(JSON.parse(JSON.stringify(props.campaign)))
+const form = reactive<Campaign>(JSON.parse(JSON.stringify(props.campaign)));
 
 function save() {
   if (!form.name.trim()) {
-    alert('Bitte einen Kampagnennamen eingeben.')
-    return
+    alert('Bitte einen Kampagnennamen eingeben.');
+    return;
   }
-  emit('save', JSON.parse(JSON.stringify(form)))
+  emit('save', JSON.parse(JSON.stringify(form)));
 }
 </script>
 
@@ -27,7 +27,12 @@ function save() {
 
     <div class="form-group">
       <label class="form-label">Beschreibung</label>
-      <textarea class="form-control" v-model="form.description" placeholder="Kurzbeschreibung der Kampagne" rows="3" />
+      <textarea
+        class="form-control"
+        v-model="form.description"
+        placeholder="Kurzbeschreibung der Kampagne"
+        rows="3"
+      />
     </div>
 
     <div class="form-group">
@@ -51,7 +56,12 @@ function save() {
 
     <div class="form-group">
       <label class="form-label">GM-Notizen</label>
-      <textarea class="form-control" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" rows="4" />
+      <textarea
+        class="form-control"
+        v-model="form.gmNotes"
+        placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
+        rows="4"
+      />
     </div>
 
     <div class="form-actions">

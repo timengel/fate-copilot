@@ -1,21 +1,21 @@
 <script setup lang="ts">
 const props = defineProps<{
-  highConcept: string
-  trouble: string
-  aspects: string[]
-  readonly?: boolean
-}>()
+  highConcept: string;
+  trouble: string;
+  aspects: string[];
+  readonly?: boolean;
+}>();
 
 const emit = defineEmits<{
-  'update:highConcept': [value: string]
-  'update:trouble': [value: string]
-  'update:aspects': [aspects: string[]]
-}>()
+  'update:highConcept': [value: string];
+  'update:trouble': [value: string];
+  'update:aspects': [aspects: string[]];
+}>();
 
 function updateAspect(index: number, value: string) {
-  const updated = [...props.aspects]
-  updated[index] = value
-  emit('update:aspects', updated)
+  const updated = [...props.aspects];
+  updated[index] = value;
+  emit('update:aspects', updated);
 }
 </script>
 

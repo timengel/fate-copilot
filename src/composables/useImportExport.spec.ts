@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
-import { useImportExport } from './useImportExport'
-import { useCharactersStore } from '../stores/characters'
-import { useCampaignsStore } from '../stores/campaigns'
-import { useSkillsStore } from '../stores/skills'
-import type { AppData, Character, Campaign, CampaignCharacterAssignment } from '../types'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import { useImportExport } from './useImportExport';
+import { useCharactersStore } from '../stores/characters';
+import { useCampaignsStore } from '../stores/campaigns';
+import { useSkillsStore } from '../stores/skills';
+import type { AppData, Character, Campaign, CampaignCharacterAssignment } from '../types';
 
 const validV11: AppData = {
   formatVersion: '1.1',
@@ -13,7 +13,7 @@ const validV11: AppData = {
   characters: [],
   campaignCharacterAssignments: [],
   skills: ['Athletik'],
-}
+};
 
 const validV10 = {
   formatVersion: '1.0' as const,
@@ -21,190 +21,244 @@ const validV10 = {
   campaigns: [],
   characters: [],
   campaignCharacterAssignments: [],
-}
+};
 
 function makeFile(data: unknown): File {
-  return new File([JSON.stringify(data)], 'test.json', { type: 'application/json' })
+  return new File([JSON.stringify(data)], 'test.json', { type: 'application/json' });
 }
 
 describe('useImportExport', () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
-  })
+    setActivePinia(createPinia());
+  });
 
   describe('importJSON', () => {
     it('resolves with valid v1.1 data', async () => {
-      const { importJSON } = useImportExport()
-      const result = await importJSON(makeFile(validV11))
-      expect(result.formatVersion).toBe('1.1')
-    })
+      const { importJSON } = useImportExport();
+      const result = await importJSON(makeFile(validV11));
+      expect(result.formatVersion).toBe('1.1');
+    });
 
     it('resolves with valid v1.0 data', async () => {
-      const { importJSON } = useImportExport()
-      const result = await importJSON(makeFile(validV10))
-      expect(result.formatVersion).toBe('1.0')
-    })
+      const { importJSON } = useImportExport();
+      const result = await importJSON(makeFile(validV10));
+      expect(result.formatVersion).toBe('1.0');
+    });
 
     it('rejects on invalid JSON string', async () => {
-      const { importJSON } = useImportExport()
-      const file = new File(['not{json}at all'], 'bad.json')
-      await expect(importJSON(file)).rejects.toThrow()
-    })
+      const { importJSON } = useImportExport();
+      const file = new File(['not{json}at all'], 'bad.json');
+      await expect(importJSON(file)).rejects.toThrow();
+    });
 
     it('rejects on unknown formatVersion', async () => {
-      const { importJSON } = useImportExport()
-      await expect(importJSON(makeFile({ ...validV11, formatVersion: '9.9' }))).rejects.toThrow()
-    })
+      const { importJSON } = useImportExport();
+      await expect(importJSON(makeFile({ ...validV11, formatVersion: '9.9' }))).rejects.toThrow();
+    });
 
     it('rejects when campaigns array is missing', async () => {
-      const { importJSON } = useImportExport()
-      const { campaigns: _c, ...noCampaigns } = validV11
-      await expect(importJSON(makeFile(noCampaigns))).rejects.toThrow()
-    })
+      const { importJSON } = useImportExport();
+      const { campaigns: _c, ...noCampaigns } = validV11;
+      await expect(importJSON(makeFile(noCampaigns))).rejects.toThrow();
+    });
 
     it('rejects when characters array is missing', async () => {
-      const { importJSON } = useImportExport()
-      const { characters: _c, ...noChars } = validV11
-      await expect(importJSON(makeFile(noChars))).rejects.toThrow()
-    })
+      const { importJSON } = useImportExport();
+      const { characters: _c, ...noChars } = validV11;
+      await expect(importJSON(makeFile(noChars))).rejects.toThrow();
+    });
 
     it('rejects when campaignCharacterAssignments is missing', async () => {
-      const { importJSON } = useImportExport()
-      const { campaignCharacterAssignments: _a, ...noAssignments } = validV11
-      await expect(importJSON(makeFile(noAssignments))).rejects.toThrow()
-    })
-
-  })
+      const { importJSON } = useImportExport();
+      const { campaignCharacterAssignments: _a, ...noAssignments } = validV11;
+      await expect(importJSON(makeFile(noAssignments))).rejects.toThrow();
+    });
+  });
 
   describe('applyImport', () => {
     it('replaces characters in the store', () => {
-      const { applyImport } = useImportExport()
+      const { applyImport } = useImportExport();
       const character: Character = {
-        id: 'c1', name: 'Alice', description: '', highConcept: '', trouble: '',
-        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
-        stressPhysical: [], stressMental: [], consequences: [], notes: '',
-      }
-      applyImport({ ...validV11, characters: [character] })
-      expect(useCharactersStore().characters[0].name).toBe('Alice')
-    })
+        id: 'c1',
+        name: 'Alice',
+        description: '',
+        highConcept: '',
+        trouble: '',
+        aspects: [],
+        skills: [],
+        stunts: [],
+        extras: '',
+        refresh: 3,
+        fatePoints: 3,
+        stressPhysical: [],
+        stressMental: [],
+        consequences: [],
+        notes: '',
+      };
+      applyImport({ ...validV11, characters: [character] });
+      expect(useCharactersStore().characters[0].name).toBe('Alice');
+    });
 
     it('replaces campaigns in the store', () => {
-      const { applyImport } = useImportExport()
-      const campaign: Campaign = { id: 'camp1', name: 'My Campaign', description: '', status: 'active', notes: '' }
-      applyImport({ ...validV11, campaigns: [campaign] })
-      expect(useCampaignsStore().campaigns[0].name).toBe('My Campaign')
-    })
+      const { applyImport } = useImportExport();
+      const campaign: Campaign = {
+        id: 'camp1',
+        name: 'My Campaign',
+        description: '',
+        status: 'active',
+        notes: '',
+      };
+      applyImport({ ...validV11, campaigns: [campaign] });
+      expect(useCampaignsStore().campaigns[0].name).toBe('My Campaign');
+    });
 
     it('replaces skills in the store', () => {
-      const { applyImport } = useImportExport()
-      applyImport({ ...validV11, skills: ['CustomSkill'] })
-      expect(useSkillsStore().skills).toEqual(['CustomSkill'])
-    })
+      const { applyImport } = useImportExport();
+      applyImport({ ...validV11, skills: ['CustomSkill'] });
+      expect(useSkillsStore().skills).toEqual(['CustomSkill']);
+    });
 
     it('falls back to SKILL_LIST when skills is undefined (v1.0)', () => {
-      const { applyImport } = useImportExport()
-      const { skills: _s, ...data } = validV11
-      applyImport(data as AppData)
-      expect(useSkillsStore().skills.length).toBeGreaterThan(0)
-    })
+      const { applyImport } = useImportExport();
+      const { skills: _s, ...data } = validV11;
+      applyImport(data as AppData);
+      expect(useSkillsStore().skills.length).toBeGreaterThan(0);
+    });
 
     it('applies campaign-character assignments to the store', () => {
-      const { applyImport } = useImportExport()
-      const assignment: CampaignCharacterAssignment = { campaignId: 'camp1', characterId: 'c1' }
-      applyImport({ ...validV11, campaignCharacterAssignments: [assignment] })
-      expect(useCampaignsStore().assignments).toEqual([assignment])
-    })
+      const { applyImport } = useImportExport();
+      const assignment: CampaignCharacterAssignment = { campaignId: 'camp1', characterId: 'c1' };
+      applyImport({ ...validV11, campaignCharacterAssignments: [assignment] });
+      expect(useCampaignsStore().assignments).toEqual([assignment]);
+    });
 
     it('clears previous store data before applying new import', () => {
-      const { applyImport } = useImportExport()
+      const { applyImport } = useImportExport();
       const existingChar: Character = {
-        id: 'old', name: 'Altcharakter', description: '', highConcept: '', trouble: '',
-        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
-        stressPhysical: [], stressMental: [], consequences: [], notes: '',
-      }
-      useCharactersStore().addCharacter(existingChar)
-      applyImport({ ...validV11, characters: [] })
-      expect(useCharactersStore().characters).toHaveLength(0)
-    })
+        id: 'old',
+        name: 'Altcharakter',
+        description: '',
+        highConcept: '',
+        trouble: '',
+        aspects: [],
+        skills: [],
+        stunts: [],
+        extras: '',
+        refresh: 3,
+        fatePoints: 3,
+        stressPhysical: [],
+        stressMental: [],
+        consequences: [],
+        notes: '',
+      };
+      useCharactersStore().addCharacter(existingChar);
+      applyImport({ ...validV11, characters: [] });
+      expect(useCharactersStore().characters).toHaveLength(0);
+    });
 
     it('preserves character type field (nsc)', () => {
-      const { applyImport } = useImportExport()
+      const { applyImport } = useImportExport();
       const nsc: Character = {
-        id: 'n1', name: 'Bösewicht', type: 'nsc', description: '', highConcept: '', trouble: '',
-        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
-        stressPhysical: [], stressMental: [], consequences: [], notes: '',
-      }
-      applyImport({ ...validV11, characters: [nsc] })
-      expect(useCharactersStore().characters[0].type).toBe('nsc')
-    })
-  })
+        id: 'n1',
+        name: 'Bösewicht',
+        type: 'nsc',
+        description: '',
+        highConcept: '',
+        trouble: '',
+        aspects: [],
+        skills: [],
+        stunts: [],
+        extras: '',
+        refresh: 3,
+        fatePoints: 3,
+        stressPhysical: [],
+        stressMental: [],
+        consequences: [],
+        notes: '',
+      };
+      applyImport({ ...validV11, characters: [nsc] });
+      expect(useCharactersStore().characters[0].type).toBe('nsc');
+    });
+  });
 
   describe('exportJSON', () => {
-    let createObjectURL: ReturnType<typeof vi.fn>
-    let revokeObjectURL: ReturnType<typeof vi.fn>
-    let fakeLink: { href: string; download: string; click: ReturnType<typeof vi.fn> }
+    let createObjectURL: ReturnType<typeof vi.fn>;
+    let revokeObjectURL: ReturnType<typeof vi.fn>;
+    let fakeLink: { href: string; download: string; click: ReturnType<typeof vi.fn> };
 
     beforeEach(() => {
-      createObjectURL = vi.fn(() => 'blob:fake-url')
-      revokeObjectURL = vi.fn()
-      vi.spyOn(URL, 'createObjectURL').mockImplementation(createObjectURL)
-      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(revokeObjectURL)
+      createObjectURL = vi.fn(() => 'blob:fake-url');
+      revokeObjectURL = vi.fn();
+      vi.spyOn(URL, 'createObjectURL').mockImplementation(createObjectURL);
+      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(revokeObjectURL);
 
-      fakeLink = { href: '', download: '', click: vi.fn() }
-      vi.spyOn(document, 'createElement').mockReturnValueOnce(fakeLink as unknown as HTMLElement)
-    })
+      fakeLink = { href: '', download: '', click: vi.fn() };
+      vi.spyOn(document, 'createElement').mockReturnValueOnce(fakeLink as unknown as HTMLElement);
+    });
 
     afterEach(() => {
-      vi.restoreAllMocks()
-    })
+      vi.restoreAllMocks();
+    });
 
     it('triggers a file download (link.click is called)', () => {
-      const { exportJSON } = useImportExport()
-      exportJSON()
-      expect(fakeLink.click).toHaveBeenCalledOnce()
-    })
+      const { exportJSON } = useImportExport();
+      exportJSON();
+      expect(fakeLink.click).toHaveBeenCalledOnce();
+    });
 
     it('sets download filename matching fate-copilot-export-YYYY-MM-DD.json', () => {
-      const { exportJSON } = useImportExport()
-      exportJSON()
-      expect(fakeLink.download).toMatch(/^fate-copilot-export-\d{4}-\d{2}-\d{2}\.json$/)
-    })
+      const { exportJSON } = useImportExport();
+      exportJSON();
+      expect(fakeLink.download).toMatch(/^fate-copilot-export-\d{4}-\d{2}-\d{2}\.json$/);
+    });
 
     it('exported JSON contains characters from the store', async () => {
       const char: Character = {
-        id: 'c1', name: 'Aragorn', description: '', highConcept: '', trouble: '',
-        aspects: [], skills: [], stunts: [], extras: '', refresh: 3, fatePoints: 3,
-        stressPhysical: [], stressMental: [], consequences: [], notes: '',
-      }
-      useCharactersStore().addCharacter(char)
+        id: 'c1',
+        name: 'Aragorn',
+        description: '',
+        highConcept: '',
+        trouble: '',
+        aspects: [],
+        skills: [],
+        stunts: [],
+        extras: '',
+        refresh: 3,
+        fatePoints: 3,
+        stressPhysical: [],
+        stressMental: [],
+        consequences: [],
+        notes: '',
+      };
+      useCharactersStore().addCharacter(char);
 
-      let capturedBlob: Blob | undefined
+      let capturedBlob: Blob | undefined;
       vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
-        capturedBlob = blob
-        return 'blob:fake-url'
-      })
+        capturedBlob = blob;
+        return 'blob:fake-url';
+      });
 
-      const { exportJSON } = useImportExport()
-      exportJSON()
+      const { exportJSON } = useImportExport();
+      exportJSON();
 
-      const text = await capturedBlob!.text()
-      const parsed = JSON.parse(text)
-      expect(parsed.characters[0].name).toBe('Aragorn')
-    })
+      const text = await capturedBlob!.text();
+      const parsed = JSON.parse(text);
+      expect(parsed.characters[0].name).toBe('Aragorn');
+    });
 
     it('exported JSON has formatVersion 1.1', async () => {
-      let capturedBlob: Blob | undefined
+      let capturedBlob: Blob | undefined;
       vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
-        capturedBlob = blob
-        return 'blob:fake-url'
-      })
+        capturedBlob = blob;
+        return 'blob:fake-url';
+      });
 
-      const { exportJSON } = useImportExport()
-      exportJSON()
+      const { exportJSON } = useImportExport();
+      exportJSON();
 
-      const text = await capturedBlob!.text()
-      const parsed = JSON.parse(text)
-      expect(parsed.formatVersion).toBe('1.1')
-    })
-  })
-})
+      const text = await capturedBlob!.text();
+      const parsed = JSON.parse(text);
+      expect(parsed.formatVersion).toBe('1.1');
+    });
+  });
+});

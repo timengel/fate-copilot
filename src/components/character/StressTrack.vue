@@ -1,22 +1,20 @@
 <script setup lang="ts">
-import type { StressBox } from '../../types'
+import type { StressBox } from '../../types';
 
 const props = defineProps<{
-  boxes: StressBox[]
-  label: string
-  readonly?: boolean
-}>()
+  boxes: StressBox[];
+  label: string;
+  readonly?: boolean;
+}>();
 
 const emit = defineEmits<{
-  update: [boxes: StressBox[]]
-}>()
+  update: [boxes: StressBox[]];
+}>();
 
 function toggle(index: number) {
-  if (props.readonly) return
-  const updated = props.boxes.map((b, i) =>
-    i === index ? { ...b, checked: !b.checked } : b
-  )
-  emit('update', updated)
+  if (props.readonly) return;
+  const updated = props.boxes.map((b, i) => (i === index ? { ...b, checked: !b.checked } : b));
+  emit('update', updated);
 }
 </script>
 
@@ -30,12 +28,7 @@ function toggle(index: number) {
         class="stress-box"
         :class="{ checked: box.checked, readonly }"
       >
-        <input
-          type="checkbox"
-          :checked="box.checked"
-          :disabled="readonly"
-          @change="toggle(i)"
-        />
+        <input type="checkbox" :checked="box.checked" :disabled="readonly" @change="toggle(i)" />
         <span class="box-value">{{ box.value }}</span>
       </label>
     </div>
@@ -70,7 +63,7 @@ function toggle(index: number) {
   user-select: none;
 }
 
-.stress-box input[type="checkbox"] {
+.stress-box input[type='checkbox'] {
   width: 22px;
   height: 22px;
   margin: 0;
@@ -83,12 +76,12 @@ function toggle(index: number) {
   transition: background 0.1s;
 }
 
-.stress-box input[type="checkbox"]:checked {
+.stress-box input[type='checkbox']:checked {
   background: var(--fate-blue);
 }
 
-.stress-box input[type="checkbox"]:checked::after {
-  content: "✕";
+.stress-box input[type='checkbox']:checked::after {
+  content: '✕';
   position: absolute;
   color: white;
   font-size: 14px;
@@ -98,7 +91,7 @@ function toggle(index: number) {
   transform: translate(-50%, -50%);
 }
 
-.stress-box.readonly input[type="checkbox"] {
+.stress-box.readonly input[type='checkbox'] {
   cursor: default;
 }
 

@@ -1,117 +1,111 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useCampaignsStore } from '../stores/campaigns'
-import { useCharactersStore } from '../stores/characters'
-import { useGMModeStore } from '../stores/gmMode'
-import CampaignForm from '../components/campaign/CampaignForm.vue'
-import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue'
-import FateButton from '../components/shared/FateButton.vue'
-import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import type { Campaign, Milestone } from '../types'
-import { CAMPAIGN_STATUS_LABEL } from '../types'
-import { getColorVars } from '../composables/useColorVars'
-import { useConfirmDialog } from '../composables/useConfirmDialog'
-import { createDefaultCampaign } from '../composables/useCharacterDefaults'
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useCampaignsStore } from '../stores/campaigns';
+import { useCharactersStore } from '../stores/characters';
+import { useGMModeStore } from '../stores/gmMode';
+import CampaignForm from '../components/campaign/CampaignForm.vue';
+import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue';
+import FateButton from '../components/shared/FateButton.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import type { Campaign, Milestone } from '../types';
+import { CAMPAIGN_STATUS_LABEL } from '../types';
+import { getColorVars } from '../composables/useColorVars';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { createDefaultCampaign } from '../composables/useCharacterDefaults';
 
 const props = defineProps<{
-  isNew?: boolean
-  editMode?: boolean
-}>()
+  isNew?: boolean;
+  editMode?: boolean;
+}>();
 
-const route = useRoute()
-const router = useRouter()
-const campaignsStore = useCampaignsStore()
-const charactersStore = useCharactersStore()
-const gmModeStore = useGMModeStore()
+const route = useRoute();
+const router = useRouter();
+const campaignsStore = useCampaignsStore();
+const charactersStore = useCharactersStore();
+const gmModeStore = useGMModeStore();
 
-const id = computed(() => route.params.id as string)
-const isEditing = ref(props.isNew || props.editMode || false)
-const { confirmDialog, showConfirmDialog } = useConfirmDialog()
+const id = computed(() => route.params.id as string);
+const isEditing = ref(props.isNew || props.editMode || false);
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
-const colorVars = computed(() => getColorVars(campaign.value?.color))
+const colorVars = computed(() => getColorVars(campaign.value?.color));
 
 const campaign = computed(() => {
-  if (props.isNew) return createDefaultCampaign()
-  return campaignsStore.getById(id.value)
-})
+  if (props.isNew) return createDefaultCampaign();
+  return campaignsStore.getById(id.value);
+});
 
 const campaignCharacters = computed(() =>
-  campaign.value ? campaignsStore.getCharactersForCampaign(campaign.value.id) : []
-)
+  campaign.value ? campaignsStore.getCharactersForCampaign(campaign.value.id) : [],
+);
 
 const scCharacters = computed(() =>
-  campaignCharacters.value.filter(c => (c.type ?? 'sc') === 'sc')
-)
-const nscCharacters = computed(() =>
-  campaignCharacters.value.filter(c => c.type === 'nsc')
-)
+  campaignCharacters.value.filter((c) => (c.type ?? 'sc') === 'sc'),
+);
+const nscCharacters = computed(() => campaignCharacters.value.filter((c) => c.type === 'nsc'));
 
 const availableCharacters = computed(() =>
-  charactersStore.characters.filter(c =>
-    !campaignCharacters.value.some(cc => cc.id === c.id)
-  )
-)
+  charactersStore.characters.filter((c) => !campaignCharacters.value.some((cc) => cc.id === c.id)),
+);
 const availableSc = computed(() =>
-  availableCharacters.value.filter(c => (c.type ?? 'sc') === 'sc')
-)
-const availableNsc = computed(() =>
-  availableCharacters.value.filter(c => c.type === 'nsc')
-)
+  availableCharacters.value.filter((c) => (c.type ?? 'sc') === 'sc'),
+);
+const availableNsc = computed(() => availableCharacters.value.filter((c) => c.type === 'nsc'));
 
 function handleSave(updated: Campaign) {
   if (props.isNew) {
-    campaignsStore.addCampaign(updated)
-    router.push('/campaigns')
+    campaignsStore.addCampaign(updated);
+    router.push('/campaigns');
   } else {
-    campaignsStore.updateCampaign(updated)
-    isEditing.value = false
+    campaignsStore.updateCampaign(updated);
+    isEditing.value = false;
   }
 }
 
 function handleCancel() {
   if (props.isNew) {
-    router.push('/campaigns')
+    router.push('/campaigns');
   } else {
-    isEditing.value = false
+    isEditing.value = false;
   }
 }
 
 function deleteCampaign() {
-  if (!campaign.value) return
+  if (!campaign.value) return;
   showConfirmDialog(
     'Kampagne löschen',
     `Kampagne "${campaign.value.name}" wirklich löschen?`,
     () => {
-      campaignsStore.deleteCampaign(campaign.value!.id)
-      router.push('/campaigns')
+      campaignsStore.deleteCampaign(campaign.value!.id);
+      router.push('/campaigns');
     },
-  )
+  );
 }
 
 function assignCharacter(characterId: string) {
-  if (!campaign.value) return
-  campaignsStore.assignCharacter(campaign.value.id, characterId)
+  if (!campaign.value) return;
+  campaignsStore.assignCharacter(campaign.value.id, characterId);
 }
 
 function unassignCharacter(characterId: string) {
-  if (!campaign.value) return
-  campaignsStore.unassignCharacter(campaign.value.id, characterId)
+  if (!campaign.value) return;
+  campaignsStore.unassignCharacter(campaign.value.id, characterId);
 }
 
 function addMilestone(milestone: Milestone) {
-  if (!campaign.value) return
-  campaignsStore.addMilestone(campaign.value.id, milestone)
+  if (!campaign.value) return;
+  campaignsStore.addMilestone(campaign.value.id, milestone);
 }
 
 function removeMilestone(milestoneId: string) {
-  if (!campaign.value) return
-  campaignsStore.removeMilestone(campaign.value.id, milestoneId)
+  if (!campaign.value) return;
+  campaignsStore.removeMilestone(campaign.value.id, milestoneId);
 }
 
 function updateMilestone(milestone: Milestone) {
-  if (!campaign.value) return
-  campaignsStore.updateMilestone(campaign.value.id, milestone)
+  if (!campaign.value) return;
+  campaignsStore.updateMilestone(campaign.value.id, milestone);
 }
 </script>
 
@@ -186,33 +180,52 @@ function updateMilestone(milestone: Milestone) {
                 <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
                   <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
                     <strong>{{ char.name || '(Unbenannt)' }}</strong>
-                    <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                    <span v-if="char.highConcept" class="assignment-concept">{{
+                      char.highConcept
+                    }}</span>
                   </div>
-                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
+                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
+                    >Entfernen</FateButton
+                  >
                 </div>
 
                 <template v-if="gmModeStore.isGMMode">
                   <div class="char-group-header">Nicht-Spieler-Charaktere (NSC)</div>
-                  <div v-if="nscCharacters.length === 0" class="empty-text">Keine NSC zugeordnet.</div>
+                  <div v-if="nscCharacters.length === 0" class="empty-text">
+                    Keine NSC zugeordnet.
+                  </div>
                   <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
                     <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
                       <strong>{{ char.name || '(Unbenannt)' }}</strong>
-                      <span v-if="char.highConcept" class="assignment-concept">{{ char.highConcept }}</span>
+                      <span v-if="char.highConcept" class="assignment-concept">{{
+                        char.highConcept
+                      }}</span>
                     </div>
-                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)">Entfernen</FateButton>
+                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
+                      >Entfernen</FateButton
+                    >
                   </div>
                 </template>
               </template>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">
-                <select class="assign-select" @change="assignCharacter(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''">
+                <select
+                  class="assign-select"
+                  @change="
+                    assignCharacter(($event.target as HTMLSelectElement).value);
+                    ($event.target as HTMLSelectElement).value = '';
+                  "
+                >
                   <option value="">Charakter hinzufügen...</option>
                   <optgroup v-if="availableSc.length > 0" label="Spielercharaktere (SC)">
                     <option v-for="c in availableSc" :key="c.id" :value="c.id">
                       {{ c.name || '(Unbenannt)' }}
                     </option>
                   </optgroup>
-                  <optgroup v-if="gmModeStore.isGMMode && availableNsc.length > 0" label="Nicht-Spieler-Charaktere (NSC)">
+                  <optgroup
+                    v-if="gmModeStore.isGMMode && availableNsc.length > 0"
+                    label="Nicht-Spieler-Charaktere (NSC)"
+                  >
                     <option v-for="c in availableNsc" :key="c.id" :value="c.id">
                       {{ c.name || '(Unbenannt)' }}
                     </option>
@@ -230,7 +243,10 @@ function updateMilestone(milestone: Milestone) {
     v-if="confirmDialog"
     :title="confirmDialog.title"
     :message="confirmDialog.message"
-    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @confirm="
+      confirmDialog.onConfirm();
+      confirmDialog = null;
+    "
     @cancel="confirmDialog = null"
   />
 </template>
@@ -331,7 +347,6 @@ function updateMilestone(milestone: Milestone) {
 .assignment-info strong {
   color: var(--fate-blue);
 }
-
 
 .assignment-concept {
   font-size: 0.8rem;

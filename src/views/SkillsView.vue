@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useSkillsStore } from '../stores/skills'
-import FateButton from '../components/shared/FateButton.vue'
-import type { SkillInfo } from '../types'
+import { ref, computed } from 'vue';
+import { useSkillsStore } from '../stores/skills';
+import FateButton from '../components/shared/FateButton.vue';
+import type { SkillInfo } from '../types';
 
-const store = useSkillsStore()
-const newSkillName = ref('')
-const infoSkill = ref<string | null>(null)
+const store = useSkillsStore();
+const newSkillName = ref('');
+const infoSkill = ref<string | null>(null);
 
-const sortedSkills = computed(() => [...store.skills].sort((a, b) => a.localeCompare(b, 'de')))
+const sortedSkills = computed(() => [...store.skills].sort((a, b) => a.localeCompare(b, 'de')));
 
 function add() {
   if (newSkillName.value.trim()) {
-    store.addSkill(newSkillName.value)
-    newSkillName.value = ''
+    store.addSkill(newSkillName.value);
+    newSkillName.value = '';
   }
 }
 
 function resetToDefaults() {
   if (confirm('Liste auf Fate-Core-Standardfertigkeiten zurücksetzen?')) {
-    store.resetToDefaults()
+    store.resetToDefaults();
   }
 }
 
@@ -28,43 +28,82 @@ const SKILL_INFO: Record<string, SkillInfo> = {
     description:
       'Körperliche Fitness, Körperbeherrschung und Bewegungsfähigkeit. Wichtig für alles, was mit dem eigenen Körper in Bewegung zu tun hat.',
     actions: [
-      { name: 'Überwinden', note: 'Hindernisse durch Springen, Laufen, Klettern, Schwimmen überwinden; Zonen wechseln.' },
-      { name: 'Vorteil erschaffen', note: 'Taktische Vorteile durch Akrobatik oder Positionierung.' },
-      { name: 'Verteidigen', note: 'Universelle Verteidigung in körperlichen Konflikten gegen Nah- und Fernkampfangriffe.' },
+      {
+        name: 'Überwinden',
+        note: 'Hindernisse durch Springen, Laufen, Klettern, Schwimmen überwinden; Zonen wechseln.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Taktische Vorteile durch Akrobatik oder Positionierung.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Universelle Verteidigung in körperlichen Konflikten gegen Nah- und Fernkampfangriffe.',
+      },
     ],
   },
   Charisma: {
     description:
       'Positive Beziehungen aufbauen, Wohlwollen erzeugen, Vertrauen wecken und andere dazu bringen, einen zu mögen.',
     actions: [
-      { name: 'Überwinden', note: 'Jemanden überreden, etwas zu tun, oder seine Zuneigung gewinnen.' },
-      { name: 'Vorteil erschaffen', note: 'Positive emotionale Zustände erzeugen wie „Aufgemuntert" oder „Gesprächsbereit".' },
-      { name: 'Verteidigen', note: 'Ruf und Atmosphäre schützen, wenn andere versuchen, sie zu untergraben.' },
+      {
+        name: 'Überwinden',
+        note: 'Jemanden überreden, etwas zu tun, oder seine Zuneigung gewinnen.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Positive emotionale Zustände erzeugen wie „Aufgemuntert" oder „Gesprächsbereit".',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Ruf und Atmosphäre schützen, wenn andere versuchen, sie zu untergraben.',
+      },
     ],
   },
   Diebeskünste: {
     description:
       'Dinge stehlen und in gesperrte Bereiche eindringen. In modernen Umgebungen auch Hacken und Sicherheitssysteme deaktivieren.',
     actions: [
-      { name: 'Überwinden', note: 'Schlösser knacken, Fallen umgehen, Taschendiebstahl, Spuren verwischen.' },
-      { name: 'Vorteil erschaffen', note: 'Orte auskundschaften, Sicherheitslücken finden, Tatortspuren auswerten.' },
+      {
+        name: 'Überwinden',
+        note: 'Schlösser knacken, Fallen umgehen, Taschendiebstahl, Spuren verwischen.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Orte auskundschaften, Sicherheitslücken finden, Tatortspuren auswerten.',
+      },
     ],
   },
   Empathie: {
     description:
       'Emotionale Zustände und Verhaltensänderungen anderer erkennen – wie Wahrnehmung, aber für Gefühle statt physische Details.',
     actions: [
-      { name: 'Vorteil erschaffen', note: 'Emotionalen Zustand einschätzen, Charakteraspekte (besonders von NSC) aufdecken.' },
-      { name: 'Verteidigen', note: 'Täuschung aufdecken; gegen soziale Vorteile verteidigen; bei mentalen Konsequenzen helfen.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Emotionalen Zustand einschätzen, Charakteraspekte (besonders von NSC) aufdecken.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Täuschung aufdecken; gegen soziale Vorteile verteidigen; bei mentalen Konsequenzen helfen.',
+      },
     ],
   },
   Fahren: {
     description:
       'Fahrzeuge und schnelle Fortbewegungsmittel steuern. Je nach Setting auch Reiten, Fliegen oder Pilotieren.',
     actions: [
-      { name: 'Überwinden', note: 'Fahrzeug durch schwieriges Gelände navigieren, Rennen und Verfolgungsjagden.' },
-      { name: 'Vorteil erschaffen', note: 'Optimale Routen finden, taktische Positionsvorteile erarbeiten.' },
-      { name: 'Verteidigen', note: 'Fahrzeugschäden abwehren, Positionierungsversuche des Gegners kontern.' },
+      {
+        name: 'Überwinden',
+        note: 'Fahrzeug durch schwieriges Gelände navigieren, Rennen und Verfolgungsjagden.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Optimale Routen finden, taktische Positionsvorteile erarbeiten.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Fahrzeugschäden abwehren, Positionierungsversuche des Gegners kontern.',
+      },
     ],
   },
   Handwerk: {
@@ -72,42 +111,75 @@ const SKILL_INFO: Record<string, SkillInfo> = {
       'Umgang mit Maschinen und mechanischen Systemen. Je nach Setting auch Mechanik, Reparieren oder Technik.',
     actions: [
       { name: 'Überwinden', note: 'Maschinen bauen, zerstören oder reparieren.' },
-      { name: 'Vorteil erschaffen', note: 'Aspekte über Maschineneigenschaften, schnelle Sabotage oder mechanische Manipulation.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Aspekte über Maschineneigenschaften, schnelle Sabotage oder mechanische Manipulation.',
+      },
     ],
   },
   Heimlichkeit: {
     description:
       'Ungesehen und ungehört bewegen. Funktioniert gut in Kombination mit Diebeskünsten.',
     actions: [
-      { name: 'Überwinden', note: 'An Wachen vorbeischleichen, Verfolgern entkommen, keine Spuren hinterlassen.' },
-      { name: 'Vorteil erschaffen', note: 'Aspekte wie „gut versteckt" oder „unbekannter Standort" erzeugen.' },
-      { name: 'Verteidigen', note: 'Entdeckung durch Wahrnehmung verhindern; Spuren vor Nachforschung verschleiern.' },
+      {
+        name: 'Überwinden',
+        note: 'An Wachen vorbeischleichen, Verfolgern entkommen, keine Spuren hinterlassen.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Aspekte wie „gut versteckt" oder „unbekannter Standort" erzeugen.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Entdeckung durch Wahrnehmung verhindern; Spuren vor Nachforschung verschleiern.',
+      },
     ],
   },
   Kämpfen: {
     description:
       'Nahkampfaktionen – unbewaffnet oder mit Waffe, innerhalb einer Zone. Für Fernkampf wird Schießen verwendet.',
     actions: [
-      { name: 'Vorteil erschaffen', note: 'Betäubende Schläge, schmutzige Tricks, Entwaffnung, Kampfstil analysieren.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Betäubende Schläge, schmutzige Tricks, Entwaffnung, Kampfstil analysieren.',
+      },
       { name: 'Angreifen', note: 'Direkte Nahkampfangriffe gegen Ziele in derselben Zone.' },
-      { name: 'Verteidigen', note: 'Gegen Kämpfen-Angriffe und Vorteils-Erschaffungsversuche verteidigen.' },
+      {
+        name: 'Verteidigen',
+        note: 'Gegen Kämpfen-Angriffe und Vorteils-Erschaffungsversuche verteidigen.',
+      },
     ],
   },
   Kontakte: {
     description:
       'Verbindungen zu Menschen und die Fähigkeit, neue Beziehungen zu knüpfen. Umfasst alle Kommunikationswege in der Spielwelt.',
     actions: [
-      { name: 'Überwinden', note: 'Bestimmte Personen durch Straßennetzwerke, Informanten oder Datenbanken aufspüren.' },
-      { name: 'Vorteil erschaffen', note: 'Den richtigen Kontakt finden, öffentliche Meinung beeinflussen, Gerüchte streuen.' },
-      { name: 'Verteidigen', note: 'Soziale Vorteile abwehren; verhindern, dass man durch Täuschung oder Nachforschung gefunden wird.' },
+      {
+        name: 'Überwinden',
+        note: 'Bestimmte Personen durch Straßennetzwerke, Informanten oder Datenbanken aufspüren.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Den richtigen Kontakt finden, öffentliche Meinung beeinflussen, Gerüchte streuen.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Soziale Vorteile abwehren; verhindern, dass man durch Täuschung oder Nachforschung gefunden wird.',
+      },
     ],
   },
   Kraft: {
     description:
       'Rohe körperliche Stärke und Ausdauer. Pendant zu Athletik: unterscheidet „stark" von „wendig". Hohe Kraft gewährt zusätzliche Stressfelder.',
     actions: [
-      { name: 'Überwinden', note: 'Physische Hindernisse durch rohe Kraft überwinden: Türen eintreten, Barrieren entfernen.' },
-      { name: 'Vorteil erschaffen', note: 'Griffe, Ringen und körperliche Kontrolle im Nahkampf (z.B. „Schwitzkasten").' },
+      {
+        name: 'Überwinden',
+        note: 'Physische Hindernisse durch rohe Kraft überwinden: Türen eintreten, Barrieren entfernen.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Griffe, Ringen und körperliche Kontrolle im Nahkampf (z.B. „Schwitzkasten").',
+      },
     ],
   },
   Nachforschung: {
@@ -115,15 +187,24 @@ const SKILL_INFO: Record<string, SkillInfo> = {
       'Informationen durch konzentrierte Suche und sorgfältige Prüfung aufdecken. Aktiver als die passive Wahrnehmung.',
     actions: [
       { name: 'Überwinden', note: 'Tatortuntersuchung, gezielte Suche, relevante Quellen finden.' },
-      { name: 'Vorteil erschaffen', note: 'Umfangreiche Details aufdecken: Überwachen, Akten durchsuchen, falsche Identitäten prüfen.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Umfangreiche Details aufdecken: Überwachen, Akten durchsuchen, falsche Identitäten prüfen.',
+      },
     ],
   },
   Provozieren: {
     description:
       'Andere in Wut versetzen und negative Emotionen wecken (Angst, Scham, Rage). Wirkt nicht gegen gefühllose Wesen.',
     actions: [
-      { name: 'Überwinden', note: 'Ziele durch Einschüchterung zu emotionsgesteuerten Handlungen zwingen.' },
-      { name: 'Vorteil erschaffen', note: 'Emotionale Zustände erschaffen: „Wütend", „Erschrocken", „Zögerlich".' },
+      {
+        name: 'Überwinden',
+        note: 'Ziele durch Einschüchterung zu emotionsgesteuerten Handlungen zwingen.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Emotionale Zustände erschaffen: „Wütend", „Erschrocken", „Zögerlich".',
+      },
       { name: 'Angreifen', note: 'Mentale Angriffe, die psychischen Schaden verursachen.' },
     ],
   },
@@ -132,14 +213,20 @@ const SKILL_INFO: Record<string, SkillInfo> = {
       'Reichtum und die Fähigkeit, ihn einzusetzen. Kann je nach Setting Land, Gold oder Kreditwürdigkeit repräsentieren.',
     actions: [
       { name: 'Überwinden', note: 'Situationen mit Geld lösen: bestechen, Luxusgüter kaufen.' },
-      { name: 'Vorteil erschaffen', note: 'Beziehungen durch Bestechung verbessern, Aspekte für besessene oder schnell beschaffte Gegenstände.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Beziehungen durch Bestechung verbessern, Aspekte für besessene oder schnell beschaffte Gegenstände.',
+      },
     ],
   },
   Schießen: {
     description:
       'Fernkampfwaffen einsetzen. Pendant zu Kämpfen für Distanzkämpfe – bis zu 2 Zonen Reichweite.',
     actions: [
-      { name: 'Vorteil erschaffen', note: 'Taktische Manöver: Trickschüsse, Sperrfeuer, Entwaffnen auf Distanz.' },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Taktische Manöver: Trickschüsse, Sperrfeuer, Entwaffnen auf Distanz.',
+      },
       { name: 'Angreifen', note: 'Physische Angriffe gegen Ziele in bis zu 2 Zonen Entfernung.' },
     ],
   },
@@ -147,8 +234,14 @@ const SKILL_INFO: Record<string, SkillInfo> = {
     description:
       'Andere anlügen, in die Irre führen und durch Falschinformationen Ziele erreichen.',
     actions: [
-      { name: 'Überwinden', note: 'Bluffs glaubwürdig machen, Lügen durchsetzen, Informationen durch Falschaussagen extrahieren.' },
-      { name: 'Vorteil erschaffen', note: 'Ablenkungen, falsche Identitäten, irreführende Eindrücke erzeugen.' },
+      {
+        name: 'Überwinden',
+        note: 'Bluffs glaubwürdig machen, Lügen durchsetzen, Informationen durch Falschaussagen extrahieren.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Ablenkungen, falsche Identitäten, irreführende Eindrücke erzeugen.',
+      },
       { name: 'Verteidigen', note: 'Nachforschung abwehren; wahre Motive vor Empathie verbergen.' },
     ],
   },
@@ -156,40 +249,66 @@ const SKILL_INFO: Record<string, SkillInfo> = {
     description:
       'Allgemeine Aufmerksamkeit und spontane Detailwahrnehmung. Schneller als Nachforschung, aber weniger tiefgreifend.',
     actions: [
-      { name: 'Überwinden', note: 'Dinge im Umfeld bemerken, undeutliche Geräusche hören, versteckte Gegenstände entdecken.' },
-      { name: 'Vorteil erschaffen', note: 'Aspekte aus Beobachtungen: Fluchtwege, Schwachstellen, Auffälligkeiten in der Menge.' },
-      { name: 'Verteidigen', note: 'Gegen Heimlichkeit; Hinterhalte verhindern; bemerken, wenn man beobachtet wird.' },
+      {
+        name: 'Überwinden',
+        note: 'Dinge im Umfeld bemerken, undeutliche Geräusche hören, versteckte Gegenstände entdecken.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Aspekte aus Beobachtungen: Fluchtwege, Schwachstellen, Auffälligkeiten in der Menge.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Gegen Heimlichkeit; Hinterhalte verhindern; bemerken, wenn man beobachtet wird.',
+      },
     ],
   },
   Wille: {
     description:
       'Mentale Ausdauer und Belastbarkeit. Mentales Pendant zu Kraft. Hoher Wille gewährt zusätzliche mentale Stressfelder.',
     actions: [
-      { name: 'Überwinden', note: 'Mentale Hindernisse überwinden: Rätsel, intellektuelle Aufgaben, bei denen Ausdauer zählt.' },
-      { name: 'Vorteil erschaffen', note: 'Aspekte für erhöhte Konzentration oder intensive Fokussierung.' },
-      { name: 'Verteidigen', note: 'Primäre Verteidigung gegen mentale Angriffe und emotionale Manipulation.' },
+      {
+        name: 'Überwinden',
+        note: 'Mentale Hindernisse überwinden: Rätsel, intellektuelle Aufgaben, bei denen Ausdauer zählt.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Aspekte für erhöhte Konzentration oder intensive Fokussierung.',
+      },
+      {
+        name: 'Verteidigen',
+        note: 'Primäre Verteidigung gegen mentale Angriffe und emotionale Manipulation.',
+      },
     ],
   },
   Wissen: {
     description:
       'Angesammeltes Wissen und formale Bildung. Je nach Setting auch Gelehrsamkeit oder Wissenschaft.',
     actions: [
-      { name: 'Überwinden', note: 'Probleme durch Expertise lösen: alte Sprachen übersetzen, schwierige Fragen beantworten.' },
-      { name: 'Vorteil erschaffen', note: 'Wie Nachforschung – Storyfakten oder verborgene Informationen aus Expertenwissen ableiten.' },
+      {
+        name: 'Überwinden',
+        note: 'Probleme durch Expertise lösen: alte Sprachen übersetzen, schwierige Fragen beantworten.',
+      },
+      {
+        name: 'Vorteil erschaffen',
+        note: 'Wie Nachforschung – Storyfakten oder verborgene Informationen aus Expertenwissen ableiten.',
+      },
     ],
   },
-}
+};
 
 const selectedInfo = computed<SkillInfo | null>(() =>
-  infoSkill.value ? (SKILL_INFO[infoSkill.value] ?? null) : null
-)
+  infoSkill.value ? (SKILL_INFO[infoSkill.value] ?? null) : null,
+);
 </script>
 
 <template>
   <div class="list-view">
     <div class="list-header">
       <h1>Fertigkeiten</h1>
-      <FateButton variant="secondary" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
+      <FateButton variant="secondary" @click="resetToDefaults"
+        >Auf Standard zurücksetzen</FateButton
+      >
     </div>
 
     <p class="skills-hint">
@@ -198,11 +317,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
     <div class="skills-manage">
       <div class="skills-list-box">
-        <div
-          v-for="skill in sortedSkills"
-          :key="skill"
-          class="skill-manage-row"
-        >
+        <div v-for="skill in sortedSkills" :key="skill" class="skill-manage-row">
           <div class="skill-manage-label">
             <span class="skill-manage-name">{{ skill }}</span>
             <FateButton
@@ -241,7 +356,9 @@ const selectedInfo = computed<SkillInfo | null>(() =>
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
-          <FateButton variant="ghost" class="skill-info-close" @click="infoSkill = null">✕</FateButton>
+          <FateButton variant="ghost" class="skill-info-close" @click="infoSkill = null"
+            >✕</FateButton
+          >
         </div>
         <p class="skill-info-description">{{ selectedInfo.description }}</p>
         <div class="skill-info-actions">

@@ -1,122 +1,133 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
-import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types'
-import { CHARACTER_COLORS } from '../../types'
-import { useGMModeStore } from '../../stores/gmMode'
-import ColorPicker from '../shared/ColorPicker.vue'
-import AspectFields from './AspectFields.vue'
-import SkillPyramid from './SkillPyramid.vue'
-import StressTrack from './StressTrack.vue'
-import ConsequenceSlots from './ConsequenceSlots.vue'
-import FateButton from '../shared/FateButton.vue'
-import FateCounter from '../shared/FateCounter.vue'
+import { computed, reactive, ref, watch } from 'vue';
+import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types';
+import { CHARACTER_COLORS } from '../../types';
+import { useGMModeStore } from '../../stores/gmMode';
+import ColorPicker from '../shared/ColorPicker.vue';
+import AspectFields from './AspectFields.vue';
+import SkillPyramid from './SkillPyramid.vue';
+import StressTrack from './StressTrack.vue';
+import ConsequenceSlots from './ConsequenceSlots.vue';
+import FateButton from '../shared/FateButton.vue';
+import FateCounter from '../shared/FateCounter.vue';
 
 const props = defineProps<{
-  character: Character
-  mode?: 'view' | 'edit'
-  hideActions?: boolean
+  character: Character;
+  mode?: 'view' | 'edit';
+  hideActions?: boolean;
   sections?: {
-    allgemeines?: boolean
-    aspekte?: boolean
-    fertigkeiten?: boolean
-    extras?: boolean
-    stunts?: boolean
-    stress?: boolean
-    konsequenzen?: boolean
-    gmNotes?: boolean
-  }
-}>()
+    allgemeines?: boolean;
+    aspekte?: boolean;
+    fertigkeiten?: boolean;
+    extras?: boolean;
+    stunts?: boolean;
+    stress?: boolean;
+    konsequenzen?: boolean;
+    gmNotes?: boolean;
+  };
+}>();
 
-const emit = defineEmits<{ save: [character: Character]; cancel: [] }>()
+const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
-const gmModeStore = useGMModeStore()
+const gmModeStore = useGMModeStore();
 
-const form = reactive<Character>(JSON.parse(JSON.stringify(props.character)))
+const form = reactive<Character>(JSON.parse(JSON.stringify(props.character)));
 
-watch(() => props.character, (val) => {
-  Object.assign(form, JSON.parse(JSON.stringify(val)))
-}, { deep: true })
+watch(
+  () => props.character,
+  (val) => {
+    Object.assign(form, JSON.parse(JSON.stringify(val)));
+  },
+  { deep: true },
+);
 
-const isEditing = computed(() => props.mode === 'edit')
+const isEditing = computed(() => props.mode === 'edit');
 
-const data = computed(() => isEditing.value ? form : props.character)
+const data = computed(() => (isEditing.value ? form : props.character));
 
-const isNscHidden = computed(() =>
-  !isEditing.value && !gmModeStore.isGMMode && props.character.type === 'nsc'
-)
+const isNscHidden = computed(
+  () => !isEditing.value && !gmModeStore.isGMMode && props.character.type === 'nsc',
+);
 
 const colorVars = computed(() => {
-  const found = CHARACTER_COLORS.find(c => c.id === (data.value.color ?? 'pfau'))
-  const c = found ?? CHARACTER_COLORS[0]!
+  const found = CHARACTER_COLORS.find((c) => c.id === (data.value.color ?? 'pfau'));
+  const c = found ?? CHARACTER_COLORS[0]!;
   return {
     '--fate-blue': c.primary,
     '--fate-blue-dark': c.dark,
     '--fate-blue-light': c.light,
-  }
-})
+  };
+});
 
 // NSC: collapsible sections (edit mode only)
-const showExtras = ref(form.type !== 'nsc' || !!form.extras?.trim())
-const showStunts = ref(form.type !== 'nsc' || form.stunts.length > 0)
+const showExtras = ref(form.type !== 'nsc' || !!form.extras?.trim());
+const showStunts = ref(form.type !== 'nsc' || form.stunts.length > 0);
 
 // Stunt management
 function addStunt() {
-  form.stunts.push({ name: '', description: '' })
+  form.stunts.push({ name: '', description: '' });
 }
 
 function removeStunt(index: number) {
-  form.stunts.splice(index, 1)
+  form.stunts.splice(index, 1);
 }
 
 function updateStunt(index: number, field: keyof Stunt, value: string) {
-  const stunt = form.stunts[index]
-  if (stunt) stunt[field] = value
+  const stunt = form.stunts[index];
+  if (stunt) stunt[field] = value;
 }
 
 // Consequence management
-const CONSEQUENCE_TYPES: { label: string; severity: ConsequenceSeverity; labelKey: ConsequenceLabel }[] = [
-  { label: 'Leicht',  severity: 2, labelKey: 'mild' },
-  { label: 'Mittel',  severity: 4, labelKey: 'moderate' },
-  { label: 'Schwer',  severity: 6, labelKey: 'severe' },
-  { label: 'Extrem',  severity: 8, labelKey: 'extreme' },
-]
+const CONSEQUENCE_TYPES: {
+  label: string;
+  severity: ConsequenceSeverity;
+  labelKey: ConsequenceLabel;
+}[] = [
+  { label: 'Leicht', severity: 2, labelKey: 'mild' },
+  { label: 'Mittel', severity: 4, labelKey: 'moderate' },
+  { label: 'Schwer', severity: 6, labelKey: 'severe' },
+  { label: 'Extrem', severity: 8, labelKey: 'extreme' },
+];
 
 function countConsequences(severity: ConsequenceSeverity) {
-  return form.consequences.filter(c => c.severity === severity).length
+  return form.consequences.filter((c) => c.severity === severity).length;
 }
 
 function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: ConsequenceLabel) {
-  const idx = form.consequences.map(c => c.severity).lastIndexOf(severity)
-  form.consequences.splice(idx === -1 ? form.consequences.length : idx + 1, 0, { severity, label: labelKey, value: '' })
+  const idx = form.consequences.map((c) => c.severity).lastIndexOf(severity);
+  form.consequences.splice(idx === -1 ? form.consequences.length : idx + 1, 0, {
+    severity,
+    label: labelKey,
+    value: '',
+  });
 }
 
 function removeConsequenceSlot(severity: ConsequenceSeverity) {
-  const idx = form.consequences.map(c => c.severity).lastIndexOf(severity)
-  if (idx !== -1) form.consequences.splice(idx, 1)
+  const idx = form.consequences.map((c) => c.severity).lastIndexOf(severity);
+  if (idx !== -1) form.consequences.splice(idx, 1);
 }
 
 // Stress management
 function addStressBox(track: 'physical' | 'mental') {
-  const arr = track === 'physical' ? form.stressPhysical : form.stressMental
-  const nextValue = arr.length > 0 ? arr[arr.length - 1]!.value + 1 : 1
-  arr.push({ value: nextValue, checked: false })
+  const arr = track === 'physical' ? form.stressPhysical : form.stressMental;
+  const nextValue = arr.length > 0 ? arr[arr.length - 1]!.value + 1 : 1;
+  arr.push({ value: nextValue, checked: false });
 }
 
 function removeStressBox(track: 'physical' | 'mental') {
-  const arr = track === 'physical' ? form.stressPhysical : form.stressMental
-  if (arr.length > 0) arr.pop()
+  const arr = track === 'physical' ? form.stressPhysical : form.stressMental;
+  if (arr.length > 0) arr.pop();
 }
 
 function save() {
-  emit('save', JSON.parse(JSON.stringify(form)))
+  emit('save', JSON.parse(JSON.stringify(form)));
 }
 
-defineExpose({ save })
+defineExpose({ save });
 </script>
 
 <template>
   <div class="character-sheet" :style="colorVars">
-
     <!-- NSC hidden in Player View (view mode only) -->
     <template v-if="isNscHidden">
       <section class="sheet-section allgemeines">
@@ -130,11 +141,12 @@ defineExpose({ save })
     </template>
 
     <template v-else>
-
       <!-- Name Bar -->
       <div class="character-name-bar">
         <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
-        <span v-if="!isEditing" class="character-type-badge">{{ data.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+        <span v-if="!isEditing" class="character-type-badge">{{
+          data.type === 'nsc' ? 'NSC' : 'SC'
+        }}</span>
         <div class="character-name-bar-end">
           <slot v-if="!isEditing" name="name-bar-actions" />
           <slot v-else name="edit-bar-actions" />
@@ -142,19 +154,34 @@ defineExpose({ save })
       </div>
 
       <!-- ALLGEMEINES -->
-      <section v-if="isEditing || sections?.allgemeines !== false" class="sheet-section allgemeines">
+      <section
+        v-if="isEditing || sections?.allgemeines !== false"
+        class="sheet-section allgemeines"
+      >
         <div class="sheet-section-header">ALLGEMEINES</div>
         <div class="allgemeines-grid">
           <div class="allgemeines-left">
             <div class="field-row">
               <label class="field-label">Name</label>
-              <input v-if="isEditing" class="field-input" v-model="form.name" placeholder="Charaktername" />
+              <input
+                v-if="isEditing"
+                class="field-input"
+                v-model="form.name"
+                placeholder="Charaktername"
+              />
               <span v-else class="field-value">{{ data.name || '—' }}</span>
             </div>
             <div class="field-row">
               <label class="field-label">Beschreibung</label>
-              <textarea v-if="isEditing" class="field-input field-textarea" v-model="form.description" placeholder="Kurzbeschreibung" />
-              <span v-else class="field-value field-description">{{ data.description || '—' }}</span>
+              <textarea
+                v-if="isEditing"
+                class="field-input field-textarea"
+                v-model="form.description"
+                placeholder="Kurzbeschreibung"
+              />
+              <span v-else class="field-value field-description">{{
+                data.description || '—'
+              }}</span>
             </div>
             <div v-if="isEditing" class="field-row">
               <label class="field-label">Farbe</label>
@@ -218,7 +245,12 @@ defineExpose({ save })
           :maxLevel="form.pyramidMaxLevel ?? 5"
           :maxCols="form.pyramidMaxCols ?? 5"
           @update="form.skills = $event"
-          @updateLayout="(p) => { form.pyramidMaxLevel = p.maxLevel; form.pyramidMaxCols = p.maxCols }"
+          @updateLayout="
+            (p) => {
+              form.pyramidMaxLevel = p.maxLevel;
+              form.pyramidMaxCols = p.maxCols;
+            }
+          "
         />
         <SkillPyramid
           v-else
@@ -241,10 +273,16 @@ defineExpose({ save })
           @click="isEditing && form.type === 'nsc' && (showExtras = !showExtras)"
         >
           EXTRAS
-          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{ showExtras ? '▼' : '▶' }}</span>
+          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
+            showExtras ? '▼' : '▶'
+          }}</span>
         </div>
         <div v-if="isEditing" v-show="showExtras">
-          <textarea class="text-area-input" v-model="form.extras" placeholder="Extras beschreiben..." />
+          <textarea
+            class="text-area-input"
+            v-model="form.extras"
+            placeholder="Extras beschreiben..."
+          />
         </div>
         <div v-else class="text-area-display">{{ data.extras || '' }}</div>
       </section>
@@ -261,7 +299,9 @@ defineExpose({ save })
           @click="isEditing && form.type === 'nsc' && (showStunts = !showStunts)"
         >
           STUNTS
-          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{ showStunts ? '▼' : '▶' }}</span>
+          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
+            showStunts ? '▼' : '▶'
+          }}</span>
         </div>
         <div v-if="isEditing" v-show="showStunts" class="stunts-list">
           <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
@@ -311,8 +351,22 @@ defineExpose({ save })
                 @update="form.stressPhysical = $event"
               />
               <div class="stress-track-controls">
-                <button type="button" class="stress-ctrl-btn" :disabled="form.stressPhysical.length === 0" @click="removeStressBox('physical')">−</button>
-                <button type="button" class="stress-ctrl-btn" :disabled="form.stressPhysical.length >= 6" @click="addStressBox('physical')">+</button>
+                <button
+                  type="button"
+                  class="stress-ctrl-btn"
+                  :disabled="form.stressPhysical.length === 0"
+                  @click="removeStressBox('physical')"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
+                  class="stress-ctrl-btn"
+                  :disabled="form.stressPhysical.length >= 6"
+                  @click="addStressBox('physical')"
+                >
+                  +
+                </button>
               </div>
             </div>
             <div class="stress-track-row">
@@ -322,8 +376,22 @@ defineExpose({ save })
                 @update="form.stressMental = $event"
               />
               <div class="stress-track-controls">
-                <button type="button" class="stress-ctrl-btn" :disabled="form.stressMental.length === 0" @click="removeStressBox('mental')">−</button>
-                <button type="button" class="stress-ctrl-btn" :disabled="form.stressMental.length >= 6" @click="addStressBox('mental')">+</button>
+                <button
+                  type="button"
+                  class="stress-ctrl-btn"
+                  :disabled="form.stressMental.length === 0"
+                  @click="removeStressBox('mental')"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
+                  class="stress-ctrl-btn"
+                  :disabled="form.stressMental.length >= 6"
+                  @click="addStressBox('mental')"
+                >
+                  +
+                </button>
               </div>
             </div>
           </template>
@@ -349,22 +417,52 @@ defineExpose({ save })
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <template v-if="isEditing">
             <div class="consequence-config">
-              <span v-for="ct in CONSEQUENCE_TYPES" :key="ct.severity" class="consequence-config-item">
-                <button type="button" class="consequence-config-btn" :disabled="countConsequences(ct.severity) === 0" @click="removeConsequenceSlot(ct.severity)">−</button>
-                <span class="consequence-config-label">{{ ct.label }} ({{ countConsequences(ct.severity) }})</span>
-                <button type="button" class="consequence-config-btn" @click="addConsequenceSlot(ct.severity, ct.labelKey)">+</button>
+              <span
+                v-for="ct in CONSEQUENCE_TYPES"
+                :key="ct.severity"
+                class="consequence-config-item"
+              >
+                <button
+                  type="button"
+                  class="consequence-config-btn"
+                  :disabled="countConsequences(ct.severity) === 0"
+                  @click="removeConsequenceSlot(ct.severity)"
+                >
+                  −
+                </button>
+                <span class="consequence-config-label"
+                  >{{ ct.label }} ({{ countConsequences(ct.severity) }})</span
+                >
+                <button
+                  type="button"
+                  class="consequence-config-btn"
+                  @click="addConsequenceSlot(ct.severity, ct.labelKey)"
+                >
+                  +
+                </button>
               </span>
             </div>
-            <ConsequenceSlots :consequences="form.consequences" @update="form.consequences = $event" />
+            <ConsequenceSlots
+              :consequences="form.consequences"
+              @update="form.consequences = $event"
+            />
           </template>
           <ConsequenceSlots v-else :consequences="data.consequences" :readonly="true" />
         </section>
       </div>
 
       <!-- GM-NOTIZEN -->
-      <section v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)" class="sheet-section gm-notes-section">
+      <section
+        v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
+        class="sheet-section gm-notes-section"
+      >
         <div class="sheet-section-header">GM-NOTIZEN</div>
-        <textarea v-if="isEditing" class="text-area-input" v-model="form.gmNotes" placeholder="Interne Notizen (nur im GM-Modus sichtbar)" />
+        <textarea
+          v-if="isEditing"
+          class="text-area-input"
+          v-model="form.gmNotes"
+          placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
+        />
         <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
       </section>
 
@@ -373,7 +471,6 @@ defineExpose({ save })
         <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
         <FateButton @click="save">Speichern</FateButton>
       </div>
-
     </template>
   </div>
 </template>

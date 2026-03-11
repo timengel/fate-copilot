@@ -1,27 +1,25 @@
 <script setup lang="ts">
-import type { Consequence, ConsequenceLabel } from '../../types'
+import type { Consequence, ConsequenceLabel } from '../../types';
 
 const props = defineProps<{
-  consequences: Consequence[]
-  readonly?: boolean
-}>()
+  consequences: Consequence[];
+  readonly?: boolean;
+}>();
 
 const emit = defineEmits<{
-  update: [consequences: Consequence[]]
-}>()
+  update: [consequences: Consequence[]];
+}>();
 
 const LABELS: Record<ConsequenceLabel, string> = {
   mild: 'Leicht',
   moderate: 'Mittel',
   severe: 'Schwer',
   extreme: 'Extrem',
-}
+};
 
 function updateValue(index: number, value: string) {
-  const updated = props.consequences.map((c, i) =>
-    i === index ? { ...c, value } : c
-  )
-  emit('update', updated)
+  const updated = props.consequences.map((c, i) => (i === index ? { ...c, value } : c));
+  emit('update', updated);
 }
 </script>
 

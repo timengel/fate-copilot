@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { RouterView, RouterLink, useRouter } from 'vue-router'
-import ImportExportBar from './components/shared/ImportExportBar.vue'
-import FatePlusLogo from './components/shared/FatePlusLogo.vue'
-import FateToggle from './components/shared/FateToggle.vue'
-import FateToast from './components/shared/FateToast.vue'
-import { initPersistence } from './composables/usePersistence'
-import { useGMModeStore } from './stores/gmMode'
+import { ref, watch } from 'vue';
+import { RouterView, RouterLink, useRouter } from 'vue-router';
+import ImportExportBar from './components/shared/ImportExportBar.vue';
+import FatePlusLogo from './components/shared/FatePlusLogo.vue';
+import FateToggle from './components/shared/FateToggle.vue';
+import FateToast from './components/shared/FateToast.vue';
+import { initPersistence } from './composables/usePersistence';
+import { useGMModeStore } from './stores/gmMode';
 
-initPersistence()
+initPersistence();
 
-const navOpen = ref(false)
-const router = useRouter()
-const gmModeStore = useGMModeStore()
+const navOpen = ref(false);
+const router = useRouter();
+const gmModeStore = useGMModeStore();
 
-watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
+watch(
+  () => router.currentRoute.value.path,
+  () => {
+    navOpen.value = false;
+  },
+);
 </script>
 
 <template>
@@ -102,7 +107,6 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
   gap: 1px;
 }
 
-
 .nav-links {
   display: flex;
   gap: 0.5rem;
@@ -144,7 +148,9 @@ watch(() => router.currentRoute.value.path, () => { navOpen.value = false })
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 6px;
   flex-shrink: 0;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .nav-gm-toggle.gm-active {

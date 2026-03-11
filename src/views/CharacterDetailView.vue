@@ -1,99 +1,97 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useCharactersStore } from '../stores/characters'
-import { useCampaignsStore } from '../stores/campaigns'
-import CharacterSheet from '../components/character/CharacterSheet.vue'
-import FateButton from '../components/shared/FateButton.vue'
-import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import type { Character, CharacterType } from '../types'
-import { createDefaultCharacter } from '../composables/useCharacterDefaults'
-import { useConfirmDialog } from '../composables/useConfirmDialog'
-import { useToastStore } from '../stores/toast'
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useCharactersStore } from '../stores/characters';
+import { useCampaignsStore } from '../stores/campaigns';
+import CharacterSheet from '../components/character/CharacterSheet.vue';
+import FateButton from '../components/shared/FateButton.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import type { Character, CharacterType } from '../types';
+import { createDefaultCharacter } from '../composables/useCharacterDefaults';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { useToastStore } from '../stores/toast';
 
 const props = defineProps<{
-  isNew?: boolean
-  editMode?: boolean
-}>()
+  isNew?: boolean;
+  editMode?: boolean;
+}>();
 
-const route = useRoute()
-const router = useRouter()
-const charactersStore = useCharactersStore()
-const campaignsStore = useCampaignsStore()
+const route = useRoute();
+const router = useRouter();
+const charactersStore = useCharactersStore();
+const campaignsStore = useCampaignsStore();
 
-const id = computed(() => route.params.id as string)
-const isEditing = ref(props.isNew || props.editMode || false)
-const { confirmDialog, showConfirmDialog } = useConfirmDialog()
-const toastStore = useToastStore()
+const id = computed(() => route.params.id as string);
+const isEditing = ref(props.isNew || props.editMode || false);
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+const toastStore = useToastStore();
 
 const character = computed(() => {
   if (props.isNew) {
-    const type = (route.query.type as CharacterType) ?? 'sc'
-    return createDefaultCharacter(type)
+    const type = (route.query.type as CharacterType) ?? 'sc';
+    return createDefaultCharacter(type);
   }
-  return charactersStore.getById(id.value)
-})
+  return charactersStore.getById(id.value);
+});
 
 const backPath = computed(() => {
   if (props.isNew) {
-    return route.query.type === 'nsc' ? '/characters?tab=nsc' : '/characters'
+    return route.query.type === 'nsc' ? '/characters?tab=nsc' : '/characters';
   }
-  return (character.value?.type ?? 'sc') === 'nsc' ? '/characters?tab=nsc' : '/characters'
-})
+  return (character.value?.type ?? 'sc') === 'nsc' ? '/characters?tab=nsc' : '/characters';
+});
 
 const characterCampaigns = computed(() =>
-  character.value ? campaignsStore.getCampaignsForCharacter(character.value.id) : []
-)
+  character.value ? campaignsStore.getCampaignsForCharacter(character.value.id) : [],
+);
 
 const availableCampaigns = computed(() =>
-  campaignsStore.campaigns.filter(c =>
-    !characterCampaigns.value.some(cc => cc.id === c.id)
-  )
-)
+  campaignsStore.campaigns.filter((c) => !characterCampaigns.value.some((cc) => cc.id === c.id)),
+);
 
 function handleSave(updated: Character) {
   if (props.isNew) {
-    charactersStore.addCharacter(updated)
-    router.replace(`/characters/${updated.id}`)
+    charactersStore.addCharacter(updated);
+    router.replace(`/characters/${updated.id}`);
   } else {
-    charactersStore.updateCharacter(updated)
-    isEditing.value = false
+    charactersStore.updateCharacter(updated);
+    isEditing.value = false;
   }
-  toastStore.show('Charakter gespeichert')
+  toastStore.show('Charakter gespeichert');
 }
 
 function handleCancel() {
   if (props.isNew) {
-    router.push(backPath.value)
+    router.push(backPath.value);
   } else {
-    isEditing.value = false
+    isEditing.value = false;
   }
 }
 
 function toggleEdit() {
-  isEditing.value = !isEditing.value
+  isEditing.value = !isEditing.value;
 }
 
 function deleteCharacter() {
-  if (!character.value) return
+  if (!character.value) return;
   showConfirmDialog(
     'Charakter löschen',
     `Charakter "${character.value.name || 'Unbenannt'}" wirklich löschen?`,
     () => {
-      charactersStore.deleteCharacter(character.value!.id)
-      router.push(backPath.value)
+      charactersStore.deleteCharacter(character.value!.id);
+      router.push(backPath.value);
     },
-  )
+  );
 }
 
 function assignToCampaign(campaignId: string) {
-  if (!character.value) return
-  campaignsStore.assignCharacter(campaignId, character.value.id)
+  if (!character.value) return;
+  campaignsStore.assignCharacter(campaignId, character.value.id);
 }
 
 function unassignFromCampaign(campaignId: string) {
-  if (!character.value) return
-  campaignsStore.unassignCharacter(campaignId, character.value.id)
+  if (!character.value) return;
+  campaignsStore.unassignCharacter(campaignId, character.value.id);
 }
 </script>
 
@@ -138,11 +136,19 @@ function unassignFromCampaign(campaignId: string) {
               <span class="assignment-name" @click="router.push(`/campaigns/${campaign.id}`)">
                 {{ campaign.name }}
               </span>
-              <FateButton variant="danger" size="S" @click="unassignFromCampaign(campaign.id)">Entfernen</FateButton>
+              <FateButton variant="danger" size="S" @click="unassignFromCampaign(campaign.id)"
+                >Entfernen</FateButton
+              >
             </div>
 
             <div v-if="availableCampaigns.length > 0" class="assign-row">
-              <select class="assign-select" @change="assignToCampaign(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''">
+              <select
+                class="assign-select"
+                @change="
+                  assignToCampaign(($event.target as HTMLSelectElement).value);
+                  ($event.target as HTMLSelectElement).value = '';
+                "
+              >
                 <option value="">Kampagne zuordnen...</option>
                 <option v-for="c in availableCampaigns" :key="c.id" :value="c.id">
                   {{ c.name }}
@@ -159,7 +165,10 @@ function unassignFromCampaign(campaignId: string) {
     v-if="confirmDialog"
     :title="confirmDialog.title"
     :message="confirmDialog.message"
-    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @confirm="
+      confirmDialog.onConfirm();
+      confirmDialog = null;
+    "
     @cancel="confirmDialog = null"
   />
 </template>

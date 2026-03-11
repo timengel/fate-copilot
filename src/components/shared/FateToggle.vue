@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: boolean
-  label?: string
-}>()
+  modelValue: boolean;
+  label?: string;
+}>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-}>()
+  'update:modelValue': [value: boolean];
+}>();
 </script>
 
 <template>
@@ -43,7 +43,9 @@ const emit = defineEmits<{
   border-radius: 10px;
   background: rgba(180, 180, 180, 0.4);
   border: 1.5px solid rgba(255, 255, 255, 0.35);
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
   flex-shrink: 0;
 }
 
@@ -61,7 +63,9 @@ const emit = defineEmits<{
   height: 14px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.7);
-  transition: transform 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 

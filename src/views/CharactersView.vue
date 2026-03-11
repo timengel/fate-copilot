@@ -1,51 +1,52 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useCharactersStore } from '../stores/characters'
-import { useGMModeStore } from '../stores/gmMode'
-import type { CharacterType } from '../types'
-import FateButton from '../components/shared/FateButton.vue'
-import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import { getColorVars } from '../composables/useColorVars'
-import { useConfirmDialog } from '../composables/useConfirmDialog'
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useCharactersStore } from '../stores/characters';
+import { useGMModeStore } from '../stores/gmMode';
+import type { CharacterType } from '../types';
+import FateButton from '../components/shared/FateButton.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import { getColorVars } from '../composables/useColorVars';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
 
-const router = useRouter()
-const route = useRoute()
-const store = useCharactersStore()
-const gmModeStore = useGMModeStore()
-const search = ref('')
-const { confirmDialog, showConfirmDialog } = useConfirmDialog()
+const router = useRouter();
+const route = useRoute();
+const store = useCharactersStore();
+const gmModeStore = useGMModeStore();
+const search = ref('');
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
-const activeTab = computed<CharacterType>(() =>
-  route.query.tab === 'nsc' ? 'nsc' : 'sc'
-)
+const activeTab = computed<CharacterType>(() => (route.query.tab === 'nsc' ? 'nsc' : 'sc'));
 
 function setTab(tab: CharacterType) {
-  router.replace({ query: tab === 'sc' ? {} : { tab } })
-  search.value = ''
+  router.replace({ query: tab === 'sc' ? {} : { tab } });
+  search.value = '';
 }
 
-watch(() => gmModeStore.isGMMode, (val) => {
-  if (!val && activeTab.value === 'nsc') setTab('sc')
-})
+watch(
+  () => gmModeStore.isGMMode,
+  (val) => {
+    if (!val && activeTab.value === 'nsc') setTab('sc');
+  },
+);
 
 const filtered = computed(() =>
-  store.characters.filter(c => {
-    const type = c.type ?? 'sc'
+  store.characters.filter((c) => {
+    const type = c.type ?? 'sc';
     return (
       type === activeTab.value &&
       (c.name.toLowerCase().includes(search.value.toLowerCase()) ||
         c.highConcept.toLowerCase().includes(search.value.toLowerCase()))
-    )
-  })
-)
+    );
+  }),
+);
 
-const tabTotal = computed(() =>
-  store.characters.filter(c => (c.type ?? 'sc') === activeTab.value).length
-)
+const tabTotal = computed(
+  () => store.characters.filter((c) => (c.type ?? 'sc') === activeTab.value).length,
+);
 
 function cardHeaderStyle(colorId?: string) {
-  return { background: getColorVars(colorId)['--fate-blue'] }
+  return { background: getColorVars(colorId)['--fate-blue'] };
 }
 
 function deleteCharacter(id: string, name: string) {
@@ -53,7 +54,7 @@ function deleteCharacter(id: string, name: string) {
     'Charakter löschen',
     `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,
     () => store.deleteCharacter(id),
-  )
+  );
 }
 </script>
 
@@ -61,7 +62,9 @@ function deleteCharacter(id: string, name: string) {
   <div class="list-view">
     <div class="list-header">
       <h1>Charaktere</h1>
-      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)">+ Neuer Charakter</FateButton>
+      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)"
+        >+ Neuer Charakter</FateButton
+      >
     </div>
 
     <div class="tab-bar">
@@ -69,27 +72,30 @@ function deleteCharacter(id: string, name: string) {
         class="tab-btn"
         :class="{ 'tab-btn--active': activeTab === 'sc' }"
         @click="setTab('sc')"
-      >Spielercharaktere (SC)</button>
+      >
+        Spielercharaktere (SC)
+      </button>
       <button
         v-if="gmModeStore.isGMMode"
         class="tab-btn"
         :class="{ 'tab-btn--active': activeTab === 'nsc' }"
         @click="setTab('nsc')"
-      >Nicht-Spieler-Charaktere (NSC)</button>
+      >
+        Nicht-Spieler-Charaktere (NSC)
+      </button>
     </div>
 
-    <input
-      v-model="search"
-      class="search-input"
-      placeholder="Charakter suchen..."
-      type="search"
-    />
+    <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
 
     <div v-if="filtered.length === 0" class="empty-state">
-      {{ tabTotal === 0
-        ? `Noch keine ${activeTab === 'sc' ? 'Spielercharaktere' : 'NSCs'} vorhanden.`
-        : 'Keine Treffer gefunden.' }}
-      <span v-if="!gmModeStore.isGMMode && tabTotal === 0 && activeTab === 'sc'" class="empty-hint">NSCs sind im Spieler-Modus ausgeblendet.</span>
+      {{
+        tabTotal === 0
+          ? `Noch keine ${activeTab === 'sc' ? 'Spielercharaktere' : 'NSCs'} vorhanden.`
+          : 'Keine Treffer gefunden.'
+      }}
+      <span v-if="!gmModeStore.isGMMode && tabTotal === 0 && activeTab === 'sc'" class="empty-hint"
+        >NSCs sind im Spieler-Modus ausgeblendet.</span
+      >
     </div>
 
     <div v-else class="card-grid">
@@ -99,14 +105,24 @@ function deleteCharacter(id: string, name: string) {
         class="character-card"
         @click="router.push(`/characters/${char.id}`)"
       >
-        <div class="card-header" :style="cardHeaderStyle(char.color)">{{ char.name || '(Unbenannt)' }}</div>
+        <div class="card-header" :style="cardHeaderStyle(char.color)">
+          {{ char.name || '(Unbenannt)' }}
+        </div>
         <div class="card-concept">{{ char.highConcept || '—' }}</div>
         <div class="card-trouble" v-if="char.trouble">
           <em>{{ char.trouble }}</em>
         </div>
         <div class="card-actions" @click.stop>
-          <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/characters/${char.id}/edit`)">Bearbeiten</FateButton>
-          <FateButton variant="danger" size="S" @click="deleteCharacter(char.id, char.name)">Löschen</FateButton>
+          <FateButton
+            icon="edit"
+            variant="secondary"
+            size="S"
+            @click="router.push(`/characters/${char.id}/edit`)"
+            >Bearbeiten</FateButton
+          >
+          <FateButton variant="danger" size="S" @click="deleteCharacter(char.id, char.name)"
+            >Löschen</FateButton
+          >
         </div>
       </div>
     </div>
@@ -116,7 +132,10 @@ function deleteCharacter(id: string, name: string) {
     v-if="confirmDialog"
     :title="confirmDialog.title"
     :message="confirmDialog.message"
-    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @confirm="
+      confirmDialog.onConfirm();
+      confirmDialog = null;
+    "
     @cancel="confirmDialog = null"
   />
 </template>
@@ -198,7 +217,9 @@ function deleteCharacter(id: string, name: string) {
   color: var(--fate-text-light);
   cursor: pointer;
   box-shadow: none;
-  transition: color 0.15s, border-bottom-color 0.15s;
+  transition:
+    color 0.15s,
+    border-bottom-color 0.15s;
 }
 
 .tab-btn:hover {

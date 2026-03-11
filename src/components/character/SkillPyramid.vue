@@ -1,96 +1,94 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { SkillEntry } from '../../types'
-import { SKILL_LEVEL_LABELS } from '../../types'
-import { useSkillsStore } from '../../stores/skills'
-import FateButton from '../shared/FateButton.vue'
+import { computed } from 'vue';
+import type { SkillEntry } from '../../types';
+import { SKILL_LEVEL_LABELS } from '../../types';
+import { useSkillsStore } from '../../stores/skills';
+import FateButton from '../shared/FateButton.vue';
 
 const props = defineProps<{
-  skills: SkillEntry[]
-  readonly?: boolean
-  maxLevel?: number
-  maxCols?: number
-}>()
+  skills: SkillEntry[];
+  readonly?: boolean;
+  maxLevel?: number;
+  maxCols?: number;
+}>();
 
 const emit = defineEmits<{
-  update: [skills: SkillEntry[]]
-  updateLayout: [payload: { maxLevel: number; maxCols: number }]
-}>()
+  update: [skills: SkillEntry[]];
+  updateLayout: [payload: { maxLevel: number; maxCols: number }];
+}>();
 
-const skillsStore = useSkillsStore()
+const skillsStore = useSkillsStore();
 
-const effectiveMaxLevel = computed(() => props.maxLevel ?? 5)
-const effectiveCols = computed(() => props.maxCols ?? 5)
+const effectiveMaxLevel = computed(() => props.maxLevel ?? 5);
+const effectiveCols = computed(() => props.maxCols ?? 5);
 
 const rows = computed(() =>
-  Array.from({ length: effectiveMaxLevel.value }, (_, i) => effectiveMaxLevel.value - i)
-)
+  Array.from({ length: effectiveMaxLevel.value }, (_, i) => effectiveMaxLevel.value - i),
+);
 
 const maxOccupiedLevel = computed(() => {
-  if (!props.readonly) return effectiveMaxLevel.value
-  const levels = props.skills.map(s => s.level)
-  return levels.length > 0 ? Math.max(...levels) : 0
-})
+  if (!props.readonly) return effectiveMaxLevel.value;
+  const levels = props.skills.map((s) => s.level);
+  return levels.length > 0 ? Math.max(...levels) : 0;
+});
 
-const visibleRows = computed(() =>
-  rows.value.filter(level => level <= maxOccupiedLevel.value)
-)
+const visibleRows = computed(() => rows.value.filter((level) => level <= maxOccupiedLevel.value));
 
 const skillsAtLevel = computed(() => {
-  const map: Record<number, string[]> = {}
-  for (let l = 1; l <= effectiveMaxLevel.value; l++) map[l] = []
+  const map: Record<number, string[]> = {};
+  for (let l = 1; l <= effectiveMaxLevel.value; l++) map[l] = [];
   for (const entry of props.skills) {
-    if (map[entry.level]) map[entry.level]!.push(entry.skill)
+    if (map[entry.level]) map[entry.level]!.push(entry.skill);
   }
-  return map
-})
+  return map;
+});
 
-const usedSkills = computed(() => new Set(props.skills.map(s => s.skill)))
-const canAddRow = computed(() => effectiveMaxLevel.value < 8)
+const usedSkills = computed(() => new Set(props.skills.map((s) => s.skill)));
+const canAddRow = computed(() => effectiveMaxLevel.value < 8);
 
 function getSlotValue(level: number, slotIndex: number): string {
-  return skillsAtLevel.value[level]?.[slotIndex] ?? ''
+  return skillsAtLevel.value[level]?.[slotIndex] ?? '';
 }
 
 function updateSlot(level: number, slotIndex: number, value: string) {
-  const atLevel = props.skills.filter(s => s.level === level)
-  const others = props.skills.filter(s => s.level !== level)
+  const atLevel = props.skills.filter((s) => s.level === level);
+  const others = props.skills.filter((s) => s.level !== level);
   if (value) {
-    const newAtLevel = [...atLevel]
-    newAtLevel[slotIndex] = { skill: value, level }
-    emit('update', [...others, ...newAtLevel.filter(s => s.skill)])
+    const newAtLevel = [...atLevel];
+    newAtLevel[slotIndex] = { skill: value, level };
+    emit('update', [...others, ...newAtLevel.filter((s) => s.skill)]);
   } else {
-    const newAtLevel = atLevel.filter((_, i) => i !== slotIndex)
-    emit('update', [...others, ...newAtLevel])
+    const newAtLevel = atLevel.filter((_, i) => i !== slotIndex);
+    emit('update', [...others, ...newAtLevel]);
   }
 }
 
 function addRow() {
-  if (!canAddRow.value) return
-  emit('updateLayout', { maxLevel: effectiveMaxLevel.value + 1, maxCols: effectiveCols.value })
+  if (!canAddRow.value) return;
+  emit('updateLayout', { maxLevel: effectiveMaxLevel.value + 1, maxCols: effectiveCols.value });
 }
 
 function removeRow() {
-  const newMaxLevel = effectiveMaxLevel.value - 1
-  if (newMaxLevel < 1) return
-  const updatedSkills = props.skills.filter(s => s.level <= newMaxLevel)
-  emit('update', updatedSkills)
-  emit('updateLayout', { maxLevel: newMaxLevel, maxCols: effectiveCols.value })
+  const newMaxLevel = effectiveMaxLevel.value - 1;
+  if (newMaxLevel < 1) return;
+  const updatedSkills = props.skills.filter((s) => s.level <= newMaxLevel);
+  emit('update', updatedSkills);
+  emit('updateLayout', { maxLevel: newMaxLevel, maxCols: effectiveCols.value });
 }
 
 function addCol() {
-  emit('updateLayout', { maxLevel: effectiveMaxLevel.value, maxCols: effectiveCols.value + 1 })
+  emit('updateLayout', { maxLevel: effectiveMaxLevel.value, maxCols: effectiveCols.value + 1 });
 }
 
 function removeCol() {
-  const newCols = effectiveCols.value - 1
-  if (newCols < 1) return
-  const updatedSkills = props.skills.filter(s => {
-    const atLevel = skillsAtLevel.value[s.level] ?? []
-    return atLevel.indexOf(s.skill) < newCols
-  })
-  emit('update', updatedSkills)
-  emit('updateLayout', { maxLevel: effectiveMaxLevel.value, maxCols: newCols })
+  const newCols = effectiveCols.value - 1;
+  if (newCols < 1) return;
+  const updatedSkills = props.skills.filter((s) => {
+    const atLevel = skillsAtLevel.value[s.level] ?? [];
+    return atLevel.indexOf(s.skill) < newCols;
+  });
+  emit('update', updatedSkills);
+  emit('updateLayout', { maxLevel: effectiveMaxLevel.value, maxCols: newCols });
 }
 </script>
 
@@ -116,16 +114,31 @@ function removeCol() {
               :key="skill"
               :value="skill"
               :disabled="usedSkills.has(skill) && skill !== getSlotValue(level, i - 1)"
-            >{{ skill }}</option>
+            >
+              {{ skill }}
+            </option>
           </select>
         </div>
       </div>
     </div>
     <div v-if="!readonly" class="pyramid-actions">
-      <FateButton variant="secondary" size="S" :disabled="effectiveMaxLevel <= 1" @click="removeRow">− Zeile</FateButton>
-      <FateButton variant="secondary" size="S" class="btn-flavor" :disabled="!canAddRow" @click="addRow">+ Zeile</FateButton>
-      <FateButton variant="secondary" size="S" :disabled="effectiveCols <= 1" @click="removeCol">− Spalte</FateButton>
-      <FateButton variant="secondary" size="S" class="btn-flavor" @click="addCol">+ Spalte</FateButton>
+      <FateButton variant="secondary" size="S" :disabled="effectiveMaxLevel <= 1" @click="removeRow"
+        >− Zeile</FateButton
+      >
+      <FateButton
+        variant="secondary"
+        size="S"
+        class="btn-flavor"
+        :disabled="!canAddRow"
+        @click="addRow"
+        >+ Zeile</FateButton
+      >
+      <FateButton variant="secondary" size="S" :disabled="effectiveCols <= 1" @click="removeCol"
+        >− Spalte</FateButton
+      >
+      <FateButton variant="secondary" size="S" class="btn-flavor" @click="addCol"
+        >+ Spalte</FateButton
+      >
     </div>
   </div>
 </template>

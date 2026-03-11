@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import FateButton from './FateButton.vue'
+import FateButton from './FateButton.vue';
 
 defineProps<{
-  title: string
-  message: string
-}>()
+  title: string;
+  message: string;
+}>();
 
 const emit = defineEmits<{
-  confirm: []
-  cancel: []
-}>()
+  confirm: [];
+  cancel: [];
+}>();
 </script>
 
 <template>

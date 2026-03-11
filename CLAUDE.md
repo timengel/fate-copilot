@@ -42,6 +42,11 @@ Verlasse dich nicht ausschließlich auf dein Trainingswissen. Nutze Thinking-Mod
 - Kampagnen-Komponenten: `src/components/campaign/`
 - Geteilte Typen zentral in `src/types/`
 
+## Code Style
+
+- **Semicolons**: Ja — alle `.ts` und `.vue` Dateien verwenden Semicolons
+- **Formatter**: Prettier (`.prettierrc` im Root) — `pnpm exec prettier --write "src/**/*.{ts,vue}"`
+
 ## Scoped Styles
 
 - Jede Vue-Komponente bekommt ihr eigenes **`<style scoped>`** Tag für ihre eigenen CSS-Regeln

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useToastStore } from '../../stores/toast'
+import { useToastStore } from '../../stores/toast';
 
-const toastStore = useToastStore()
+const toastStore = useToastStore();
 </script>
 
 <template>
@@ -32,7 +32,9 @@ const toastStore = useToastStore()
 
 .toast-enter-active,
 .toast-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .toast-enter-from,

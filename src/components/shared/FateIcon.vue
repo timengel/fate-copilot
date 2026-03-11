@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ButtonIcon } from '../../types'
+import type { ButtonIcon } from '../../types';
 
-defineProps<{ name: ButtonIcon; size?: number }>()
+defineProps<{ name: ButtonIcon; size?: number }>();
 </script>
 
 <template>

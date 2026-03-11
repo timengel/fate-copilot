@@ -1,39 +1,36 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCampaignsStore } from '../stores/campaigns'
-import FateButton from '../components/shared/FateButton.vue'
-import ConfirmDialog from '../components/shared/ConfirmDialog.vue'
-import { CAMPAIGN_STATUS_LABEL } from '../types'
-import type { CampaignStatus } from '../types'
-import { getColorVars } from '../composables/useColorVars'
-import { useConfirmDialog } from '../composables/useConfirmDialog'
-import { useGMModeStore } from '../stores/gmMode'
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCampaignsStore } from '../stores/campaigns';
+import FateButton from '../components/shared/FateButton.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import { CAMPAIGN_STATUS_LABEL } from '../types';
+import type { CampaignStatus } from '../types';
+import { getColorVars } from '../composables/useColorVars';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { useGMModeStore } from '../stores/gmMode';
 
-const router = useRouter()
-const store = useCampaignsStore()
-const gmModeStore = useGMModeStore()
-const { confirmDialog, showConfirmDialog } = useConfirmDialog()
+const router = useRouter();
+const store = useCampaignsStore();
+const gmModeStore = useGMModeStore();
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
-const STATUS_ORDER: CampaignStatus[] = ['active', 'inactive', 'completed']
+const STATUS_ORDER: CampaignStatus[] = ['active', 'inactive', 'completed'];
 
 const groupedCampaigns = computed(() =>
-  STATUS_ORDER
-    .filter(status => status === 'active' || gmModeStore.isGMMode)
-    .map(status => ({
+  STATUS_ORDER.filter((status) => status === 'active' || gmModeStore.isGMMode)
+    .map((status) => ({
       status,
       label: CAMPAIGN_STATUS_LABEL[status],
-      campaigns: store.campaigns.filter(c => c.status === status),
+      campaigns: store.campaigns.filter((c) => c.status === status),
     }))
-    .filter(group => group.campaigns.length > 0)
-)
+    .filter((group) => group.campaigns.length > 0),
+);
 
 function deleteCampaign(id: string, name: string) {
-  showConfirmDialog(
-    'Kampagne löschen',
-    `Kampagne "${name}" wirklich löschen?`,
-    () => store.deleteCampaign(id),
-  )
+  showConfirmDialog('Kampagne löschen', `Kampagne "${name}" wirklich löschen?`, () =>
+    store.deleteCampaign(id),
+  );
 }
 </script>
 
@@ -60,13 +57,26 @@ function deleteCampaign(id: string, name: string) {
             @click="router.push(`/campaigns/${campaign.id}`)"
           >
             <div class="card-header">{{ campaign.name }}</div>
-            <div class="card-description" v-if="campaign.description">{{ campaign.description }}</div>
+            <div class="card-description" v-if="campaign.description">
+              {{ campaign.description }}
+            </div>
             <div class="card-meta">
               {{ store.getCharactersForCampaign(campaign.id).length }} Charaktere
             </div>
             <div class="card-actions" @click.stop>
-              <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/campaigns/${campaign.id}/edit`)">Bearbeiten</FateButton>
-              <FateButton variant="danger" size="S" @click="deleteCampaign(campaign.id, campaign.name)">Löschen</FateButton>
+              <FateButton
+                icon="edit"
+                variant="secondary"
+                size="S"
+                @click="router.push(`/campaigns/${campaign.id}/edit`)"
+                >Bearbeiten</FateButton
+              >
+              <FateButton
+                variant="danger"
+                size="S"
+                @click="deleteCampaign(campaign.id, campaign.name)"
+                >Löschen</FateButton
+              >
             </div>
           </div>
         </div>
@@ -78,7 +88,10 @@ function deleteCampaign(id: string, name: string) {
     v-if="confirmDialog"
     :title="confirmDialog.title"
     :message="confirmDialog.message"
-    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @confirm="
+      confirmDialog.onConfirm();
+      confirmDialog = null;
+    "
     @cancel="confirmDialog = null"
   />
 </template>
