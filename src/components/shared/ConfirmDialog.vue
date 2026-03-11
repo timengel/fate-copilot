@@ -18,8 +18,8 @@ const emit = defineEmits<{
       <div class="dialog-title">{{ title }}</div>
       <div class="dialog-message">{{ message }}</div>
       <div class="dialog-actions">
-        <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
-        <FateButton variant="danger" @click="emit('confirm')">Bestätigen</FateButton>
+        <FateButton icon="close" variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
+        <FateButton icon="check" variant="danger" @click="emit('confirm')">Bestätigen</FateButton>
       </div>
     </div>
   </div>

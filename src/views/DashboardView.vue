@@ -290,17 +290,17 @@ onUnmounted(() => {
           :hideActions="true"
           @save="handleSave"
           @cancel="editingId = null"
-        />
-        <CharacterSheet v-else :character="character" :sections="visibleSections" />
-        <div v-if="editingId === character.id || showEditButton" class="dashboard-entry-toolbar">
-          <template v-if="editingId === character.id">
-            <FateButton variant="secondary" size="S" @click="editingId = null">Abbrechen</FateButton>
-            <FateButton variant="primary" size="S" @click="saveEditing">Speichern</FateButton>
+        >
+          <template #edit-bar-actions>
+            <FateButton icon="close" variant="outline" size="S" @click="editingId = null">Abbrechen</FateButton>
+            <FateButton icon="check" variant="outline" size="S" @click="saveEditing">Speichern</FateButton>
           </template>
-          <template v-else>
-            <FateButton icon="edit" variant="secondary" size="S" @click="editingId = character.id">Bearbeiten</FateButton>
+        </CharacterSheet>
+        <CharacterSheet v-else :character="character" :sections="visibleSections">
+          <template v-if="showEditButton" #name-bar-actions>
+            <FateButton icon="edit" variant="outline" size="S" @click="editingId = character.id">Bearbeiten</FateButton>
           </template>
-        </div>
+        </CharacterSheet>
       </div>
     </div>
   </div>
@@ -485,8 +485,6 @@ onUnmounted(() => {
   container-type: inline-size;
   container-name: character-card;
   background: var(--fate-white);
-  border: 1px solid var(--fate-border);
-  border-radius: 8px;
   box-shadow: 0 1px 4px rgba(28, 158, 214, 0.08);
   overflow: hidden;
 }

@@ -131,10 +131,14 @@ defineExpose({ save })
 
     <template v-else>
 
-      <!-- Name Bar (view mode only) -->
-      <div v-if="!isEditing" class="character-name-bar">
+      <!-- Name Bar -->
+      <div class="character-name-bar">
         <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
-        <span class="character-type-badge">{{ data.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+        <span v-if="!isEditing" class="character-type-badge">{{ data.type === 'nsc' ? 'NSC' : 'SC' }}</span>
+        <div class="character-name-bar-end">
+          <slot v-if="!isEditing" name="name-bar-actions" />
+          <slot v-else name="edit-bar-actions" />
+        </div>
       </div>
 
       <!-- ALLGEMEINES -->
@@ -410,7 +414,6 @@ defineExpose({ save })
 .character-name-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0.6rem 0.75rem;
   background: var(--fate-blue-dark);
   gap: 0.5rem;
@@ -423,6 +426,14 @@ defineExpose({ save })
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.character-name-bar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
 }
 
 .character-type-badge {
@@ -648,7 +659,6 @@ defineExpose({ save })
 .sheet-stress-row {
   display: grid;
   grid-template-columns: max-content 1fr;
-  border-bottom: 1px solid var(--fate-border);
 }
 
 .stress-section {
@@ -755,7 +765,7 @@ defineExpose({ save })
 
 /* GM notes section */
 .gm-notes-section {
-  background: #f0f4ff;
+  background: white;
 }
 
 .gm-notes-display {
