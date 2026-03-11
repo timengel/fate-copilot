@@ -90,7 +90,7 @@ function getCharCampaign(charId: string): string | null {
     <div v-else class="home-grid">
       <section class="home-section">
         <div class="section-header">
-          <h2>Kampagnen</h2>
+          <h2>Aktive Kampagnen</h2>
           <FateButton variant="outline" size="S" @click.stop="router.push('/campaigns/new')"
             >+ Neu</FateButton
           >
