@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { useSessionStorage } from '@vueuse/core'
 
 export const useGMModeStore = defineStore('gmMode', () => {
-  const isGMMode = ref(false)
+  const isGMMode = useSessionStorage('gm-mode', false)
 
   function toggle() {
     isGMMode.value = !isGMMode.value
