@@ -6,6 +6,7 @@ import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
+import FateCheckbox from '../shared/FateCheckbox.vue';
 import StressTrack from './StressTrack.vue';
 import DiceTrack from './DiceTrack.vue';
 import FateButton from '../shared/FateButton.vue';
@@ -32,6 +33,9 @@ watch(
 
 const isEditing = computed(() => props.mode === 'edit');
 const data = computed(() => (isEditing.value ? form : props.item));
+const isItemHidden = computed(
+  () => !isEditing.value && !gmModeStore.isGMMode && !!props.item.hidden,
+);
 
 const colorVars = computed(() => {
   const found = CHARACTER_COLORS.find((c) => c.id === (data.value.color ?? 'pfau'));
@@ -93,12 +97,23 @@ defineExpose({ save });
 </script>
 
 <template>
-  <div class="item-sheet" :style="colorVars">
+  <div v-if="isItemHidden" class="item-sheet item-sheet--hidden" :style="colorVars">
+    <div class="item-name-bar">
+      <FateAvatar :value="props.item.avatar" />
+      <span class="item-name-text">{{ props.item.name || '(Unbenannt)' }}</span>
+    </div>
+    <div class="item-hidden-body">
+      <div class="item-hidden-label">Details sind im GM-Modus sichtbar.</div>
+    </div>
+  </div>
+
+  <div v-else class="item-sheet" :style="colorVars">
     <!-- Name Bar -->
     <div class="item-name-bar">
       <FateAvatar :value="data.avatar" />
       <span class="item-name-text">{{ data.name || '(Unbenannt)' }}</span>
-      <span v-if="!isEditing" class="item-type-badge">ITEM</span>
+      <span v-if="!isEditing && gmModeStore.isGMMode && data.hidden" class="item-hidden-badge">VERSTECKT</span>
+      <span v-if="!isEditing && !(gmModeStore.isGMMode && data.hidden)" class="item-type-badge">ITEM</span>
       <div class="item-name-bar-end">
         <slot v-if="!isEditing" name="name-bar-actions" />
         <slot v-else name="edit-bar-actions" />
@@ -331,6 +346,12 @@ defineExpose({ save });
         placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
       />
       <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
+      <FateCheckbox
+        v-if="isEditing"
+        :modelValue="!!form.hidden"
+        label="Nur im GM-Modus sichtbar (versteckt)"
+        @update:modelValue="form.hidden = $event"
+      />
     </section>
 
     <!-- FORM ACTIONS (edit mode only) -->
@@ -350,6 +371,31 @@ defineExpose({ save });
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
+}
+
+.item-sheet--hidden {
+  display: block;
+}
+
+.item-hidden-body {
+  padding: 1rem 0.9rem;
+  text-align: center;
+}
+
+.item-hidden-label {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+  font-style: italic;
+}
+
+.item-hidden-badge {
+  background: var(--fate-blue-dark);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
 }
 
 /* Full-width grid children */

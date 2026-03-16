@@ -11,6 +11,7 @@ import type { Item } from '../types';
 import { createDefaultItem } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useToastStore } from '../stores/toast';
+import { useGMModeStore } from '../stores/gmMode';
 
 const props = defineProps<{
   isNew?: boolean;
@@ -21,6 +22,7 @@ const route = useRoute();
 const router = useRouter();
 const itemsStore = useItemsStore();
 const campaignsStore = useCampaignsStore();
+const gmModeStore = useGMModeStore();
 
 const id = computed(() => route.params.id as string);
 const isEditing = ref(props.isNew || props.editMode || false);
@@ -105,7 +107,7 @@ function deleteItem() {
 
       <template v-else>
         <ItemSheet :item="item">
-          <template v-if="!isNew" #name-bar-actions>
+          <template v-if="!isNew && (gmModeStore.isGMMode || !item.hidden)" #name-bar-actions>
             <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
           </template>

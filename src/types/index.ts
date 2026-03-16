@@ -106,6 +106,7 @@ export interface Item {
   stressPhysical: StressBox[];
   stressMental: StressBox[];
   gmNotes?: string;
+  hidden?: boolean;
   color?: string;
   avatar?: string;
   redDice: number;

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
+import { useGMModeStore } from '../stores/gmMode';
 import FateButton from '../components/shared/FateButton.vue';
 import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
@@ -11,11 +12,16 @@ import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
 const store = useItemsStore();
+const gmModeStore = useGMModeStore();
 const search = ref('');
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const filtered = computed(() =>
-  store.items.filter((c) => c.name.toLowerCase().includes(search.value.toLowerCase())),
+  store.items.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.value.toLowerCase()) &&
+      (gmModeStore.isGMMode || !c.hidden),
+  ),
 );
 
 const totalItems = computed(() => store.items.length);
@@ -55,6 +61,7 @@ function deleteItem(id: string, name: string) {
         <div class="card-header" :style="cardHeaderStyle(item.color)">
           <FateAvatar :value="item.avatar" size="S" />
           {{ item.name || '(Unbenannt)' }}
+          <span v-if="item.hidden" class="card-hidden-badge">GM</span>
         </div>
         <div v-if="item.description" class="card-description">{{ item.description }}</div>
         <div v-if="item.redDice || item.blueDice" class="card-meta">
@@ -135,6 +142,17 @@ function deleteItem(id: string, name: string) {
   padding: 0.5rem 0.9rem 0.75rem;
   margin-top: auto;
   justify-content: flex-end;
+}
+
+.card-hidden-badge {
+  margin-left: auto;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
 }
 
 .search-input {
