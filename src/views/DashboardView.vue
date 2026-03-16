@@ -100,7 +100,6 @@ onUnmounted(() => {
 
 <template>
   <div class="dashboard-view">
-    <FateHeader title="Dashboard" />
     <!-- Sidebar (desktop) -->
     <aside class="dashboard-sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-header">

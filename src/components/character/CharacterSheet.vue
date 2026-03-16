@@ -17,6 +17,8 @@ const props = defineProps<{
   hideActions?: boolean;
   sections?: {
     allgemeines?: boolean;
+    allgemeinesRefresh?: boolean;
+    allgemeinesFatePoints?: boolean;
     aspekte?: boolean;
     fertigkeiten?: boolean;
     extras?: boolean;
@@ -59,9 +61,13 @@ const colorVars = computed(() => {
   };
 });
 
-// NSC: collapsible sections (edit mode only)
-const showExtras = ref(form.type !== 'nsc' || !!form.extras?.trim());
-const showStunts = ref(form.type !== 'nsc' || form.stunts.length > 0);
+// NSC/Item: collapsible sections (edit mode only)
+const showExtras = ref(
+  (form.type !== 'nsc' && form.type !== 'item') || !!form.extras?.trim(),
+);
+const showStunts = ref(
+  (form.type !== 'nsc' && form.type !== 'item') || form.stunts.length > 0,
+);
 
 // Stunt management
 function addStunt() {
@@ -145,7 +151,7 @@ defineExpose({ save });
       <div class="character-name-bar">
         <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
         <span v-if="!isEditing" class="character-type-badge">{{
-          data.type === 'nsc' ? 'NSC' : 'SC'
+          data.type === 'nsc' ? 'NSC' : data.type === 'item' ? 'ITEM' : 'SC'
         }}</span>
         <div class="character-name-bar-end">
           <slot v-if="!isEditing" name="name-bar-actions" />
@@ -189,12 +195,12 @@ defineExpose({ save });
             </div>
           </div>
           <div class="allgemeines-right">
-            <div class="field-row">
+            <div v-if="sections?.allgemeinesRefresh !== false" class="field-row">
               <label class="field-label">Erholungsrate</label>
               <FateCounter v-if="isEditing" v-model="form.refresh" :min="1" :max="10" />
               <span v-else class="field-value refresh-value">{{ data.refresh }}</span>
             </div>
-            <div class="field-row">
+            <div v-if="sections?.allgemeinesFatePoints !== false" class="field-row">
               <label class="field-label">Fate-Punkte</label>
               <FateCounter v-if="isEditing" v-model="form.fatePoints" />
               <span v-else class="field-value fate-points">{{ data.fatePoints }}</span>
@@ -265,11 +271,11 @@ defineExpose({ save });
       >
         <div
           class="sheet-section-header"
-          :class="{ 'section-header-toggle': isEditing && form.type === 'nsc' }"
-          @click="isEditing && form.type === 'nsc' && (showExtras = !showExtras)"
+          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc' || form.type === 'item') }"
+          @click="isEditing && (form.type === 'nsc' || form.type === 'item') && (showExtras = !showExtras)"
         >
           EXTRAS
-          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
+          <span v-if="isEditing && (form.type === 'nsc' || form.type === 'item')" class="section-toggle">{{
             showExtras ? '▼' : '▶'
           }}</span>
         </div>
@@ -291,11 +297,11 @@ defineExpose({ save });
       >
         <div
           class="sheet-section-header"
-          :class="{ 'section-header-toggle': isEditing && form.type === 'nsc' }"
-          @click="isEditing && form.type === 'nsc' && (showStunts = !showStunts)"
+          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc' || form.type === 'item') }"
+          @click="isEditing && (form.type === 'nsc' || form.type === 'item') && (showStunts = !showStunts)"
         >
           STUNTS
-          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
+          <span v-if="isEditing && (form.type === 'nsc' || form.type === 'item')" class="section-toggle">{{
             showStunts ? '▼' : '▶'
           }}</span>
         </div>

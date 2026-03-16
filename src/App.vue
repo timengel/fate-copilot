@@ -31,6 +31,7 @@ watch(
 
         <button
           class="nav-hamburger"
+          :class="{ 'nav-open': navOpen }"
           :aria-expanded="navOpen"
           aria-label="Navigation öffnen"
           @click="navOpen = !navOpen"
@@ -45,6 +46,7 @@ watch(
             <RouterLink to="/dashboard" class="nav-link">Dashboard</RouterLink>
             <RouterLink to="/campaigns" class="nav-link">Kampagnen</RouterLink>
             <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
+            <RouterLink to="/items" class="nav-link">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
             <RouterLink to="/settings" class="nav-link">Einstellungen</RouterLink>
           </div>
@@ -172,12 +174,14 @@ watch(
   display: none;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-end;
   gap: 5px;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 4px 6px;
-  margin-left: auto;
+  flex: 1;
+  height: 100%;
 }
 
 .hamburger-bar {
@@ -186,9 +190,26 @@ watch(
   height: 2px;
   background: white;
   border-radius: 2px;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+  transform-origin: center;
 }
 
-@container header (width < 768px) {
+.nav-hamburger.nav-open .hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-hamburger.nav-open .hamburger-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.nav-hamburger.nav-open .hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@container header (width < 1130px) {
   .nav-hamburger {
     display: flex;
   }
