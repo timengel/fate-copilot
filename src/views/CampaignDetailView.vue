@@ -198,31 +198,6 @@ function updateMilestone(milestone: Milestone) {
             />
           </section>
 
-          <!-- ITEMS -->
-          <section class="sheet-section">
-            <div class="sheet-section-header">ITEMS</div>
-            <div class="campaign-characters">
-              <div v-if="campaignItems.length === 0" class="empty-text">
-                Noch keine Gegenstände zugeordnet.
-              </div>
-              <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
-                <div class="assignment-info" @click="router.push(`/items/${item.id}`)">
-                  <strong>{{ item.name || '(Unbenannt)' }}</strong>
-                </div>
-                <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
-              </div>
-
-              <div v-if="availableItems.length > 0" class="assign-row">
-                <select class="assign-select" @change="onAssignItem">
-                  <option value="">Gegenstand hinzufügen...</option>
-                  <option v-for="i in availableItems" :key="i.id" :value="i.id">
-                    {{ i.name || '(Unbenannt)' }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </section>
-
           <!-- CHARAKTERE -->
           <section class="sheet-section">
             <div class="sheet-section-header">CHARAKTERE</div>
@@ -235,8 +210,9 @@ function updateMilestone(milestone: Milestone) {
                 <div class="char-group-header">Spielercharaktere (SC)</div>
                 <div v-if="scCharacters.length === 0" class="empty-text">Keine SC zugeordnet.</div>
                 <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
+                  <div class="assignment-avatar" :style="{ background: getColorVars(char.color)['--fate-blue'] }">{{ char.avatar }}</div>
                   <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                    <strong>{{ char.name || '(Unbenannt)' }}</strong>
+                    <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
                     <span v-if="char.highConcept" class="assignment-concept">{{
                       char.highConcept
                     }}</span>
@@ -252,8 +228,9 @@ function updateMilestone(milestone: Milestone) {
                     Keine NSC zugeordnet.
                   </div>
                   <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
+                    <div class="assignment-avatar" :style="{ background: getColorVars(char.color)['--fate-blue'] }">{{ char.avatar }}</div>
                     <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                      <strong>{{ char.name || '(Unbenannt)' }}</strong>
+                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
                       <span v-if="char.highConcept" class="assignment-concept">{{
                         char.highConcept
                       }}</span>
@@ -284,6 +261,33 @@ function updateMilestone(milestone: Milestone) {
                       {{ c.name || '(Unbenannt)' }}
                     </option>
                   </optgroup>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- ITEMS -->
+          <section class="sheet-section">
+            <div class="sheet-section-header">ITEMS</div>
+            <div class="campaign-characters">
+              <div v-if="campaignItems.length === 0" class="empty-text">
+                Noch keine Gegenstände zugeordnet.
+              </div>
+              <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
+                <div class="assignment-avatar" :style="{ background: getColorVars(item.color)['--fate-blue'] }">{{ item.avatar }}</div>
+                <div class="assignment-info" @click="router.push(`/items/${item.id}`)">
+                  <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || '(Unbenannt)' }}</strong>
+                  <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
+                </div>
+                <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
+              </div>
+
+              <div v-if="availableItems.length > 0" class="assign-row">
+                <select class="assign-select" @change="onAssignItem">
+                  <option value="">Gegenstand hinzufügen...</option>
+                  <option v-for="i in availableItems" :key="i.id" :value="i.id">
+                    {{ i.name || '(Unbenannt)' }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -376,8 +380,21 @@ function updateMilestone(milestone: Milestone) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.4rem 0;
   border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.assignment-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  line-height: 1;
 }
 
 .assignment-row:last-of-type {
@@ -398,9 +415,6 @@ function updateMilestone(milestone: Milestone) {
   background: var(--fate-hover-bg);
 }
 
-.assignment-info strong {
-  color: var(--fate-blue);
-}
 
 .assignment-concept {
   font-size: 0.8rem;

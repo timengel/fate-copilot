@@ -6,6 +6,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
+import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
@@ -22,6 +23,7 @@ const formRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
 const selectedCampaignId = useSessionStorage<string | null>('dashboard-campaign', null);
 const showSC = useSessionStorage('dashboard-show-sc', true);
 const showNSC = useSessionStorage('dashboard-show-nsc', true);
+const showItems = useSessionStorage('dashboard-show-items', true);
 const showEditButton = useSessionStorage('dashboard-show-edit-btn', true);
 const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list');
 
@@ -52,6 +54,15 @@ watchEffect(() => {
 const allCharactersInCampaign = computed(() =>
   selectedCampaignId.value ? campaignsStore.getCharactersForCampaign(selectedCampaignId.value) : [],
 );
+
+const allItemsInCampaign = computed(() =>
+  selectedCampaignId.value ? campaignsStore.getItemsForCampaign(selectedCampaignId.value) : [],
+);
+
+const items = computed(() => {
+  if (!showItems.value) return [];
+  return allItemsInCampaign.value.filter((i) => gmModeStore.isGMMode || !i.hidden);
+});
 
 const characters = computed(() => {
   return allCharactersInCampaign.value.filter((c) => {
@@ -135,6 +146,11 @@ onUnmounted(() => {
         </div>
 
         <div class="sidebar-group">
+          <div class="sidebar-group-label">Items</div>
+          <FateCheckbox v-model="showItems" label="Zeige Items" />
+        </div>
+
+        <div class="sidebar-group">
           <div class="sidebar-group-label">Sektionen</div>
           <FateCheckbox v-model="visibleSections.general" label="Allgemeines" />
           <FateCheckbox v-model="visibleSections.aspects" label="Aspekte" />
@@ -183,6 +199,10 @@ onUnmounted(() => {
         <span class="filters-inline-label">Charaktere:</span>
         <FateCheckbox v-model="showSC" label="SC" />
         <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="NSC" />
+      </div>
+      <div class="filters-inline-row">
+        <span class="filters-inline-label">Items:</span>
+        <FateCheckbox v-model="showItems" label="Zeige Items" />
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Sektionen:</span>
@@ -247,6 +267,16 @@ onUnmounted(() => {
             >
           </template>
         </CharacterSheet>
+      </div>
+    </div>
+
+    <div
+      v-if="items.length > 0"
+      class="dashboard-stack"
+      :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
+    >
+      <div v-for="item in items" :key="item.id" class="dashboard-entry">
+        <ItemSheet :item="item" />
       </div>
     </div>
   </div>
