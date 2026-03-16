@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
+import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
 import CampaignForm from '../components/campaign/CampaignForm.vue';
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue';
@@ -23,6 +24,7 @@ const route = useRoute();
 const router = useRouter();
 const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
+const itemsStore = useItemsStore();
 const gmModeStore = useGMModeStore();
 
 const id = computed(() => {
@@ -84,6 +86,26 @@ function deleteCampaign() {
       router.push('/campaigns');
     },
   );
+}
+
+const campaignItems = computed(() =>
+  campaign.value ? campaignsStore.getItemsForCampaign(campaign.value.id) : [],
+);
+
+const availableItems = computed(() =>
+  itemsStore.items.filter((i) => !campaignItems.value.some((ci) => ci.id === i.id)),
+);
+
+function onAssignItem(e: Event) {
+  if (e.target instanceof HTMLSelectElement) {
+    campaignsStore.assignItem(campaign.value!.id, e.target.value);
+    e.target.value = '';
+  }
+}
+
+function unassignItem(itemId: string) {
+  if (!campaign.value) return;
+  campaignsStore.unassignItem(campaign.value.id, itemId);
 }
 
 function assignCharacter(characterId: string) {
@@ -174,6 +196,31 @@ function updateMilestone(milestone: Milestone) {
               @remove="removeMilestone"
               @update="updateMilestone"
             />
+          </section>
+
+          <!-- ITEMS -->
+          <section class="sheet-section">
+            <div class="sheet-section-header">ITEMS</div>
+            <div class="campaign-characters">
+              <div v-if="campaignItems.length === 0" class="empty-text">
+                Noch keine Gegenstände zugeordnet.
+              </div>
+              <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
+                <div class="assignment-info" @click="router.push(`/items/${item.id}`)">
+                  <strong>{{ item.name || '(Unbenannt)' }}</strong>
+                </div>
+                <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
+              </div>
+
+              <div v-if="availableItems.length > 0" class="assign-row">
+                <select class="assign-select" @change="onAssignItem">
+                  <option value="">Gegenstand hinzufügen...</option>
+                  <option v-for="i in availableItems" :key="i.id" :value="i.id">
+                    {{ i.name || '(Unbenannt)' }}
+                  </option>
+                </select>
+              </div>
+            </div>
           </section>
 
           <!-- CHARAKTERE -->

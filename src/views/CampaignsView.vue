@@ -67,6 +67,9 @@ function deleteCampaign(id: string, name: string) {
               <span v-if="gmModeStore.isGMMode">
                 · {{ store.getCharactersForCampaign(campaign.id).filter((c) => c.type === 'nsc').length }} NSC
               </span>
+              <span v-if="store.getItemsForCampaign(campaign.id).length > 0">
+                · {{ store.getItemsForCampaign(campaign.id).length }} Item{{ store.getItemsForCampaign(campaign.id).length !== 1 ? 's' : '' }}
+              </span>
               <span v-if="campaign.milestones.length > 0">
                 · {{ campaign.milestones.length }} Meilenstein{{ campaign.milestones.length !== 1 ? 'e' : '' }}
               </span>
@@ -155,6 +158,9 @@ function deleteCampaign(id: string, name: string) {
 }
 
 .card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.25rem;
   padding: 0.25rem 0.9rem;
   font-size: 0.8rem;
   color: var(--fate-text-light);

@@ -1,0 +1,71 @@
+import { render, fireEvent } from '@testing-library/vue';
+import { createPinia, setActivePinia } from 'pinia';
+import CampaignsView from './CampaignsView.vue';
+import { useCampaignsStore } from '../stores/campaigns';
+import type { Campaign } from '../types';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const mockPush = vi.fn();
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
+function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
+  return {
+    id: 'campaign-1',
+    name: 'Test Kampagne',
+    description: 'Eine Beschreibung',
+    status: 'active',
+    notes: '',
+    milestones: [],
+    ...overrides,
+  };
+}
+
+describe('CampaignsView – card interactions', () => {
+  beforeEach(() => {
+    mockPush.mockClear();
+  });
+
+  function setup() {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useCampaignsStore();
+    const campaign = makeCampaign();
+    store.addCampaign(campaign);
+
+    const result = render(CampaignsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+    return { ...result, campaignId: campaign.id };
+  }
+
+  it('clicking the card navigates to the campaign view page', async () => {
+    const { container, campaignId } = setup();
+    await fireEvent.click(container.querySelector('.campaign-card')!);
+    expect(mockPush).toHaveBeenCalledWith(`/campaigns/${campaignId}`);
+  });
+
+  it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
+    const { container, campaignId } = setup();
+    const [editBtn] = container.querySelectorAll('.card-actions button');
+    await fireEvent.click(editBtn!);
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith(`/campaigns/${campaignId}/edit`);
+  });
+
+  it('clicking the delete button does not trigger navigation', async () => {
+    const { container } = setup();
+    const [, deleteBtn] = container.querySelectorAll('.card-actions button');
+    await fireEvent.click(deleteBtn!);
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+});

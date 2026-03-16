@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { Campaign, CampaignCharacterAssignment, Milestone } from '../types';
+import type { Campaign, CampaignCharacterAssignment, CampaignItemAssignment, Milestone } from '../types';
 import { useCharactersStore } from './characters';
+import { useItemsStore } from './items';
 
 export const useCampaignsStore = defineStore('campaigns', () => {
   const campaigns = ref<Campaign[]>([]);
   const assignments = ref<CampaignCharacterAssignment[]>([]);
+  const itemAssignments = ref<CampaignItemAssignment[]>([]);
 
   function addCampaign(campaign: Campaign) {
     campaigns.value.push(campaign);
@@ -22,6 +24,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
   function deleteCampaign(id: string) {
     campaigns.value = campaigns.value.filter((c) => c.id !== id);
     assignments.value = assignments.value.filter((a) => a.campaignId !== id);
+    itemAssignments.value = itemAssignments.value.filter((a) => a.campaignId !== id);
   }
 
   function getById(id: string): Campaign | undefined {
@@ -49,6 +52,36 @@ export const useCampaignsStore = defineStore('campaigns', () => {
       .filter((a) => a.campaignId === campaignId)
       .map((a) => a.characterId);
     return charactersStore.characters.filter((c) => ids.includes(c.id));
+  }
+
+  function assignItem(campaignId: string, itemId: string) {
+    const exists = itemAssignments.value.some(
+      (a) => a.campaignId === campaignId && a.itemId === itemId,
+    );
+    if (!exists) {
+      itemAssignments.value.push({ campaignId, itemId });
+    }
+  }
+
+  function unassignItem(campaignId: string, itemId: string) {
+    itemAssignments.value = itemAssignments.value.filter(
+      (a) => !(a.campaignId === campaignId && a.itemId === itemId),
+    );
+  }
+
+  function getItemsForCampaign(campaignId: string) {
+    const itemsStore = useItemsStore();
+    const ids = itemAssignments.value
+      .filter((a) => a.campaignId === campaignId)
+      .map((a) => a.itemId);
+    return itemsStore.items.filter((i) => ids.includes(i.id));
+  }
+
+  function getCampaignsForItem(itemId: string) {
+    const ids = itemAssignments.value
+      .filter((a) => a.itemId === itemId)
+      .map((a) => a.campaignId);
+    return campaigns.value.filter((c) => ids.includes(c.id));
   }
 
   function getCampaignsForCharacter(characterId: string) {
@@ -95,9 +128,11 @@ export const useCampaignsStore = defineStore('campaigns', () => {
   function replaceAll(
     incomingCampaigns: Campaign[],
     incomingAssignments: CampaignCharacterAssignment[],
+    incomingItemAssignments: CampaignItemAssignment[] = [],
   ) {
     campaigns.value = incomingCampaigns;
     assignments.value = incomingAssignments;
+    itemAssignments.value = incomingItemAssignments;
   }
 
   const activeCampaigns = computed(() => campaigns.value.filter((c) => c.status === 'active'));
@@ -113,6 +148,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
   return {
     campaigns,
     assignments,
+    itemAssignments,
     activeCampaigns,
     characterCountsForCampaign,
     addCampaign,
@@ -123,6 +159,10 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     unassignCharacter,
     getCharactersForCampaign,
     getCampaignsForCharacter,
+    assignItem,
+    unassignItem,
+    getItemsForCampaign,
+    getCampaignsForItem,
     addMilestone,
     removeMilestone,
     updateMilestone,

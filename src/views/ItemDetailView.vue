@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
+import { useCampaignsStore } from '../stores/campaigns';
 import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
+import FateCampaignSection from '../components/shared/FateCampaignSection.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import type { Item } from '../types';
 import { createDefaultItem } from '../composables/useCharacterDefaults';
@@ -18,6 +20,7 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 const itemsStore = useItemsStore();
+const campaignsStore = useCampaignsStore();
 
 const id = computed(() => route.params.id as string);
 const isEditing = ref(props.isNew || props.editMode || false);
@@ -29,6 +32,14 @@ const item = computed(() => {
   if (props.isNew) return createDefaultItem();
   return itemsStore.getById(id.value);
 });
+
+const itemCampaigns = computed(() =>
+  item.value && !props.isNew ? campaignsStore.getCampaignsForItem(item.value.id) : [],
+);
+
+const availableCampaigns = computed(() =>
+  campaignsStore.campaigns.filter((c) => !itemCampaigns.value.some((ic) => ic.id === c.id)),
+);
 
 function handleSave(updated: Item) {
   if (props.isNew) {
@@ -92,12 +103,24 @@ function deleteItem() {
         </template>
       </ItemSheet>
 
-      <ItemSheet v-else :item="item">
-        <template v-if="!isNew" #name-bar-actions>
-          <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
-          <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
-        </template>
-      </ItemSheet>
+      <template v-else>
+        <ItemSheet :item="item">
+          <template v-if="!isNew" #name-bar-actions>
+            <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
+            <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
+          </template>
+        </ItemSheet>
+
+        <!-- KAMPAGNEN-ZUORDNUNG -->
+        <FateCampaignSection
+          v-if="!isNew"
+          :assigned-campaigns="itemCampaigns"
+          :available-campaigns="availableCampaigns"
+          @assign="(id) => campaignsStore.assignItem(id, item!.id)"
+          @unassign="(id) => campaignsStore.unassignItem(id, item!.id)"
+          @navigate="(id) => router.push(`/campaigns/${id}`)"
+        />
+      </template>
     </template>
   </div>
 

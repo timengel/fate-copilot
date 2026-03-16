@@ -22,6 +22,7 @@ export function useImportExport() {
       characters: charactersStore.characters,
       items: itemsStore.items,
       campaignCharacterAssignments: campaignsStore.assignments,
+      campaignItemAssignments: campaignsStore.itemAssignments,
       skills: skillsStore.skills,
     };
 
@@ -77,7 +78,7 @@ export function useImportExport() {
 
     itemsStore.replaceAll(data.items ?? []);
     charactersStore.replaceAll(data.characters);
-    campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments);
+    campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments, data.campaignItemAssignments ?? []);
     skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
   }
 

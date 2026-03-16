@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
+import FateCampaignSection from '../components/shared/FateCampaignSection.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import type { Character, CharacterType } from '../types';
 import { createDefaultCharacter } from '../composables/useCharacterDefaults';
@@ -97,22 +98,6 @@ function queryCharacterType(): CharacterType {
   return isCharacterType(route.query.type) ? route.query.type : 'sc';
 }
 
-function onAssignToCampaign(e: Event) {
-  if (e.target instanceof HTMLSelectElement) {
-    assignToCampaign(e.target.value);
-    e.target.value = '';
-  }
-}
-
-function assignToCampaign(campaignId: string) {
-  if (!character.value) return;
-  campaignsStore.assignCharacter(campaignId, character.value.id);
-}
-
-function unassignFromCampaign(campaignId: string) {
-  if (!character.value) return;
-  campaignsStore.unassignCharacter(campaignId, character.value.id);
-}
 </script>
 
 <template>
@@ -152,34 +137,13 @@ function unassignFromCampaign(campaignId: string) {
         </CharacterSheet>
 
         <!-- KAMPAGNEN-ZUORDNUNG -->
-        <section class="sheet-section campaigns-section">
-          <div class="sheet-section-header">KAMPAGNEN</div>
-          <div class="campaign-assignments">
-            <div v-if="characterCampaigns.length === 0" class="empty-text">
-              Keiner Kampagne zugeordnet.
-            </div>
-            <div v-for="campaign in characterCampaigns" :key="campaign.id" class="assignment-row">
-              <span class="assignment-name" @click="router.push(`/campaigns/${campaign.id}`)">
-                {{ campaign.name }}
-              </span>
-              <FateButton variant="danger" size="M" @click="unassignFromCampaign(campaign.id)"
-                >Entfernen</FateButton
-              >
-            </div>
-
-            <div v-if="availableCampaigns.length > 0" class="assign-row">
-              <select
-                class="assign-select"
-                @change="onAssignToCampaign"
-              >
-                <option value="">Kampagne zuordnen...</option>
-                <option v-for="c in availableCampaigns" :key="c.id" :value="c.id">
-                  {{ c.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </section>
+        <FateCampaignSection
+          :assigned-campaigns="characterCampaigns"
+          :available-campaigns="availableCampaigns"
+          @assign="(id) => campaignsStore.assignCharacter(id, character!.id)"
+          @unassign="(id) => campaignsStore.unassignCharacter(id, character!.id)"
+          @navigate="(id) => router.push(`/campaigns/${id}`)"
+        />
       </template>
     </template>
   </div>
@@ -201,59 +165,5 @@ function unassignFromCampaign(campaignId: string) {
   padding: 2rem;
   text-align: center;
   color: var(--fate-text-light);
-}
-
-.campaigns-section {
-  margin-top: 1rem;
-  background: white;
-  border: 1px solid var(--fate-border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.campaign-assignments {
-  padding: 0.5rem 0.75rem;
-}
-
-.assignment-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid var(--fate-blue-light);
-}
-
-.assignment-row:last-of-type {
-  border-bottom: none;
-}
-
-.assignment-name {
-  cursor: pointer;
-  color: var(--fate-blue);
-  font-weight: 500;
-}
-
-.assignment-name:hover {
-  text-decoration: underline;
-}
-
-.assign-row {
-  padding-top: 0.5rem;
-}
-
-.assign-select {
-  padding: 0.35rem 0.5rem;
-  border: 1px solid var(--fate-border);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-family: inherit;
-  color: var(--fate-text);
-  background: white;
-  cursor: pointer;
-}
-
-.assign-select:focus {
-  outline: none;
-  border-color: var(--fate-blue);
 }
 </style>

@@ -27,7 +27,7 @@ export function initPersistence() {
           ...c,
           milestones: c.milestones ?? [],
         }));
-        campaignsStore.replaceAll(campaigns, data.campaignCharacterAssignments ?? []);
+        campaignsStore.replaceAll(campaigns, data.campaignCharacterAssignments ?? [], data.campaignItemAssignments ?? []);
         skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
       }
     } catch {
@@ -44,6 +44,7 @@ export function initPersistence() {
       characters: charactersStore.characters,
       items: itemsStore.items,
       campaignCharacterAssignments: campaignsStore.assignments,
+      campaignItemAssignments: campaignsStore.itemAssignments,
       skills: skillsStore.skills,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
