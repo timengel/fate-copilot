@@ -422,7 +422,7 @@ defineExpose({ save });
         <section
           v-if="isEditing || sections?.konsequenzen !== false"
           class="sheet-section konsequenzen"
-          :class="{ 'span-full': sections?.stress === false || (form.stressPhysical.length === 0 && form.stressMental.length === 0) }"
+          :class="{ 'span-full': !isEditing && (sections?.stress === false || (form.stressPhysical.length === 0 && form.stressMental.length === 0)) }"
         >
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <template v-if="isEditing">
