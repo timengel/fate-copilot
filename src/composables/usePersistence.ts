@@ -1,5 +1,5 @@
 import { watchEffect } from 'vue';
-import type { AppData, AppDataVersion } from '../types';
+import type { AppData, AppDataVersion, Character, Item } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
@@ -8,6 +8,28 @@ import { useSkillsStore } from '../stores/skills';
 
 const STORAGE_KEY = 'fate-copilot-data';
 const FORMAT_VERSION: AppDataVersion = '1.1';
+
+type LegacyCharacter = Omit<Character, 'type'> & { type?: string; redDice?: number; blueDice?: number };
+
+function migrateToItem(c: LegacyCharacter): Item {
+  return {
+    id: c.id,
+    type: 'item',
+    name: c.name,
+    description: c.description,
+    highConcept: c.highConcept,
+    trouble: c.trouble,
+    aspects: c.aspects,
+    stunts: c.stunts,
+    extras: c.extras,
+    stressPhysical: c.stressPhysical,
+    stressMental: c.stressMental,
+    gmNotes: c.gmNotes,
+    color: c.color,
+    redDice: c.redDice ?? 0,
+    blueDice: c.blueDice ?? 0,
+  };
+}
 
 export function initPersistence() {
   const charactersStore = useCharactersStore();
@@ -19,28 +41,22 @@ export function initPersistence() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
-      const data: unknown = JSON.parse(raw);
-      if (
-        typeof data === 'object' &&
-        data !== null &&
-        'formatVersion' in data &&
-        (data.formatVersion === '1.0' || data.formatVersion === '1.1')
-      ) {
-        const appData = data as AppData; // safe: object shape and format version validated
-        // Items in eigenem Store laden; Migration: alte Daten hatten Items im characters-Array
-        if (appData.items) {
-          itemsStore.replaceAll(appData.items);
-          charactersStore.replaceAll((appData.characters ?? []).filter((c) => c.type !== 'item'));
+      const data = JSON.parse(raw) as AppData;
+      if (data.formatVersion === '1.0' || data.formatVersion === '1.1') {
+        if (data.items) {
+          itemsStore.replaceAll(data.items);
+          charactersStore.replaceAll((data.characters ?? []));
         } else {
-          itemsStore.replaceAll((appData.characters ?? []).filter((c) => c.type === 'item'));
-          charactersStore.replaceAll((appData.characters ?? []).filter((c) => c.type !== 'item'));
+          const legacy = (data.characters ?? []) as unknown as LegacyCharacter[];
+          itemsStore.replaceAll(legacy.filter((c) => c.type === 'item').map(migrateToItem));
+          charactersStore.replaceAll(legacy.filter((c) => c.type !== 'item') as unknown as Character[]);
         }
-        const campaigns = (appData.campaigns ?? []).map((c) => ({
+        const campaigns = (data.campaigns ?? []).map((c) => ({
           ...c,
           milestones: c.milestones ?? [],
         }));
-        campaignsStore.replaceAll(campaigns, appData.campaignCharacterAssignments ?? []);
-        skillsStore.replaceAll(appData.skills ?? [...SKILL_LIST]);
+        campaignsStore.replaceAll(campaigns, data.campaignCharacterAssignments ?? []);
+        skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
       }
     } catch {
       // Korrupte Daten still ignorieren

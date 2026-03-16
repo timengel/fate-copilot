@@ -1,4 +1,4 @@
-import type { Campaign, Character, CharacterType, Consequence } from '../types';
+import type { Campaign, Character, CharacterType, Consequence, Item } from '../types';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -54,27 +54,17 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
   };
 }
 
-export function createDefaultItem(): Character {
+export function createDefaultItem(): Item {
   return {
     id: generateId(),
     type: 'item',
     name: '',
     description: '',
-    highConcept: '',
-    trouble: '',
-    aspects: ['', '', ''],
-    skills: [],
+    aspects: [''],
     stunts: [],
     extras: '',
-    refresh: 0,
-    fatePoints: 0,
-    stressPhysical: [
-      { value: 1, checked: false },
-      { value: 2, checked: false },
-    ],
-    stressMental: [{ value: 1, checked: false }],
-    consequences: [],
-    notes: '',
+    stressPhysical: [],
+    stressMental: [],
     color: 'pfau',
     redDice: 0,
     blueDice: 0,

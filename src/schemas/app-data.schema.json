@@ -33,7 +33,7 @@
     },
     "items": {
       "type": "array",
-      "items": { "$ref": "#/$defs/Character" }
+      "items": { "$ref": "#/$defs/Item" }
     },
     "campaignCharacterAssignments": {
       "type": "array",
@@ -99,7 +99,7 @@
         "id": { "type": "string" },
         "type": {
           "type": "string",
-          "enum": ["sc", "nsc", "item"]
+          "enum": ["sc", "nsc"]
         },
         "name": { "type": "string" },
         "description": { "type": "string" },
@@ -118,7 +118,7 @@
           "items": { "$ref": "#/$defs/Stunt" }
         },
         "extras": { "type": "string" },
-        "refresh": { "type": "integer", "minimum": 0 },
+        "refresh": { "type": "integer", "minimum": 1 },
         "fatePoints": { "type": "integer", "minimum": 0 },
         "stressPhysical": {
           "type": "array",
@@ -136,6 +136,52 @@
         "gmNotes": { "type": "string" },
         "pyramidMaxLevel": { "type": "integer", "minimum": 1, "maximum": 8 },
         "pyramidMaxCols": { "type": "integer", "minimum": 1 },
+        "color": {
+          "type": "string",
+          "enum": [
+            "pfau", "heidelbeere", "lavendel", "weintraube",
+            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
+          ]
+        }
+      }
+    },
+    "Item": {
+      "type": "object",
+      "required": [
+        "id", "type", "name", "description", "highConcept", "trouble",
+        "aspects", "stunts", "extras",
+        "stressPhysical", "stressMental",
+        "redDice", "blueDice"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["item"]
+        },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "highConcept": { "type": "string" },
+        "trouble": { "type": "string" },
+        "aspects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "stunts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Stunt" }
+        },
+        "extras": { "type": "string" },
+        "stressPhysical": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressBox" }
+        },
+        "stressMental": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressBox" }
+        },
+        "gmNotes": { "type": "string" },
         "color": {
           "type": "string",
           "enum": [

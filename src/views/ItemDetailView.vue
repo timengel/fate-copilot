@@ -2,10 +2,10 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
-import CharacterSheet from '../components/character/CharacterSheet.vue';
+import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
-import type { Character } from '../types';
+import type { Item } from '../types';
 import { createDefaultItem } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useToastStore } from '../stores/toast';
@@ -19,34 +19,25 @@ const route = useRoute();
 const router = useRouter();
 const itemsStore = useItemsStore();
 
-const id = computed(() => {
-  const param = route.params.id;
-  return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
-});
+const id = computed(() => route.params.id as string);
 const isEditing = ref(props.isNew || props.editMode || false);
+const itemSheetRef = ref<InstanceType<typeof ItemSheet> | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();
-
-const itemSections = {
-  fertigkeiten: false,
-  konsequenzen: false,
-  allgemeinesRefresh: false,
-  allgemeinesFatePoints: false,
-  redAndBlueDice: true,
-};
 
 const item = computed(() => {
   if (props.isNew) return createDefaultItem();
   return itemsStore.getById(id.value);
 });
 
-function handleSave(updated: Character) {
+function handleSave(updated: Item) {
   if (props.isNew) {
     itemsStore.addItem(updated);
     router.replace(`/items/${updated.id}`);
   } else {
     itemsStore.updateItem(updated);
     isEditing.value = false;
+    if (props.editMode) router.replace(`/items/${updated.id}`);
   }
   toastStore.show('Gegenstand gespeichert');
 }
@@ -56,6 +47,7 @@ function handleCancel() {
     router.push('/items');
   } else {
     isEditing.value = false;
+    if (props.editMode) router.replace(`/items/${id.value}`);
   }
 }
 
@@ -82,25 +74,30 @@ function deleteItem() {
     <template v-else-if="item">
       <div class="detail-toolbar">
         <FateButton variant="link" @click="router.push('/items')">← Gegenstände</FateButton>
-        <div class="toolbar-actions">
-          <template v-if="!isNew">
-            <FateButton v-if="!isEditing" icon="edit" @click="isEditing = true">Bearbeiten</FateButton>
-            <FateButton variant="danger-outline" @click="deleteItem">Löschen</FateButton>
-          </template>
-        </div>
       </div>
 
-      <CharacterSheet
+      <ItemSheet
         v-if="isEditing"
+        ref="itemSheetRef"
         mode="edit"
         :key="item.id"
-        :character="item"
-        :sections="itemSections"
+        :item="item"
+        :hideActions="true"
         @save="handleSave"
         @cancel="handleCancel"
-      />
+      >
+        <template #edit-bar-actions>
+          <FateButton icon="close" variant="outline" size="S" @click="handleCancel">Abbrechen</FateButton>
+          <FateButton icon="check" variant="outline" size="S" @click="itemSheetRef?.save()">Speichern</FateButton>
+        </template>
+      </ItemSheet>
 
-      <CharacterSheet v-else :character="item" :sections="itemSections" />
+      <ItemSheet v-else :item="item">
+        <template v-if="!isNew" #name-bar-actions>
+          <FateButton icon="edit" variant="outline" size="S" @click="isEditing = true">Bearbeiten</FateButton>
+          <FateButton icon="delete" variant="danger" size="S" @click="deleteItem" />
+        </template>
+      </ItemSheet>
     </template>
   </div>
 

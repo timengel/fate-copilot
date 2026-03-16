@@ -1,4 +1,4 @@
-import type { AppData, AppDataVersion } from '../types';
+import type { AppData, AppDataVersion, Character, Item } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
@@ -7,6 +7,28 @@ import { useSkillsStore } from '../stores/skills';
 
 const FORMAT_VERSION: AppDataVersion = '1.1';
 const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0', '1.1'];
+
+type LegacyCharacter = Omit<Character, 'type'> & { type?: string; redDice?: number; blueDice?: number };
+
+function migrateToItem(c: LegacyCharacter): Item {
+  return {
+    id: c.id,
+    type: 'item',
+    name: c.name,
+    description: c.description,
+    highConcept: c.highConcept,
+    trouble: c.trouble,
+    aspects: c.aspects,
+    stunts: c.stunts,
+    extras: c.extras,
+    stressPhysical: c.stressPhysical,
+    stressMental: c.stressMental,
+    gmNotes: c.gmNotes,
+    color: c.color,
+    redDice: c.redDice ?? 0,
+    blueDice: c.blueDice ?? 0,
+  };
+}
 
 export function useImportExport() {
   function exportJSON() {
@@ -38,16 +60,15 @@ export function useImportExport() {
 
   function validateImportData(data: unknown): data is AppData {
     if (typeof data !== 'object' || data === null) return false;
-    if (!('formatVersion' in data) || (data.formatVersion !== '1.0' && data.formatVersion !== '1.1')) {
+    const d = data as Record<string, unknown>;
+    if (!SUPPORTED_VERSIONS.includes(d.formatVersion as AppDataVersion)) {
       throw new Error(
-        `Unbekannte Formatversion: "${String('formatVersion' in data ? data.formatVersion : '')}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`,
+        `Unbekannte Formatversion: "${d.formatVersion}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`,
       );
     }
-    if (!('campaigns' in data) || !Array.isArray(data.campaigns))
-      throw new Error('Fehlende oder ungültige "campaigns"-Liste');
-    if (!('characters' in data) || !Array.isArray(data.characters))
-      throw new Error('Fehlende oder ungültige "characters"-Liste');
-    if (!('campaignCharacterAssignments' in data) || !Array.isArray(data.campaignCharacterAssignments))
+    if (!Array.isArray(d.campaigns)) throw new Error('Fehlende oder ungültige "campaigns"-Liste');
+    if (!Array.isArray(d.characters)) throw new Error('Fehlende oder ungültige "characters"-Liste');
+    if (!Array.isArray(d.campaignCharacterAssignments))
       throw new Error('Fehlende oder ungültige "campaignCharacterAssignments"-Liste');
     return true;
   }
@@ -57,12 +78,7 @@ export function useImportExport() {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const result = e.target?.result;
-          if (typeof result !== 'string') {
-            reject(new Error('Datei konnte nicht gelesen werden'));
-            return;
-          }
-          const raw = JSON.parse(result);
+          const raw = JSON.parse(e.target?.result as string);
           if (validateImportData(raw)) {
             resolve(raw);
           }
@@ -80,13 +96,15 @@ export function useImportExport() {
     const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
-    // Migration: alte Exporte haben Items im characters-Array
+
     if (data.items) {
       itemsStore.replaceAll(data.items);
-      charactersStore.replaceAll(data.characters.filter((c) => c.type !== 'item'));
+      charactersStore.replaceAll(data.characters);
     } else {
-      itemsStore.replaceAll(data.characters.filter((c) => c.type === 'item'));
-      charactersStore.replaceAll(data.characters.filter((c) => c.type !== 'item'));
+      // Migration: alte Exporte haben Items im characters-Array
+      const legacy = data.characters as unknown as LegacyCharacter[];
+      itemsStore.replaceAll(legacy.filter((c) => c.type === 'item').map(migrateToItem));
+      charactersStore.replaceAll(legacy.filter((c) => c.type !== 'item') as unknown as Character[]);
     }
     campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments);
     skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);

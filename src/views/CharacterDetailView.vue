@@ -26,6 +26,7 @@ const id = computed(() => {
   return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
 });
 const isEditing = ref(props.isNew || props.editMode || false);
+const charSheetRef = ref<InstanceType<typeof CharacterSheet> | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();
 
@@ -58,6 +59,7 @@ function handleSave(updated: Character) {
   } else {
     charactersStore.updateCharacter(updated);
     isEditing.value = false;
+    if (props.editMode) router.replace(`/characters/${updated.id}`);
   }
   toastStore.show('Charakter gespeichert');
 }
@@ -67,6 +69,7 @@ function handleCancel() {
     router.push(backPath.value);
   } else {
     isEditing.value = false;
+    if (props.editMode) router.replace(`/characters/${id.value}`);
   }
 }
 
@@ -86,7 +89,7 @@ function deleteCharacter() {
   );
 }
 
-const VALID_CHARACTER_TYPES: CharacterType[] = ['sc', 'nsc', 'item'];
+const VALID_CHARACTER_TYPES: CharacterType[] = ['sc', 'nsc'];
 function isCharacterType(value: unknown): value is CharacterType {
   return VALID_CHARACTER_TYPES.some((t) => t === value);
 }
@@ -122,25 +125,31 @@ function unassignFromCampaign(campaignId: string) {
     <template v-else-if="character">
       <div class="detail-toolbar">
         <FateButton variant="link" @click="router.push(backPath)">← Charaktere</FateButton>
-        <div class="toolbar-actions">
-          <template v-if="!isNew">
-            <FateButton v-if="!isEditing" icon="edit" @click="toggleEdit">Bearbeiten</FateButton>
-            <FateButton variant="danger-outline" @click="deleteCharacter">Löschen</FateButton>
-          </template>
-        </div>
       </div>
 
       <CharacterSheet
         v-if="isEditing"
+        ref="charSheetRef"
         mode="edit"
         :key="character.id"
         :character="character"
+        :hideActions="true"
         @save="handleSave"
         @cancel="handleCancel"
-      />
+      >
+        <template #edit-bar-actions>
+          <FateButton icon="close" variant="outline" size="S" @click="handleCancel">Abbrechen</FateButton>
+          <FateButton icon="check" variant="outline" size="S" @click="charSheetRef?.save()">Speichern</FateButton>
+        </template>
+      </CharacterSheet>
 
       <template v-else>
-        <CharacterSheet :character="character" />
+        <CharacterSheet :character="character">
+          <template v-if="!isNew" #name-bar-actions>
+            <FateButton icon="edit" variant="outline" size="S" @click="toggleEdit">Bearbeiten</FateButton>
+            <FateButton icon="delete" variant="danger" size="S" @click="deleteCharacter" />
+          </template>
+        </CharacterSheet>
 
         <!-- KAMPAGNEN-ZUORDNUNG -->
         <section class="sheet-section campaigns-section">

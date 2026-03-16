@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watchEffect } from 'vue';
+import { computed, reactive, watchEffect } from 'vue';
 import type { Item, Stunt } from '../../types';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
-import AspectFields from './AspectFields.vue';
 import StressTrack from './StressTrack.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
@@ -38,8 +37,7 @@ const colorVars = computed(() => {
   };
 });
 
-const showExtras = ref(!!form.extras?.trim());
-const showStunts = ref(form.stunts.length > 0);
+
 
 function addStunt() {
   form.stunts.push({ name: '', description: '' });
@@ -63,6 +61,22 @@ function addStressBox(track: 'physical' | 'mental') {
 function removeStressBox(track: 'physical' | 'mental') {
   const arr = track === 'physical' ? form.stressPhysical : form.stressMental;
   if (arr.length > 0) arr.pop();
+}
+
+function updateAspect(index: number, value: string) {
+  form.aspects[index] = value;
+}
+
+function onAspectInput(index: number, e: Event) {
+  if (e.target instanceof HTMLInputElement) updateAspect(index, e.target.value);
+}
+
+function addAspect() {
+  form.aspects.push('');
+}
+
+function removeAspect(index: number) {
+  form.aspects.splice(index, 1);
 }
 
 function save() {
@@ -120,57 +134,43 @@ defineExpose({ save });
     </section>
 
     <!-- ASPEKTE -->
-    <section class="sheet-section aspekte span-full">
+    <section v-if="isEditing || data.aspects.some(a => a)" class="sheet-section aspekte span-full">
       <div class="sheet-section-header">ASPEKTE</div>
-      <AspectFields
-        v-if="isEditing"
-        :highConcept="form.highConcept"
-        :trouble="form.trouble"
-        :aspects="form.aspects"
-        @update:highConcept="form.highConcept = $event"
-        @update:trouble="form.trouble = $event"
-        @update:aspects="form.aspects = $event"
-      />
-      <AspectFields
-        v-else
-        :highConcept="data.highConcept"
-        :trouble="data.trouble"
-        :aspects="data.aspects"
-        :readonly="true"
-      />
+      <div class="aspect-fields">
+        <div v-for="(aspect, i) in (isEditing ? form.aspects : data.aspects)" :key="i" class="aspect-row">
+          <span v-if="!isEditing" class="aspect-value">{{ aspect }}</span>
+          <template v-else>
+            <input
+              class="aspect-input"
+              :value="aspect"
+              placeholder="Aspekt"
+              @input="onAspectInput(i, $event)"
+            />
+            <FateButton variant="danger" size="S" @click="removeAspect(i)">✕</FateButton>
+          </template>
+        </div>
+        <div v-if="isEditing" class="aspect-add-row">
+          <FateButton variant="secondary" size="S" class="btn-flavor" @click="addAspect">+ Aspekt</FateButton>
+        </div>
+      </div>
     </section>
 
     <!-- EXTRAS -->
-    <section class="sheet-section extras">
-      <div
-        class="sheet-section-header"
-        :class="{ 'section-header-toggle': isEditing }"
-        @click="isEditing && (showExtras = !showExtras)"
-      >
-        EXTRAS
-        <span v-if="isEditing" class="section-toggle">{{ showExtras ? '▼' : '▶' }}</span>
-      </div>
-      <div v-if="isEditing" v-show="showExtras">
-        <textarea
-          class="text-area-input"
-          v-model="form.extras"
-          placeholder="Extras beschreiben..."
-        />
-      </div>
+    <section v-if="isEditing || data.extras?.trim()" class="sheet-section extras">
+      <div class="sheet-section-header">EXTRAS</div>
+      <textarea
+        v-if="isEditing"
+        class="text-area-input"
+        v-model="form.extras"
+        placeholder="Extras beschreiben..."
+      />
       <div v-else class="text-area-display">{{ data.extras || '' }}</div>
     </section>
 
     <!-- STUNTS -->
-    <section class="sheet-section stunts">
-      <div
-        class="sheet-section-header"
-        :class="{ 'section-header-toggle': isEditing }"
-        @click="isEditing && (showStunts = !showStunts)"
-      >
-        STUNTS
-        <span v-if="isEditing" class="section-toggle">{{ showStunts ? '▼' : '▶' }}</span>
-      </div>
-      <div v-if="isEditing" v-show="showStunts" class="stunts-list">
+    <section v-if="isEditing || data.stunts.length > 0" class="sheet-section stunts">
+      <div class="sheet-section-header">STUNTS</div>
+      <div v-if="isEditing" class="stunts-list">
         <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
           <div class="stunt-edit-fields">
             <input
@@ -201,7 +201,7 @@ defineExpose({ save });
     </section>
 
     <!-- STRESS -->
-    <div class="sheet-stress-row">
+    <div v-if="isEditing || data.stressPhysical.length > 0 || data.stressMental.length > 0" class="sheet-stress-row">
       <div class="stress-section span-full">
         <template v-if="isEditing">
           <div class="stress-track-row">
@@ -257,10 +257,12 @@ defineExpose({ save });
         </template>
         <template v-else>
           <StressTrack
+            v-if="data.stressPhysical.length > 0"
             label="KÖRPERLICHER STRESS"
             :boxes="data.stressPhysical"
           />
           <StressTrack
+            v-if="data.stressMental.length > 0"
             label="GEISTIGER STRESS"
             :boxes="data.stressMental"
           />
@@ -460,7 +462,7 @@ defineExpose({ save });
 }
 
 .sheet-section-header {
-  background: var(--fate-blue-dark);
+  background: var(--fate-blue);
   color: white;
   font-size: 0.65rem;
   font-weight: 700;
@@ -597,13 +599,13 @@ defineExpose({ save });
 }
 
 .stress-ctrl-btn {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: 1px solid var(--fate-border);
   border-radius: 3px;
   background: white;
   color: var(--fate-text);
-  font-size: 0.85rem;
+  font-size: 1rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -677,6 +679,72 @@ defineExpose({ save });
   padding: 0.75rem;
   border-top: 1px solid var(--fate-border);
   background: var(--fate-blue-light);
+}
+
+/* ASPECTS */
+.aspect-fields {
+  padding: 0.25rem 0;
+}
+
+.aspect-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 3px 0.75rem;
+  border-bottom: 1px solid var(--fate-blue-light);
+}
+
+.aspect-row:last-child {
+  border-bottom: none;
+}
+
+.aspect-label {
+  font-size: 0.7rem;
+  color: var(--fate-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.aspect-value {
+  flex: 1;
+  min-height: 1.4em;
+  padding: 1px 2px;
+  color: var(--fate-text);
+}
+
+.aspect-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--fate-border);
+  padding: 2px 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.aspect-input:focus {
+  border-bottom-color: var(--fate-blue);
+}
+
+.btn-flavor {
+  background: var(--fate-blue) !important;
+  color: white !important;
+}
+.btn-flavor:hover {
+  background: var(--fate-blue-dark) !important;
+}
+
+.aspect-add-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  align-items: center;
 }
 
 /* RESPONSIVE */

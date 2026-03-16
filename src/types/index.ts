@@ -99,14 +99,11 @@ export interface Item {
   type: 'item';
   name: string;
   description: string;
-  highConcept: string;
-  trouble: string;
   aspects: string[];
   stunts: Stunt[];
   extras: string;
   stressPhysical: StressBox[];
   stressMental: StressBox[];
-  notes: string;
   gmNotes?: string;
   color?: string;
   redDice: number;

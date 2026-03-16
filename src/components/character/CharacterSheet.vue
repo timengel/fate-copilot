@@ -26,7 +26,6 @@ const props = defineProps<{
     stress?: boolean;
     konsequenzen?: boolean;
     gmNotes?: boolean;
-    redAndBlueDice?: boolean;
   };
 }>();
 
@@ -35,14 +34,10 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 const gmModeStore = useGMModeStore();
 
 const rawForm = JSON.parse(JSON.stringify(props.character)) as Character;
-rawForm.redDice ??= 0;
-rawForm.blueDice ??= 0;
 const form = reactive<Character>(rawForm);
 
 watchEffect(() => {
   const updated = JSON.parse(JSON.stringify(props.character)) as Character;
-  updated.redDice ??= 0;
-  updated.blueDice ??= 0;
   Object.assign(form, updated);
 });
 
@@ -64,12 +59,12 @@ const colorVars = computed(() => {
   };
 });
 
-// NSC/Item: collapsible sections (edit mode only)
+// NSC: collapsible sections (edit mode only)
 const showExtras = ref(
-  (form.type !== 'nsc' && form.type !== 'item') || !!form.extras?.trim(),
+  form.type !== 'nsc' || !!form.extras?.trim(),
 );
 const showStunts = ref(
-  (form.type !== 'nsc' && form.type !== 'item') || form.stunts.length > 0,
+  form.type !== 'nsc' || form.stunts.length > 0,
 );
 
 // Stunt management
@@ -162,7 +157,7 @@ defineExpose({ save });
       <div class="character-name-bar">
         <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
         <span v-if="!isEditing" class="character-type-badge">{{
-          data.type === 'nsc' ? 'NSC' : data.type === 'item' ? 'ITEM' : 'SC'
+          data.type === 'nsc' ? 'NSC' : 'SC'
         }}</span>
         <div class="character-name-bar-end">
           <slot v-if="!isEditing" name="name-bar-actions" />
@@ -282,11 +277,11 @@ defineExpose({ save });
       >
         <div
           class="sheet-section-header"
-          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc' || form.type === 'item') }"
-          @click="isEditing && (form.type === 'nsc' || form.type === 'item') && (showExtras = !showExtras)"
+          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc') }"
+          @click="isEditing && form.type === 'nsc' && (showExtras = !showExtras)"
         >
           EXTRAS
-          <span v-if="isEditing && (form.type === 'nsc' || form.type === 'item')" class="section-toggle">{{
+          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
             showExtras ? '▼' : '▶'
           }}</span>
         </div>
@@ -308,11 +303,11 @@ defineExpose({ save });
       >
         <div
           class="sheet-section-header"
-          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc' || form.type === 'item') }"
-          @click="isEditing && (form.type === 'nsc' || form.type === 'item') && (showStunts = !showStunts)"
+          :class="{ 'section-header-toggle': isEditing && form.type === 'nsc' }"
+          @click="isEditing && form.type === 'nsc' && (showStunts = !showStunts)"
         >
           STUNTS
-          <span v-if="isEditing && (form.type === 'nsc' || form.type === 'item')" class="section-toggle">{{
+          <span v-if="isEditing && form.type === 'nsc'" class="section-toggle">{{
             showStunts ? '▼' : '▶'
           }}</span>
         </div>
@@ -348,11 +343,11 @@ defineExpose({ save });
 
       <!-- STRESS + KONSEQUENZEN -->
       <div
-        v-if="isEditing || sections?.stress !== false || sections?.konsequenzen !== false"
+        v-if="isEditing || (form.stressPhysical.length > 0 || form.stressMental.length > 0) || sections?.konsequenzen !== false"
         class="sheet-stress-row"
       >
         <div
-          v-if="isEditing || sections?.stress !== false"
+          v-if="isEditing || form.stressPhysical.length > 0 || form.stressMental.length > 0"
           class="stress-section"
           :class="{ 'span-full': !isEditing && sections?.konsequenzen === false }"
         >
@@ -410,11 +405,13 @@ defineExpose({ save });
           </template>
           <template v-else>
             <StressTrack
+              v-if="form.stressPhysical.length > 0"
               label="KÖRPERLICHER STRESS (KRAFT)"
               :boxes="form.stressPhysical"
               @update="form.stressPhysical = $event"
             />
             <StressTrack
+              v-if="form.stressMental.length > 0"
               label="GEISTIGER STRESS (WILLE)"
               :boxes="form.stressMental"
               @update="form.stressMental = $event"
@@ -425,7 +422,7 @@ defineExpose({ save });
         <section
           v-if="isEditing || sections?.konsequenzen !== false"
           class="sheet-section konsequenzen"
-          :class="{ 'span-full': !isEditing && sections?.stress === false }"
+          :class="{ 'span-full': sections?.stress === false || (form.stressPhysical.length === 0 && form.stressMental.length === 0) }"
         >
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <template v-if="isEditing">
@@ -444,7 +441,7 @@ defineExpose({ save });
                   −
                 </button>
                 <span class="consequence-config-label"
-                  >{{ ct.label }} ({{ countConsequences(ct.severity) }})</span
+                  >{{ ct.label }} ({{ ct.severity }})</span
                 >
                 <button
                   type="button"
@@ -463,30 +460,6 @@ defineExpose({ save });
           <ConsequenceSlots v-else :consequences="data.consequences" :readonly="true" />
         </section>
       </div>
-
-      <!-- ROTE & BLAUE WÜRFEL -->
-      <section
-        v-if="sections?.redAndBlueDice === true && (isEditing || data.redDice || data.blueDice)"
-        class="sheet-section red-blue-dice-section"
-      >
-        <div class="sheet-section-header">ROTE &amp; BLAUE WÜRFEL</div>
-        <div class="red-blue-dice-grid">
-          <div class="dice-row">
-            <span class="dice-label dice-label--red">🔴 Rote Würfel</span>
-            <FateCounter v-if="isEditing" :modelValue="form.redDice ?? 0" :min="0" :max="4" @update:modelValue="form.redDice = $event" />
-            <span v-else class="dice-value">{{ data.redDice ?? 0 }}</span>
-          </div>
-          <div class="dice-row">
-            <span class="dice-label dice-label--blue">🔵 Blaue Würfel</span>
-            <FateCounter v-if="isEditing" :modelValue="form.blueDice ?? 0" :min="0" :max="4" @update:modelValue="form.blueDice = $event" />
-            <span v-else class="dice-value">{{ data.blueDice ?? 0 }}</span>
-          </div>
-        </div>
-        <p v-if="isEditing" class="dice-hint">
-          Rote Würfel ersetzen beim Angriff reguläre Fate-Würfel (+1 Schaden pro +). Blaue Würfel
-          ersetzen bei der Verteidigung reguläre Fate-Würfel (absorbieren 1 Schaden pro +).
-        </p>
-      </section>
 
       <!-- GM-NOTIZEN -->
       <section
@@ -807,13 +780,13 @@ defineExpose({ save });
 }
 
 .stress-ctrl-btn {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: 1px solid var(--fate-border);
   border-radius: 3px;
   background: white;
   color: var(--fate-text);
-  font-size: 0.85rem;
+  font-size: 1rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -845,16 +818,23 @@ defineExpose({ save });
   display: flex;
   align-items: center;
   gap: 3px;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--fate-border);
+}
+
+.consequence-config-item:last-child {
+  padding-right: 0;
+  border-right: none;
 }
 
 .consequence-config-btn {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: 1px solid var(--fate-border);
   border-radius: 3px;
   background: white;
   color: var(--fate-text);
-  font-size: 0.85rem;
+  font-size: 1rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -874,46 +854,10 @@ defineExpose({ save });
 }
 
 .consequence-config-label {
-  font-size: 0.7rem;
-  color: var(--fate-text-light);
+  font-size: 0.8rem;
+  color: var(--fate-text);
   min-width: 70px;
   text-align: center;
-}
-
-/* Red & Blue Dice section */
-.red-blue-dice-section {
-  background: white;
-}
-
-.red-blue-dice-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-}
-
-.dice-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.dice-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  min-width: 10rem;
-}
-
-.dice-value {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.dice-hint {
-  font-size: 0.78rem;
-  color: var(--fate-text-light);
-  margin-top: 0.5rem;
-  line-height: 1.4;
 }
 
 /* GM notes section */
