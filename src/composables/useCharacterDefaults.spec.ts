@@ -69,16 +69,16 @@ describe('createDefaultCharacter (NSC)', () => {
   it('returns 1 mental stress box with value [1], unchecked', () => {
     const { stressMental } = createDefaultCharacter('nsc');
     expect(stressMental).toHaveLength(1);
-    expect(stressMental[0].value).toBe(1);
-    expect(stressMental[0].checked).toBe(false);
+    expect(stressMental[0]!.value).toBe(1);
+    expect(stressMental[0]!.checked).toBe(false);
   });
 
   it('returns exactly 1 consequence slot with severity 2 and label mild', () => {
     const { consequences } = createDefaultCharacter('nsc');
     expect(consequences).toHaveLength(1);
-    expect(consequences[0].severity).toBe(2);
-    expect(consequences[0].label).toBe('mild');
-    expect(consequences[0].value).toBe('');
+    expect(consequences[0]!.severity).toBe(2);
+    expect(consequences[0]!.label).toBe('mild');
+    expect(consequences[0]!.value).toBe('');
   });
 });
 

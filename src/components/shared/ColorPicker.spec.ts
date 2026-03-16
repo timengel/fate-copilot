@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/vue';
 import ColorPicker from './ColorPicker.vue';
 import { CHARACTER_COLORS } from '../../types';
@@ -13,14 +13,14 @@ describe('ColorPicker', () => {
     const { container } = render(ColorPicker);
     const swatches = container.querySelectorAll('button.color-swatch');
     const pfauIndex = CHARACTER_COLORS.findIndex((c) => c.id === 'pfau');
-    expect(swatches[pfauIndex].classList.contains('active')).toBe(true);
+    expect(swatches[pfauIndex]!.classList.contains('active')).toBe(true);
   });
 
   it('marks only the given color swatch as active', () => {
     const { container } = render(ColorPicker, { props: { modelValue: 'tomate' } });
     const swatches = container.querySelectorAll('button.color-swatch');
     const tomateIndex = CHARACTER_COLORS.findIndex((c) => c.id === 'tomate');
-    expect(swatches[tomateIndex].classList.contains('active')).toBe(true);
+    expect(swatches[tomateIndex]!.classList.contains('active')).toBe(true);
     // others must not be active
     swatches.forEach((swatch, i) => {
       if (i !== tomateIndex) {
@@ -35,7 +35,7 @@ describe('ColorPicker', () => {
       props: { modelValue: 'pfau', 'onUpdate:modelValue': onUpdate },
     });
     const basilikumIndex = CHARACTER_COLORS.findIndex((c) => c.id === 'basilikum');
-    await fireEvent.click(container.querySelectorAll('button.color-swatch')[basilikumIndex]);
+    await fireEvent.click(container.querySelectorAll('button.color-swatch')[basilikumIndex]!);
     expect(onUpdate).toHaveBeenCalledWith('basilikum');
   });
 });

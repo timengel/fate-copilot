@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import FateButton from './FateButton.vue';
+import type { ButtonSize } from '../../types';
 
 describe('FateButton', () => {
   it('renders a button element', () => {
@@ -31,7 +32,7 @@ describe('FateButton', () => {
   });
 
   it('applies fate-btn--sm when size is sm', () => {
-    const { container } = render(FateButton, { props: { size: 'sm' } });
+    const { container } = render(FateButton, { props: { size: 'sm' as ButtonSize } });
     expect(container.querySelector('button')!.classList.contains('fate-btn--sm')).toBe(true);
   });
 

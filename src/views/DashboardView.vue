@@ -8,7 +8,6 @@ import { useToastStore } from '../stores/toast';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
-import FateHeader from '../components/shared/FateHeader.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import type { Character } from '../types';
 

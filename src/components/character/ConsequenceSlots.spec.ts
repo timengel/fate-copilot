@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import type { Consequence } from '../../types';
@@ -36,17 +36,17 @@ describe('ConsequenceSlots', () => {
       props: { consequences, readonly: false, onUpdate },
     });
     const input = container.querySelectorAll<HTMLInputElement>('input.consequence-input')[0];
-    await fireEvent.update(input, 'Broken arm');
+    await fireEvent.update(input!, 'Broken arm');
     expect(onUpdate).toHaveBeenCalledOnce();
-    const updated: Consequence[] = onUpdate.mock.calls[0][0];
-    expect(updated[0].value).toBe('Broken arm');
-    expect(updated[1].value).toBe(''); // others untouched
+    const updated: Consequence[] = onUpdate.mock.calls[0]![0];
+    expect(updated[0]!.value).toBe('Broken arm');
+    expect(updated[1]!.value).toBe(''); // others untouched
   });
 
   it('shows existing values in inputs', () => {
     const { container } = render(ConsequenceSlots, { props: { consequences, readonly: false } });
     const inputs = container.querySelectorAll<HTMLInputElement>('input.consequence-input');
-    expect(inputs[3].value).toBe('Broken leg');
+    expect(inputs[3]!.value).toBe('Broken leg');
   });
 
   describe('readonly mode', () => {
@@ -67,11 +67,11 @@ describe('ConsequenceSlots', () => {
       props: { consequences, readonly: false, onUpdate },
     });
     const input = container.querySelectorAll<HTMLInputElement>('input.consequence-input')[0];
-    await fireEvent.update(input, 'Sprained ankle');
-    const updated: Consequence[] = onUpdate.mock.calls[0][0];
-    expect(updated[0].value).toBe('Sprained ankle');
-    expect(updated[1].value).toBe('');
-    expect(updated[2].value).toBe('');
-    expect(updated[3].value).toBe('Broken leg'); // unchanged
+    await fireEvent.update(input!, 'Sprained ankle');
+    const updated: Consequence[] = onUpdate.mock.calls[0]![0];
+    expect(updated[0]!.value).toBe('Sprained ankle');
+    expect(updated[1]!.value).toBe('');
+    expect(updated[2]!.value).toBe('');
+    expect(updated[3]!.value).toBe('Broken leg'); // unchanged
   });
 });

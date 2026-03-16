@@ -92,7 +92,7 @@ describe('useCampaignsStore', () => {
     store.addCampaign(makeCampaign({ id: 'b', status: 'inactive' }));
     store.addCampaign(makeCampaign({ id: 'c', status: 'completed' }));
     expect(store.activeCampaigns).toHaveLength(1);
-    expect(store.activeCampaigns[0].id).toBe('a');
+    expect(store.activeCampaigns[0]!.id).toBe('a');
   });
 
   it('assignCharacter adds an assignment', () => {
@@ -123,7 +123,7 @@ describe('useCampaignsStore', () => {
     store.assignCharacter('c1', 'char1');
     const result = store.getCharactersForCampaign('c1');
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Alice');
+    expect(result[0]!.name).toBe('Alice');
   });
 
   it('getCampaignsForCharacter returns assigned campaigns', () => {
@@ -133,7 +133,7 @@ describe('useCampaignsStore', () => {
     store.assignCharacter('c1', 'char1');
     const result = store.getCampaignsForCharacter('char1');
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Campaign 1');
+    expect(result[0]!.name).toBe('Campaign 1');
   });
 
   it('addMilestone adds to the campaign', () => {
@@ -142,7 +142,7 @@ describe('useCampaignsStore', () => {
     const milestone: Milestone = { id: 'm1', type: 'small', description: 'First' };
     store.addMilestone('c1', milestone);
     expect(store.getById('c1')?.milestones).toHaveLength(1);
-    expect(store.getById('c1')?.milestones?.[0].description).toBe('First');
+    expect(store.getById('c1')?.milestones?.[0]!.description).toBe('First');
   });
 
   it('removeMilestone removes from the campaign', () => {
@@ -177,7 +177,7 @@ describe('useCampaignsStore', () => {
       }),
     );
     store.updateMilestone('c1', { id: 'm1', type: 'major', description: 'Updated' });
-    expect(store.getById('c1')?.milestones?.[1].description).toBe('Second');
+    expect(store.getById('c1')?.milestones?.[1]!.description).toBe('Second');
   });
 
   it('replaceAll replaces campaigns and assignments', () => {
@@ -185,8 +185,8 @@ describe('useCampaignsStore', () => {
     store.addCampaign(makeCampaign({ id: 'old' }));
     store.assignCharacter('old', 'char1');
     store.replaceAll([makeCampaign({ id: 'new' })], [{ campaignId: 'new', characterId: 'c1' }]);
-    expect(store.campaigns[0].id).toBe('new');
-    expect(store.assignments[0].campaignId).toBe('new');
+    expect(store.campaigns[0]!.id).toBe('new');
+    expect(store.assignments[0]!.campaignId).toBe('new');
   });
 
   it('addMilestone with non-existent campaignId does nothing', () => {

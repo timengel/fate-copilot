@@ -1,6 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue';
 import { setActivePinia, createPinia } from 'pinia';
 import FateToggle from './FateToggle.vue';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 
 beforeEach(() => {
   setActivePinia(createPinia());

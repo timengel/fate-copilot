@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import StressTrack from './StressTrack.vue';
 import type { StressBox } from '../../types';
@@ -23,8 +23,8 @@ describe('StressTrack', () => {
   it('reflects checked state in the DOM', () => {
     const { container } = render(StressTrack, { props: { boxes, label: 'Test', readonly: false } });
     const checkboxes = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-    expect(checkboxes[0].checked).toBe(false);
-    expect(checkboxes[1].checked).toBe(true);
+    expect(checkboxes[0]!.checked).toBe(false);
+    expect(checkboxes[1]!.checked).toBe(true);
   });
 
   it('calls onUpdate with toggled box when a checkbox changes', async () => {
@@ -32,10 +32,10 @@ describe('StressTrack', () => {
     const { container } = render(StressTrack, {
       props: { boxes, label: 'Test', readonly: false, onUpdate },
     });
-    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]);
+    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]!);
     expect(onUpdate).toHaveBeenCalledOnce();
-    const updatedBoxes: StressBox[] = onUpdate.mock.calls[0][0];
-    expect(updatedBoxes[0].checked).toBe(true); // was false → toggled to true
+    const updatedBoxes: StressBox[] = onUpdate.mock.calls[0]![0];
+    expect(updatedBoxes[0]!.checked).toBe(true); // was false → toggled to true
   });
 
   it('does not call onUpdate when readonly', async () => {
@@ -43,7 +43,7 @@ describe('StressTrack', () => {
     const { container } = render(StressTrack, {
       props: { boxes, label: 'Test', readonly: true, onUpdate },
     });
-    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]);
+    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]!);
     expect(onUpdate).not.toHaveBeenCalled();
   });
 
@@ -52,11 +52,11 @@ describe('StressTrack', () => {
     const { container } = render(StressTrack, {
       props: { boxes, label: 'Test', readonly: false, onUpdate },
     });
-    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]);
-    const updated: StressBox[] = onUpdate.mock.calls[0][0];
-    expect(updated[0].checked).toBe(true); // was false → toggled
-    expect(updated[1].checked).toBe(true); // unchanged
-    expect(updated[2].checked).toBe(false); // unchanged
+    await fireEvent.change(container.querySelectorAll('input[type="checkbox"]')[0]!);
+    const updated: StressBox[] = onUpdate.mock.calls[0]![0];
+    expect(updated[0]!.checked).toBe(true); // was false → toggled
+    expect(updated[1]!.checked).toBe(true); // unchanged
+    expect(updated[2]!.checked).toBe(false); // unchanged
     expect(updated.map((b) => b.value)).toEqual([1, 2, 3]); // values preserved
   });
 });

@@ -96,7 +96,7 @@ describe('useImportExport', () => {
         notes: '',
       };
       applyImport({ ...validV11, characters: [character] });
-      expect(useCharactersStore().characters[0].name).toBe('Alice');
+      expect(useCharactersStore().characters[0]!.name).toBe('Alice');
     });
 
     it('replaces campaigns in the store', () => {
@@ -107,9 +107,10 @@ describe('useImportExport', () => {
         description: '',
         status: 'active',
         notes: '',
+        milestones: [],
       };
       applyImport({ ...validV11, campaigns: [campaign] });
-      expect(useCampaignsStore().campaigns[0].name).toBe('My Campaign');
+      expect(useCampaignsStore().campaigns[0]!.name).toBe('My Campaign');
     });
 
     it('replaces skills in the store', () => {
@@ -177,7 +178,7 @@ describe('useImportExport', () => {
         notes: '',
       };
       applyImport({ ...validV11, characters: [nsc] });
-      expect(useCharactersStore().characters[0].type).toBe('nsc');
+      expect(useCharactersStore().characters[0]!.type).toBe('nsc');
     });
   });
 

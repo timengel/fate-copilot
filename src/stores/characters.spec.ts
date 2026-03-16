@@ -53,7 +53,7 @@ describe('useCharactersStore', () => {
     const store = useCharactersStore();
     store.addCharacter(makeChar({ id: 'c1', name: 'Old' }));
     store.updateCharacter(makeChar({ id: 'c1', name: 'New' }));
-    expect(store.characters[0].name).toBe('New');
+    expect(store.characters[0]!.name).toBe('New');
   });
 
   it('update leaves other characters untouched', () => {
@@ -83,7 +83,7 @@ describe('useCharactersStore', () => {
     store.addCharacter(makeChar({ id: 'old' }));
     store.replaceAll([makeChar({ id: 'new1' }), makeChar({ id: 'new2' })]);
     expect(store.characters).toHaveLength(2);
-    expect(store.characters[0].id).toBe('new1');
+    expect(store.characters[0]!.id).toBe('new1');
   });
 
   it('replaceAll with empty array clears all', () => {

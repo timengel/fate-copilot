@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import SkillPyramid from './SkillPyramid.vue';
@@ -28,9 +28,9 @@ describe('SkillPyramid', () => {
       const { container } = renderPyramid([], { onUpdate });
       // maxLevel=2, maxCols=2 → top row is level 2, first select is slot 0
       const selects = container.querySelectorAll<HTMLSelectElement>('.skill-select');
-      await fireEvent.change(selects[0], { target: { value: 'Athletik' } });
+      await fireEvent.change(selects[0]!, { target: { value: 'Athletik' } });
       expect(onUpdate).toHaveBeenCalledOnce();
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted).toContainEqual({ skill: 'Athletik', level: 2 });
     });
 
@@ -39,9 +39,9 @@ describe('SkillPyramid', () => {
       const skills: SkillEntry[] = [{ skill: 'Athletik', level: 2 }];
       const { container } = renderPyramid(skills, { onUpdate });
       const selects = container.querySelectorAll<HTMLSelectElement>('.skill-select');
-      await fireEvent.change(selects[0], { target: { value: '' } });
+      await fireEvent.change(selects[0]!, { target: { value: '' } });
       expect(onUpdate).toHaveBeenCalledOnce();
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted.find((e) => e.skill === 'Athletik')).toBeUndefined();
     });
 
@@ -50,8 +50,8 @@ describe('SkillPyramid', () => {
       const skills: SkillEntry[] = [{ skill: 'Athletik', level: 2 }];
       const { container } = renderPyramid(skills, { onUpdate });
       const selects = container.querySelectorAll<HTMLSelectElement>('.skill-select');
-      await fireEvent.change(selects[0], { target: { value: 'Kämpfen' } });
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      await fireEvent.change(selects[0]!, { target: { value: 'Kämpfen' } });
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted).toContainEqual({ skill: 'Kämpfen', level: 2 });
       expect(emitted.find((e) => e.skill === 'Athletik')).toBeUndefined();
     });
@@ -62,8 +62,8 @@ describe('SkillPyramid', () => {
       const { container } = renderPyramid(skills, { onUpdate });
       // selects[0] is level 2, slot 0
       const selects = container.querySelectorAll<HTMLSelectElement>('.skill-select');
-      await fireEvent.change(selects[0], { target: { value: 'Athletik' } });
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      await fireEvent.change(selects[0]!, { target: { value: 'Athletik' } });
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted).toContainEqual({ skill: 'Athletik', level: 2 });
       expect(emitted).toContainEqual({ skill: 'Kämpfen', level: 1 });
     });
@@ -94,7 +94,7 @@ describe('SkillPyramid', () => {
       ];
       renderPyramid(skills, { onUpdate });
       await fireEvent.click(screen.getByText('− Zeile'));
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted.find((e) => e.level === 2)).toBeUndefined();
       expect(emitted).toContainEqual({ skill: 'Kämpfen', level: 1 });
     });
@@ -139,7 +139,7 @@ describe('SkillPyramid', () => {
       ];
       renderPyramid(skills, { onUpdate });
       await fireEvent.click(screen.getByText('− Spalte'));
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted).toContainEqual({ skill: 'Athletik', level: 2 });
       expect(emitted.find((e) => e.skill === 'Kämpfen')).toBeUndefined();
     });
@@ -152,7 +152,7 @@ describe('SkillPyramid', () => {
       ];
       renderPyramid(skills, { onUpdate });
       await fireEvent.click(screen.getByText('− Spalte'));
-      const emitted: SkillEntry[] = onUpdate.mock.calls[0][0];
+      const emitted: SkillEntry[] = onUpdate.mock.calls[0]![0];
       expect(emitted).toContainEqual({ skill: 'Athletik', level: 2 });
       expect(emitted).toContainEqual({ skill: 'Kämpfen', level: 1 });
     });
