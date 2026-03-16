@@ -5,6 +5,15 @@ function generateId(): string {
 }
 
 export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
+  const consequences: Consequence[] =
+    type === 'nsc'
+      ? [{ severity: 2, label: 'mild', value: '' }]
+      : [
+          { severity: 2, label: 'mild', value: '' },
+          { severity: 4, label: 'moderate', value: '' },
+          { severity: 6, label: 'severe', value: '' },
+          { severity: 8, label: 'extreme', value: '' },
+        ];
   return {
     id: generateId(),
     type,
@@ -39,14 +48,7 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
             { value: 3, checked: false },
             { value: 4, checked: false },
           ],
-    consequences: (type === 'nsc'
-      ? [{ severity: 2, label: 'mild', value: '' }]
-      : [
-          { severity: 2, label: 'mild', value: '' },
-          { severity: 4, label: 'moderate', value: '' },
-          { severity: 6, label: 'severe', value: '' },
-          { severity: 8, label: 'extreme', value: '' },
-        ]) as Consequence[],
+    consequences,
     notes: '',
     color: 'pfau',
   };

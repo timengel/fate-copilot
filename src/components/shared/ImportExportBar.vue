@@ -17,8 +17,9 @@ function triggerImport() {
 }
 
 async function onFileSelected(event: Event) {
+  if (!(event.target instanceof HTMLInputElement)) return;
   importError.value = '';
-  const file = (event.target as HTMLInputElement).files?.[0];
+  const file = event.target.files?.[0];
   if (!file) return;
   try {
     pendingData.value = await importJSON(file);
@@ -26,7 +27,7 @@ async function onFileSelected(event: Event) {
   } catch (e) {
     importError.value = e instanceof Error ? e.message : 'Unbekannter Fehler';
   } finally {
-    (event.target as HTMLInputElement).value = '';
+    event.target.value = '';
   }
 }
 

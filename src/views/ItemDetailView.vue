@@ -19,7 +19,10 @@ const route = useRoute();
 const router = useRouter();
 const itemsStore = useItemsStore();
 
-const id = computed(() => route.params.id as string);
+const id = computed(() => {
+  const param = route.params.id;
+  return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
+});
 const isEditing = ref(props.isNew || props.editMode || false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();

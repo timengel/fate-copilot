@@ -80,6 +80,10 @@ function addCol() {
   emit('updateLayout', { maxLevel: effectiveMaxLevel.value, maxCols: effectiveCols.value + 1 });
 }
 
+function onSkillChange(level: number, i: number, e: Event) {
+  if (e.target instanceof HTMLSelectElement) updateSlot(level, i - 1, e.target.value);
+}
+
 function removeCol() {
   const newCols = effectiveCols.value - 1;
   if (newCols < 1) return;
@@ -106,7 +110,7 @@ function removeCol() {
             v-else
             class="skill-select"
             :value="getSlotValue(level, i - 1)"
-            @change="updateSlot(level, i - 1, ($event.target as HTMLSelectElement).value)"
+            @change="onSkillChange(level, i, $event)"
           >
             <option value="">—</option>
             <option

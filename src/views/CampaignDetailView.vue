@@ -25,7 +25,10 @@ const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const gmModeStore = useGMModeStore();
 
-const id = computed(() => route.params.id as string);
+const id = computed(() => {
+  const param = route.params.id;
+  return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
+});
 const isEditing = ref(props.isNew || props.editMode || false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
@@ -86,6 +89,13 @@ function deleteCampaign() {
 function assignCharacter(characterId: string) {
   if (!campaign.value) return;
   campaignsStore.assignCharacter(campaign.value.id, characterId);
+}
+
+function onAssignCharacter(e: Event) {
+  if (e.target instanceof HTMLSelectElement) {
+    assignCharacter(e.target.value);
+    e.target.value = '';
+  }
 }
 
 function unassignCharacter(characterId: string) {
@@ -211,10 +221,7 @@ function updateMilestone(milestone: Milestone) {
               <div v-if="availableCharacters.length > 0" class="assign-row">
                 <select
                   class="assign-select"
-                  @change="
-                    assignCharacter(($event.target as HTMLSelectElement).value);
-                    ($event.target as HTMLSelectElement).value = '';
-                  "
+                  @change="onAssignCharacter"
                 >
                   <option value="">Charakter hinzufügen...</option>
                   <optgroup v-if="availableSc.length > 0" label="Spielercharaktere (SC)">

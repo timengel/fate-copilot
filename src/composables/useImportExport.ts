@@ -38,15 +38,16 @@ export function useImportExport() {
 
   function validateImportData(data: unknown): data is AppData {
     if (typeof data !== 'object' || data === null) return false;
-    const d = data as Record<string, unknown>;
-    if (!SUPPORTED_VERSIONS.includes(d.formatVersion as AppDataVersion)) {
+    if (!('formatVersion' in data) || (data.formatVersion !== '1.0' && data.formatVersion !== '1.1')) {
       throw new Error(
-        `Unbekannte Formatversion: "${d.formatVersion}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`,
+        `Unbekannte Formatversion: "${String('formatVersion' in data ? data.formatVersion : '')}". Unterstützt: ${SUPPORTED_VERSIONS.join(', ')}`,
       );
     }
-    if (!Array.isArray(d.campaigns)) throw new Error('Fehlende oder ungültige "campaigns"-Liste');
-    if (!Array.isArray(d.characters)) throw new Error('Fehlende oder ungültige "characters"-Liste');
-    if (!Array.isArray(d.campaignCharacterAssignments))
+    if (!('campaigns' in data) || !Array.isArray(data.campaigns))
+      throw new Error('Fehlende oder ungültige "campaigns"-Liste');
+    if (!('characters' in data) || !Array.isArray(data.characters))
+      throw new Error('Fehlende oder ungültige "characters"-Liste');
+    if (!('campaignCharacterAssignments' in data) || !Array.isArray(data.campaignCharacterAssignments))
       throw new Error('Fehlende oder ungültige "campaignCharacterAssignments"-Liste');
     return true;
   }
@@ -56,7 +57,12 @@ export function useImportExport() {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const raw = JSON.parse(e.target?.result as string);
+          const result = e.target?.result;
+          if (typeof result !== 'string') {
+            reject(new Error('Datei konnte nicht gelesen werden'));
+            return;
+          }
+          const raw = JSON.parse(result);
           if (validateImportData(raw)) {
             resolve(raw);
           }

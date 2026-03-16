@@ -86,6 +86,14 @@ function updateStunt(index: number, field: keyof Stunt, value: string) {
   if (stunt) stunt[field] = value;
 }
 
+function onStuntNameInput(index: number, e: Event) {
+  if (e.target instanceof HTMLInputElement) updateStunt(index, 'name', e.target.value);
+}
+
+function onStuntDescInput(index: number, e: Event) {
+  if (e.target instanceof HTMLTextAreaElement) updateStunt(index, 'description', e.target.value);
+}
+
 // Consequence management
 const CONSEQUENCE_TYPES: {
   label: string;
@@ -315,14 +323,14 @@ defineExpose({ save });
                 class="stunt-name-input"
                 :value="stunt.name"
                 placeholder="Name des Stunts"
-                @input="updateStunt(i, 'name', ($event.target as HTMLInputElement).value)"
+                @input="onStuntNameInput(i, $event)"
               />
               <textarea
                 class="stunt-desc-textarea"
                 :value="stunt.description"
                 placeholder="Beschreibung"
                 rows="1"
-                @input="updateStunt(i, 'description', ($event.target as HTMLTextAreaElement).value)"
+                @input="onStuntDescInput(i, $event)"
               />
             </div>
             <FateButton variant="danger" size="S" @click="removeStunt(i)">✕</FateButton>

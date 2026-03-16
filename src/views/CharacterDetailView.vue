@@ -21,15 +21,17 @@ const router = useRouter();
 const charactersStore = useCharactersStore();
 const campaignsStore = useCampaignsStore();
 
-const id = computed(() => route.params.id as string);
+const id = computed(() => {
+  const param = route.params.id;
+  return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
+});
 const isEditing = ref(props.isNew || props.editMode || false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();
 
 const character = computed(() => {
   if (props.isNew) {
-    const type = (route.query.type as CharacterType) ?? 'sc';
-    return createDefaultCharacter(type);
+    return createDefaultCharacter(queryCharacterType());
   }
   return charactersStore.getById(id.value);
 });
@@ -82,6 +84,21 @@ function deleteCharacter() {
       router.push(backPath.value);
     },
   );
+}
+
+const VALID_CHARACTER_TYPES: CharacterType[] = ['sc', 'nsc', 'item'];
+function isCharacterType(value: unknown): value is CharacterType {
+  return VALID_CHARACTER_TYPES.some((t) => t === value);
+}
+function queryCharacterType(): CharacterType {
+  return isCharacterType(route.query.type) ? route.query.type : 'sc';
+}
+
+function onAssignToCampaign(e: Event) {
+  if (e.target instanceof HTMLSelectElement) {
+    assignToCampaign(e.target.value);
+    e.target.value = '';
+  }
 }
 
 function assignToCampaign(campaignId: string) {
@@ -144,10 +161,7 @@ function unassignFromCampaign(campaignId: string) {
             <div v-if="availableCampaigns.length > 0" class="assign-row">
               <select
                 class="assign-select"
-                @change="
-                  assignToCampaign(($event.target as HTMLSelectElement).value);
-                  ($event.target as HTMLSelectElement).value = '';
-                "
+                @change="onAssignToCampaign"
               >
                 <option value="">Kampagne zuordnen...</option>
                 <option v-for="c in availableCampaigns" :key="c.id" :value="c.id">

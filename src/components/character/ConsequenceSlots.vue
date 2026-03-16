@@ -21,6 +21,10 @@ function updateValue(index: number, value: string) {
   const updated = props.consequences.map((c, i) => (i === index ? { ...c, value } : c));
   emit('update', updated);
 }
+
+function onValueInput(i: number, e: Event) {
+  if (e.target instanceof HTMLInputElement) updateValue(i, e.target.value);
+}
 </script>
 
 <template>
@@ -34,7 +38,7 @@ function updateValue(index: number, value: string) {
         class="consequence-input"
         :value="con.value"
         :placeholder="`${LABELS[con.label]} Konsequenz`"
-        @input="updateValue(i, ($event.target as HTMLInputElement).value)"
+        @input="onValueInput(i, $event)"
       />
     </div>
   </div>

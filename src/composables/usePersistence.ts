@@ -19,22 +19,28 @@ export function initPersistence() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
-      const data = JSON.parse(raw) as AppData;
-      if (data.formatVersion === '1.0' || data.formatVersion === '1.1') {
+      const data: unknown = JSON.parse(raw);
+      if (
+        typeof data === 'object' &&
+        data !== null &&
+        'formatVersion' in data &&
+        (data.formatVersion === '1.0' || data.formatVersion === '1.1')
+      ) {
+        const appData = data as AppData; // safe: object shape and format version validated
         // Items in eigenem Store laden; Migration: alte Daten hatten Items im characters-Array
-        if (data.items) {
-          itemsStore.replaceAll(data.items);
-          charactersStore.replaceAll((data.characters ?? []).filter((c) => c.type !== 'item'));
+        if (appData.items) {
+          itemsStore.replaceAll(appData.items);
+          charactersStore.replaceAll((appData.characters ?? []).filter((c) => c.type !== 'item'));
         } else {
-          itemsStore.replaceAll((data.characters ?? []).filter((c) => c.type === 'item'));
-          charactersStore.replaceAll((data.characters ?? []).filter((c) => c.type !== 'item'));
+          itemsStore.replaceAll((appData.characters ?? []).filter((c) => c.type === 'item'));
+          charactersStore.replaceAll((appData.characters ?? []).filter((c) => c.type !== 'item'));
         }
-        const campaigns = (data.campaigns ?? []).map((c) => ({
+        const campaigns = (appData.campaigns ?? []).map((c) => ({
           ...c,
           milestones: c.milestones ?? [],
         }));
-        campaignsStore.replaceAll(campaigns, data.campaignCharacterAssignments ?? []);
-        skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
+        campaignsStore.replaceAll(campaigns, appData.campaignCharacterAssignments ?? []);
+        skillsStore.replaceAll(appData.skills ?? [...SKILL_LIST]);
       }
     } catch {
       // Korrupte Daten still ignorieren

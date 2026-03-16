@@ -17,6 +17,18 @@ function updateAspect(index: number, value: string) {
   updated[index] = value;
   emit('update:aspects', updated);
 }
+
+function onHighConceptInput(e: Event) {
+  if (e.target instanceof HTMLInputElement) emit('update:highConcept', e.target.value);
+}
+
+function onTroubleInput(e: Event) {
+  if (e.target instanceof HTMLInputElement) emit('update:trouble', e.target.value);
+}
+
+function onAspectInput(index: number, e: Event) {
+  if (e.target instanceof HTMLInputElement) updateAspect(index, e.target.value);
+}
 </script>
 
 <template>
@@ -29,7 +41,7 @@ function updateAspect(index: number, value: string) {
         class="aspect-input"
         :value="highConcept"
         placeholder="High Concept"
-        @input="emit('update:highConcept', ($event.target as HTMLInputElement).value)"
+        @input="onHighConceptInput"
       />
     </div>
 
@@ -41,7 +53,7 @@ function updateAspect(index: number, value: string) {
         class="aspect-input"
         :value="trouble"
         placeholder="Trouble"
-        @input="emit('update:trouble', ($event.target as HTMLInputElement).value)"
+        @input="onTroubleInput"
       />
     </div>
 
@@ -54,7 +66,7 @@ function updateAspect(index: number, value: string) {
           class="aspect-input"
           :value="aspect"
           placeholder="Weiterer Aspekt"
-          @input="updateAspect(i, ($event.target as HTMLInputElement).value)"
+          @input="onAspectInput(i, $event)"
         />
       </div>
     </template>
