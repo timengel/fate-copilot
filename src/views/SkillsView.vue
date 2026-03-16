@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useSkillsStore } from '../stores/skills';
 import FateButton from '../components/shared/FateButton.vue';
+import FateHeader from '../components/shared/FateHeader.vue';
 import type { SkillInfo } from '../types';
 
 const store = useSkillsStore();
@@ -304,12 +305,9 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
 <template>
   <div class="list-view">
-    <div class="list-header">
-      <h1>Fertigkeiten</h1>
-      <FateButton variant="secondary" @click="resetToDefaults"
-        >Auf Standard zurücksetzen</FateButton
-      >
-    </div>
+    <FateHeader title="Fertigkeiten">
+      <FateButton variant="secondary" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
+    </FateHeader>
 
     <p class="skills-hint">
       Diese Fertigkeiten stehen in der Skill-Pyramide als Dropdown-Optionen zur Verfügung.

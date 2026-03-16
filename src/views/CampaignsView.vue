@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import FateButton from '../components/shared/FateButton.vue';
+import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { CAMPAIGN_STATUS_LABEL } from '../types';
 import type { CampaignStatus } from '../types';
@@ -36,10 +37,9 @@ function deleteCampaign(id: string, name: string) {
 
 <template>
   <div class="list-view">
-    <div class="list-header">
-      <h1>Kampagnen</h1>
+    <FateHeader title="Kampagnen">
       <FateButton @click="router.push('/campaigns/new')">+ Neue Kampagne</FateButton>
-    </div>
+    </FateHeader>
 
     <div v-if="store.campaigns.length === 0" class="empty-state">
       Noch keine Kampagnen vorhanden.

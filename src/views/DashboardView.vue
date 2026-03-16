@@ -7,6 +7,7 @@ import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
+import FateHeader from '../components/shared/FateHeader.vue';
 import type { Character } from '../types';
 
 const campaignsStore = useCampaignsStore();
@@ -99,6 +100,7 @@ onUnmounted(() => {
 
 <template>
   <div class="dashboard-view">
+    <FateHeader title="Dashboard" />
     <!-- Sidebar (desktop) -->
     <aside class="dashboard-sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-header">

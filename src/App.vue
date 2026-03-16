@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
-import ImportExportBar from './components/shared/ImportExportBar.vue';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateToast from './components/shared/FateToast.vue';
@@ -47,8 +46,8 @@ watch(
             <RouterLink to="/campaigns" class="nav-link">Kampagnen</RouterLink>
             <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
+            <RouterLink to="/settings" class="nav-link">Einstellungen</RouterLink>
           </div>
-          <ImportExportBar />
         </div>
 
         <div class="nav-gm-toggle" :class="{ 'gm-active': gmModeStore.isGMMode }" @click="gmModeStore.isGMMode = !gmModeStore.isGMMode">
@@ -226,13 +225,6 @@ watch(
     padding: 0.7rem 0.8rem;
   }
 
-  /* Import/Export-Bar im Drawer */
-  .nav-drawer :deep(.import-export-bar) {
-    margin-left: 0;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-  }
 }
 
 @container header (width < 360px) {

@@ -6,6 +6,7 @@ import CharacterDetailView from '../views/CharacterDetailView.vue';
 import CampaignsView from '../views/CampaignsView.vue';
 import CampaignDetailView from '../views/CampaignDetailView.vue';
 import SkillsView from '../views/SkillsView.vue';
+import SettingsView from '../views/SettingsView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,7 @@ const router = createRouter({
     { path: '/campaigns/:id', component: CampaignDetailView },
     { path: '/campaigns/:id/edit', component: CampaignDetailView, props: { editMode: true } },
     { path: '/skills', component: SkillsView },
+    { path: '/settings', component: SettingsView },
   ],
 });
 

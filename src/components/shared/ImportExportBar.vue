@@ -46,10 +46,10 @@ function cancelImport() {
 
 <template>
   <div class="import-export-bar">
-    <FateButton variant="outline" @click="exportJSON" title="Alle Daten als JSON exportieren"
+    <FateButton variant="secondary" @click="exportJSON" title="Alle Daten als JSON exportieren"
       >↓ Exportieren</FateButton
     >
-    <FateButton variant="outline" @click="triggerImport" title="JSON-Datei importieren"
+    <FateButton variant="secondary" @click="triggerImport" title="JSON-Datei importieren"
       >↑ Importieren</FateButton
     >
     <input
@@ -76,7 +76,6 @@ function cancelImport() {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
 }
 
 .import-error {

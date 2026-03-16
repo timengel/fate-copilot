@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import type { CharacterType } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
+import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
@@ -60,12 +61,9 @@ function deleteCharacter(id: string, name: string) {
 
 <template>
   <div class="list-view">
-    <div class="list-header">
-      <h1>Charaktere</h1>
-      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)"
-        >+ Neuer Charakter</FateButton
-      >
-    </div>
+    <FateHeader title="Charaktere">
+      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)">+ Neuer Charakter</FateButton>
+    </FateHeader>
 
     <div class="tab-bar">
       <button
