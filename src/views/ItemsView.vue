@@ -14,11 +14,7 @@ const search = ref('');
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const filtered = computed(() =>
-  store.items.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      c.highConcept.toLowerCase().includes(search.value.toLowerCase()),
-  ),
+  store.items.filter((c) => c.name.toLowerCase().includes(search.value.toLowerCase())),
 );
 
 const totalItems = computed(() => store.items.length);
@@ -57,10 +53,6 @@ function deleteItem(id: string, name: string) {
       >
         <div class="card-header" :style="cardHeaderStyle(item.color)">
           {{ item.name || '(Unbenannt)' }}
-        </div>
-        <div class="card-concept">{{ item.highConcept || '—' }}</div>
-        <div class="card-trouble" v-if="item.trouble">
-          <em>{{ item.trouble }}</em>
         </div>
         <div class="card-actions" @click.stop>
           <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/items/${item.id}/edit`)" />
@@ -108,18 +100,6 @@ function deleteItem(id: string, name: string) {
   font-weight: 700;
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
-}
-
-.card-concept {
-  padding: 0.5rem 0.9rem 0.25rem;
-  font-size: 0.875rem;
-  color: var(--fate-text);
-}
-
-.card-trouble {
-  padding: 0 0.9rem 0.25rem;
-  font-size: 0.8rem;
-  color: var(--fate-text-light);
 }
 
 .card-actions {

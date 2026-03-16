@@ -205,11 +205,13 @@ defineExpose({ save });
       <div class="stress-section span-full">
         <template v-if="isEditing">
           <div class="stress-track-row">
-            <StressTrack
-              label="KÖRPERLICHER STRESS"
-              :boxes="form.stressPhysical"
-              @update="form.stressPhysical = $event"
-            />
+            <div class="stress-track-wrap">
+              <StressTrack
+                label="KÖRPERLICHER STRESS"
+                :boxes="form.stressPhysical"
+                @update="form.stressPhysical = $event"
+              />
+            </div>
             <div class="stress-track-controls">
               <button
                 type="button"
@@ -230,11 +232,13 @@ defineExpose({ save });
             </div>
           </div>
           <div class="stress-track-row">
-            <StressTrack
-              label="GEISTIGER STRESS"
-              :boxes="form.stressMental"
-              @update="form.stressMental = $event"
-            />
+            <div class="stress-track-wrap">
+              <StressTrack
+                label="GEISTIGER STRESS"
+                :boxes="form.stressMental"
+                @update="form.stressMental = $event"
+              />
+            </div>
             <div class="stress-track-controls">
               <button
                 type="button"
@@ -317,8 +321,8 @@ defineExpose({ save });
 
     <!-- FORM ACTIONS (edit mode only) -->
     <div v-if="isEditing && !hideActions" class="form-actions">
-      <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
-      <FateButton @click="save">Speichern</FateButton>
+      <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
+      <FateButton icon="check" @click="save"><span class="btn-label">Speichern</span></FateButton>
     </div>
   </div>
 </template>
@@ -597,11 +601,18 @@ defineExpose({ save });
   gap: 4px;
 }
 
+.stress-track-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .stress-track-controls {
   display: flex;
   flex-direction: row;
   gap: 2px;
   padding-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .stress-ctrl-btn {
@@ -706,6 +717,7 @@ defineExpose({ save });
 
 .aspect-input {
   flex: 1;
+  min-width: 0;
   border: none;
   border-bottom: 1px solid var(--fate-border);
   padding: 2px 4px;
@@ -714,7 +726,6 @@ defineExpose({ save });
   color: var(--fate-text);
   background: transparent;
   outline: none;
-  width: 100%;
 }
 
 .aspect-input:focus {
@@ -747,6 +758,23 @@ defineExpose({ save });
   }
 }
 
+@container character-card (width < 480px) {
+  .form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .form-actions .btn-label {
+    display: none;
+  }
+
+  .form-actions :deep(.fate-btn) {
+    padding: 0;
+    width: 32px;
+    justify-content: center;
+  }
+}
+
 @container main (width < 768px) {
   .item-sheet {
     grid-template-columns: 1fr;
@@ -754,6 +782,23 @@ defineExpose({ save });
 
   .extras {
     border-right: none;
+  }
+}
+
+@container main (width < 480px) {
+  .form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .form-actions .btn-label {
+    display: none;
+  }
+
+  .form-actions :deep(.fate-btn) {
+    padding: 0;
+    width: 32px;
+    justify-content: center;
   }
 }
 </style>
