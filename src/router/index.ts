@@ -5,6 +5,8 @@ import CharactersView from '../views/CharactersView.vue';
 import CharacterDetailView from '../views/CharacterDetailView.vue';
 import CampaignsView from '../views/CampaignsView.vue';
 import CampaignDetailView from '../views/CampaignDetailView.vue';
+import ItemsView from '../views/ItemsView.vue';
+import ItemDetailView from '../views/ItemDetailView.vue';
 import SkillsView from '../views/SkillsView.vue';
 import SettingsView from '../views/SettingsView.vue';
 
@@ -21,6 +23,10 @@ const router = createRouter({
     { path: '/campaigns/new', component: CampaignDetailView, props: { isNew: true } },
     { path: '/campaigns/:id', component: CampaignDetailView },
     { path: '/campaigns/:id/edit', component: CampaignDetailView, props: { editMode: true } },
+    { path: '/items', component: ItemsView },
+    { path: '/items/new', component: ItemDetailView, props: { isNew: true } },
+    { path: '/items/:id', component: ItemDetailView },
+    { path: '/items/:id/edit', component: ItemDetailView, props: { editMode: true } },
     { path: '/skills', component: SkillsView },
     { path: '/settings', component: SettingsView },
   ],

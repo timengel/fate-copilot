@@ -52,6 +52,33 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
   };
 }
 
+export function createDefaultItem(): Character {
+  return {
+    id: generateId(),
+    type: 'item',
+    name: '',
+    description: '',
+    highConcept: '',
+    trouble: '',
+    aspects: ['', '', ''],
+    skills: [],
+    stunts: [],
+    extras: '',
+    refresh: 0,
+    fatePoints: 0,
+    stressPhysical: [
+      { value: 1, checked: false },
+      { value: 2, checked: false },
+    ],
+    stressMental: [{ value: 1, checked: false }],
+    consequences: [],
+    notes: '',
+    color: 'pfau',
+    redDice: 0,
+    blueDice: 0,
+  };
+}
+
 export function createDefaultCampaign(): Campaign {
   return {
     id: generateId(),
@@ -64,5 +91,5 @@ export function createDefaultCampaign(): Campaign {
 }
 
 export function useCharacterDefaults() {
-  return { createDefaultCharacter, createDefaultCampaign, generateId };
+  return { createDefaultCharacter, createDefaultItem, createDefaultCampaign, generateId };
 }

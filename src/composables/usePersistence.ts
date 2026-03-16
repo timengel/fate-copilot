@@ -1,7 +1,8 @@
-import { watch } from 'vue';
+import { watchEffect } from 'vue';
 import type { AppData, AppDataVersion } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
+import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
 
@@ -10,6 +11,7 @@ const FORMAT_VERSION: AppDataVersion = '1.1';
 
 export function initPersistence() {
   const charactersStore = useCharactersStore();
+  const itemsStore = useItemsStore();
   const campaignsStore = useCampaignsStore();
   const skillsStore = useSkillsStore();
 
@@ -19,7 +21,14 @@ export function initPersistence() {
     try {
       const data = JSON.parse(raw) as AppData;
       if (data.formatVersion === '1.0' || data.formatVersion === '1.1') {
-        charactersStore.replaceAll(data.characters ?? []);
+        // Items in eigenem Store laden; Migration: alte Daten hatten Items im characters-Array
+        if (data.items) {
+          itemsStore.replaceAll(data.items);
+          charactersStore.replaceAll((data.characters ?? []).filter((c) => c.type !== 'item'));
+        } else {
+          itemsStore.replaceAll((data.characters ?? []).filter((c) => c.type === 'item'));
+          charactersStore.replaceAll((data.characters ?? []).filter((c) => c.type !== 'item'));
+        }
         const campaigns = (data.campaigns ?? []).map((c) => ({
           ...c,
           milestones: c.milestones ?? [],
@@ -33,24 +42,16 @@ export function initPersistence() {
   }
 
   // Bei jeder Änderung: in localStorage schreiben
-  watch(
-    [
-      () => charactersStore.characters,
-      () => campaignsStore.campaigns,
-      () => campaignsStore.assignments,
-      () => skillsStore.skills,
-    ],
-    () => {
-      const data: AppData = {
-        formatVersion: FORMAT_VERSION,
-        exportDate: new Date().toISOString(),
-        campaigns: campaignsStore.campaigns,
-        characters: charactersStore.characters,
-        campaignCharacterAssignments: campaignsStore.assignments,
-        skills: skillsStore.skills,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    },
-    { deep: true },
-  );
+  watchEffect(() => {
+    const data: AppData = {
+      formatVersion: FORMAT_VERSION,
+      exportDate: new Date().toISOString(),
+      campaigns: campaignsStore.campaigns,
+      characters: charactersStore.characters,
+      items: itemsStore.items,
+      campaignCharacterAssignments: campaignsStore.assignments,
+      skills: skillsStore.skills,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  });
 }

@@ -1,6 +1,7 @@
 import type { AppData, AppDataVersion } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
+import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
 
@@ -10,6 +11,7 @@ const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0', '1.1'];
 export function useImportExport() {
   function exportJSON() {
     const charactersStore = useCharactersStore();
+    const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
 
@@ -18,6 +20,7 @@ export function useImportExport() {
       exportDate: new Date().toISOString(),
       campaigns: campaignsStore.campaigns,
       characters: charactersStore.characters,
+      items: itemsStore.items,
       campaignCharacterAssignments: campaignsStore.assignments,
       skills: skillsStore.skills,
     };
@@ -68,9 +71,17 @@ export function useImportExport() {
 
   function applyImport(data: AppData) {
     const charactersStore = useCharactersStore();
+    const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
-    charactersStore.replaceAll(data.characters);
+    // Migration: alte Exporte haben Items im characters-Array
+    if (data.items) {
+      itemsStore.replaceAll(data.items);
+      charactersStore.replaceAll(data.characters.filter((c) => c.type !== 'item'));
+    } else {
+      itemsStore.replaceAll(data.characters.filter((c) => c.type === 'item'));
+      charactersStore.replaceAll(data.characters.filter((c) => c.type !== 'item'));
+    }
     campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments);
     skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
   }

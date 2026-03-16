@@ -94,6 +94,25 @@ export interface Character {
   color?: string;
 }
 
+export interface Item {
+  id: string;
+  type: 'item';
+  name: string;
+  description: string;
+  highConcept: string;
+  trouble: string;
+  aspects: string[];
+  stunts: Stunt[];
+  extras: string;
+  stressPhysical: StressBox[];
+  stressMental: StressBox[];
+  notes: string;
+  gmNotes?: string;
+  color?: string;
+  redDice: number;
+  blueDice: number;
+}
+
 export interface Milestone {
   id: string;
   type: MilestoneType;
@@ -121,6 +140,7 @@ export interface AppData {
   exportDate: string;
   campaigns: Campaign[];
   characters: Character[];
+  items?: Item[]; // optional für Rückwärtskompatibilität
   campaignCharacterAssignments: CampaignCharacterAssignment[];
   skills?: string[]; // optional für Rückwärtskompatibilität mit v1.0
 }

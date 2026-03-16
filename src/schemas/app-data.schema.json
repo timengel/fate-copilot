@@ -31,6 +31,10 @@
       "type": "array",
       "items": { "$ref": "#/$defs/Character" }
     },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Character" }
+    },
     "campaignCharacterAssignments": {
       "type": "array",
       "items": { "$ref": "#/$defs/CampaignCharacterAssignment" }
@@ -95,7 +99,7 @@
         "id": { "type": "string" },
         "type": {
           "type": "string",
-          "enum": ["sc", "nsc"]
+          "enum": ["sc", "nsc", "item"]
         },
         "name": { "type": "string" },
         "description": { "type": "string" },
@@ -114,7 +118,7 @@
           "items": { "$ref": "#/$defs/Stunt" }
         },
         "extras": { "type": "string" },
-        "refresh": { "type": "integer", "minimum": 1 },
+        "refresh": { "type": "integer", "minimum": 0 },
         "fatePoints": { "type": "integer", "minimum": 0 },
         "stressPhysical": {
           "type": "array",
@@ -138,7 +142,9 @@
             "pfau", "heidelbeere", "lavendel", "weintraube",
             "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
           ]
-        }
+        },
+        "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 }
       }
     },
     "SkillEntry": {

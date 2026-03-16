@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watchEffect } from 'vue';
 import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -26,6 +26,7 @@ const props = defineProps<{
     stress?: boolean;
     konsequenzen?: boolean;
     gmNotes?: boolean;
+    redAndBlueDice?: boolean;
   };
 }>();
 
@@ -33,15 +34,17 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Character>(JSON.parse(JSON.stringify(props.character)));
+const rawForm = JSON.parse(JSON.stringify(props.character)) as Character;
+rawForm.redDice ??= 0;
+rawForm.blueDice ??= 0;
+const form = reactive<Character>(rawForm);
 
-watch(
-  () => props.character,
-  (val) => {
-    Object.assign(form, JSON.parse(JSON.stringify(val)));
-  },
-  { deep: true },
-);
+watchEffect(() => {
+  const updated = JSON.parse(JSON.stringify(props.character)) as Character;
+  updated.redDice ??= 0;
+  updated.blueDice ??= 0;
+  Object.assign(form, updated);
+});
 
 const isEditing = computed(() => props.mode === 'edit');
 
@@ -453,6 +456,30 @@ defineExpose({ save });
         </section>
       </div>
 
+      <!-- ROTE & BLAUE WÜRFEL -->
+      <section
+        v-if="sections?.redAndBlueDice === true && (isEditing || data.redDice || data.blueDice)"
+        class="sheet-section red-blue-dice-section"
+      >
+        <div class="sheet-section-header">ROTE &amp; BLAUE WÜRFEL</div>
+        <div class="red-blue-dice-grid">
+          <div class="dice-row">
+            <span class="dice-label dice-label--red">🔴 Rote Würfel</span>
+            <FateCounter v-if="isEditing" :modelValue="form.redDice ?? 0" :min="0" :max="4" @update:modelValue="form.redDice = $event" />
+            <span v-else class="dice-value">{{ data.redDice ?? 0 }}</span>
+          </div>
+          <div class="dice-row">
+            <span class="dice-label dice-label--blue">🔵 Blaue Würfel</span>
+            <FateCounter v-if="isEditing" :modelValue="form.blueDice ?? 0" :min="0" :max="4" @update:modelValue="form.blueDice = $event" />
+            <span v-else class="dice-value">{{ data.blueDice ?? 0 }}</span>
+          </div>
+        </div>
+        <p v-if="isEditing" class="dice-hint">
+          Rote Würfel ersetzen beim Angriff reguläre Fate-Würfel (+1 Schaden pro +). Blaue Würfel
+          ersetzen bei der Verteidigung reguläre Fate-Würfel (absorbieren 1 Schaden pro +).
+        </p>
+      </section>
+
       <!-- GM-NOTIZEN -->
       <section
         v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
@@ -492,6 +519,7 @@ defineExpose({ save });
 .character-name-bar,
 .allgemeines,
 .sheet-stress-row,
+.red-blue-dice-section,
 .gm-notes-section,
 .form-actions {
   grid-column: 1 / -1;
@@ -842,6 +870,42 @@ defineExpose({ save });
   color: var(--fate-text-light);
   min-width: 70px;
   text-align: center;
+}
+
+/* Red & Blue Dice section */
+.red-blue-dice-section {
+  background: white;
+}
+
+.red-blue-dice-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.dice-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dice-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 10rem;
+}
+
+.dice-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dice-hint {
+  font-size: 0.78rem;
+  color: var(--fate-text-light);
+  margin-top: 0.5rem;
+  line-height: 1.4;
 }
 
 /* GM notes section */
