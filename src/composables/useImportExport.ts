@@ -1,4 +1,4 @@
-import type { AppData, AppDataVersion, Character, Item } from '../types';
+import type { AppData, AppDataVersion } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
@@ -7,28 +7,6 @@ import { useSkillsStore } from '../stores/skills';
 
 const FORMAT_VERSION: AppDataVersion = '1.1';
 const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0', '1.1'];
-
-type LegacyCharacter = Omit<Character, 'type'> & { type?: string; redDice?: number; blueDice?: number };
-
-function migrateToItem(c: LegacyCharacter): Item {
-  return {
-    id: c.id,
-    type: 'item',
-    name: c.name,
-    description: c.description,
-    highConcept: c.highConcept,
-    trouble: c.trouble,
-    aspects: c.aspects,
-    stunts: c.stunts,
-    extras: c.extras,
-    stressPhysical: c.stressPhysical,
-    stressMental: c.stressMental,
-    gmNotes: c.gmNotes,
-    color: c.color,
-    redDice: c.redDice ?? 0,
-    blueDice: c.blueDice ?? 0,
-  };
-}
 
 export function useImportExport() {
   function exportJSON() {
@@ -97,15 +75,8 @@ export function useImportExport() {
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
 
-    if (data.items) {
-      itemsStore.replaceAll(data.items);
-      charactersStore.replaceAll(data.characters);
-    } else {
-      // Migration: alte Exporte haben Items im characters-Array
-      const legacy = data.characters as unknown as LegacyCharacter[];
-      itemsStore.replaceAll(legacy.filter((c) => c.type === 'item').map(migrateToItem));
-      charactersStore.replaceAll(legacy.filter((c) => c.type !== 'item') as unknown as Character[]);
-    }
+    itemsStore.replaceAll(data.items ?? []);
+    charactersStore.replaceAll(data.characters);
     campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments);
     skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
   }
