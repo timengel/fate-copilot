@@ -36,6 +36,7 @@ const visibleSections = useSessionStorage('dashboard-sections', {
   stress: true,
   consequences: true,
   gmNotes: true,
+  dice: true,
 });
 
 const allCampaigns = computed(() =>
@@ -160,6 +161,7 @@ onUnmounted(() => {
           <FateCheckbox v-model="visibleSections.stress" label="Stress" />
           <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
+          <FateCheckbox v-if="showItems" v-model="visibleSections.dice" label="Würfel (Items)" />
         </div>
 
         <div class="sidebar-group">
@@ -214,6 +216,7 @@ onUnmounted(() => {
         <FateCheckbox v-model="visibleSections.stress" label="Stress" />
         <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
         <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
+        <FateCheckbox v-if="showItems" v-model="visibleSections.dice" label="Würfel (Items)" />
         <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
       </div>
       <div class="filters-inline-row">
@@ -439,6 +442,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .dashboard-stack--grid {

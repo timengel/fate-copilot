@@ -22,6 +22,7 @@ const props = defineProps<{
     stunts?: boolean;
     stress?: boolean;
     gmNotes?: boolean;
+    dice?: boolean;
   };
 }>();
 
@@ -49,6 +50,7 @@ const show = computed(() => ({
   stunts: isEditing.value || (props.sections?.stunts ?? true),
   stress: isEditing.value || (props.sections?.stress ?? true),
   gmNotes: isEditing.value || (props.sections?.gmNotes ?? true),
+  dice: isEditing.value || (props.sections?.dice ?? true),
 }));
 const isItemHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && !!props.item.hidden,
@@ -322,7 +324,7 @@ defineExpose({ save });
 
     <!-- ROTE & BLAUE WÜRFEL -->
     <section
-      v-if="isEditing || data.redDice || data.blueDice"
+      v-if="show.dice && (isEditing || data.redDice || data.blueDice)"
       class="sheet-section red-blue-dice-section"
     >
       <div class="sheet-section-header">ROTE &amp; BLAUE WÜRFEL</div>
