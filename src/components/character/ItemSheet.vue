@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watchEffect } from 'vue';
+import { computed, reactive, toRaw, watch } from 'vue';
 import type { Item, Stunt } from '../../types';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -18,11 +18,15 @@ const emit = defineEmits<{ save: [item: Item]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Item>(JSON.parse(JSON.stringify(props.item)) as Item);
+const form = reactive<Item>(structuredClone(toRaw(props.item)));
 
-watchEffect(() => {
-  Object.assign(form, JSON.parse(JSON.stringify(props.item)));
-});
+watch(
+  () => props.item,
+  (item) => {
+    Object.assign(form, structuredClone(toRaw(item)));
+  },
+  { deep: true },
+);
 
 const isEditing = computed(() => props.mode === 'edit');
 const data = computed(() => (isEditing.value ? form : props.item));
@@ -80,7 +84,7 @@ function removeAspect(index: number) {
 }
 
 function save() {
-  emit('save', JSON.parse(JSON.stringify(form)));
+  emit('save', structuredClone(toRaw(form)));
 }
 
 defineExpose({ save });

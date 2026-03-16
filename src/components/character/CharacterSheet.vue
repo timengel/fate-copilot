@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watchEffect } from 'vue';
+import { computed, reactive, ref, toRaw, watch } from 'vue';
 import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -16,15 +16,15 @@ const props = defineProps<{
   mode?: 'view' | 'edit';
   hideActions?: boolean;
   sections?: {
-    allgemeines?: boolean;
-    allgemeinesRefresh?: boolean;
-    allgemeinesFatePoints?: boolean;
-    aspekte?: boolean;
-    fertigkeiten?: boolean;
+    general?: boolean;
+    generalRefresh?: boolean;
+    generalFatePoints?: boolean;
+    aspects?: boolean;
+    skills?: boolean;
     extras?: boolean;
     stunts?: boolean;
     stress?: boolean;
-    konsequenzen?: boolean;
+    consequences?: boolean;
     gmNotes?: boolean;
   };
 }>();
@@ -33,13 +33,15 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const rawForm = JSON.parse(JSON.stringify(props.character)) as Character;
-const form = reactive<Character>(rawForm);
+const form = reactive<Character>(structuredClone(toRaw(props.character)));
 
-watchEffect(() => {
-  const updated = JSON.parse(JSON.stringify(props.character)) as Character;
-  Object.assign(form, updated);
-});
+watch(
+  () => props.character,
+  (character) => {
+    Object.assign(form, structuredClone(toRaw(character)));
+  },
+  { deep: true },
+);
 
 const isEditing = computed(() => props.mode === 'edit');
 
@@ -132,7 +134,7 @@ function removeStressBox(track: 'physical' | 'mental') {
 }
 
 function save() {
-  emit('save', JSON.parse(JSON.stringify(form)));
+  emit('save', structuredClone(toRaw(form)));
 }
 
 defineExpose({ save });
@@ -142,7 +144,7 @@ defineExpose({ save });
   <div class="character-sheet" :style="colorVars">
     <!-- NSC hidden in Player View (view mode only) -->
     <template v-if="isNscHidden">
-      <section class="sheet-section allgemeines">
+      <section class="sheet-section general">
         <div class="sheet-section-header">NSC</div>
         <div class="nsc-hidden-body">
           <div class="nsc-hidden-name">{{ data.name || '(Unbenannt)' }}</div>
@@ -167,12 +169,12 @@ defineExpose({ save });
 
       <!-- ALLGEMEINES -->
       <section
-        v-if="isEditing || sections?.allgemeines !== false"
-        class="sheet-section allgemeines"
+        v-if="isEditing || sections?.general !== false"
+        class="sheet-section general"
       >
         <div class="sheet-section-header">ALLGEMEINES</div>
-        <div class="allgemeines-grid">
-          <div class="allgemeines-left">
+        <div class="general-grid">
+          <div class="general-left">
             <div class="field-row">
               <label class="field-label">Name</label>
               <input
@@ -200,13 +202,13 @@ defineExpose({ save });
               <ColorPicker v-model="form.color" />
             </div>
           </div>
-          <div class="allgemeines-right">
-            <div v-if="sections?.allgemeinesRefresh !== false" class="field-row">
+          <div class="general-right">
+            <div v-if="sections?.generalRefresh !== false" class="field-row">
               <label class="field-label">Erholungsrate</label>
               <FateCounter v-if="isEditing" v-model="form.refresh" :min="1" :max="10" />
               <span v-else class="field-value refresh-value">{{ data.refresh }}</span>
             </div>
-            <div v-if="sections?.allgemeinesFatePoints !== false" class="field-row">
+            <div v-if="sections?.generalFatePoints !== false" class="field-row">
               <label class="field-label">Fate-Punkte</label>
               <FateCounter v-if="isEditing" v-model="form.fatePoints" />
               <span v-else class="field-value fate-points">{{ data.fatePoints }}</span>
@@ -217,9 +219,9 @@ defineExpose({ save });
 
       <!-- ASPEKTE -->
       <section
-        v-if="isEditing || sections?.aspekte !== false"
-        class="sheet-section aspekte"
-        :class="{ 'span-full': !isEditing && sections?.fertigkeiten === false }"
+        v-if="isEditing || sections?.aspects !== false"
+        class="sheet-section aspects"
+        :class="{ 'span-full': !isEditing && sections?.skills === false }"
       >
         <div class="sheet-section-header">ASPEKTE</div>
         <AspectFields
@@ -242,9 +244,9 @@ defineExpose({ save });
 
       <!-- FERTIGKEITEN -->
       <section
-        v-if="isEditing || sections?.fertigkeiten !== false"
-        class="sheet-section fertigkeiten"
-        :class="{ 'span-full': !isEditing && sections?.aspekte === false }"
+        v-if="isEditing || sections?.skills !== false"
+        class="sheet-section skills"
+        :class="{ 'span-full': !isEditing && sections?.aspects === false }"
       >
         <div class="sheet-section-header">FERTIGKEITEN</div>
         <SkillPyramid
@@ -343,13 +345,13 @@ defineExpose({ save });
 
       <!-- STRESS + KONSEQUENZEN -->
       <div
-        v-if="isEditing || (form.stressPhysical.length > 0 || form.stressMental.length > 0) || sections?.konsequenzen !== false"
+        v-if="isEditing || (form.stressPhysical.length > 0 || form.stressMental.length > 0) || sections?.consequences !== false"
         class="sheet-stress-row"
       >
         <div
           v-if="isEditing || form.stressPhysical.length > 0 || form.stressMental.length > 0"
           class="stress-section"
-          :class="{ 'span-full': !isEditing && sections?.konsequenzen === false }"
+          :class="{ 'span-full': !isEditing && sections?.consequences === false }"
         >
           <template v-if="isEditing">
             <div class="stress-track-row">
@@ -424,8 +426,8 @@ defineExpose({ save });
         </div>
 
         <section
-          v-if="isEditing || sections?.konsequenzen !== false"
-          class="sheet-section konsequenzen"
+          v-if="isEditing || sections?.consequences !== false"
+          class="sheet-section consequences"
           :class="{ 'span-full': !isEditing && (sections?.stress === false || (form.stressPhysical.length === 0 && form.stressMental.length === 0)) }"
         >
           <div class="sheet-section-header">KONSEQUENZEN</div>
@@ -502,7 +504,7 @@ defineExpose({ save });
 
 /* Full-width grid children */
 .character-name-bar,
-.allgemeines,
+.general,
 .sheet-stress-row,
 .red-blue-dice-section,
 .gm-notes-section,
@@ -511,7 +513,7 @@ defineExpose({ save });
 }
 
 /* Left-column sections get a right-side divider */
-.aspekte,
+.aspects,
 .extras {
   border-right: 1px solid var(--fate-border);
 }
@@ -560,7 +562,7 @@ defineExpose({ save });
 }
 
 /* ALLGEMEINES */
-.allgemeines-grid {
+.general-grid {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.5rem;
@@ -568,7 +570,7 @@ defineExpose({ save });
   align-items: start;
 }
 
-.allgemeines-right {
+.general-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -764,7 +766,7 @@ defineExpose({ save });
   min-width: 220px;
 }
 
-.konsequenzen {
+.consequences {
   border-bottom: none;
 }
 
@@ -920,7 +922,7 @@ defineExpose({ save });
     grid-template-columns: 1fr;
   }
 
-  .aspekte,
+  .aspects,
   .extras {
     border-right: none;
   }
@@ -935,11 +937,11 @@ defineExpose({ save });
     min-width: 0;
   }
 
-  .allgemeines-grid {
+  .general-grid {
     grid-template-columns: 1fr;
   }
 
-  .allgemeines-right {
+  .general-right {
     align-items: flex-start;
     min-width: 0;
   }
@@ -967,7 +969,7 @@ defineExpose({ save });
     grid-template-columns: 1fr;
   }
 
-  .aspekte,
+  .aspects,
   .extras {
     border-right: none;
   }
@@ -982,11 +984,11 @@ defineExpose({ save });
     min-width: 0;
   }
 
-  .allgemeines-grid {
+  .general-grid {
     grid-template-columns: 1fr;
   }
 
-  .allgemeines-right {
+  .general-right {
     align-items: flex-start;
     min-width: 0;
   }

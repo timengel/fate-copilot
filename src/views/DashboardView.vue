@@ -25,13 +25,13 @@ const showEditButton = useSessionStorage('dashboard-show-edit-btn', true);
 const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list');
 
 const visibleSections = useSessionStorage('dashboard-sections', {
-  allgemeines: true,
-  aspekte: true,
-  fertigkeiten: true,
+  general: true,
+  aspects: true,
+  skills: true,
   extras: true,
   stunts: true,
   stress: true,
-  konsequenzen: true,
+  consequences: true,
   gmNotes: true,
 });
 
@@ -142,15 +142,15 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Sektionen</div>
           <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.allgemeines" />
+            <input type="checkbox" v-model="visibleSections.general" />
             Allgemeines
           </label>
           <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.aspekte" />
+            <input type="checkbox" v-model="visibleSections.aspects" />
             Aspekte
           </label>
           <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.fertigkeiten" />
+            <input type="checkbox" v-model="visibleSections.skills" />
             Fertigkeiten
           </label>
           <label class="filter-label">
@@ -166,7 +166,7 @@ onUnmounted(() => {
             Stress
           </label>
           <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.konsequenzen" />
+            <input type="checkbox" v-model="visibleSections.consequences" />
             Konsequenzen
           </label>
           <label class="filter-label" v-if="gmModeStore.isGMMode">
@@ -225,15 +225,15 @@ onUnmounted(() => {
       <div class="filters-inline-row">
         <span class="filters-inline-label">Sektionen:</span>
         <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.allgemeines" />
+          <input type="checkbox" v-model="visibleSections.general" />
           Allgemeines
         </label>
         <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.aspekte" />
+          <input type="checkbox" v-model="visibleSections.aspects" />
           Aspekte
         </label>
         <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.fertigkeiten" />
+          <input type="checkbox" v-model="visibleSections.skills" />
           Fertigkeiten
         </label>
         <label class="filter-label">
@@ -249,7 +249,7 @@ onUnmounted(() => {
           Stress
         </label>
         <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.konsequenzen" />
+          <input type="checkbox" v-model="visibleSections.consequences" />
           Konsequenzen
         </label>
         <label class="filter-label" v-if="gmModeStore.isGMMode">

@@ -97,11 +97,11 @@ function deleteCharacter(id: string, name: string) {
     </div>
 
     <div v-else class="card-grid">
-      <div
+      <router-link
         v-for="char in filtered"
         :key="char.id"
         class="character-card"
-        @click="router.push(`/characters/${char.id}`)"
+        :to="`/characters/${char.id}`"
       >
         <div class="card-header" :style="cardHeaderStyle(char.color)">
           {{ char.name || '(Unbenannt)' }}
@@ -114,7 +114,7 @@ function deleteCharacter(id: string, name: string) {
           <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/characters/${char.id}/edit`)" />
           <FateButton icon="delete" variant="danger" size="S" @click="deleteCharacter(char.id, char.name)" />
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 
@@ -144,6 +144,8 @@ function deleteCharacter(id: string, name: string) {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
 }
 
 .character-card:hover,

@@ -49,12 +49,12 @@ function deleteCampaign(id: string, name: string) {
       <div v-for="group in groupedCampaigns" :key="group.status" class="status-group">
         <h2 class="status-group-title" :class="`title-${group.status}`">{{ group.label }}</h2>
         <div class="card-grid">
-          <div
+          <router-link
             v-for="campaign in group.campaigns"
             :key="campaign.id"
             class="campaign-card"
             :style="getColorVars(campaign.color)"
-            @click="router.push(`/campaigns/${campaign.id}`)"
+            :to="`/campaigns/${campaign.id}`"
           >
             <div class="card-header">{{ campaign.name }}</div>
             <div class="card-description" v-if="campaign.description">
@@ -75,7 +75,7 @@ function deleteCampaign(id: string, name: string) {
               <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/campaigns/${campaign.id}/edit`)" />
               <FateButton icon="delete" variant="danger" size="S" @click="deleteCampaign(campaign.id, campaign.name)" />
             </div>
-          </div>
+          </router-link>
         </div>
       </div>
     </template>
@@ -126,6 +126,8 @@ function deleteCampaign(id: string, name: string) {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
 }
 
 .campaign-card:hover {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, toRaw } from 'vue';
 import type { Campaign } from '../../types';
 import ColorPicker from '../shared/ColorPicker.vue';
 import FateButton from '../shared/FateButton.vue';
@@ -7,14 +7,14 @@ import FateButton from '../shared/FateButton.vue';
 const props = defineProps<{ campaign: Campaign }>();
 const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>();
 
-const form = reactive<Campaign>(JSON.parse(JSON.stringify(props.campaign)));
+const form = reactive<Campaign>(structuredClone(toRaw(props.campaign)));
 
 function save() {
   if (!form.name.trim()) {
     alert('Bitte einen Kampagnennamen eingeben.');
     return;
   }
-  emit('save', JSON.parse(JSON.stringify(form)));
+  emit('save', structuredClone(toRaw(form)));
 }
 </script>
 
