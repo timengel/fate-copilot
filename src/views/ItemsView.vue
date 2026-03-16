@@ -54,9 +54,9 @@ function deleteItem(id: string, name: string) {
         <div class="card-header" :style="cardHeaderStyle(item.color)">
           {{ item.name || '(Unbenannt)' }}
         </div>
-        <div class="card-actions" @click.stop>
-          <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/items/${item.id}/edit`)" />
-          <FateButton icon="delete" variant="danger" size="S" @click="deleteItem(item.id, item.name)" />
+        <div class="card-actions">
+          <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/items/${item.id}/edit`)" />
+          <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteItem(item.id, item.name)" />
         </div>
       </div>
     </div>

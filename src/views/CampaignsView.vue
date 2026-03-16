@@ -71,9 +71,9 @@ function deleteCampaign(id: string, name: string) {
                 · {{ campaign.milestones.length }} Meilenstein{{ campaign.milestones.length !== 1 ? 'e' : '' }}
               </span>
             </div>
-            <div class="card-actions" @click.stop>
-              <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/campaigns/${campaign.id}/edit`)" />
-              <FateButton icon="delete" variant="danger" size="S" @click="deleteCampaign(campaign.id, campaign.name)" />
+            <div class="card-actions">
+              <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/campaigns/${campaign.id}/edit`)" />
+              <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteCampaign(campaign.id, campaign.name)" />
             </div>
           </div>
         </div>
