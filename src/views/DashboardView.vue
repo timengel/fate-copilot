@@ -8,6 +8,7 @@ import { useToastStore } from '../stores/toast';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
+import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import type { Character } from '../types';
 
 const campaignsStore = useCampaignsStore();
@@ -129,58 +130,25 @@ onUnmounted(() => {
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Charaktere</div>
-          <label class="filter-label">
-            <input type="checkbox" v-model="showSC" />
-            Zeige SC
-          </label>
-          <label class="filter-label" v-if="gmModeStore.isGMMode">
-            <input type="checkbox" v-model="showNSC" />
-            Zeige NSC
-          </label>
+          <FateCheckbox v-model="showSC" label="Zeige SC" />
+          <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="Zeige NSC" />
         </div>
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Sektionen</div>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.general" />
-            Allgemeines
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.aspects" />
-            Aspekte
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.skills" />
-            Fertigkeiten
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.extras" />
-            Extras
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.stunts" />
-            Stunts
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.stress" />
-            Stress
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" v-model="visibleSections.consequences" />
-            Konsequenzen
-          </label>
-          <label class="filter-label" v-if="gmModeStore.isGMMode">
-            <input type="checkbox" v-model="visibleSections.gmNotes" />
-            GM-Notizen
-          </label>
+          <FateCheckbox v-model="visibleSections.general" label="Allgemeines" />
+          <FateCheckbox v-model="visibleSections.aspects" label="Aspekte" />
+          <FateCheckbox v-model="visibleSections.skills" label="Fertigkeiten" />
+          <FateCheckbox v-model="visibleSections.extras" label="Extras" />
+          <FateCheckbox v-model="visibleSections.stunts" label="Stunts" />
+          <FateCheckbox v-model="visibleSections.stress" label="Stress" />
+          <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
+          <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
         </div>
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Aktionen</div>
-          <label class="filter-label">
-            <input type="checkbox" v-model="showEditButton" />
-            Bearbeiten
-          </label>
+          <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
         </div>
 
         <div class="sidebar-group">
@@ -213,53 +181,20 @@ onUnmounted(() => {
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Charaktere:</span>
-        <label class="filter-label">
-          <input type="checkbox" v-model="showSC" />
-          SC
-        </label>
-        <label class="filter-label" v-if="gmModeStore.isGMMode">
-          <input type="checkbox" v-model="showNSC" />
-          NSC
-        </label>
+        <FateCheckbox v-model="showSC" label="SC" />
+        <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="NSC" />
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Sektionen:</span>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.general" />
-          Allgemeines
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.aspects" />
-          Aspekte
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.skills" />
-          Fertigkeiten
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.extras" />
-          Extras
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.stunts" />
-          Stunts
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.stress" />
-          Stress
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="visibleSections.consequences" />
-          Konsequenzen
-        </label>
-        <label class="filter-label" v-if="gmModeStore.isGMMode">
-          <input type="checkbox" v-model="visibleSections.gmNotes" />
-          GM-Notizen
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" v-model="showEditButton" />
-          Bearbeiten
-        </label>
+        <FateCheckbox v-model="visibleSections.general" label="Allgemeines" />
+        <FateCheckbox v-model="visibleSections.aspects" label="Aspekte" />
+        <FateCheckbox v-model="visibleSections.skills" label="Fertigkeiten" />
+        <FateCheckbox v-model="visibleSections.extras" label="Extras" />
+        <FateCheckbox v-model="visibleSections.stunts" label="Stunts" />
+        <FateCheckbox v-model="visibleSections.stress" label="Stress" />
+        <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
+        <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
+        <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Layout:</span>
@@ -440,13 +375,6 @@ onUnmounted(() => {
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.25rem 0;
-}
-
-.filter-label input[type='checkbox'] {
-  accent-color: var(--fate-blue);
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
 }
 
 .dashboard-filters-inline {
