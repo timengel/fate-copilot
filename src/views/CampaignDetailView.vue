@@ -88,9 +88,10 @@ function deleteCampaign() {
   );
 }
 
-const campaignItems = computed(() =>
-  campaign.value ? campaignsStore.getItemsForCampaign(campaign.value.id) : [],
-);
+const campaignItems = computed(() => {
+  const items = campaign.value ? campaignsStore.getItemsForCampaign(campaign.value.id) : [];
+  return items.filter((i) => gmModeStore.isGMMode || !i.hidden);
+});
 
 const availableItems = computed(() =>
   itemsStore.items.filter((i) => !campaignItems.value.some((ci) => ci.id === i.id)),

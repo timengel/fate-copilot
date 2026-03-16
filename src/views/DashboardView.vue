@@ -230,14 +230,15 @@ onUnmounted(() => {
     </div>
 
     <div v-if="!selectedCampaignId" class="dashboard-empty">Keine Kampagne ausgewählt.</div>
-    <div v-else-if="allCharactersInCampaign.length === 0" class="dashboard-empty">
-      Keine Charaktere in dieser Kampagne.
+    <div v-else-if="allCharactersInCampaign.length === 0 && allItemsInCampaign.length === 0" class="dashboard-empty">
+      Keine Charaktere oder Items in dieser Kampagne.
     </div>
-    <div v-else-if="characters.length === 0" class="dashboard-empty">
-      Alle Charaktere sind ausgeblendet.
+    <div v-else-if="characters.length === 0 && items.length === 0" class="dashboard-empty">
+      Alle Charaktere und Items sind ausgeblendet.
     </div>
+
     <div
-      v-else
+      v-if="characters.length > 0"
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
     >
@@ -276,7 +277,7 @@ onUnmounted(() => {
       :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
     >
       <div v-for="item in items" :key="item.id" class="dashboard-entry">
-        <ItemSheet :item="item" />
+        <ItemSheet :item="item" :sections="visibleSections" />
       </div>
     </div>
   </div>

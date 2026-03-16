@@ -15,6 +15,14 @@ const props = defineProps<{
   item: Item;
   mode?: 'view' | 'edit';
   hideActions?: boolean;
+  sections?: {
+    general?: boolean;
+    aspects?: boolean;
+    extras?: boolean;
+    stunts?: boolean;
+    stress?: boolean;
+    gmNotes?: boolean;
+  };
 }>();
 
 const emit = defineEmits<{ save: [item: Item]; cancel: [] }>();
@@ -33,6 +41,15 @@ watch(
 
 const isEditing = computed(() => props.mode === 'edit');
 const data = computed(() => (isEditing.value ? form : props.item));
+
+const show = computed(() => ({
+  general: isEditing.value || (props.sections?.general ?? true),
+  aspects: isEditing.value || (props.sections?.aspects ?? true),
+  extras: isEditing.value || (props.sections?.extras ?? true),
+  stunts: isEditing.value || (props.sections?.stunts ?? true),
+  stress: isEditing.value || (props.sections?.stress ?? true),
+  gmNotes: isEditing.value || (props.sections?.gmNotes ?? true),
+}));
 const isItemHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && !!props.item.hidden,
 );
@@ -121,7 +138,7 @@ defineExpose({ save });
     </div>
 
     <!-- ALLGEMEINES -->
-    <section class="sheet-section allgemeines">
+    <section v-show="show.general" class="sheet-section allgemeines">
       <div class="sheet-section-header">ALLGEMEINES</div>
       <div class="allgemeines-grid">
         <div class="allgemeines-left">
@@ -160,7 +177,7 @@ defineExpose({ save });
     </section>
 
     <!-- ASPEKTE -->
-    <section v-if="isEditing || data.aspects.some(a => a)" class="sheet-section aspekte span-full">
+    <section v-if="show.aspects && (isEditing || data.aspects.some(a => a))" class="sheet-section aspekte span-full">
       <div class="sheet-section-header">ASPEKTE</div>
       <div class="aspect-fields">
         <div v-for="(aspect, i) in (isEditing ? form.aspects : data.aspects)" :key="i" class="aspect-row">
@@ -182,7 +199,7 @@ defineExpose({ save });
     </section>
 
     <!-- EXTRAS -->
-    <section v-if="isEditing || data.extras?.trim()" class="sheet-section extras">
+    <section v-if="show.extras && (isEditing || data.extras?.trim())" class="sheet-section extras">
       <div class="sheet-section-header">EXTRAS</div>
       <textarea
         v-if="isEditing"
@@ -194,7 +211,7 @@ defineExpose({ save });
     </section>
 
     <!-- STUNTS -->
-    <section v-if="isEditing || data.stunts.length > 0" class="sheet-section stunts">
+    <section v-if="show.stunts && (isEditing || data.stunts.length > 0)" class="sheet-section stunts">
       <div class="sheet-section-header">STUNTS</div>
       <div v-if="isEditing" class="stunts-list">
         <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
@@ -227,7 +244,7 @@ defineExpose({ save });
     </section>
 
     <!-- STRESS -->
-    <div v-if="isEditing || data.stressPhysical.length > 0 || data.stressMental.length > 0" class="sheet-stress-row">
+    <div v-if="show.stress && (isEditing || data.stressPhysical.length > 0 || data.stressMental.length > 0)" class="sheet-stress-row">
       <div class="stress-section span-full">
         <div class="sheet-section-header">STRESS</div>
         <div class="stress-content">
@@ -335,7 +352,7 @@ defineExpose({ save });
 
     <!-- GM-NOTIZEN -->
     <section
-      v-if="gmModeStore.isGMMode && (isEditing || data.gmNotes)"
+      v-if="show.gmNotes && gmModeStore.isGMMode && (isEditing || data.gmNotes)"
       class="sheet-section gm-notes-section"
     >
       <div class="sheet-section-header">GM-NOTIZEN</div>
