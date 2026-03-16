@@ -5,8 +5,8 @@ import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
 import StressTrack from './StressTrack.vue';
+import DiceTrack from './DiceTrack.vue';
 import FateButton from '../shared/FateButton.vue';
-import FateCounter from '../shared/FateCounter.vue';
 
 const props = defineProps<{
   item: Item;
@@ -276,17 +276,23 @@ defineExpose({ save });
       class="sheet-section red-blue-dice-section"
     >
       <div class="sheet-section-header">ROTE &amp; BLAUE WÜRFEL</div>
-      <div class="red-blue-dice-grid">
-        <div class="dice-row">
-          <span class="dice-label">🔴 Rote Würfel</span>
-          <FateCounter v-if="isEditing" :modelValue="form.redDice" :min="0" :max="4" @update:modelValue="form.redDice = $event" />
-          <span v-else class="dice-value">{{ data.redDice }}</span>
-        </div>
-        <div class="dice-row">
-          <span class="dice-label">🔵 Blaue Würfel</span>
-          <FateCounter v-if="isEditing" :modelValue="form.blueDice" :min="0" :max="4" @update:modelValue="form.blueDice = $event" />
-          <span v-else class="dice-value">{{ data.blueDice }}</span>
-        </div>
+      <div class="dice-tracks">
+        <DiceTrack
+          v-if="isEditing || data.redDice"
+          label="ROTE WÜRFEL"
+          color="red"
+          :count="isEditing ? form.redDice : data.redDice"
+          :readonly="!isEditing"
+          @update="form.redDice = $event"
+        />
+        <DiceTrack
+          v-if="isEditing || data.blueDice"
+          label="BLAUE WÜRFEL"
+          color="blue"
+          :count="isEditing ? form.blueDice : data.blueDice"
+          :readonly="!isEditing"
+          @update="form.blueDice = $event"
+        />
       </div>
       <p v-if="isEditing" class="dice-hint">
         Rote Würfel ersetzen beim Angriff reguläre Fate-Würfel (+1 Schaden pro +). Blaue Würfel
@@ -629,28 +635,11 @@ defineExpose({ save });
   background: white;
 }
 
-.red-blue-dice-grid {
+.dice-tracks {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-}
-
-.dice-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.dice-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  min-width: 10rem;
-}
-
-.dice-value {
-  font-size: 1rem;
-  font-weight: 600;
 }
 
 .dice-hint {
