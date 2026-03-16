@@ -87,15 +87,15 @@ function deleteItem() {
         @cancel="handleCancel"
       >
         <template #edit-bar-actions>
-          <FateButton icon="close" variant="outline" size="S" @click="handleCancel">Abbrechen</FateButton>
-          <FateButton icon="check" variant="outline" size="S" @click="itemSheetRef?.save()">Speichern</FateButton>
+          <FateButton icon="close" variant="outline" size="M" @click="handleCancel"><span class="btn-label">Abbrechen</span></FateButton>
+          <FateButton icon="check" variant="outline" size="M" @click="itemSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
         </template>
       </ItemSheet>
 
       <ItemSheet v-else :item="item">
         <template v-if="!isNew" #name-bar-actions>
-          <FateButton icon="edit" variant="outline" size="S" @click="isEditing = true">Bearbeiten</FateButton>
-          <FateButton icon="delete" variant="danger" size="S" @click="deleteItem" />
+          <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
+          <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
         </template>
       </ItemSheet>
     </template>

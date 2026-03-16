@@ -354,8 +354,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
-          <FateButton variant="ghost" class="skill-info-close" @click="infoSkill = null"
-            >✕</FateButton
+          <FateButton icon="close" variant="ghost" class="skill-info-close" @click="infoSkill = null"></FateButton
           >
         </div>
         <p class="skill-info-description">{{ selectedInfo.description }}</p>

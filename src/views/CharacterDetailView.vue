@@ -138,16 +138,16 @@ function unassignFromCampaign(campaignId: string) {
         @cancel="handleCancel"
       >
         <template #edit-bar-actions>
-          <FateButton icon="close" variant="outline" size="S" @click="handleCancel">Abbrechen</FateButton>
-          <FateButton icon="check" variant="outline" size="S" @click="charSheetRef?.save()">Speichern</FateButton>
+          <FateButton icon="close" variant="outline" size="M" @click="handleCancel"><span class="btn-label">Abbrechen</span></FateButton>
+          <FateButton icon="check" variant="outline" size="M" @click="charSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
         </template>
       </CharacterSheet>
 
       <template v-else>
         <CharacterSheet :character="character">
           <template v-if="!isNew" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="S" @click="toggleEdit">Bearbeiten</FateButton>
-            <FateButton icon="delete" variant="danger" size="S" @click="deleteCharacter" />
+            <FateButton icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
+            <FateButton icon="delete" variant="danger" size="M" @click="deleteCharacter" />
           </template>
         </CharacterSheet>
 
@@ -162,7 +162,7 @@ function unassignFromCampaign(campaignId: string) {
               <span class="assignment-name" @click="router.push(`/campaigns/${campaign.id}`)">
                 {{ campaign.name }}
               </span>
-              <FateButton variant="danger" size="S" @click="unassignFromCampaign(campaign.id)"
+              <FateButton variant="danger" size="M" @click="unassignFromCampaign(campaign.id)"
                 >Entfernen</FateButton
               >
             </div>

@@ -136,7 +136,6 @@ button {
 .fate-btn--add {
   background: var(--fate-blue-light);
   color: var(--fate-blue);
-  margin-top: 0.5rem;
 }
 .fate-btn--add:hover {
   background: color-mix(in srgb, var(--fate-blue-light) 60%, var(--fate-blue) 40%);

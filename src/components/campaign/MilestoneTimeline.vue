@@ -89,10 +89,8 @@ function cancelEdit() {
             @keydown.enter="saveEdit(m.id)"
             @keydown.escape="cancelEdit"
           />
-          <FateButton variant="add" size="S" @click="saveEdit(m.id)">✓</FateButton>
-          <FateButton variant="ghost" size="S" class="milestone-remove" @click="cancelEdit"
-            >✕</FateButton
-          >
+          <FateButton icon="check" variant="add" size="S" @click="saveEdit(m.id)"></FateButton>
+          <FateButton icon="close" variant="ghost" size="S" class="milestone-remove" @click="cancelEdit"></FateButton>
         </div>
 
         <!-- View mode -->
@@ -103,17 +101,18 @@ function cancelEdit() {
             v-if="!readonly && i === milestones.length - 1"
             variant="danger-outline"
             size="S"
+            icon="close"
             class="milestone-remove"
-            @click="emit('remove', m.id)"
-            >✕</FateButton
-          >
+            @click="emit('remove', m.id)">
+            </FateButton>
           <FateButton
             v-if="!readonly"
             variant="ghost"
+            icon="edit"
             size="S"
             class="milestone-edit"
             @click="startEdit(m)"
-            >✎</FateButton
+            ></FateButton
           >
         </div>
       </div>

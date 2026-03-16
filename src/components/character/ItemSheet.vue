@@ -150,7 +150,7 @@ defineExpose({ save });
               placeholder="Aspekt"
               @input="onAspectInput(i, $event)"
             />
-            <FateButton variant="danger" size="S" @click="removeAspect(i)">✕</FateButton>
+            <FateButton variant="danger" size="M" icon="close" @click="removeAspect(i)" />
           </template>
         </div>
         <div v-if="isEditing" class="aspect-add-row">
@@ -191,7 +191,7 @@ defineExpose({ save });
               @input="updateStunt(i, 'description', ($event.target as HTMLTextAreaElement).value)"
             />
           </div>
-          <FateButton variant="danger" size="S" @click="removeStunt(i)">✕</FateButton>
+          <FateButton icon="close" variant="danger" size="S" @click="removeStunt(i)"></FateButton>
         </div>
         <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
       </div>
@@ -626,8 +626,8 @@ defineExpose({ save });
 }
 
 .stress-ctrl-btn {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--fate-border);
   border-radius: 3px;
   background: white;
@@ -774,13 +774,15 @@ defineExpose({ save });
     justify-content: flex-end;
   }
 
-  .form-actions .btn-label {
+  .form-actions .btn-label,
+  .item-name-bar :deep(.btn-label) {
     display: none;
   }
 
-  .form-actions :deep(.fate-btn) {
+  .form-actions :deep(.fate-btn),
+  .item-name-bar :deep(.fate-btn) {
     padding: 0;
-    width: 32px;
+    width: var(--btn-size, 32px);
     justify-content: center;
   }
 }
@@ -801,13 +803,15 @@ defineExpose({ save });
     justify-content: flex-end;
   }
 
-  .form-actions .btn-label {
+  .form-actions .btn-label,
+  .item-name-bar :deep(.btn-label) {
     display: none;
   }
 
-  .form-actions :deep(.fate-btn) {
+  .form-actions :deep(.fate-btn),
+  .item-name-bar :deep(.fate-btn) {
     padding: 0;
-    width: 32px;
+    width: var(--btn-size, 32px);
     justify-content: center;
   }
 }

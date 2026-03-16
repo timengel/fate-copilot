@@ -10,6 +10,7 @@ import StressTrack from './StressTrack.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
+import FateIcon from '../shared/FateIcon.vue';
 
 const props = defineProps<{
   character: Character;
@@ -330,7 +331,7 @@ defineExpose({ save });
                 @input="onStuntDescInput(i, $event)"
               />
             </div>
-            <FateButton variant="danger" size="S" @click="removeStunt(i)">✕</FateButton>
+            <FateButton icon="close" variant="danger" size="M" @click="removeStunt(i)" name="close"></FateButton>
           </div>
           <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
         </div>
@@ -762,7 +763,7 @@ defineExpose({ save });
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--fate-border);
-  min-width: 220px;
+  min-width: 240px;
 }
 
 .stress-content {
@@ -799,8 +800,8 @@ defineExpose({ save });
 }
 
 .stress-ctrl-btn {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--fate-border);
   border-radius: 3px;
   background: white;
@@ -959,13 +960,15 @@ defineExpose({ save });
 }
 
 @container character-card (width < 480px) {
-  .form-actions .btn-label {
+  .form-actions .btn-label,
+  .character-name-bar :deep(.btn-label) {
     display: none;
   }
 
-  .form-actions :deep(.fate-btn) {
+  .form-actions :deep(.fate-btn),
+  .character-name-bar :deep(.fate-btn) {
     padding: 0;
-    width: 32px;
+    width: var(--btn-size, 32px);
     justify-content: center;
   }
 }
@@ -1006,13 +1009,15 @@ defineExpose({ save });
 }
 
 @container main (width < 480px) {
-  .form-actions .btn-label {
+  .form-actions .btn-label,
+  .character-name-bar :deep(.btn-label) {
     display: none;
   }
 
-  .form-actions :deep(.fate-btn) {
+  .form-actions :deep(.fate-btn),
+  .character-name-bar :deep(.fate-btn) {
     padding: 0;
-    width: 32px;
+    width: var(--btn-size, 32px);
     justify-content: center;
   }
 }

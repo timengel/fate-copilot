@@ -297,18 +297,18 @@ onUnmounted(() => {
           @cancel="editingId = null"
         >
           <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="S" @click="editingId = null"
-              >Abbrechen</FateButton
+            <FateButton icon="close" variant="outline" size="M" @click="editingId = null"
+              ><span class="btn-label">Abbrechen</span></FateButton
             >
-            <FateButton icon="check" variant="outline" size="S" @click="saveEditing"
-              >Speichern</FateButton
+            <FateButton icon="check" variant="outline" size="M" @click="saveEditing"
+              ><span class="btn-label">Speichern</span></FateButton
             >
           </template>
         </CharacterSheet>
         <CharacterSheet v-else :character="character" :sections="visibleSections">
           <template v-if="showEditButton" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="S" @click="editingId = character.id"
-              >Bearbeiten</FateButton
+            <FateButton icon="edit" variant="outline" size="M" @click="editingId = character.id"
+              ><span class="btn-label">Bearbeiten</span></FateButton
             >
           </template>
         </CharacterSheet>

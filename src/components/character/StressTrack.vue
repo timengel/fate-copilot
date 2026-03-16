@@ -65,12 +65,13 @@ function toggle(index: number) {
 }
 
 .stress-box input[type='checkbox'] {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   margin: 0;
   cursor: pointer;
   appearance: none;
-  border: 2px solid var(--fate-blue);
+  border: 3px solid var(--fate-blue);
+  box-sizing: border-box;
   border-radius: 2px;
   background: white;
   position: relative;
@@ -85,7 +86,7 @@ function toggle(index: number) {
   content: '✕';
   position: absolute;
   color: white;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 700;
   top: 50%;
   left: 50%;

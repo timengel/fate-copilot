@@ -45,11 +45,11 @@ function deleteItem(id: string, name: string) {
     </div>
 
     <div v-else class="card-grid">
-      <router-link
+      <div
         v-for="item in filtered"
         :key="item.id"
         class="character-card"
-        :to="`/items/${item.id}`"
+        @click="router.push(`/items/${item.id}`)"
       >
         <div class="card-header" :style="cardHeaderStyle(item.color)">
           {{ item.name || '(Unbenannt)' }}
@@ -58,7 +58,7 @@ function deleteItem(id: string, name: string) {
           <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/items/${item.id}/edit`)" />
           <FateButton icon="delete" variant="danger" size="S" @click="deleteItem(item.id, item.name)" />
         </div>
-      </router-link>
+      </div>
     </div>
   </div>
 
@@ -87,8 +87,6 @@ function deleteItem(id: string, name: string) {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  text-decoration: none;
-  color: inherit;
 }
 
 .character-card:hover {
