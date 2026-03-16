@@ -273,7 +273,7 @@ defineExpose({ save });
 
       <!-- EXTRAS -->
       <section
-        v-if="isEditing || sections?.extras !== false"
+        v-if="isEditing || (sections?.extras !== false && data.extras?.trim())"
         class="sheet-section extras"
         :class="{ 'span-full': !isEditing && sections?.stunts === false }"
       >
@@ -299,7 +299,7 @@ defineExpose({ save });
 
       <!-- STUNTS -->
       <section
-        v-if="isEditing || sections?.stunts !== false"
+        v-if="isEditing || (sections?.stunts !== false && data.stunts.length > 0)"
         class="sheet-section stunts"
         :class="{ 'span-full': !isEditing && sections?.extras === false }"
       >
@@ -349,10 +349,12 @@ defineExpose({ save });
         class="sheet-stress-row"
       >
         <div
-          v-if="isEditing || form.stressPhysical.length > 0 || form.stressMental.length > 0"
+          v-if="isEditing || (sections?.stress !== false && (form.stressPhysical.length > 0 || form.stressMental.length > 0))"
           class="stress-section"
           :class="{ 'span-full': !isEditing && sections?.consequences === false }"
         >
+          <div class="sheet-section-header">STRESS</div>
+          <div class="stress-content">
           <template v-if="isEditing">
             <div class="stress-track-row">
               <div class="stress-track-wrap">
@@ -423,6 +425,7 @@ defineExpose({ save });
               @update="form.stressMental = $event"
             />
           </template>
+          </div>
         </div>
 
         <section
@@ -648,7 +651,6 @@ defineExpose({ save });
 /* EXTRAS / STUNTS */
 .text-area-display {
   padding: 0.5rem 0.75rem;
-  min-height: 120px;
   white-space: pre-wrap;
   font-size: 0.875rem;
   color: var(--fate-text);
@@ -670,7 +672,6 @@ defineExpose({ save });
 
 .stunts-list {
   padding: 0.5rem 0.75rem;
-  min-height: 120px;
 }
 
 /* View mode stunt display */
@@ -758,12 +759,17 @@ defineExpose({ save });
 }
 
 .stress-section {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--fate-border);
+  min-width: 220px;
+}
+
+.stress-content {
   padding: 0.5rem 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  border-right: 1px solid var(--fate-border);
-  min-width: 220px;
 }
 
 .consequences {

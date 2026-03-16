@@ -128,6 +128,7 @@ function deleteCampaign(id: string, name: string) {
   flex-direction: column;
   text-decoration: none;
   color: inherit;
+  max-height: 210px;
 }
 
 .campaign-card:hover {
@@ -148,6 +149,11 @@ function deleteCampaign(id: string, name: string) {
   padding: 0.25rem 0.9rem;
   font-size: 0.8rem;
   color: var(--fate-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-meta {

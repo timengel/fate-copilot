@@ -210,7 +210,7 @@ function removeCol() {
   display: block;
   border-bottom: 1px solid var(--fate-border);
   height: 1.6em;
-  padding: 1px 3px;
+  padding: 0;
   font-size: 0.8rem;
   color: var(--fate-text);
   text-align: left;

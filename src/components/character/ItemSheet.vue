@@ -207,6 +207,8 @@ defineExpose({ save });
     <!-- STRESS -->
     <div v-if="isEditing || data.stressPhysical.length > 0 || data.stressMental.length > 0" class="sheet-stress-row">
       <div class="stress-section span-full">
+        <div class="sheet-section-header">STRESS</div>
+        <div class="stress-content">
         <template v-if="isEditing">
           <div class="stress-track-row">
             <div class="stress-track-wrap">
@@ -275,6 +277,7 @@ defineExpose({ save });
             :boxes="data.stressMental"
           />
         </template>
+        </div>
       </div>
     </div>
 
@@ -490,7 +493,6 @@ defineExpose({ save });
 /* EXTRAS / STUNTS */
 .text-area-display {
   padding: 0.5rem 0.75rem;
-  min-height: 120px;
   white-space: pre-wrap;
   font-size: 0.875rem;
   color: var(--fate-text);
@@ -512,7 +514,6 @@ defineExpose({ save });
 
 .stunts-list {
   padding: 0.5rem 0.75rem;
-  min-height: 120px;
 }
 
 .stunt-item {
@@ -592,6 +593,11 @@ defineExpose({ save });
 }
 
 .stress-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.stress-content {
   padding: 0.5rem 0.75rem;
   display: flex;
   flex-direction: column;

@@ -106,9 +106,11 @@ function deleteCharacter(id: string, name: string) {
         <div class="card-header" :style="cardHeaderStyle(char.color)">
           {{ char.name || '(Unbenannt)' }}
         </div>
-        <div class="card-concept">{{ char.highConcept || '—' }}</div>
-        <div class="card-trouble" v-if="char.trouble">
-          <em>{{ char.trouble }}</em>
+        <div class="card-description">
+          <div class="card-concept">{{ char.highConcept || '—' }}</div>
+          <div class="card-trouble" v-if="char.trouble">
+            <em>{{ char.trouble }}</em>
+          </div>
         </div>
         <div class="card-actions" @click.stop>
           <FateButton icon="edit" variant="secondary" size="S" @click="router.push(`/characters/${char.id}/edit`)" />
@@ -131,8 +133,7 @@ function deleteCharacter(id: string, name: string) {
 </template>
 
 <style scoped>
-.character-card,
-.campaign-card {
+.character-card {
   background: white;
   border: 1px solid var(--fate-border);
   border-radius: 6px;
@@ -146,10 +147,10 @@ function deleteCharacter(id: string, name: string) {
   flex-direction: column;
   text-decoration: none;
   color: inherit;
+  max-height: 210px;
 }
 
-.character-card:hover,
-.campaign-card:hover {
+.character-card:hover {
   box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
   border-color: var(--fate-blue);
 }
@@ -166,12 +167,22 @@ function deleteCharacter(id: string, name: string) {
   padding: 0.5rem 0.9rem 0.25rem;
   font-size: 0.875rem;
   color: var(--fate-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-trouble {
   padding: 0 0.9rem 0.25rem;
   font-size: 0.8rem;
   color: var(--fate-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-actions {
