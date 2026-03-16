@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import type { CharacterType } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
+import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { getColorVars } from '../composables/useColorVars';
@@ -104,6 +105,7 @@ function deleteCharacter(id: string, name: string) {
         @click="router.push(`/characters/${char.id}`)"
       >
         <div class="card-header" :style="cardHeaderStyle(char.color)">
+          <FateAvatar :value="char.avatar" size="S" />
           {{ char.name || '(Unbenannt)' }}
         </div>
         <div class="card-description">
@@ -159,6 +161,9 @@ function deleteCharacter(id: string, name: string) {
   font-weight: 700;
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .card-concept {

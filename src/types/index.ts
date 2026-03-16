@@ -92,6 +92,7 @@ export interface Character {
   pyramidMaxLevel?: number;
   pyramidMaxCols?: number;
   color?: string;
+  avatar?: string;
 }
 
 export interface Item {
@@ -106,6 +107,7 @@ export interface Item {
   stressMental: StressBox[];
   gmNotes?: string;
   color?: string;
+  avatar?: string;
   redDice: number;
   blueDice: number;
 }

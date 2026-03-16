@@ -4,6 +4,8 @@ import type { Item, Stunt } from '../../types';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
+import FateAvatar from '../shared/FateAvatar.vue';
+import AvatarPicker from '../shared/AvatarPicker.vue';
 import StressTrack from './StressTrack.vue';
 import DiceTrack from './DiceTrack.vue';
 import FateButton from '../shared/FateButton.vue';
@@ -94,6 +96,7 @@ defineExpose({ save });
   <div class="item-sheet" :style="colorVars">
     <!-- Name Bar -->
     <div class="item-name-bar">
+      <FateAvatar :value="data.avatar" />
       <span class="item-name-text">{{ data.name || '(Unbenannt)' }}</span>
       <span v-if="!isEditing" class="item-type-badge">ITEM</span>
       <div class="item-name-bar-end">
@@ -132,6 +135,10 @@ defineExpose({ save });
           <div v-if="isEditing" class="field-row">
             <label class="field-label">Farbe</label>
             <ColorPicker v-model="form.color" />
+          </div>
+          <div v-if="isEditing" class="field-row">
+            <label class="field-label">Avatar</label>
+            <AvatarPicker v-model="form.avatar" />
           </div>
         </div>
       </div>

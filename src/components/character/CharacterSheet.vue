@@ -11,6 +11,8 @@ import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
 import FateIcon from '../shared/FateIcon.vue';
+import FateAvatar from '../shared/FateAvatar.vue';
+import AvatarPicker from '../shared/AvatarPicker.vue';
 
 const props = defineProps<{
   character: Character;
@@ -158,6 +160,7 @@ defineExpose({ save });
     <template v-else>
       <!-- Name Bar -->
       <div class="character-name-bar">
+        <FateAvatar :value="data.avatar" />
         <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
         <span v-if="!isEditing" class="character-type-badge">{{
           data.type === 'nsc' ? 'NSC' : 'SC'
@@ -201,6 +204,10 @@ defineExpose({ save });
             <div v-if="isEditing" class="field-row">
               <label class="field-label">Farbe</label>
               <ColorPicker v-model="form.color" />
+            </div>
+            <div v-if="isEditing" class="field-row">
+              <label class="field-label">Avatar</label>
+              <AvatarPicker v-model="form.avatar" />
             </div>
           </div>
           <div class="general-right">

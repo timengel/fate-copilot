@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
 import FateButton from '../components/shared/FateButton.vue';
+import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { getColorVars } from '../composables/useColorVars';
@@ -52,7 +53,14 @@ function deleteItem(id: string, name: string) {
         @click="router.push(`/items/${item.id}`)"
       >
         <div class="card-header" :style="cardHeaderStyle(item.color)">
+          <FateAvatar :value="item.avatar" size="S" />
           {{ item.name || '(Unbenannt)' }}
+        </div>
+        <div v-if="item.description" class="card-description">{{ item.description }}</div>
+        <div v-if="item.redDice || item.blueDice" class="card-meta">
+          <span v-if="item.redDice">{{ item.redDice }} 🟥</span>
+          <span v-if="item.redDice && item.blueDice"> · </span>
+          <span v-if="item.blueDice">{{ item.blueDice }} 🟦</span>
         </div>
         <div class="card-actions">
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/items/${item.id}/edit`)" />
@@ -100,6 +108,25 @@ function deleteItem(id: string, name: string) {
   font-weight: 700;
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-description {
+  padding: 0.25rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  padding: 0.1rem 0.9rem 0.25rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
 }
 
 .card-actions {

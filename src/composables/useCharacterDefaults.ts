@@ -51,6 +51,7 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     consequences,
     notes: '',
     color: 'pfau',
+    avatar: '',
   };
 }
 
@@ -66,6 +67,7 @@ export function createDefaultItem(): Item {
     stressPhysical: [],
     stressMental: [],
     color: 'pfau',
+    avatar: '',
     redDice: 0,
     blueDice: 0,
   };
