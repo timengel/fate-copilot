@@ -286,6 +286,20 @@ describe('CharacterSheet (view mode)', () => {
     renderView(char);
     expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
   });
+
+  it('lets the stress section span the full row when consequences are hidden', () => {
+    const char: Character = {
+      ...createDefaultCharacter(),
+      stressPhysical: [{ value: 1, checked: false }],
+      consequences: [
+        { severity: 2, label: 'mild', value: '' },
+        { severity: 4, label: 'moderate', value: '' },
+      ],
+    };
+    const { container } = renderView(char);
+    expect(container.querySelector('.stress-section')?.classList.contains('span-full')).toBe(true);
+    expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+  });
 });
 
 // ─── Dirty-state: save/cancel button visibility ───────────────────────────

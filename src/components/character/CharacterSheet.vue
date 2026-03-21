@@ -69,6 +69,16 @@ const isDirty = computed(
 
 const data = computed(() => (isEditing.value ? form : props.character));
 const visibleConsequences = computed(() => data.value.consequences.filter((con) => con.value.trim() !== ''));
+const hasVisibleStress = computed(
+  () => isEditing.value || (sectionsEnabled('stress') && (data.value.stressPhysical.length > 0 || data.value.stressMental.length > 0)),
+);
+const hasVisibleConsequences = computed(
+  () => isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
+);
+
+function sectionsEnabled(section: 'stress' | 'consequences') {
+  return props.sections?.[section] !== false;
+}
 
 const isNscHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && props.character.type === 'nsc',
@@ -383,13 +393,13 @@ defineExpose({ save });
 
       <!-- STRESS + KONSEQUENZEN -->
       <div
-        v-if="isEditing || (data.stressPhysical.length > 0 || data.stressMental.length > 0) || sections?.consequences !== false"
+        v-if="hasVisibleStress || hasVisibleConsequences"
         class="sheet-stress-row"
       >
         <div
-          v-if="isEditing || (sections?.stress !== false && (data.stressPhysical.length > 0 || data.stressMental.length > 0))"
+          v-if="hasVisibleStress"
           class="stress-section"
-          :class="{ 'span-full': !isEditing && sections?.consequences === false }"
+          :class="{ 'span-full': !hasVisibleConsequences }"
         >
           <div class="sheet-section-header">STRESS</div>
           <div class="stress-content">
@@ -467,9 +477,9 @@ defineExpose({ save });
         </div>
 
         <section
-          v-if="isEditing || (sections?.consequences !== false && visibleConsequences.length > 0)"
+          v-if="hasVisibleConsequences"
           class="sheet-section consequences"
-          :class="{ 'span-full': !isEditing && (sections?.stress === false || (data.stressPhysical.length === 0 && data.stressMental.length === 0)) }"
+          :class="{ 'span-full': !hasVisibleStress }"
         >
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <template v-if="isEditing">
