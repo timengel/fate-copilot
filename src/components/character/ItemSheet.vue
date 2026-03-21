@@ -276,22 +276,22 @@ defineExpose({ save });
               />
             </div>
             <div class="stress-track-controls">
-              <button
-                type="button"
+              <FateButton
                 class="stress-ctrl-btn"
+                variant="counter"
+                size="S"
+                icon="minus"
                 :disabled="form.stressPhysical.length === 0"
                 @click="removeStressBox('physical')"
-              >
-                −
-              </button>
-              <button
-                type="button"
+              />
+              <FateButton
                 class="stress-ctrl-btn"
+                variant="counter"
+                size="S"
+                icon="plus"
                 :disabled="form.stressPhysical.length >= 6"
                 @click="addStressBox('physical')"
-              >
-                +
-              </button>
+              />
             </div>
           </div>
           <div class="stress-track-row">
@@ -303,22 +303,22 @@ defineExpose({ save });
               />
             </div>
             <div class="stress-track-controls">
-              <button
-                type="button"
+              <FateButton
                 class="stress-ctrl-btn"
+                variant="counter"
+                size="S"
+                icon="minus"
                 :disabled="form.stressMental.length === 0"
                 @click="removeStressBox('mental')"
-              >
-                −
-              </button>
-              <button
-                type="button"
+              />
+              <FateButton
                 class="stress-ctrl-btn"
+                variant="counter"
+                size="S"
+                icon="plus"
                 :disabled="form.stressMental.length >= 6"
                 @click="addStressBox('mental')"
-              >
-                +
-              </button>
+              />
             </div>
           </div>
         </template>
@@ -766,29 +766,7 @@ defineExpose({ save });
 }
 
 .stress-ctrl-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
-  border-radius: 4px;
-  background: color-mix(in srgb, white 92%, var(--fate-blue-light) 8%);
-  color: var(--fate-text);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
   padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stress-ctrl-btn:hover:not(:disabled) {
-  border-color: var(--fate-blue);
-  color: var(--fate-blue);
-}
-
-.stress-ctrl-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
 }
 
 /* RED & BLUE DICE */

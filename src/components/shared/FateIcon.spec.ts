@@ -50,6 +50,16 @@ describe('FateIcon', () => {
       expect(container.querySelectorAll('path').length).toBe(3);
     });
 
+    it('renders minus icon with one line', () => {
+      const { container } = render(FateIcon, { props: { name: 'minus' } });
+      expect(container.querySelectorAll('line').length).toBe(1);
+    });
+
+    it('renders plus icon with two lines', () => {
+      const { container } = render(FateIcon, { props: { name: 'plus' } });
+      expect(container.querySelectorAll('line').length).toBe(2);
+    });
+
     it('renders add icon with two lines', () => {
       const { container } = render(FateIcon, { props: { name: 'add' } });
       expect(container.querySelectorAll('line').length).toBe(2);

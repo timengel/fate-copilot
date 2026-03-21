@@ -11,7 +11,7 @@ withDefaults(
   }>(),
   {
     min: 0,
-    size: 'XS',
+    size: 'S',
   },
 );
 
@@ -24,22 +24,26 @@ const emit = defineEmits<{
   <div class="fate-counter">
     <FateButton
       variant="counter"
+      icon="minus"
       :size="size"
+      aria-label="Verringern"
+      title="Verringern"
       @click="emit('update:modelValue', Math.max(min, modelValue - 1))"
-      >−</FateButton
-    >
+    />
     <span class="fate-counter-value">{{ modelValue }}</span>
     <FateButton
       variant="counter"
+      icon="plus"
       :size="size"
+      aria-label="Erhöhen"
+      title="Erhöhen"
       @click="
         emit(
           'update:modelValue',
           max !== undefined ? Math.min(max, modelValue + 1) : modelValue + 1,
         )
       "
-      >+</FateButton
-    >
+    />
   </div>
 </template>
 

@@ -40,6 +40,8 @@ export type ButtonIcon =
   | 'edit'
   | 'archive'
   | 'unarchive'
+  | 'minus'
+  | 'plus'
   | 'add'
   | 'close'
   | 'check'

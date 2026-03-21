@@ -204,6 +204,11 @@ button:disabled {
   padding: 0;
 }
 
+.fate-btn--counter:hover {
+  background: var(--fate-blue-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
 .fate-btn--info {
   background: var(--fate-blue);
   color: white;
