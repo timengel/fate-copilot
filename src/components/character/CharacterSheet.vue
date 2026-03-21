@@ -353,11 +353,11 @@ defineExpose({ save });
 
       <!-- STRESS + KONSEQUENZEN -->
       <div
-        v-if="isEditing || (form.stressPhysical.length > 0 || form.stressMental.length > 0) || sections?.consequences !== false"
+        v-if="isEditing || (data.stressPhysical.length > 0 || data.stressMental.length > 0) || sections?.consequences !== false"
         class="sheet-stress-row"
       >
         <div
-          v-if="isEditing || (sections?.stress !== false && (form.stressPhysical.length > 0 || form.stressMental.length > 0))"
+          v-if="isEditing || (sections?.stress !== false && (data.stressPhysical.length > 0 || data.stressMental.length > 0))"
           class="stress-section"
           :class="{ 'span-full': !isEditing && sections?.consequences === false }"
         >
@@ -421,16 +421,16 @@ defineExpose({ save });
           </template>
           <template v-else>
             <StressTrack
-              v-if="form.stressPhysical.length > 0"
+              v-if="data.stressPhysical.length > 0"
               label="KÖRPERLICHER STRESS (KRAFT)"
-              :boxes="form.stressPhysical"
-              @update="form.stressPhysical = $event"
+              :boxes="data.stressPhysical"
+              @update="(boxes) => { form.stressPhysical = boxes; save(); }"
             />
             <StressTrack
-              v-if="form.stressMental.length > 0"
+              v-if="data.stressMental.length > 0"
               label="GEISTIGER STRESS (WILLE)"
-              :boxes="form.stressMental"
-              @update="form.stressMental = $event"
+              :boxes="data.stressMental"
+              @update="(boxes) => { form.stressMental = boxes; save(); }"
             />
           </template>
           </div>
@@ -439,7 +439,7 @@ defineExpose({ save });
         <section
           v-if="isEditing || sections?.consequences !== false"
           class="sheet-section consequences"
-          :class="{ 'span-full': !isEditing && (sections?.stress === false || (form.stressPhysical.length === 0 && form.stressMental.length === 0)) }"
+          :class="{ 'span-full': !isEditing && (sections?.stress === false || (data.stressPhysical.length === 0 && data.stressMental.length === 0)) }"
         >
           <div class="sheet-section-header">KONSEQUENZEN</div>
           <template v-if="isEditing">
