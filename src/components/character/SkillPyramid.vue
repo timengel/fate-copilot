@@ -208,7 +208,7 @@ function removeCol() {
 
 .skill-value {
   display: block;
-  border-bottom: 1px solid var(--fate-border);
+  border-bottom: 1px solid var(--fate-light-border);
   height: 1.6em;
   padding: 0;
   font-size: 0.8rem;
@@ -222,7 +222,7 @@ function removeCol() {
 .skill-input {
   width: 100%;
   border: none;
-  border-bottom: 1px solid var(--fate-border);
+  border-bottom: 1px solid var(--fate-light-border);
   padding: 2px 3px;
   font-size: 0.8rem;
   font-family: inherit;

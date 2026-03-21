@@ -54,7 +54,7 @@ function onValueInput(i: number, e: Event) {
   align-items: center;
   gap: 0.5rem;
   padding: 3px 0;
-  border-bottom: 1px solid var(--fate-blue-light);
+  border-bottom: 1px solid var(--fate-light-border);
 }
 
 .consequence-row:last-child {
@@ -82,7 +82,6 @@ function onValueInput(i: number, e: Event) {
   flex: 1;
   font-size: 0.875rem;
   color: var(--fate-text);
-  border-bottom: 1px solid var(--fate-border);
   min-height: 1.4em;
   padding: 1px 2px;
 }
@@ -90,7 +89,6 @@ function onValueInput(i: number, e: Event) {
 .consequence-input {
   flex: 1;
   border: none;
-  border-bottom: 1px solid var(--fate-border);
   padding: 2px 4px;
   font-size: 0.875rem;
   font-family: inherit;

@@ -83,7 +83,7 @@ function onAspectInput(index: number, e: Event) {
   align-items: baseline;
   gap: 0.5rem;
   padding: 3px 0.75rem;
-  border-bottom: 1px solid var(--fate-blue-light);
+  border-bottom: 1px solid var(--fate-light-border);
 }
 
 .aspect-row:last-child {
@@ -110,7 +110,6 @@ function onAspectInput(index: number, e: Event) {
 .aspect-input {
   flex: 1;
   border: none;
-  border-bottom: 1px solid var(--fate-border);
   padding: 2px 4px;
   font-size: 0.875rem;
   font-family: inherit;

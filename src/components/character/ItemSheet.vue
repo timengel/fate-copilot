@@ -410,11 +410,12 @@ defineExpose({ save });
 .item-sheet {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: white;
-  border: 1px solid var(--fate-border);
+  background: color-mix(in srgb, white 72%, var(--fate-blue-light) 28%);
+  border: 1px solid var(--fate-blue-light);
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 .item-sheet--hidden {
@@ -476,7 +477,7 @@ defineExpose({ save });
 
 /* Left-column sections get a right-side divider */
 .extras {
-  border-right: 1px solid var(--fate-border);
+  border-right: none;
 }
 
 .span-full {
@@ -554,10 +555,12 @@ defineExpose({ save });
 }
 
 .field-value {
-  border-bottom: 1px solid var(--fate-border);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
   min-width: 120px;
   min-height: 1.4em;
-  padding: 1px 2px;
+  padding: 0.3rem 0.45rem;
   color: var(--fate-text);
   font-size: 0.875rem;
 }
@@ -568,33 +571,34 @@ defineExpose({ save });
 }
 
 .field-input {
-  border: none;
-  border-bottom: 1px solid var(--fate-border);
-  padding: 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: transparent;
+  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
   width: 100%;
   outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .field-input:focus {
-  border-bottom-color: var(--fate-blue);
+  border-color: var(--fate-blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, white 30%);
 }
 
 .field-textarea {
   field-sizing: content;
   resize: vertical;
   min-height: 3em;
-  border: 1px solid var(--fate-border);
-  border-radius: 3px;
-  padding: 4px;
+  padding: 0.45rem 0.55rem;
 }
 
 /* SHEET SECTION */
 .sheet-section {
-  border-bottom: 1px solid var(--fate-border);
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .sheet-section-header {
@@ -611,24 +615,28 @@ defineExpose({ save });
 
 /* EXTRAS / STUNTS */
 .text-area-display {
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 0.75rem;
   white-space: pre-wrap;
   font-size: 0.875rem;
   color: var(--fate-text);
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .text-area-input {
   field-sizing: content;
   width: 100%;
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: transparent;
+  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
   resize: vertical;
   outline: none;
   min-height: 80px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .stunts-list {
@@ -656,14 +664,14 @@ defineExpose({ save });
 }
 
 .stunt-name-input {
-  border: none;
-  border-bottom: 1px solid var(--fate-border);
-  padding: 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
   font-size: 0.8rem;
   font-family: inherit;
   font-weight: 600;
   color: var(--fate-text);
-  background: transparent;
+  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
   outline: none;
   width: 100%;
 }
@@ -671,13 +679,13 @@ defineExpose({ save });
 .stunt-desc-textarea {
   field-sizing: content;
   resize: none;
-  border: none;
-  border-bottom: 1px solid var(--fate-border);
-  padding: 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
   font-size: 0.75rem;
   font-family: inherit;
   color: var(--fate-text-light);
-  background: transparent;
+  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
   outline: none;
   width: 100%;
   min-height: 1.5em;
@@ -686,7 +694,7 @@ defineExpose({ save });
 
 .stunt-name-input:focus,
 .stunt-desc-textarea:focus {
-  border-bottom-color: var(--fate-blue);
+  border-color: var(--fate-blue);
 }
 
 /* SECTION TOGGLE */
@@ -708,7 +716,7 @@ defineExpose({ save });
 /* STRESS */
 .sheet-stress-row {
   grid-column: 1 / -1;
-  border-bottom: 1px solid var(--fate-border);
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
 }
 
 .stress-section {
@@ -747,9 +755,9 @@ defineExpose({ save });
 .stress-ctrl-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid var(--fate-border);
-  border-radius: 3px;
-  background: white;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  background: color-mix(in srgb, white 92%, var(--fate-blue-light) 8%);
   color: var(--fate-text);
   font-size: 1rem;
   line-height: 1;
@@ -772,7 +780,7 @@ defineExpose({ save });
 
 /* RED & BLUE DICE */
 .red-blue-dice-section {
-  background: white;
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
 }
 
 .dice-tracks {
@@ -793,7 +801,7 @@ defineExpose({ save });
 
 /* GM NOTES */
 .gm-notes-section {
-  background: white;
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
 }
 
 .gm-options-divider {
@@ -812,8 +820,8 @@ defineExpose({ save });
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 0.75rem;
-  border-top: 1px solid var(--fate-border);
-  background: var(--fate-blue-light);
+  background: color-mix(in srgb, white 88%, var(--fate-blue-light) 12%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 /* ASPECTS */
@@ -826,7 +834,8 @@ defineExpose({ save });
   align-items: baseline;
   gap: 0.5rem;
   padding: 3px 0.75rem;
-  border-bottom: 1px solid var(--fate-blue-light);
+  background: color-mix(in srgb, white 91%, var(--fate-blue-light) 9%);
+  border-bottom: 1px solid var(--fate-light-border);
 }
 
 .aspect-row:last-child {
@@ -853,18 +862,18 @@ defineExpose({ save });
 .aspect-input {
   flex: 1;
   min-width: 0;
-  border: none;
-  border-bottom: 1px solid var(--fate-border);
-  padding: 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: transparent;
+  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
   outline: none;
 }
 
 .aspect-input:focus {
-  border-bottom-color: var(--fate-blue);
+  border-color: var(--fate-blue);
 }
 
 .btn-flavor {

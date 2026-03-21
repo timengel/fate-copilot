@@ -61,6 +61,7 @@ function isRenderableNode(node: VNode): boolean {
   <div
     class="fate-card"
     :class="{ 'fate-card--clickable': clickable, 'fate-card--with-actions': hasActions }"
+    :style="colorVars"
   >
     <component
       :is="clickable ? 'button' : 'div'"
@@ -99,21 +100,20 @@ function isRenderableNode(node: VNode): boolean {
 
 <style scoped>
 .fate-card {
-  background: white;
-  border: 1px solid var(--fate-border);
+  background: color-mix(in srgb, white 45%, var(--fate-blue-light) 55%);
+  border: 1px solid var(--fate-blue-light);
   border-radius: 6px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   max-height: 210px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
+    box-shadow 0.15s;
 }
 
 .fate-card--clickable:hover {
-  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
-  border-color: var(--fate-blue);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
 .fate-card__main {

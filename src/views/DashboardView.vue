@@ -483,9 +483,8 @@ onUnmounted(() => {
 .dashboard-entry {
   container-type: inline-size;
   container-name: character-card;
-  background: var(--fate-white);
-  box-shadow: 0 1px 4px rgba(28, 158, 214, 0.08);
-  overflow: hidden;
+  background: transparent;
+  overflow: visible;
 }
 
 .dashboard-entry-toolbar {
