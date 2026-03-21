@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import CharacterSheet from './CharacterSheet.vue';
 import { createDefaultCharacter } from '../../composables/useCharacterDefaults';
+import { useSkillsStore } from '../../stores/skills';
 import type { Character, Consequence } from '../../types';
 
 function renderForm(character?: Character, extraProps: Record<string, unknown> = {}) {
@@ -41,7 +42,7 @@ describe('CharacterSheet (edit mode)', () => {
     const char = { ...createDefaultCharacter(), name: 'Test Hero' };
     renderForm(char, { onSave });
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.name).toBe('Test Hero');
   });
 
@@ -78,11 +79,11 @@ describe('CharacterSheet (edit mode)', () => {
     const char = { ...createDefaultCharacter(), stressPhysical: [{ value: 1, checked: false }] };
     const { container } = renderForm(char, { onSave });
     const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]); // physical +
+    await fireEvent.click(btns[1]!); // physical +
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.stressPhysical).toHaveLength(2);
-    expect(saved.stressPhysical[1].value).toBe(2);
+    expect(saved.stressPhysical[1]!.value).toBe(2);
   });
 
   it('new stress box gets value = last value + 1', async () => {
@@ -96,10 +97,10 @@ describe('CharacterSheet (edit mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
     const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]); // physical +
+    await fireEvent.click(btns[1]!); // physical +
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
-    expect(saved.stressPhysical[2].value).toBe(6);
+    const saved: Character = onSave.mock.calls[0]![0];
+    expect(saved.stressPhysical[2]!.value).toBe(6);
   });
 
   it('adds stress box with value 1 when track is empty', async () => {
@@ -107,11 +108,11 @@ describe('CharacterSheet (edit mode)', () => {
     const char = { ...createDefaultCharacter(), stressPhysical: [] };
     const { container } = renderForm(char, { onSave });
     const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]); // physical +
+    await fireEvent.click(btns[1]!); // physical +
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.stressPhysical).toHaveLength(1);
-    expect(saved.stressPhysical[0].value).toBe(1);
+    expect(saved.stressPhysical[0]!.value).toBe(1);
   });
 
   it('removes the last physical stress box when − is clicked', async () => {
@@ -125,18 +126,18 @@ describe('CharacterSheet (edit mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
     const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[0]); // physical −
+    await fireEvent.click(btns[0]!); // physical −
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.stressPhysical).toHaveLength(1);
-    expect(saved.stressPhysical[0].value).toBe(1);
+    expect(saved.stressPhysical[0]!.value).toBe(1);
   });
 
   it('− stress button is disabled when track is empty', () => {
     const char = { ...createDefaultCharacter(), stressPhysical: [] };
     const { container } = renderForm(char);
     const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    expect(btns[0].disabled).toBe(true); // physical −
+    expect(btns[0]!.disabled).toBe(true); // physical −
   });
 
   // ─── Konsequenz-Slot-Verwaltung (NSC) ─────────────────────────
@@ -147,9 +148,9 @@ describe('CharacterSheet (edit mode)', () => {
     const { container } = renderForm(char, { onSave });
     // consequence-config-btn order: Leicht−(0), Leicht+(1), Mittel−(2), Mittel+(3), ...
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[1]); // Leicht +
+    await fireEvent.click(configBtns[1]!); // Leicht +
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.consequences.filter((c) => c.severity === 2)).toHaveLength(2);
   });
 
@@ -164,9 +165,9 @@ describe('CharacterSheet (edit mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[0]); // Leicht −
+    await fireEvent.click(configBtns[0]!); // Leicht −
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.consequences.filter((c) => c.severity === 2)).toHaveLength(1);
   });
 
@@ -174,9 +175,9 @@ describe('CharacterSheet (edit mode)', () => {
     const char = createDefaultCharacter('nsc'); // only 1 mild; moderate/severe/extreme = 0
     const { container } = renderForm(char);
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    expect(configBtns[2].disabled).toBe(true); // Mittel −
-    expect(configBtns[4].disabled).toBe(true); // Schwer −
-    expect(configBtns[6].disabled).toBe(true); // Extrem −
+    expect(configBtns[2]!.disabled).toBe(true); // Mittel −
+    expect(configBtns[4]!.disabled).toBe(true); // Schwer −
+    expect(configBtns[6]!.disabled).toBe(true); // Extrem −
   });
 
   it('NSC: new consequence slot is inserted after existing slots of same severity', async () => {
@@ -190,13 +191,47 @@ describe('CharacterSheet (edit mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[1]); // Leicht + → adds after index 0 (last mild)
+    await fireEvent.click(configBtns[1]!); // Leicht + → adds after index 0 (last mild)
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     const mildIdx = saved.consequences.findIndex((c) => c.severity === 2 && c.value === '');
     const modIdx = saved.consequences.findIndex((c) => c.severity === 4);
     // new mild slot should appear before the moderate slot
     expect(mildIdx).toBeLessThan(modIdx);
+  });
+
+  // ─── DataCloneError regression ────────────────────────────────
+  // When SkillPyramid emits a filtered reactive array, form.skills holds Vue Proxy
+  // objects. structuredClone() would fail — JSON.parse(JSON.stringify()) must be used.
+
+  it('save() emits a structuredClone-able character after SkillPyramid emits reactive skills', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useSkillsStore().replaceAll(['Athletik', 'Kämpfen']);
+
+    const onSave = vi.fn();
+    const char = {
+      ...createDefaultCharacter(),
+      skills: [{ skill: 'Athletik', level: 2 }],
+      pyramidMaxLevel: 2,
+      pyramidMaxCols: 2,
+    };
+    render(CharacterSheet, {
+      // No SkillPyramid stub — we need the real component to emit reactive proxy elements
+      props: { character: char, mode: 'edit', onSave },
+      global: { plugins: [pinia] },
+    });
+
+    // "− Zeile" triggers SkillPyramid.removeRow() which calls props.skills.filter(...)
+    // and emits an array whose elements are Vue Proxy objects.
+    // CharacterSheet then assigns form.skills = $event (the reactive array elements).
+    await fireEvent.click(screen.getByText('− Zeile'));
+    await fireEvent.click(screen.getByText('Speichern'));
+
+    expect(onSave).toHaveBeenCalledOnce();
+    const saved = onSave.mock.calls[0]![0] as Character;
+    // Must not throw DataCloneError (regression for structuredClone on Vue Proxy)
+    expect(() => structuredClone(saved)).not.toThrow();
   });
 
   // ─── Save erzeugt Deep Clone ───────────────────────────────────
@@ -206,7 +241,7 @@ describe('CharacterSheet (edit mode)', () => {
     const char = createDefaultCharacter();
     renderForm(char, { onSave });
     await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0][0];
+    const saved: Character = onSave.mock.calls[0]![0];
     expect(saved).not.toBe(char);
     expect(saved.stressPhysical).not.toBe(char.stressPhysical);
     expect(saved.consequences).not.toBe(char.consequences);
