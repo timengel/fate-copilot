@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Consequence, ConsequenceLabel } from '../../types';
+import FateButton from '../shared/FateButton.vue';
 
 const props = defineProps<{
   consequences: Consequence[];
@@ -25,6 +26,10 @@ function updateValue(index: number, value: string) {
 function onValueInput(i: number, e: Event) {
   if (e.target instanceof HTMLInputElement) updateValue(i, e.target.value);
 }
+
+function clearValue(index: number) {
+  updateValue(index, '');
+}
 </script>
 
 <template>
@@ -39,6 +44,17 @@ function onValueInput(i: number, e: Event) {
         :value="con.value"
         :placeholder="`${LABELS[con.label]} Konsequenz`"
         @input="onValueInput(i, $event)"
+      />
+      <FateButton
+        v-if="!readonly"
+        class="consequence-clear"
+        variant="subtle"
+        size="S"
+        icon="close"
+        :disabled="!con.value"
+        :aria-label="`${LABELS[con.label]}e Konsequenz leeren`"
+        title="Konsequenz leeren"
+        @click="clearValue(i)"
       />
     </div>
   </div>
@@ -88,6 +104,7 @@ function onValueInput(i: number, e: Event) {
 
 .consequence-input {
   flex: 1;
+  min-width: 0;
   border: none;
   padding: 2px 4px;
   font-size: 0.875rem;
@@ -99,5 +116,9 @@ function onValueInput(i: number, e: Event) {
 
 .consequence-input:focus {
   border-bottom-color: var(--fate-blue);
+}
+
+.consequence-clear {
+  flex-shrink: 0;
 }
 </style>

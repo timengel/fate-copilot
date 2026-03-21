@@ -49,10 +49,33 @@ describe('ConsequenceSlots', () => {
     expect(inputs[3]!.value).toBe('Broken leg');
   });
 
+  it('renders one clear button per editable consequence row', () => {
+    const { container } = render(ConsequenceSlots, { props: { consequences, readonly: false } });
+    expect(container.querySelectorAll('button.consequence-clear')).toHaveLength(4);
+  });
+
+  it('clears a consequence value via the clear button', async () => {
+    const onUpdate = vi.fn();
+    const { container } = render(ConsequenceSlots, {
+      props: { consequences, readonly: false, onUpdate },
+    });
+    const clearButtons = container.querySelectorAll<HTMLButtonElement>('button.consequence-clear');
+    await fireEvent.click(clearButtons[3]!);
+    expect(onUpdate).toHaveBeenCalledOnce();
+    const updated: Consequence[] = onUpdate.mock.calls[0]![0];
+    expect(updated[3]!.value).toBe('');
+    expect(updated[0]!.value).toBe('');
+  });
+
   describe('readonly mode', () => {
     it('does not render inputs', () => {
       const { container } = render(ConsequenceSlots, { props: { consequences, readonly: true } });
       expect(container.querySelectorAll('input.consequence-input')).toHaveLength(0);
+    });
+
+    it('does not render clear buttons', () => {
+      const { container } = render(ConsequenceSlots, { props: { consequences, readonly: true } });
+      expect(container.querySelectorAll('button.consequence-clear')).toHaveLength(0);
     });
 
     it('shows existing values as text', () => {
