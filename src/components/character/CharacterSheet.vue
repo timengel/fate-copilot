@@ -283,7 +283,7 @@ defineExpose({ save });
       <section
         v-if="isEditing || (sections?.extras !== false && data.extras?.trim())"
         class="sheet-section extras"
-        :class="{ 'span-full': !isEditing && sections?.stunts === false }"
+        :class="{ 'span-full': !isEditing && (sections?.stunts === false || data.stunts.length === 0) }"
       >
         <div
           class="sheet-section-header"
@@ -309,7 +309,7 @@ defineExpose({ save });
       <section
         v-if="isEditing || (sections?.stunts !== false && data.stunts.length > 0)"
         class="sheet-section stunts"
-        :class="{ 'span-full': !isEditing && sections?.extras === false }"
+        :class="{ 'span-full': !isEditing && (sections?.extras === false || !data.extras?.trim()) }"
       >
         <div
           class="sheet-section-header"
