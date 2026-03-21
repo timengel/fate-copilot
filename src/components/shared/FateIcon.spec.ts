@@ -40,6 +40,16 @@ describe('FateIcon', () => {
       expect(container.querySelectorAll('path').length).toBe(2);
     });
 
+    it('renders archive icon with three paths', () => {
+      const { container } = render(FateIcon, { props: { name: 'archive' } });
+      expect(container.querySelectorAll('path').length).toBe(3);
+    });
+
+    it('renders unarchive icon with three paths', () => {
+      const { container } = render(FateIcon, { props: { name: 'unarchive' } });
+      expect(container.querySelectorAll('path').length).toBe(3);
+    });
+
     it('renders add icon with two lines', () => {
       const { container } = render(FateIcon, { props: { name: 'add' } });
       expect(container.querySelectorAll('line').length).toBe(2);

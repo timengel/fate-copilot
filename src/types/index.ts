@@ -38,6 +38,8 @@ export type ButtonSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
 export type ButtonIcon =
   | 'delete'
   | 'edit'
+  | 'archive'
+  | 'unarchive'
   | 'add'
   | 'close'
   | 'check'

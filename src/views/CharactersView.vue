@@ -3,18 +3,20 @@ import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
-import type { CharacterType } from '../types';
+import type { Character, CharacterType } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
 const route = useRoute();
 const store = useCharactersStore();
 const gmModeStore = useGMModeStore();
+const toastStore = useToastStore();
 const search = ref('');
 const showArchivedCharacters = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
@@ -59,6 +61,15 @@ function deleteCharacter(id: string, name: string) {
     'Charakter löschen',
     `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,
     () => store.deleteCharacter(id),
+  );
+}
+
+function toggleArchived(character: Character) {
+  store.updateCharacter({ ...character, archived: !character.archived });
+  toastStore.show(
+    character.archived
+      ? `Charakter "${character.name || 'Unbenannt'}" entarchiviert`
+      : `Charakter "${character.name || 'Unbenannt'}" archiviert`,
   );
 }
 </script>
@@ -121,6 +132,15 @@ function deleteCharacter(id: string, name: string) {
         </template>
         <template #actions>
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/characters/${char.id}/edit`)" />
+          <FateButton
+            v-if="gmModeStore.isGMMode"
+            :icon="char.archived ? 'unarchive' : 'archive'"
+            variant="secondary"
+            size="S"
+            :aria-label="char.archived ? 'Charakter entarchivieren' : 'Charakter archivieren'"
+            :title="char.archived ? 'Entarchivieren' : 'Archivieren'"
+            @click.stop="toggleArchived(char)"
+          />
           <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteCharacter(char.id, char.name)" />
         </template>
       </FateCard>

@@ -2,6 +2,8 @@ import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import ItemsView from './ItemsView.vue';
 import { useItemsStore } from '../stores/items';
+import { useGMModeStore } from '../stores/gmMode';
+import { useToastStore } from '../stores/toast';
 import type { Item } from '../types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -53,6 +55,29 @@ describe('ItemsView – card interactions', () => {
     return { ...result, itemId: item.id };
   }
 
+  function setupGM(overrides: Partial<Item> = {}) {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useItemsStore();
+    const gmStore = useGMModeStore();
+    gmStore.isGMMode = true;
+    const item = makeItem(overrides);
+    store.addItem(item);
+
+    const result = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+    return { ...result, store, itemId: item.id };
+  }
+
   it('clicking the card navigates to the item view page', async () => {
     const { container, itemId } = setup();
     await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
@@ -72,6 +97,26 @@ describe('ItemsView – card interactions', () => {
     const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('shows a quick archive button in GM mode', () => {
+    const { getByLabelText } = setupGM();
+    expect(getByLabelText('Gegenstand archivieren')).toBeTruthy();
+  });
+
+  it('quick archive toggles the archived flag without navigation', async () => {
+    const { getByLabelText, store, itemId } = setupGM();
+    const toastStore = useToastStore();
+    await fireEvent.click(getByLabelText('Gegenstand archivieren'));
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(store.getById(itemId)?.archived).toBe(true);
+    expect(toastStore.message).toBe('Gegenstand "Test Gegenstand" archiviert');
+  });
+
+  it('shows an unarchive button for archived items in GM mode when archived entries are shown', async () => {
+    const { getByLabelText, getByText } = setupGM({ archived: true });
+    await fireEvent.click(getByText('Zeige archivierte Gegenstände'));
+    expect(getByLabelText('Gegenstand entarchivieren')).toBeTruthy();
   });
 
   it('shows archived items only when the archive filter is enabled', async () => {

@@ -3,16 +3,19 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
+import type { Item } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
 const store = useItemsStore();
 const gmModeStore = useGMModeStore();
+const toastStore = useToastStore();
 const search = ref('');
 const showArchivedItems = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
@@ -33,6 +36,15 @@ function deleteItem(id: string, name: string) {
     'Gegenstand löschen',
     `Gegenstand "${name || 'Unbenannt'}" wirklich löschen?`,
     () => store.deleteItem(id),
+  );
+}
+
+function toggleArchived(item: Item) {
+  store.updateItem({ ...item, archived: !item.archived });
+  toastStore.show(
+    item.archived
+      ? `Gegenstand "${item.name || 'Unbenannt'}" entarchiviert`
+      : `Gegenstand "${item.name || 'Unbenannt'}" archiviert`,
   );
 }
 </script>
@@ -74,6 +86,15 @@ function deleteItem(id: string, name: string) {
         </template>
         <template #actions>
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/items/${item.id}/edit`)" />
+          <FateButton
+            v-if="gmModeStore.isGMMode"
+            :icon="item.archived ? 'unarchive' : 'archive'"
+            variant="secondary"
+            size="S"
+            :aria-label="item.archived ? 'Gegenstand entarchivieren' : 'Gegenstand archivieren'"
+            :title="item.archived ? 'Entarchivieren' : 'Archivieren'"
+            @click.stop="toggleArchived(item)"
+          />
           <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteItem(item.id, item.name)" />
         </template>
       </FateCard>

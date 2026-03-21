@@ -2,6 +2,8 @@ import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import CharactersView from './CharactersView.vue';
 import { useCharactersStore } from '../stores/characters';
+import { useGMModeStore } from '../stores/gmMode';
+import { useToastStore } from '../stores/toast';
 import type { Character } from '../types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -59,6 +61,29 @@ describe('CharactersView – card interactions', () => {
     return { ...result, charId: char.id };
   }
 
+  function setupGM(overrides: Partial<Character> = {}) {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useCharactersStore();
+    const gmStore = useGMModeStore();
+    gmStore.isGMMode = true;
+    const char = makeCharacter(overrides);
+    store.addCharacter(char);
+
+    const result = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+    return { ...result, store, charId: char.id };
+  }
+
   it('clicking the card navigates to the character view page', async () => {
     const { container, charId } = setup();
     await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
@@ -78,5 +103,25 @@ describe('CharactersView – card interactions', () => {
     const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('shows a quick archive button in GM mode', () => {
+    const { getByLabelText } = setupGM();
+    expect(getByLabelText('Charakter archivieren')).toBeTruthy();
+  });
+
+  it('quick archive toggles the archived flag without navigation', async () => {
+    const { getByLabelText, store, charId } = setupGM();
+    const toastStore = useToastStore();
+    await fireEvent.click(getByLabelText('Charakter archivieren'));
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(store.getById(charId)?.archived).toBe(true);
+    expect(toastStore.message).toBe('Charakter "Test Charakter" archiviert');
+  });
+
+  it('shows an unarchive button for archived characters in GM mode when archived entries are shown', async () => {
+    const { getByLabelText, getByText } = setupGM({ archived: true });
+    await fireEvent.click(getByText('Zeige archivierte Charaktere'));
+    expect(getByLabelText('Charakter entarchivieren')).toBeTruthy();
   });
 });
