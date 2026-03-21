@@ -11,11 +11,13 @@ withDefaults(
     size?: ButtonSize;
     type?: 'button' | 'submit' | 'reset';
     icon?: ButtonIcon;
+    disabled?: boolean;
   }>(),
   {
     variant: 'primary',
     size: 'M',
     type: 'button',
+    disabled: false,
   },
 );
 </script>
@@ -23,6 +25,7 @@ withDefaults(
 <template>
   <button
     :type="type"
+    :disabled="disabled"
     :class="[
       'fate-btn',
       `fate-btn--${variant}`,
@@ -52,6 +55,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
+  user-select: none;
 }
 
 .fate-btn--primary {
@@ -176,6 +180,12 @@ button {
 .fate-btn--subtle:hover {
   background: rgba(0, 0, 0, 0.06);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .fate-btn--counter {

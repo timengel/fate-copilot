@@ -86,7 +86,9 @@ function deleteItem() {
 
     <template v-else-if="item">
       <div class="detail-toolbar">
-        <FateButton variant="link" @click="router.push('/items')">← Gegenstände</FateButton>
+        <div class="back-btn">
+          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/items')">Gegenstände</FateButton>
+        </div>
       </div>
 
       <ItemSheet
@@ -139,6 +141,12 @@ function deleteItem() {
 </template>
 
 <style scoped>
+.back-btn {
+  --fate-blue: #1c9ed6;
+  --fate-blue-dark: #1480b0;
+  --fate-blue-light: #e8f4fb;
+}
+
 .not-found {
   padding: 2rem;
   text-align: center;

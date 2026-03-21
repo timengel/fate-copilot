@@ -1,27 +1,36 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useSkillsStore } from '../stores/skills';
+import { useToastStore } from '../stores/toast';
 import FateButton from '../components/shared/FateButton.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
 import type { SkillInfo } from '../types';
 
 const store = useSkillsStore();
+const toastStore = useToastStore();
 const newSkillName = ref('');
 const infoSkill = ref<string | null>(null);
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const sortedSkills = computed(() => [...store.skills].sort((a, b) => a.localeCompare(b, 'de')));
 
 function add() {
-  if (newSkillName.value.trim()) {
-    store.addSkill(newSkillName.value);
+  const trimmed = newSkillName.value.trim();
+  if (trimmed) {
+    store.addSkill(trimmed);
+    toastStore.show(`Fertigkeit "${trimmed}" hinzugefügt`);
     newSkillName.value = '';
   }
 }
 
 function resetToDefaults() {
-  if (confirm('Liste auf Fate-Core-Standardfertigkeiten zurücksetzen?')) {
-    store.resetToDefaults();
-  }
+  showConfirmDialog(
+    'Fertigkeiten zurücksetzen',
+    'Die Fertigkeitsliste wird auf die Fate-Core-Standardfertigkeiten zurückgesetzt. Eigene Anpassungen gehen verloren.',
+    () => store.resetToDefaults(),
+  );
 }
 
 const SKILL_INFO: Record<string, SkillInfo> = {
@@ -306,7 +315,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 <template>
   <div class="list-view">
     <FateHeader title="Fertigkeiten">
-      <FateButton variant="secondary" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
+      <FateButton variant="danger" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
     </FateHeader>
 
     <p class="skills-hint">
@@ -343,10 +352,18 @@ const selectedInfo = computed<SkillInfo | null>(() =>
           placeholder="Neue Fertigkeit..."
           @keydown.enter="add"
         />
-        <FateButton @click="add">Hinzufügen</FateButton>
+        <FateButton :disabled="!newSkillName.trim()" @click="add">Hinzufügen</FateButton>
       </div>
     </div>
   </div>
+
+  <ConfirmDialog
+    v-if="confirmDialog"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @cancel="confirmDialog = null"
+  />
 
   <!-- Info Modal -->
   <Teleport to="body">
@@ -354,7 +371,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
-          <FateButton icon="close" variant="ghost" class="skill-info-close" @click="infoSkill = null"></FateButton
+          <FateButton icon="close" variant="secondary" class="skill-info-close" @click="infoSkill = null"></FateButton
           >
         </div>
         <p class="skill-info-description">{{ selectedInfo.description }}</p>

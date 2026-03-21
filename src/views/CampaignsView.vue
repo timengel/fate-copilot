@@ -38,7 +38,7 @@ function deleteCampaign(id: string, name: string) {
 <template>
   <div class="list-view">
     <FateHeader title="Kampagnen">
-      <FateButton @click="router.push('/campaigns/new')">+ Neue Kampagne</FateButton>
+      <FateButton variant="primary" icon="add" @click="router.push('/campaigns/new')">Neue Kampagne</FateButton>
     </FateHeader>
 
     <div v-if="store.campaigns.length === 0" class="empty-state">

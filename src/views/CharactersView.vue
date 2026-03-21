@@ -63,7 +63,7 @@ function deleteCharacter(id: string, name: string) {
 <template>
   <div class="list-view">
     <FateHeader title="Charaktere">
-      <FateButton @click="router.push(`/characters/new?type=${activeTab}`)">+ Neuer Charakter</FateButton>
+      <FateButton variant="primary" icon="add" @click="router.push(`/characters/new?type=${activeTab}`)">Neuer Charakter</FateButton>
     </FateHeader>
 
     <div class="tab-bar">

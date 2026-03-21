@@ -151,7 +151,9 @@ function updateMilestone(milestone: Milestone) {
 
     <template v-else-if="campaign">
       <div class="detail-toolbar">
-        <FateButton variant="link" @click="router.push('/campaigns')">← Kampagnen</FateButton>
+        <div class="back-btn">
+          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/campaigns')">Kampagnen</FateButton>
+        </div>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
             <FateButton icon="edit" @click="isEditing = true">Bearbeiten</FateButton>
@@ -311,6 +313,12 @@ function updateMilestone(milestone: Milestone) {
 </template>
 
 <style scoped>
+.back-btn {
+  --fate-blue: #1c9ed6;
+  --fate-blue-dark: #1480b0;
+  --fate-blue-light: #e8f4fb;
+}
+
 .not-found {
   padding: 2rem;
   text-align: center;

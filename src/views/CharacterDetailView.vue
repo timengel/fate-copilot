@@ -109,7 +109,9 @@ function queryCharacterType(): CharacterType {
 
     <template v-else-if="character">
       <div class="detail-toolbar">
-        <FateButton variant="link" @click="router.push(backPath)">← Charaktere</FateButton>
+        <div class="back-btn">
+          <FateButton variant="secondary" icon="arrow-left" @click="router.push(backPath)">Charaktere</FateButton>
+        </div>
       </div>
 
       <CharacterSheet
@@ -161,6 +163,12 @@ function queryCharacterType(): CharacterType {
 </template>
 
 <style scoped>
+.back-btn {
+  --fate-blue: #1c9ed6;
+  --fate-blue-dark: #1480b0;
+  --fate-blue-light: #e8f4fb;
+}
+
 .not-found {
   padding: 2rem;
   text-align: center;

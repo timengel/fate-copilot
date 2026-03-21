@@ -42,7 +42,7 @@ function deleteItem(id: string, name: string) {
 <template>
   <div class="list-view">
     <FateHeader title="Gegenstände">
-      <FateButton @click="router.push('/items/new')">+ Neuer Gegenstand</FateButton>
+      <FateButton variant="primary" icon="add" @click="router.push('/items/new')">Neuer Gegenstand</FateButton>
     </FateHeader>
 
     <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
