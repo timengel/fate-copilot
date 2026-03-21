@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia } from 'pinia';
 import MilestoneTimeline from './MilestoneTimeline.vue';
@@ -60,7 +60,7 @@ describe('MilestoneTimeline', () => {
       await fireEvent.update(input, 'New Milestone');
       await fireEvent.click(screen.getByText('+ Hinzufügen'));
       expect(onAdd).toHaveBeenCalledOnce();
-      const added: Milestone = onAdd.mock.calls[0][0];
+      const added: Milestone = onAdd.mock.calls[0]![0];
       expect(added.description).toBe('New Milestone');
       expect(added.id).toBeTruthy();
     });
@@ -90,7 +90,7 @@ describe('MilestoneTimeline', () => {
       const onUpdate = vi.fn();
       const { container } = renderTimeline({ milestones, readonly: false, onUpdate });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
-      await fireEvent.click(screen.getByText('✓'));
+      await fireEvent.click(container.querySelector('.milestone-save')!);
       expect(onUpdate).toHaveBeenCalledOnce();
     });
 
@@ -136,7 +136,7 @@ describe('MilestoneTimeline', () => {
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!;
       await fireEvent.update(editInput, '');
-      await fireEvent.click(screen.getByText('✓'));
+      await fireEvent.click(container.querySelector('.milestone-save')!);
       expect(onUpdate).not.toHaveBeenCalled();
     });
 
@@ -146,8 +146,8 @@ describe('MilestoneTimeline', () => {
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!;
       await fireEvent.update(editInput, '  updated  ');
-      await fireEvent.click(screen.getByText('✓'));
-      expect(onUpdate.mock.calls[0][0].description).toBe('updated');
+      await fireEvent.click(container.querySelector('.milestone-save')!);
+      expect(onUpdate.mock.calls[0]![0].description).toBe('updated');
     });
 
     it('remove button is only present on the last milestone', () => {

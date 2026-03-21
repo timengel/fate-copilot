@@ -89,7 +89,7 @@ function cancelEdit() {
             @keydown.enter="saveEdit(m.id)"
             @keydown.escape="cancelEdit"
           />
-          <FateButton icon="check" variant="add" size="S" @click="saveEdit(m.id)"></FateButton>
+          <FateButton icon="check" variant="add" size="S" class="milestone-save" @click="saveEdit(m.id)"></FateButton>
           <FateButton icon="close" variant="ghost" size="S" class="milestone-remove" @click="cancelEdit"></FateButton>
         </div>
 
