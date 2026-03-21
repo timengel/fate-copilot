@@ -546,7 +546,6 @@ defineExpose({ save });
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: color-mix(in srgb, white 72%, var(--fate-blue-light) 28%);
-  border: 1px solid var(--fate-blue-light);
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
@@ -871,12 +870,13 @@ defineExpose({ save });
 .sheet-stress-row {
   display: grid;
   grid-template-columns: max-content 1fr;
+  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .stress-section {
   display: flex;
   flex-direction: column;
-  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
   min-width: 240px;
 }
 
@@ -1060,7 +1060,6 @@ defineExpose({ save });
 
   .stress-section {
     border-right: none;
-    border-bottom: 1px solid var(--fate-border);
     min-width: 0;
   }
 
@@ -1109,7 +1108,6 @@ defineExpose({ save });
 
   .stress-section {
     border-right: none;
-    border-bottom: 1px solid var(--fate-border);
     min-width: 0;
   }
 
