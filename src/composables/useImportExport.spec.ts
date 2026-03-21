@@ -23,6 +23,24 @@ const validV10 = {
   campaignCharacterAssignments: [],
 };
 
+const minimalCharacter: Character = {
+  id: 'c1',
+  name: 'Alice',
+  description: '',
+  highConcept: '',
+  trouble: '',
+  aspects: [],
+  skills: [],
+  stunts: [],
+  extras: '',
+  refresh: 3,
+  fatePoints: 3,
+  stressPhysical: [],
+  stressMental: [],
+  consequences: [],
+  notes: '',
+};
+
 function makeFile(data: unknown): File {
   return new File([JSON.stringify(data)], 'test.json', { type: 'application/json' });
 }
@@ -72,6 +90,55 @@ describe('useImportExport', () => {
       const { importJSON } = useImportExport();
       const { campaignCharacterAssignments: _a, ...noAssignments } = validV11;
       await expect(importJSON(makeFile(noAssignments))).rejects.toThrow();
+    });
+  });
+
+  describe('importFromString', () => {
+    it('returns parsed AppData for valid v1.1 JSON string', () => {
+      const { importFromString } = useImportExport();
+      const result = importFromString(JSON.stringify(validV11));
+      expect(result.formatVersion).toBe('1.1');
+    });
+
+    it('returns parsed AppData for valid v1.0 JSON string', () => {
+      const { importFromString } = useImportExport();
+      const result = importFromString(JSON.stringify(validV10));
+      expect(result.formatVersion).toBe('1.0');
+    });
+
+    it('returns correct characters array', () => {
+      const { importFromString } = useImportExport();
+      const data = { ...validV11, characters: [minimalCharacter] };
+      const result = importFromString(JSON.stringify(data));
+      expect(result.characters[0]!.name).toBe('Alice');
+    });
+
+    it('throws on invalid JSON string', () => {
+      const { importFromString } = useImportExport();
+      expect(() => importFromString('not{json}')).toThrow();
+    });
+
+    it('throws on unknown formatVersion', () => {
+      const { importFromString } = useImportExport();
+      expect(() => importFromString(JSON.stringify({ ...validV11, formatVersion: '9.9' }))).toThrow();
+    });
+
+    it('throws when campaigns array is missing', () => {
+      const { importFromString } = useImportExport();
+      const { campaigns: _c, ...noCampaigns } = validV11;
+      expect(() => importFromString(JSON.stringify(noCampaigns))).toThrow();
+    });
+
+    it('throws when characters array is missing', () => {
+      const { importFromString } = useImportExport();
+      const { characters: _c, ...noChars } = validV11;
+      expect(() => importFromString(JSON.stringify(noChars))).toThrow();
+    });
+
+    it('throws when campaignCharacterAssignments is missing', () => {
+      const { importFromString } = useImportExport();
+      const { campaignCharacterAssignments: _a, ...noAssignments } = validV11;
+      expect(() => importFromString(JSON.stringify(noAssignments))).toThrow();
     });
   });
 
@@ -214,24 +281,7 @@ describe('useImportExport', () => {
     });
 
     it('exported JSON contains characters from the store', async () => {
-      const char: Character = {
-        id: 'c1',
-        name: 'Aragorn',
-        description: '',
-        highConcept: '',
-        trouble: '',
-        aspects: [],
-        skills: [],
-        stunts: [],
-        extras: '',
-        refresh: 3,
-        fatePoints: 3,
-        stressPhysical: [],
-        stressMental: [],
-        consequences: [],
-        notes: '',
-      };
-      useCharactersStore().addCharacter(char);
+      useCharactersStore().addCharacter({ ...minimalCharacter, name: 'Aragorn' });
 
       let capturedBlob: Blob | undefined;
       vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
@@ -260,6 +310,66 @@ describe('useImportExport', () => {
       const text = await capturedBlob!.text();
       const parsed = JSON.parse(text);
       expect(parsed.formatVersion).toBe('1.1');
+    });
+  });
+
+  describe('exportToClipboard', () => {
+    let writeText: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('calls navigator.clipboard.writeText once', async () => {
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      expect(writeText).toHaveBeenCalledOnce();
+    });
+
+    it('written JSON has formatVersion 1.1', async () => {
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.formatVersion).toBe('1.1');
+    });
+
+    it('written JSON contains characters from the store', async () => {
+      useCharactersStore().addCharacter({ ...minimalCharacter, name: 'Bilbo' });
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.characters[0].name).toBe('Bilbo');
+    });
+
+    it('written JSON contains campaigns from the store', async () => {
+      const campaign: Campaign = {
+        id: 'camp1', name: 'Mittelerde', description: '', status: 'active', notes: '', milestones: [],
+      };
+      useCampaignsStore().addCampaign(campaign);
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.campaigns[0].name).toBe('Mittelerde');
+    });
+
+    it('includes all required AppData fields', async () => {
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed).toHaveProperty('formatVersion');
+      expect(parsed).toHaveProperty('exportDate');
+      expect(parsed).toHaveProperty('campaigns');
+      expect(parsed).toHaveProperty('characters');
+      expect(parsed).toHaveProperty('campaignCharacterAssignments');
     });
   });
 });

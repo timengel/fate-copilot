@@ -1,19 +1,43 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useImportExport } from '../../composables/useImportExport';
+import { useToastStore } from '../../stores/toast';
 import ConfirmDialog from './ConfirmDialog.vue';
 import FateButton from './FateButton.vue';
 import type { AppData } from '../../types';
 
-const { exportJSON, importJSON, applyImport } = useImportExport();
+const { exportJSON, exportToClipboard, importJSON, importFromString, applyImport } = useImportExport();
+const toastStore = useToastStore();
 
 const showConfirm = ref(false);
 const pendingData = ref<AppData | null>(null);
 const importError = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
+const pasteText = ref('');
 
 function triggerImport() {
   fileInput.value?.click();
+}
+
+async function copyToClipboard() {
+  importError.value = '';
+  try {
+    await exportToClipboard();
+    toastStore.show('In die Zwischenablage kopiert!');
+  } catch (e) {
+    importError.value = e instanceof Error ? e.message : 'Kopieren fehlgeschlagen';
+  }
+}
+
+function onPasteImport() {
+  importError.value = '';
+  try {
+    pendingData.value = importFromString(pasteText.value);
+    pasteText.value = '';
+    showConfirm.value = true;
+  } catch (e) {
+    importError.value = e instanceof Error ? e.message : 'Ungültiger JSON-String';
+  }
 }
 
 async function onFileSelected(event: Event) {
@@ -47,12 +71,45 @@ function cancelImport() {
 
 <template>
   <div class="import-export-bar">
-    <FateButton variant="secondary" @click="exportJSON" title="Alle Daten als JSON exportieren"
-      >↓ Exportieren</FateButton
-    >
-    <FateButton variant="secondary" @click="triggerImport" title="JSON-Datei importieren"
-      >↑ Importieren</FateButton
-    >
+    <!-- JSON-Text -->
+    <div class="io-card">
+      <div class="io-card-header">
+        <div class="io-card-title">JSON-Text</div>
+        <FateButton
+          variant="secondary"
+          size="S"
+          icon="copy"
+          @click="copyToClipboard"
+          title="Alle Daten als JSON-String kopieren"
+        >
+          Kopieren
+        </FateButton>
+      </div>
+      <textarea
+        v-model="pasteText"
+        placeholder="JSON hier einfügen …"
+        rows="5"
+        class="text-import-textarea"
+      />
+      <FateButton variant="primary" size="S" icon="upload" @click="onPasteImport">
+        Importieren
+      </FateButton>
+    </div>
+
+    <!-- JSON-Datei -->
+    <div class="io-card">
+      <div class="io-card-title">JSON-Datei</div>
+      <p class="io-card-desc">Exportiere oder importiere alle Daten als <code>.json</code>-Datei.</p>
+      <div class="io-card-actions">
+        <FateButton variant="secondary" size="S" icon="download" @click="exportJSON" title="Alle Daten als JSON-Datei herunterladen">
+          Exportieren
+        </FateButton>
+        <FateButton variant="secondary" size="S" icon="upload" @click="triggerImport" title="JSON-Datei importieren">
+          Importieren
+        </FateButton>
+      </div>
+    </div>
+
     <input
       ref="fileInput"
       type="file"
@@ -60,7 +117,8 @@ function cancelImport() {
       style="display: none"
       @change="onFileSelected"
     />
-    <span v-if="importError" class="import-error">{{ importError }}</span>
+
+    <p v-if="importError" class="import-error">{{ importError }}</p>
 
     <ConfirmDialog
       v-if="showConfirm"
@@ -75,13 +133,81 @@ function cancelImport() {
 <style scoped>
 .import-export-bar {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.io-card {
+  background: var(--fate-bg);
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  padding: 0.75rem 0.875rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
-.import-error {
-  color: #ffe0e0;
+.io-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.io-card-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fate-blue);
+}
+
+.io-card-desc {
   font-size: 0.8rem;
-  max-width: 200px;
+  color: var(--fate-text-light);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.io-card-desc code {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: var(--fate-blue-light);
+  color: var(--fate-blue);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+.io-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.text-import-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  padding: 0.5rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  resize: vertical;
+  color: var(--fate-text);
+  background: var(--fate-white);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.text-import-textarea:focus {
+  border-color: var(--fate-blue);
+}
+
+.import-error {
+  font-size: 0.8rem;
+  color: var(--fate-red);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: #fde8e6;
+  border-radius: 4px;
 }
 </style>

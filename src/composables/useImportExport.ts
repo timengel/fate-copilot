@@ -52,6 +52,32 @@ export function useImportExport() {
     return true;
   }
 
+  async function exportToClipboard(): Promise<void> {
+    const charactersStore = useCharactersStore();
+    const itemsStore = useItemsStore();
+    const campaignsStore = useCampaignsStore();
+    const skillsStore = useSkillsStore();
+
+    const data: AppData = {
+      formatVersion: FORMAT_VERSION,
+      exportDate: new Date().toISOString(),
+      campaigns: campaignsStore.campaigns,
+      characters: charactersStore.characters,
+      items: itemsStore.items,
+      campaignCharacterAssignments: campaignsStore.assignments,
+      campaignItemAssignments: campaignsStore.itemAssignments,
+      skills: skillsStore.skills,
+    };
+
+    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+  }
+
+  function importFromString(jsonString: string): AppData {
+    const raw = JSON.parse(jsonString);
+    validateImportData(raw);
+    return raw as AppData;
+  }
+
   function importJSON(file: File): Promise<AppData> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -82,5 +108,5 @@ export function useImportExport() {
     skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
   }
 
-  return { exportJSON, importJSON, applyImport };
+  return { exportJSON, exportToClipboard, importJSON, importFromString, applyImport };
 }

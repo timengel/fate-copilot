@@ -29,7 +29,9 @@ export type ButtonIcon =
   | 'chevron-left'
   | 'chevron-right'
   | 'download'
-  | 'upload';
+  | 'upload'
+  | 'copy'
+  | 'paste';
 
 // ============================================================
 // Domain Types

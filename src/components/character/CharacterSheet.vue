@@ -10,7 +10,6 @@ import StressTrack from './StressTrack.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
-import FateIcon from '../shared/FateIcon.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 
@@ -142,7 +141,7 @@ function removeStressBox(track: 'physical' | 'mental') {
 }
 
 function save() {
-  emit('save', structuredClone(toRaw(form)));
+  emit('save', JSON.parse(JSON.stringify(form)));
 }
 
 defineExpose({ save });
