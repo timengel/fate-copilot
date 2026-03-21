@@ -1,20 +1,32 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ value?: string; size?: 'S' | 'M' }>(), { size: 'M' });
+withDefaults(defineProps<{ value?: string; size?: 'S' | 'M'; background?: string }>(), {
+  size: 'M',
+  background: 'rgba(255, 255, 255, 0.3)',
+});
 </script>
 
 <template>
-  <div v-if="value" class="fate-avatar" :class="`fate-avatar--${size}`">{{ value }}</div>
+  <div
+    v-if="value"
+    class="fate-avatar"
+    :class="`fate-avatar--${size}`"
+    :style="{ background }"
+  >
+    <span class="fate-avatar__content">{{ value }}</span>
+  </div>
 </template>
 
 <style scoped>
 .fate-avatar {
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   line-height: 1;
+}
+
+.fate-avatar__content {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 

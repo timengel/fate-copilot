@@ -10,6 +10,7 @@ import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue';
 import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import FateDropdown from '../components/shared/FateDropdown.vue';
 import type { Campaign, Milestone } from '../types';
 import { CAMPAIGN_STATUS_LABEL } from '../types';
 import { getColorVars } from '../composables/useColorVars';
@@ -33,6 +34,8 @@ const id = computed(() => {
   return Array.isArray(param) ? (param[0] ?? '') : (param ?? '');
 });
 const isEditing = ref(props.isNew || props.editMode || false);
+const selectedCharacterId = ref('');
+const selectedItemId = ref('');
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const colorVars = computed(() => getColorVars(campaign.value?.color));
@@ -58,6 +61,19 @@ const availableSc = computed(() =>
   availableCharacters.value.filter((c) => (c.type ?? 'sc') === 'sc'),
 );
 const availableNsc = computed(() => availableCharacters.value.filter((c) => c.type === 'nsc'));
+const availableCharacterGroups = computed(() => [
+  {
+    label: 'Spielercharaktere (SC)',
+    options: availableSc.value.map((c) => ({ value: c.id, label: c.name || '(Unbenannt)' })),
+  },
+  {
+    label: 'Nicht-Spieler-Charaktere (NSC)',
+    options: availableNsc.value.map((c) => ({ value: c.id, label: c.name || '(Unbenannt)' })),
+  },
+].filter((group) => group.options.length > 0));
+const availableItemOptions = computed(() =>
+  availableItems.value.map((i) => ({ value: i.id, label: i.name || '(Unbenannt)' })),
+);
 
 function handleSave(updated: Campaign) {
   if (props.isNew) {
@@ -98,11 +114,10 @@ const availableItems = computed(() =>
   itemsStore.items.filter((i) => !campaignItems.value.some((ci) => ci.id === i.id)),
 );
 
-function onAssignItem(e: Event) {
-  if (e.target instanceof HTMLSelectElement) {
-    campaignsStore.assignItem(campaign.value!.id, e.target.value);
-    e.target.value = '';
-  }
+function onAssignItem(itemId: string) {
+  if (!campaign.value || !itemId) return;
+  campaignsStore.assignItem(campaign.value.id, itemId);
+  selectedItemId.value = '';
 }
 
 function unassignItem(itemId: string) {
@@ -115,11 +130,10 @@ function assignCharacter(characterId: string) {
   campaignsStore.assignCharacter(campaign.value.id, characterId);
 }
 
-function onAssignCharacter(e: Event) {
-  if (e.target instanceof HTMLSelectElement) {
-    assignCharacter(e.target.value);
-    e.target.value = '';
-  }
+function onAssignCharacter(characterId: string) {
+  if (!characterId) return;
+  assignCharacter(characterId);
+  selectedCharacterId.value = '';
 }
 
 function unassignCharacter(characterId: string) {
@@ -140,6 +154,10 @@ function removeMilestone(milestoneId: string) {
 function updateMilestone(milestone: Milestone) {
   if (!campaign.value) return;
   campaignsStore.updateMilestone(campaign.value.id, milestone);
+}
+
+function navigateToAssignment(path: string) {
+  router.push(path);
 }
 </script>
 
@@ -175,7 +193,7 @@ function updateMilestone(milestone: Milestone) {
         <div class="campaign-detail">
           <div class="campaign-detail-header">
             <div class="campaign-title">
-              <FateAvatar :value="campaign.avatar" />
+              <FateAvatar :value="campaign.avatar" :background="colorVars['--fate-blue']" />
               <h1>{{ campaign.name }}</h1>
             </div>
             <span class="badge" :class="`status-${campaign.status}`">
@@ -217,17 +235,34 @@ function updateMilestone(milestone: Milestone) {
               <template v-else>
                 <div class="char-group-header">Spielercharaktere (SC)</div>
                 <div v-if="scCharacters.length === 0" class="empty-text">Keine SC zugeordnet.</div>
-                <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
-                  <div class="assignment-avatar" :style="{ background: getColorVars(char.color)['--fate-blue'] }">{{ char.avatar }}</div>
-                  <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                    <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
-                    <span v-if="char.highConcept" class="assignment-concept">{{
-                      char.highConcept
-                    }}</span>
-                  </div>
-                  <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
-                    >Entfernen</FateButton
+                <div
+                  v-for="char in scCharacters"
+                  :key="char.id"
+                  class="assignment-row"
+                >
+                  <button
+                    type="button"
+                    class="assignment-main assignment-main--clickable"
+                    @click="navigateToAssignment(`/characters/${char.id}`)"
                   >
+                    <FateAvatar
+                      class="assignment-avatar"
+                      :value="char.avatar"
+                      size="S"
+                      :background="getColorVars(char.color)['--fate-blue']"
+                    />
+                    <div class="assignment-info">
+                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
+                      <span v-if="char.highConcept" class="assignment-concept">{{
+                        char.highConcept
+                      }}</span>
+                    </div>
+                  </button>
+                  <div class="assignment-actions">
+                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
+                      >Entfernen</FateButton
+                    >
+                  </div>
                 </div>
 
                 <template v-if="gmModeStore.isGMMode">
@@ -235,41 +270,48 @@ function updateMilestone(milestone: Milestone) {
                   <div v-if="nscCharacters.length === 0" class="empty-text">
                     Keine NSC zugeordnet.
                   </div>
-                  <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
-                    <div class="assignment-avatar" :style="{ background: getColorVars(char.color)['--fate-blue'] }">{{ char.avatar }}</div>
-                    <div class="assignment-info" @click="router.push(`/characters/${char.id}`)">
-                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
-                      <span v-if="char.highConcept" class="assignment-concept">{{
-                        char.highConcept
-                      }}</span>
-                    </div>
-                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
-                      >Entfernen</FateButton
+                  <div
+                    v-for="char in nscCharacters"
+                    :key="char.id"
+                    class="assignment-row"
+                  >
+                    <button
+                      type="button"
+                      class="assignment-main assignment-main--clickable"
+                      @click="navigateToAssignment(`/characters/${char.id}`)"
                     >
+                      <FateAvatar
+                        class="assignment-avatar"
+                        :value="char.avatar"
+                        size="S"
+                        :background="getColorVars(char.color)['--fate-blue']"
+                      />
+                      <div class="assignment-info">
+                        <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
+                        <span v-if="char.highConcept" class="assignment-concept">{{
+                          char.highConcept
+                        }}</span>
+                      </div>
+                    </button>
+                    <div class="assignment-actions">
+                      <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
+                        >Entfernen</FateButton
+                      >
+                    </div>
                   </div>
                 </template>
               </template>
 
               <div v-if="availableCharacters.length > 0" class="assign-row">
-                <select
-                  class="assign-select"
+                <FateDropdown
+                  v-model="selectedCharacterId"
+                  class="assign-dropdown"
+                  size="M"
+                  variant="secondary"
+                  placeholder="Charakter hinzufügen..."
+                  :groups="availableCharacterGroups"
                   @change="onAssignCharacter"
-                >
-                  <option value="">Charakter hinzufügen...</option>
-                  <optgroup v-if="availableSc.length > 0" label="Spielercharaktere (SC)">
-                    <option v-for="c in availableSc" :key="c.id" :value="c.id">
-                      {{ c.name || '(Unbenannt)' }}
-                    </option>
-                  </optgroup>
-                  <optgroup
-                    v-if="gmModeStore.isGMMode && availableNsc.length > 0"
-                    label="Nicht-Spieler-Charaktere (NSC)"
-                  >
-                    <option v-for="c in availableNsc" :key="c.id" :value="c.id">
-                      {{ c.name || '(Unbenannt)' }}
-                    </option>
-                  </optgroup>
-                </select>
+                />
               </div>
             </div>
           </section>
@@ -281,22 +323,42 @@ function updateMilestone(milestone: Milestone) {
               <div v-if="campaignItems.length === 0" class="empty-text">
                 Noch keine Gegenstände zugeordnet.
               </div>
-              <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
-                <div class="assignment-avatar" :style="{ background: getColorVars(item.color)['--fate-blue'] }">{{ item.avatar }}</div>
-                <div class="assignment-info" @click="router.push(`/items/${item.id}`)">
-                  <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || '(Unbenannt)' }}</strong>
-                  <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
+              <div
+                v-for="item in campaignItems"
+                :key="item.id"
+                class="assignment-row"
+              >
+                <button
+                  type="button"
+                  class="assignment-main assignment-main--clickable"
+                  @click="navigateToAssignment(`/items/${item.id}`)"
+                >
+                  <FateAvatar
+                    class="assignment-avatar"
+                    :value="item.avatar"
+                    size="S"
+                    :background="getColorVars(item.color)['--fate-blue']"
+                  />
+                  <div class="assignment-info">
+                    <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || '(Unbenannt)' }}</strong>
+                    <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
+                  </div>
+                </button>
+                <div class="assignment-actions">
+                  <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
                 </div>
-                <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
               </div>
 
               <div v-if="availableItems.length > 0" class="assign-row">
-                <select class="assign-select" @change="onAssignItem">
-                  <option value="">Gegenstand hinzufügen...</option>
-                  <option v-for="i in availableItems" :key="i.id" :value="i.id">
-                    {{ i.name || '(Unbenannt)' }}
-                  </option>
-                </select>
+                <FateDropdown
+                  v-model="selectedItemId"
+                  class="assign-dropdown"
+                  size="M"
+                  variant="secondary"
+                  placeholder="Gegenstand hinzufügen..."
+                  :options="availableItemOptions"
+                  @change="onAssignItem"
+                />
               </div>
             </div>
           </section>
@@ -403,38 +465,49 @@ function updateMilestone(milestone: Milestone) {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.4rem 0;
+  padding: 0.4rem;
   border-bottom: 1px solid var(--fate-blue-light);
-}
-
-.assignment-avatar {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  line-height: 1;
 }
 
 .assignment-row:last-of-type {
   border-bottom: none;
 }
 
-.assignment-info {
+.assignment-main {
   display: flex;
-  flex-direction: column;
-  cursor: pointer;
+  align-items: center;
+  gap: 0.5rem;
   flex: 1;
+  min-width: 0;
+}
+
+.assignment-main--clickable {
+  appearance: none;
+  border: none;
+  background: transparent;
+  width: 100%;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   transition: background 0.1s;
 }
 
-.assignment-info:hover {
-  background: var(--fate-hover-bg);
+.assignment-main--clickable:hover {
+  background: var(--fate-blue-light);
+}
+
+.assignment-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.assignment-actions {
+  flex-shrink: 0;
 }
 
 
@@ -462,20 +535,8 @@ function updateMilestone(milestone: Milestone) {
   padding-top: 0.5rem;
 }
 
-.assign-select {
-  padding: 0.35rem 0.5rem;
-  border: 1px solid var(--fate-border);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-family: inherit;
-  color: var(--fate-text);
-  background: white;
-  cursor: pointer;
-}
-
-.assign-select:focus {
-  outline: none;
-  border-color: var(--fate-blue);
+.assign-dropdown {
+  min-width: min(100%, 320px);
 }
 
 @container main (width < 480px) {

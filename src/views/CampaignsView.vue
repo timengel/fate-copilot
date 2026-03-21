@@ -59,7 +59,7 @@ function deleteCampaign(id: string, name: string) {
           >
             <div class="card-header">
               <FateAvatar :value="campaign.avatar" size="S" />
-              {{ campaign.name }}
+              <span class="card-header-title">{{ campaign.name }}</span>
             </div>
             <div class="card-description" v-if="campaign.description">
               {{ campaign.description }}
@@ -147,10 +147,18 @@ function deleteCampaign(id: string, name: string) {
   font-weight: 700;
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
-  margin-bottom: 0.25rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+}
+
+.card-header-title {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-description {
@@ -158,8 +166,8 @@ function deleteCampaign(id: string, name: string) {
   font-size: 0.8rem;
   color: var(--fate-text-light);
   display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

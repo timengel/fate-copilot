@@ -66,7 +66,7 @@ function save() {
     <div class="form-group">
       <label class="form-label">Avatar</label>
       <div class="avatar-field">
-        <FateAvatar :value="form.avatar" />
+        <FateAvatar :value="form.avatar" :background="getColorVars(form.color)['--fate-blue']" />
         <AvatarPicker v-model="form.avatar" />
       </div>
     </div>

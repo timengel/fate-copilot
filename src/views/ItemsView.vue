@@ -102,6 +102,7 @@ function deleteItem(id: string, name: string) {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: 210px;
 }
 
 .character-card:hover {
