@@ -14,6 +14,18 @@ import FateIcon from '../shared/FateIcon.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 
+// Module-level constant — not reactive, shared across all instances
+const CONSEQUENCE_TYPES: {
+  label: string;
+  severity: ConsequenceSeverity;
+  labelKey: ConsequenceLabel;
+}[] = [
+  { label: 'Leicht', severity: 2, labelKey: 'mild' },
+  { label: 'Mittel', severity: 4, labelKey: 'moderate' },
+  { label: 'Schwer', severity: 6, labelKey: 'severe' },
+  { label: 'Extrem', severity: 8, labelKey: 'extreme' },
+];
+
 const props = defineProps<{
   character: Character;
   mode?: 'view' | 'edit';
@@ -65,11 +77,15 @@ const colorVars = computed(() => {
 });
 
 // NSC: collapsible sections (edit mode only)
-const showExtras = ref(
-  form.type !== 'nsc' || !!form.extras?.trim(),
-);
-const showStunts = ref(
-  form.type !== 'nsc' || form.stunts.length > 0,
+const showExtras = ref(form.type !== 'nsc' || !!form.extras?.trim());
+const showStunts = ref(form.type !== 'nsc' || form.stunts.length > 0);
+
+watch(
+  () => form.type,
+  (newType) => {
+    showExtras.value = newType !== 'nsc' || !!form.extras?.trim();
+    showStunts.value = newType !== 'nsc' || form.stunts.length > 0;
+  },
 );
 
 // Stunt management
@@ -95,17 +111,6 @@ function onStuntDescInput(index: number, e: Event) {
 }
 
 // Consequence management
-const CONSEQUENCE_TYPES: {
-  label: string;
-  severity: ConsequenceSeverity;
-  labelKey: ConsequenceLabel;
-}[] = [
-  { label: 'Leicht', severity: 2, labelKey: 'mild' },
-  { label: 'Mittel', severity: 4, labelKey: 'moderate' },
-  { label: 'Schwer', severity: 6, labelKey: 'severe' },
-  { label: 'Extrem', severity: 8, labelKey: 'extreme' },
-];
-
 function countConsequences(severity: ConsequenceSeverity) {
   return form.consequences.filter((c) => c.severity === severity).length;
 }
