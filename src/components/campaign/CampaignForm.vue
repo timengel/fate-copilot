@@ -2,6 +2,7 @@
 import { reactive } from 'vue';
 import type { Campaign } from '../../types';
 import { deepClone } from '../../utils/deepClone';
+import { getColorVars } from '../../composables/useColorVars';
 import ColorPicker from '../shared/ColorPicker.vue';
 import FateButton from '../shared/FateButton.vue';
 
@@ -20,7 +21,7 @@ function save() {
 </script>
 
 <template>
-  <div class="campaign-form">
+  <div class="campaign-form" :style="getColorVars(form.color)">
     <div class="form-group">
       <label class="form-label">Name *</label>
       <input class="form-control" v-model="form.name" placeholder="Kampagnenname" />
@@ -66,8 +67,8 @@ function save() {
     </div>
 
     <div class="form-actions">
-      <FateButton variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
-      <FateButton @click="save">Speichern</FateButton>
+      <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
+      <FateButton icon="check" @click="save"><span class="btn-label">Speichern</span></FateButton>
     </div>
   </div>
 </template>
@@ -79,6 +80,8 @@ function save() {
   border-radius: 6px;
   padding: 1.25rem;
   max-width: 600px;
+  container-type: inline-size;
+  container-name: campaign-form;
 }
 
 .form-group {
@@ -115,8 +118,16 @@ function save() {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border-top: 1px solid var(--fate-border);
-  background: var(--fate-blue-light);
+  padding-top: 0.75rem;
+}
+
+@container campaign-form (width < 480px) {
+  .form-actions .btn-label {
+    display: none;
+  }
+
+  .form-actions :deep(.fate-btn) {
+    padding: 0;
+  }
 }
 </style>
