@@ -29,4 +29,6 @@ export const useCharactersStore = defineStore('characters', () => {
   }
 
   return { characters, addCharacter, updateCharacter, deleteCharacter, getById, replaceAll };
+}, {
+  persist: { key: 'fcp-characters' },
 });

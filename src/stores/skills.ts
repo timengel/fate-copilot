@@ -34,4 +34,6 @@ export const useSkillsStore = defineStore('skills', () => {
   }
 
   return { skills, addSkill, removeSkill, replaceAll, resetToDefaults };
+}, {
+  persist: { key: 'fcp-skills' },
 });

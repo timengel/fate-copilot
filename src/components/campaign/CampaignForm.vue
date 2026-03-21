@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { reactive, toRaw } from 'vue';
+import { reactive } from 'vue';
 import type { Campaign } from '../../types';
+import { deepClone } from '../../utils/deepClone';
 import ColorPicker from '../shared/ColorPicker.vue';
 import FateButton from '../shared/FateButton.vue';
 
 const props = defineProps<{ campaign: Campaign }>();
 const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>();
 
-const form = reactive<Campaign>(structuredClone(toRaw(props.campaign)));
+const form = reactive<Campaign>(deepClone(props.campaign));
 
 function save() {
   if (!form.name.trim()) {
     alert('Bitte einen Kampagnennamen eingeben.');
     return;
   }
-  emit('save', structuredClone(toRaw(form)));
+  emit('save', deepClone(form));
 }
 </script>
 

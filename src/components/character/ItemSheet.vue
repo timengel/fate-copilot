@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, toRaw, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { Item, Stunt } from '../../types';
+import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
@@ -30,12 +31,12 @@ const emit = defineEmits<{ save: [item: Item]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Item>(structuredClone(toRaw(props.item)));
+const form = reactive<Item>(deepClone(props.item));
 
 watch(
   () => props.item,
   (item) => {
-    Object.assign(form, structuredClone(toRaw(item)));
+    Object.assign(form, deepClone(item));
   },
   { deep: true },
 );
@@ -109,7 +110,7 @@ function removeAspect(index: number) {
 }
 
 function save() {
-  emit('save', structuredClone(toRaw(form)));
+  emit('save', deepClone(form));
 }
 
 defineExpose({ save });

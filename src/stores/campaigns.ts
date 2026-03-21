@@ -168,4 +168,6 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     updateMilestone,
     replaceAll,
   };
+}, {
+  persist: { key: 'fcp-campaigns' },
 });

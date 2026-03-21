@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, toRaw, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types';
+import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
@@ -47,12 +48,12 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Character>(structuredClone(toRaw(props.character)));
+const form = reactive<Character>(deepClone(props.character));
 
 watch(
   () => props.character,
   (character) => {
-    Object.assign(form, structuredClone(toRaw(character)));
+    Object.assign(form, deepClone(character));
   },
   { deep: true },
 );
@@ -141,7 +142,7 @@ function removeStressBox(track: 'physical' | 'mental') {
 }
 
 function save() {
-  emit('save', JSON.parse(JSON.stringify(form)));
+  emit('save', deepClone(form));
 }
 
 defineExpose({ save });

@@ -2,10 +2,26 @@
 import ImportExportBar from '../components/shared/ImportExportBar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import FateToggle from '../components/shared/FateToggle.vue';
+import FateButton from '../components/shared/FateButton.vue';
+import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from '../stores/gmMode';
+import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { ToggleVariant } from '@fate/types';
 
 const gmModeStore = useGMModeStore();
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+
+function clearAllData() {
+  showConfirmDialog(
+    'Alle Daten löschen',
+    'Alle Kampagnen, Charaktere, Gegenstände und Einstellungen werden unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
+    () => {
+      localStorage.clear();
+      sessionStorage.clear();
+      location.reload();
+    },
+  );
+}
 </script>
 
 <template>
@@ -31,6 +47,25 @@ const gmModeStore = useGMModeStore();
       </p>
       <ImportExportBar />
     </section>
+
+    <section class="settings-section settings-section--danger">
+      <h2>Gefahrenzone</h2>
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <span>Alle Daten löschen</span>
+          <span class="settings-row-description">Löscht alle Kampagnen, Charaktere, Gegenstände und Einstellungen unwiderruflich.</span>
+        </div>
+        <FateButton variant="danger" @click="clearAllData">Zurücksetzen</FateButton>
+      </div>
+    </section>
+
+    <ConfirmDialog
+      v-if="confirmDialog"
+      :title="confirmDialog.title"
+      :message="confirmDialog.message"
+      @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+      @cancel="confirmDialog = null"
+    />
   </div>
 </template>
 
@@ -81,6 +116,14 @@ const gmModeStore = useGMModeStore();
 .settings-row-description {
   font-size: 0.8rem;
   color: var(--fate-text-light);
+}
+
+.settings-section--danger {
+  border-color: var(--fate-red);
+}
+
+.settings-section--danger h2 {
+  color: var(--fate-red);
 }
 
 @container main (max-width: 480px) {

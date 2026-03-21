@@ -4,11 +4,8 @@ import { RouterView, RouterLink, useRouter } from 'vue-router';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateToast from './components/shared/FateToast.vue';
-import { initPersistence } from './composables/usePersistence';
 import { useGMModeStore } from './stores/gmMode';
 import { ToggleVariant } from './types';
-
-initPersistence();
 
 const navOpen = ref(false);
 const router = useRouter();

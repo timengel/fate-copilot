@@ -202,7 +202,8 @@ describe('CharacterSheet (edit mode)', () => {
 
   // ─── DataCloneError regression ────────────────────────────────
   // When SkillPyramid emits a filtered reactive array, form.skills holds Vue Proxy
-  // objects. structuredClone() would fail — JSON.parse(JSON.stringify()) must be used.
+  // objects. structuredClone(toRaw()) only unwraps one level and would fail.
+  // deepClone() recursively strips all Vue proxies and must be used instead.
 
   it('save() emits a structuredClone-able character after SkillPyramid emits reactive skills', async () => {
     const pinia = createPinia();
