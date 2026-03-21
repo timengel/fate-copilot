@@ -18,6 +18,18 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   });
 }
 
+function renderView(character?: Character, extraProps: Record<string, unknown> = {}) {
+  const pinia = createPinia();
+  setActivePinia(pinia);
+  return render(CharacterSheet, {
+    props: { character: character ?? createDefaultCharacter(), mode: 'view', ...extraProps },
+    global: {
+      plugins: [pinia],
+      stubs: { SkillPyramid: true },
+    },
+  });
+}
+
 describe('CharacterSheet (edit mode)', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -246,6 +258,33 @@ describe('CharacterSheet (edit mode)', () => {
     expect(saved).not.toBe(char);
     expect(saved.stressPhysical).not.toBe(char.stressPhysical);
     expect(saved.consequences).not.toBe(char.consequences);
+  });
+});
+
+describe('CharacterSheet (view mode)', () => {
+  it('hides empty consequence rows', () => {
+    const char: Character = {
+      ...createDefaultCharacter(),
+      consequences: [
+        { severity: 2, label: 'mild', value: '' },
+        { severity: 4, label: 'moderate', value: 'Sprained ankle' },
+      ],
+    };
+    const { container } = renderView(char);
+    expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
+    expect(screen.getByText('Sprained ankle')).toBeTruthy();
+  });
+
+  it('hides the consequences section when all consequences are empty', () => {
+    const char: Character = {
+      ...createDefaultCharacter(),
+      consequences: [
+        { severity: 2, label: 'mild', value: '' },
+        { severity: 4, label: 'moderate', value: '' },
+      ],
+    };
+    renderView(char);
+    expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
   });
 });
 

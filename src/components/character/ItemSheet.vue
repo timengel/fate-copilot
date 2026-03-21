@@ -164,7 +164,7 @@ defineExpose({ save });
             />
             <span v-else class="field-value">{{ data.name || '—' }}</span>
           </div>
-          <div class="field-row">
+          <div class="field-row field-row--multiline">
             <label class="field-label">Beschreibung</label>
             <textarea
               v-if="isEditing"
@@ -544,9 +544,13 @@ defineExpose({ save });
 
 .field-row {
   display: flex;
-  align-items: start;
+  align-items: center;
   gap: 0.5rem;
   padding: 3px 0;
+}
+
+.field-row--multiline {
+  align-items: start;
 }
 
 .field-label {

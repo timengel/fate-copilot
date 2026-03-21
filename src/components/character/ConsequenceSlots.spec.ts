@@ -68,6 +68,12 @@ describe('ConsequenceSlots', () => {
   });
 
   describe('readonly mode', () => {
+    it('hides empty consequence rows', () => {
+      const { container } = render(ConsequenceSlots, { props: { consequences, readonly: true } });
+      expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
+      expect(screen.getByText('Broken leg')).toBeTruthy();
+    });
+
     it('does not render inputs', () => {
       const { container } = render(ConsequenceSlots, { props: { consequences, readonly: true } });
       expect(container.querySelectorAll('input.consequence-input')).toHaveLength(0);

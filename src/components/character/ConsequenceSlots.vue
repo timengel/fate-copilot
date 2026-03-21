@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Consequence, ConsequenceLabel } from '../../types';
 import FateButton from '../shared/FateButton.vue';
 
@@ -18,6 +19,10 @@ const LABELS: Record<ConsequenceLabel, string> = {
   extreme: 'Extrem',
 };
 
+const visibleConsequences = computed(() =>
+  props.readonly ? props.consequences.filter((con) => con.value.trim() !== '') : props.consequences,
+);
+
 function updateValue(index: number, value: string) {
   const updated = props.consequences.map((c, i) => (i === index ? { ...c, value } : c));
   emit('update', updated);
@@ -34,15 +39,15 @@ function clearValue(index: number) {
 
 <template>
   <div class="consequence-slots">
-    <div v-for="(con, i) in consequences" :key="i" class="consequence-row">
+    <div v-for="(con, i) in visibleConsequences" :key="`${con.severity}-${con.label}-${i}`" class="consequence-row">
       <span class="consequence-severity">{{ con.severity }}</span>
       <span class="consequence-label">{{ LABELS[con.label] }}</span>
-      <span v-if="readonly" class="consequence-value">{{ con.value || '—' }}</span>
+      <span v-if="readonly" class="consequence-value">{{ con.value }}</span>
       <input
         v-else
         class="consequence-input"
         :value="con.value"
-        :placeholder="`${LABELS[con.label]} Konsequenz`"
+        placeholder="—"
         @input="onValueInput(i, $event)"
       />
       <FateButton

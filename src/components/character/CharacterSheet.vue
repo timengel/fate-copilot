@@ -68,6 +68,7 @@ const isDirty = computed(
 );
 
 const data = computed(() => (isEditing.value ? form : props.character));
+const visibleConsequences = computed(() => data.value.consequences.filter((con) => con.value.trim() !== ''));
 
 const isNscHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && props.character.type === 'nsc',
@@ -204,7 +205,7 @@ defineExpose({ save });
               />
               <span v-else class="field-value">{{ data.name || '—' }}</span>
             </div>
-            <div class="field-row">
+            <div class="field-row field-row--multiline">
               <label class="field-label">Beschreibung</label>
               <textarea
                 v-if="isEditing"
@@ -226,15 +227,31 @@ defineExpose({ save });
             </div>
           </div>
           <div class="general-right">
-            <div v-if="sections?.generalRefresh !== false" class="field-row">
-              <label class="field-label">Erholungsrate</label>
-              <FateCounter v-if="isEditing" v-model="form.refresh" :min="1" :max="10" />
-              <span v-else class="field-value refresh-value">{{ data.refresh }}</span>
+            <div
+              v-if="isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
+              class="field-row field-row--stats"
+            >
+              <div v-if="sections?.generalFatePoints !== false" class="field-stat">
+                <label class="field-label">Fate-Punkte</label>
+                <FateCounter v-model="form.fatePoints" />
+              </div>
+              <div v-if="sections?.generalRefresh !== false" class="field-stat">
+                <label class="field-label">Erholungsrate</label>
+                <FateCounter v-model="form.refresh" :min="1" :max="10" />
+              </div>
             </div>
-            <div v-if="sections?.generalFatePoints !== false" class="field-row">
-              <label class="field-label">Fate-Punkte</label>
-              <FateCounter v-if="isEditing" v-model="form.fatePoints" />
-              <span v-else class="field-value fate-points">{{ data.fatePoints }}</span>
+            <div
+              v-if="!isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
+              class="field-row field-row--stats"
+            >
+              <div v-if="sections?.generalFatePoints !== false" class="field-stat">
+                <span class="field-label">Fate-Punkte</span>
+                <span class="field-value fate-points">{{ data.fatePoints }}</span>
+              </div>
+              <div v-if="sections?.generalRefresh !== false" class="field-stat">
+                <span class="field-label">Erholungsrate</span>
+                <span class="field-value refresh-value">{{ data.refresh }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -452,7 +469,7 @@ defineExpose({ save });
         </div>
 
         <section
-          v-if="isEditing || sections?.consequences !== false"
+          v-if="isEditing || (sections?.consequences !== false && visibleConsequences.length > 0)"
           class="sheet-section consequences"
           :class="{ 'span-full': !isEditing && (sections?.stress === false || (data.stressPhysical.length === 0 && data.stressMental.length === 0)) }"
         >
@@ -489,7 +506,7 @@ defineExpose({ save });
               @update="form.consequences = $event"
             />
           </template>
-          <ConsequenceSlots v-else :consequences="data.consequences" :readonly="true" />
+          <ConsequenceSlots v-else :consequences="visibleConsequences" :readonly="true" />
         </section>
       </div>
 
@@ -640,9 +657,31 @@ defineExpose({ save });
 
 .field-row {
   display: flex;
-  align-items: start;
+  align-items: center;
   gap: 0.5rem;
   padding: 3px 0;
+}
+
+.field-row--multiline {
+  align-items: start;
+}
+
+.field-row--stats {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.field-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-stat + .field-stat {
+  border-left: 1px solid color-mix(in srgb, var(--fate-blue) 28%, white 72%);
+  padding-left: 1rem;
 }
 
 .field-label {
@@ -670,6 +709,14 @@ defineExpose({ save });
 .general-left .field-value {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.general .field-value {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  min-width: 0;
+  padding: 0;
 }
 
 .field-value.field-description {
