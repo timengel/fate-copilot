@@ -7,19 +7,22 @@ import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
 const store = useItemsStore();
 const gmModeStore = useGMModeStore();
 const search = ref('');
+const showArchivedItems = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const filtered = computed(() =>
   store.items.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.value.toLowerCase()) &&
-      (gmModeStore.isGMMode || !c.hidden),
+    (item) =>
+      item.name.toLowerCase().includes(search.value.toLowerCase()) &&
+      (showArchivedItems.value || !item.archived) &&
+      (gmModeStore.isGMMode || !item.hidden),
   ),
 );
 
@@ -40,7 +43,10 @@ function deleteItem(id: string, name: string) {
       <FateButton variant="primary" icon="add" @click="router.push('/items/new')">Neuer Gegenstand</FateButton>
     </FateHeader>
 
-    <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
+    <div class="items-input-row">
+      <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
+      <FateCheckbox v-model="showArchivedItems" label="Zeige archivierte Gegenstände" />
+    </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
       {{ totalItems === 0 ? 'Noch keine Gegenstände vorhanden.' : 'Keine Treffer gefunden.' }}
@@ -87,14 +93,23 @@ function deleteItem(id: string, name: string) {
 </template>
 
 <style scoped>
+.items-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
 .search-input {
+  flex: 1;
   width: 100%;
+  min-width: min(260px, 100%);
   max-width: 400px;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--fate-border);
   border-radius: 4px;
   font-size: 0.875rem;
-  margin-bottom: 1rem;
   color: var(--fate-text);
   background: white;
 }

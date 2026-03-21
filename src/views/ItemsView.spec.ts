@@ -73,4 +73,29 @@ describe('ItemsView – card interactions', () => {
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
   });
+
+  it('shows archived items only when the archive filter is enabled', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useItemsStore();
+    store.addItem(makeItem({ id: 'item-archived', name: 'Archivierter Gegenstand', archived: true }));
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    expect(view.queryByText('Archivierter Gegenstand')).toBeNull();
+
+    await fireEvent.click(view.getByText('Zeige archivierte Gegenstände'));
+
+    expect(view.getByText('Archivierter Gegenstand')).toBeTruthy();
+  });
 });
