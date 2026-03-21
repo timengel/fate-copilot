@@ -74,6 +74,17 @@ describe('DashboardView archived item filter', () => {
         plugins: [pinia],
         stubs: {
           FateButton: { template: '<button><slot /></button>' },
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
           FateRadioButtonGroup: { template: '<div />' },
           CharacterSheet: { template: '<div class="character-sheet-stub" />' },
           ItemSheet: stubItemSheet
@@ -144,6 +155,17 @@ describe('DashboardView archived item filter', () => {
       global: {
         plugins: [pinia],
         stubs: {
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
           FateRadioButtonGroup: { template: '<div />' },
           CharacterSheet: { template: '<div class="character-sheet-stub" />' },
         },

@@ -10,9 +10,10 @@ import CharacterSheet from '../components/character/CharacterSheet.vue';
 import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import FateDropdown from '../components/shared/FateDropdown.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
 import { useItemsStore } from '../stores/items';
-import type { Character, Item } from '../types';
+import { DropdownVariant, type Character, type Item } from '../types';
 
 const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
@@ -42,6 +43,20 @@ const allCampaigns = computed(() =>
     ? campaignsStore.campaigns
     : campaignsStore.campaigns.filter((c) => c.status === 'active'),
 );
+
+const campaignOptions = computed(() =>
+  allCampaigns.value.map((campaign) => ({
+    value: campaign.id,
+    label: campaign.name,
+  })),
+);
+
+const selectedCampaignIdDropdown = computed({
+  get: () => selectedCampaignId.value ?? '',
+  set: (value: string) => {
+    selectedCampaignId.value = value || null;
+  },
+});
 
 watchEffect(() => {
   const visible = allCampaigns.value;
@@ -150,12 +165,14 @@ onUnmounted(() => {
           <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
             Keine Kampagnen.
           </div>
-          <select v-else v-model="selectedCampaignId" class="campaign-select">
-            <option :value="null" disabled>Wählen…</option>
-            <option v-for="campaign in allCampaigns" :key="campaign.id" :value="campaign.id">
-              {{ campaign.name }}
-            </option>
-          </select>
+          <FateDropdown
+            v-else
+            v-model="selectedCampaignIdDropdown"
+            class="campaign-dropdown"
+            placeholder="Wählen…"
+            :options="campaignOptions"
+            :variant="DropdownVariant.Secondary"
+          />
         </div>
 
         <div class="sidebar-group">
@@ -330,21 +347,27 @@ onUnmounted(() => {
   width: 100%;
 }
 
-.campaign-select {
-  width: 100%;
-  padding: 0.3rem 0.4rem;
-  font-size: 0.85rem;
-  border: 1px solid var(--fate-border);
-  border-radius: 4px;
-  background: var(--fate-white);
-  color: var(--fate-text);
-  cursor: pointer;
+.campaign-dropdown {
   margin-top: 0.25rem;
 }
 
-.campaign-select:focus {
-  outline: 2px solid var(--fate-blue);
-  outline-offset: 2px;
+:deep(.campaign-dropdown.fate-dropdown) {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  --dropdown-min-width: 0;
+  --dropdown-max-width: 100%;
+}
+
+:deep(.campaign-dropdown .fate-dropdown__select) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .campaign-select-inline {
@@ -422,6 +445,7 @@ onUnmounted(() => {
 
 .sidebar-group {
   margin-top: 1rem;
+  min-width: 0;
 }
 
 .sidebar-group-label {
