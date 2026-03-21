@@ -111,7 +111,9 @@ const campaignItems = computed(() => {
 });
 
 const availableItems = computed(() =>
-  itemsStore.items.filter((i) => !campaignItems.value.some((ci) => ci.id === i.id)),
+  itemsStore.items.filter(
+    (i) => !campaignItems.value.some((ci) => ci.id === i.id) && (gmModeStore.isGMMode || !i.hidden),
+  ),
 );
 
 function onAssignItem(itemId: string) {

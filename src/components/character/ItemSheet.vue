@@ -140,8 +140,8 @@ defineExpose({ save });
     <div class="item-name-bar">
       <FateAvatar :value="data.avatar" />
       <span class="item-name-text">{{ data.name || 'Unbenannt' }}</span>
+      <span v-if="!isEditing" class="item-type-badge">ITEM</span>
       <span v-if="!isEditing && gmModeStore.isGMMode && data.hidden" class="item-hidden-badge">VERSTECKT</span>
-      <span v-if="!isEditing && !(gmModeStore.isGMMode && data.hidden)" class="item-type-badge">ITEM</span>
       <div class="item-name-bar-end">
         <slot v-if="!isEditing" name="name-bar-actions" />
         <slot v-else name="edit-bar-actions" :isDirty="isDirty" />
@@ -210,7 +210,11 @@ defineExpose({ save });
     </section>
 
     <!-- EXTRAS -->
-    <section v-if="show.extras && (isEditing || data.extras?.trim())" class="sheet-section extras">
+    <section
+      v-if="show.extras && (isEditing || data.extras?.trim())"
+      class="sheet-section extras"
+      :class="{ 'span-full': !isEditing && (!show.stunts || data.stunts.length === 0) }"
+    >
       <div class="sheet-section-header">EXTRAS</div>
       <textarea
         v-if="isEditing"
@@ -222,7 +226,11 @@ defineExpose({ save });
     </section>
 
     <!-- STUNTS -->
-    <section v-if="show.stunts && (isEditing || data.stunts.length > 0)" class="sheet-section stunts">
+    <section
+      v-if="show.stunts && (isEditing || data.stunts.length > 0)"
+      class="sheet-section stunts"
+      :class="{ 'span-full': !isEditing && (!show.extras || !data.extras?.trim()) }"
+    >
       <div class="sheet-section-header">STUNTS</div>
       <div v-if="isEditing" class="stunts-list">
         <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
@@ -417,7 +425,18 @@ defineExpose({ save });
 }
 
 .item-hidden-badge {
-  background: var(--fate-blue-dark);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff6cf;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.item-type-badge {
+  background: rgba(255, 255, 255, 0.3);
   color: white;
   font-size: 0.65rem;
   font-weight: 700;
