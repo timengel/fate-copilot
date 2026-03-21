@@ -171,7 +171,7 @@ onUnmounted(() => {
             class="campaign-dropdown"
             placeholder="Wählen…"
             :options="campaignOptions"
-            :variant="DropdownVariant.Secondary"
+            :variant="DropdownVariant.Add"
           />
         </div>
 

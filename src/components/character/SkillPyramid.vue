@@ -105,10 +105,16 @@ function removeCol() {
       </div>
       <div class="level-slots">
         <div v-for="i in effectiveCols" :key="i" class="skill-slot">
-          <span v-if="readonly" class="skill-value">{{ getSlotValue(level, i - 1) }}</span>
+          <span
+            v-if="readonly"
+            class="skill-value"
+            :class="{ 'skill-value--filled': !!getSlotValue(level, i - 1) }"
+            >{{ getSlotValue(level, i - 1) }}</span
+          >
           <select
             v-else
             class="skill-select"
+            :class="{ 'skill-select--filled': !!getSlotValue(level, i - 1) }"
             :value="getSlotValue(level, i - 1)"
             @change="onSkillChange(level, i, $event)"
           >
@@ -204,19 +210,24 @@ function removeCol() {
 
 .skill-slot {
   flex: 1;
+  min-width: 0;
 }
 
 .skill-value {
   display: block;
-  border-bottom: 1px solid var(--fate-light-border);
+  border-radius: 6px;
   height: 1.6em;
-  padding: 0;
+  padding: 0.15rem 0.4rem;
   font-size: 0.8rem;
   color: var(--fate-text);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.skill-value--filled {
+  background: var(--fate-blue-light);
 }
 
 .skill-input {
@@ -238,28 +249,34 @@ function removeCol() {
 }
 
 .skill-slot--locked {
-  border-bottom: 1px solid var(--fate-border);
+  border-radius: 6px;
+  background: var(--fate-blue-light);
   opacity: 0.2;
   pointer-events: none;
 }
 
 .skill-select {
   width: 100%;
-  border: none;
-  border-bottom: 1px solid var(--fate-border);
-  padding: 2px 2px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
   font-size: 0.75rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: transparent;
+  background: var(--fate-blue-light);
   outline: none;
   cursor: pointer;
   appearance: auto;
+  text-overflow: ellipsis;
+}
+
+.skill-select--filled {
+  background: var(--fate-blue-light);
 }
 
 .skill-select:focus {
-  border-bottom-color: var(--fate-blue);
-  background: var(--fate-blue-light);
+  border-color: var(--fate-blue);
+  background: color-mix(in srgb, var(--fate-blue-light) 78%, white 22%);
 }
 
 @container (width < 500px) {
