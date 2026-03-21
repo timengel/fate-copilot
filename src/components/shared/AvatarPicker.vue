@@ -6,7 +6,8 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 
 function onInput(e: Event) {
   const val = (e.target as HTMLInputElement).value;
-  const first = [...val][0] ?? '';
+  const segments = [...new Intl.Segmenter().segment(val)];
+  const first = segments[0]?.segment ?? '';
   emit('update:modelValue', first);
   (e.target as HTMLInputElement).value = first;
 }
