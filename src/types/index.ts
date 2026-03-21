@@ -54,7 +54,8 @@ export type ButtonIcon =
   | 'upload'
   | 'copy'
   | 'paste'
-  | 'settings';
+  | 'settings'
+  | 'reset';
 
 // ============================================================
 // Domain Types

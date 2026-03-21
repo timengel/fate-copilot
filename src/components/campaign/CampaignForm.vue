@@ -167,6 +167,8 @@ function save() {
 
   .form-actions :deep(.fate-btn) {
     padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
   }
 }
 </style>

@@ -156,7 +156,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem;
+  padding: 0.4rem 0.55rem;
 }
 
 .nav-link-settings-label {

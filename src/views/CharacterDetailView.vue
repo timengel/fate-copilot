@@ -134,7 +134,7 @@ function queryCharacterType(): CharacterType {
       <template v-else>
         <CharacterSheet :character="character">
           <template v-if="!isNew" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
+            <FateButton class="edit-btn" icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteCharacter" />
           </template>
         </CharacterSheet>
@@ -174,5 +174,17 @@ function queryCharacterType(): CharacterType {
   padding: 2rem;
   text-align: center;
   color: var(--fate-text-light);
+}
+
+@container main (width < 480px) {
+  .btn-label {
+    display: none;
+  }
+
+  :deep(.edit-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
+  }
 }
 </style>

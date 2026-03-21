@@ -6,6 +6,7 @@ import FateButton from '../components/shared/FateButton.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
+import FateIcon from '../components/shared/FateIcon.vue';
 import { useGMModeStore } from '../stores/gmMode';
 import type { SkillInfo } from '../types';
 
@@ -316,9 +317,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
 <template>
   <div class="list-view">
-    <FateHeader title="Fertigkeiten">
-      <FateButton v-if="gmModeStore.isGMMode" variant="danger" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
-    </FateHeader>
+    <FateHeader title="Fertigkeiten" />
 
     <p class="skills-hint">
       Diese Fertigkeiten stehen in der Skill-Pyramide als Dropdown-Optionen zur Verfügung.
@@ -326,17 +325,16 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
     <div class="skills-manage">
       <div>
-        <div v-for="skill in sortedSkills" :key="skill" class="skill-manage-row">
+        <div
+          v-for="skill in sortedSkills"
+          :key="skill"
+          class="skill-manage-row"
+          :class="{ 'skill-manage-row--clickable': !!SKILL_INFO[skill] }"
+          @click="SKILL_INFO[skill] ? (infoSkill = skill) : undefined"
+        >
           <div class="skill-manage-label">
             <span class="skill-manage-name">{{ skill }}</span>
-            <FateButton
-              v-if="SKILL_INFO[skill]"
-              icon="info"
-              variant="secondary"
-              size="S"
-              :title="`Info zu ${skill}`"
-              @click="infoSkill = skill"
-            />
+            <FateIcon v-if="SKILL_INFO[skill]" name="info" :size="14" class="skill-info-icon" />
           </div>
           <div class="skill-manage-actions">
             <FateButton
@@ -362,6 +360,13 @@ const selectedInfo = computed<SkillInfo | null>(() =>
         />
         <FateButton :disabled="!newSkillName.trim()" @click="add">Hinzufügen</FateButton>
       </div>
+    </div>
+
+    <div v-if="gmModeStore.isGMMode" class="reset-btn-wrapper">
+      <FateButton variant="danger" icon="reset" @click="resetToDefaults">
+        <span class="reset-label-full">Auf Standard zurücksetzen</span>
+        <span class="reset-label-short">Zurücksetzen</span>
+      </FateButton>
     </div>
   </div>
 
@@ -409,7 +414,13 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
-  margin: 0 auto 6rem auto;
+  margin: 0 auto 3rem auto;
+}
+
+@container main (width < 480px) {
+  .skills-manage {
+    margin-bottom: 1.5rem;
+  }
 }
 
 .skill-manage-row {
@@ -418,11 +429,21 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   justify-content: space-between;
   padding: 0.65rem 1rem;
   border-bottom: 1px solid var(--fate-blue-light);
+  transition: background 0.1s;
 }
 
-.skill-manage-row:hover {
+.skill-manage-row--clickable {
+  cursor: pointer;
+}
+
+.skill-manage-row--clickable:hover {
   background: var(--fate-hover-bg);
 }
+
+.skill-manage-row--clickable:active {
+  background: var(--fate-blue-light);
+}
+
 
 .skill-manage-actions {
   display: flex;
@@ -526,6 +547,11 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   gap: 0.4rem;
 }
 
+.skill-info-icon {
+  color: var(--fate-text-light);
+  flex-shrink: 0;
+}
+
 .skill-manage-name {
   font-size: 1rem;
   font-weight: 500;
@@ -554,5 +580,25 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 
 .skill-add-input:focus {
   border-color: var(--fate-blue);
+}
+
+.reset-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.reset-label-short {
+  display: none;
+}
+
+@container main (width < 480px) {
+  .reset-label-full {
+    display: none;
+  }
+
+  .reset-label-short {
+    display: inline;
+  }
 }
 </style>
