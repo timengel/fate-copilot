@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ButtonSize, ButtonVariant } from '../../types';
+import { DropdownVariant, type ButtonSize } from '@fate/types';
 import FateIcon from './FateIcon.vue';
 
 export interface FateDropdownOption {
@@ -19,7 +19,7 @@ withDefaults(
     placeholder?: string;
     options?: FateDropdownOption[];
     groups?: FateDropdownGroup[];
-    variant?: ButtonVariant;
+    variant?: DropdownVariant;
     size?: ButtonSize;
     disabled?: boolean;
   }>(),
@@ -28,7 +28,7 @@ withDefaults(
     placeholder: '',
     options: () => [],
     groups: () => [],
-    variant: 'secondary',
+    variant: DropdownVariant.Secondary,
     size: 'M',
     disabled: false,
   },

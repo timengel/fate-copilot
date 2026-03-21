@@ -163,11 +163,12 @@ function deleteCampaign(id: string, name: string) {
 
 .card-description {
   padding: 0.25rem 0.9rem;
-  font-size: 0.8rem;
-  color: var(--fate-text-light);
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--fate-text);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -128,7 +128,7 @@ defineExpose({ save });
   <div v-if="isItemHidden" class="item-sheet item-sheet--hidden" :style="colorVars">
     <div class="item-name-bar">
       <FateAvatar :value="props.item.avatar" />
-      <span class="item-name-text">{{ props.item.name || '(Unbenannt)' }}</span>
+      <span class="item-name-text">{{ props.item.name || 'Unbenannt' }}</span>
     </div>
     <div class="item-hidden-body">
       <div class="item-hidden-label">Details sind im GM-Modus sichtbar.</div>
@@ -139,7 +139,7 @@ defineExpose({ save });
     <!-- Name Bar -->
     <div class="item-name-bar">
       <FateAvatar :value="data.avatar" />
-      <span class="item-name-text">{{ data.name || '(Unbenannt)' }}</span>
+      <span class="item-name-text">{{ data.name || 'Unbenannt' }}</span>
       <span v-if="!isEditing && gmModeStore.isGMMode && data.hidden" class="item-hidden-badge">VERSTECKT</span>
       <span v-if="!isEditing && !(gmModeStore.isGMMode && data.hidden)" class="item-type-badge">ITEM</span>
       <div class="item-name-bar-end">

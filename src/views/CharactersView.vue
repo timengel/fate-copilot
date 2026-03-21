@@ -106,7 +106,7 @@ function deleteCharacter(id: string, name: string) {
       >
         <div class="card-header" :style="cardHeaderStyle(char.color)">
           <FateAvatar :value="char.avatar" size="S" />
-          {{ char.name || '(Unbenannt)' }}
+          <span class="card-header-title">{{ char.name || 'Unbenannt' }}</span>
         </div>
         <div class="card-description">
           <div class="card-concept">{{ char.highConcept || '—' }}</div>
@@ -162,17 +162,27 @@ function deleteCharacter(id: string, name: string) {
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
 }
 
+.card-header-title {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .card-concept {
-  padding: 0.5rem 0.9rem 0.25rem;
+  padding: 0.25rem 0.9rem;
+  margin-top: 0.25rem;
   font-size: 0.875rem;
   color: var(--fate-text);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

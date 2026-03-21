@@ -16,7 +16,7 @@
   --fate-red: #c0392b;
   --fate-green: #27ae60;
 
-  font-family: "Segoe UI", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: var(--fate-text);
@@ -92,7 +92,6 @@ body.dashboard-grid-active .app-main {
   padding-top: 0.5rem;
 }
 
-
 .empty-state {
   color: var(--fate-text-light);
   padding: 2rem;
@@ -142,7 +141,6 @@ body.dashboard-grid-active .app-main {
 }
 
 .sheet-section {
-  border-bottom: 1px solid var(--fate-border);
   container-type: inline-size;
 }
 
@@ -177,7 +175,6 @@ body.dashboard-grid-active .app-main {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 
-
   .toolbar-actions {
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -193,4 +190,3 @@ body.dashboard-grid-active .app-main {
     grid-template-columns: 1fr;
   }
 }
-

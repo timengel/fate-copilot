@@ -21,6 +21,18 @@ export type ButtonVariant =
   | 'ghost'
   | 'subtle';
 
+export enum DropdownVariant {
+  Primary = 'primary',
+  Secondary = 'secondary',
+  Danger = 'danger',
+  DangerOutline = 'danger-outline',
+  Link = 'link',
+  Outline = 'outline',
+  Add = 'add',
+  Ghost = 'ghost',
+  Subtle = 'subtle',
+}
+
 export type ButtonSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
 
 export type ButtonIcon =

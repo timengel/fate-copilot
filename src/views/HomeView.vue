@@ -148,7 +148,7 @@ function getCharCampaign(charId: string): string | null {
               ></div>
               <div class="item-main">
                 <div class="item-name-row">
-                  <span class="item-name">{{ char.name || '(Unbenannt)' }}</span>
+                  <span class="item-name">{{ char.name || 'Unbenannt' }}</span>
                   <FateTag
                     :color="char.type === 'nsc' ? 'banane' : 'pfau'"
                     :label="char.type === 'nsc' ? 'NSC' : 'SC'"

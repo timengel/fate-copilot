@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import type { Milestone, MilestoneType, TagColor } from '../../types';
 import FateButton from '../shared/FateButton.vue';
+import FateDropdown from '../shared/FateDropdown.vue';
 import FateTag from '../shared/FateTag.vue';
 
 const props = defineProps<{
@@ -26,6 +27,12 @@ const TYPE_COLORS: Record<MilestoneType, TagColor> = {
   significant: 'pfau',
   major: 'banane',
 };
+
+const TYPE_OPTIONS = [
+  { value: 'small', label: 'Kleiner Meilenstein' },
+  { value: 'significant', label: 'Bedeutender Meilenstein' },
+  { value: 'major', label: 'Großer Meilenstein' },
+] as const;
 
 const newType = ref<MilestoneType>('small');
 const newDescription = ref('');
@@ -78,11 +85,7 @@ function cancelEdit() {
 
         <!-- Edit mode -->
         <div v-if="!readonly && editingId === m.id" class="timeline-content timeline-content--edit">
-          <select v-model="editType" class="milestone-type-select">
-            <option value="small">Kleiner Meilenstein</option>
-            <option value="significant">Bedeutender Meilenstein</option>
-            <option value="major">Großer Meilenstein</option>
-          </select>
+          <FateDropdown v-model="editType" class="milestone-type-select" :options="TYPE_OPTIONS" size="S" variant="secondary" />
           <input
             v-model="editDescription"
             class="milestone-desc-input"
@@ -119,11 +122,7 @@ function cancelEdit() {
     </div>
 
     <div v-if="!readonly" class="milestone-add-form">
-      <select v-model="newType" class="milestone-type-select">
-        <option value="small">Kleiner Meilenstein</option>
-        <option value="significant">Bedeutender Meilenstein</option>
-        <option value="major">Großer Meilenstein</option>
-      </select>
+      <FateDropdown v-model="newType" class="milestone-type-select" :options="TYPE_OPTIONS" size="S" variant="secondary" />
       <input
         v-model="newDescription"
         class="milestone-desc-input"
@@ -236,17 +235,12 @@ function cancelEdit() {
   align-items: center;
   flex-wrap: wrap;
   padding-top: 0.25rem;
-  border-top: 1px solid var(--fate-border);
 }
 
 .milestone-type-select {
-  font-size: 0.78rem;
-  padding: 3px 6px;
-  border: 1px solid var(--fate-border);
-  border-radius: 4px;
-  background: var(--fate-surface);
-  color: var(--fate-text);
-  font-family: inherit;
+  --dropdown-min-width: 10.5rem;
+  --dropdown-max-width: 14rem;
+  flex-shrink: 0;
 }
 
 .milestone-desc-input {

@@ -60,7 +60,7 @@ function deleteItem(id: string, name: string) {
       >
         <div class="card-header" :style="cardHeaderStyle(item.color)">
           <FateAvatar :value="item.avatar" size="S" />
-          {{ item.name || '(Unbenannt)' }}
+          <span class="card-header-title">{{ item.name || 'Unbenannt' }}</span>
           <span v-if="item.hidden" class="card-hidden-badge">GM</span>
         </div>
         <div v-if="item.description" class="card-description">{{ item.description }}</div>
@@ -117,16 +117,28 @@ function deleteItem(id: string, name: string) {
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+}
+
+.card-header-title {
+  min-width: 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-description {
   padding: 0.25rem 0.9rem;
-  font-size: 0.8rem;
-  color: var(--fate-text-light);
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--fate-text);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

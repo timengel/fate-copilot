@@ -163,7 +163,7 @@ defineExpose({ save });
       <section class="sheet-section general">
         <div class="sheet-section-header">NSC</div>
         <div class="nsc-hidden-body">
-          <div class="nsc-hidden-name">{{ data.name || '(Unbenannt)' }}</div>
+          <div class="nsc-hidden-name">{{ data.name || 'Unbenannt' }}</div>
           <div v-if="data.highConcept" class="nsc-hidden-concept">{{ data.highConcept }}</div>
           <div class="nsc-hidden-label">Details sind im GM-Modus sichtbar.</div>
         </div>
@@ -174,7 +174,7 @@ defineExpose({ save });
       <!-- Name Bar -->
       <div class="character-name-bar">
         <FateAvatar :value="data.avatar" />
-        <span class="character-name-text">{{ data.name || '(Unbenannt)' }}</span>
+        <span class="character-name-text">{{ data.name || 'Unbenannt' }}</span>
         <span v-if="!isEditing" class="character-type-badge">{{
           data.type === 'nsc' ? 'NSC' : 'SC'
         }}</span>

@@ -12,7 +12,7 @@ import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
 import type { Campaign, Milestone } from '../types';
-import { CAMPAIGN_STATUS_LABEL } from '../types';
+import { CAMPAIGN_STATUS_LABEL, DropdownVariant } from '../types';
 import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { createDefaultCampaign } from '../composables/useCharacterDefaults';
@@ -64,15 +64,15 @@ const availableNsc = computed(() => availableCharacters.value.filter((c) => c.ty
 const availableCharacterGroups = computed(() => [
   {
     label: 'Spielercharaktere (SC)',
-    options: availableSc.value.map((c) => ({ value: c.id, label: c.name || '(Unbenannt)' })),
+    options: availableSc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
   },
   {
     label: 'Nicht-Spieler-Charaktere (NSC)',
-    options: availableNsc.value.map((c) => ({ value: c.id, label: c.name || '(Unbenannt)' })),
+    options: availableNsc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
   },
 ].filter((group) => group.options.length > 0));
 const availableItemOptions = computed(() =>
-  availableItems.value.map((i) => ({ value: i.id, label: i.name || '(Unbenannt)' })),
+  availableItems.value.map((i) => ({ value: i.id, label: i.name || 'Unbenannt' })),
 );
 
 function handleSave(updated: Campaign) {
@@ -252,7 +252,7 @@ function navigateToAssignment(path: string) {
                       :background="getColorVars(char.color)['--fate-blue']"
                     />
                     <div class="assignment-info">
-                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
+                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
                       <span v-if="char.highConcept" class="assignment-concept">{{
                         char.highConcept
                       }}</span>
@@ -287,7 +287,7 @@ function navigateToAssignment(path: string) {
                         :background="getColorVars(char.color)['--fate-blue']"
                       />
                       <div class="assignment-info">
-                        <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || '(Unbenannt)' }}</strong>
+                        <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
                         <span v-if="char.highConcept" class="assignment-concept">{{
                           char.highConcept
                         }}</span>
@@ -306,8 +306,8 @@ function navigateToAssignment(path: string) {
                 <FateDropdown
                   v-model="selectedCharacterId"
                   class="assign-dropdown"
-                  size="M"
-                  variant="secondary"
+                  size="S"
+                  :variant="DropdownVariant.Secondary"
                   placeholder="Charakter hinzufügen..."
                   :groups="availableCharacterGroups"
                   @change="onAssignCharacter"
@@ -340,7 +340,7 @@ function navigateToAssignment(path: string) {
                     :background="getColorVars(item.color)['--fate-blue']"
                   />
                   <div class="assignment-info">
-                    <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || '(Unbenannt)' }}</strong>
+                    <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
                     <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
                   </div>
                 </button>
@@ -353,8 +353,8 @@ function navigateToAssignment(path: string) {
                 <FateDropdown
                   v-model="selectedItemId"
                   class="assign-dropdown"
-                  size="M"
-                  variant="secondary"
+                  size="S"
+                  :variant="DropdownVariant.Secondary"
                   placeholder="Gegenstand hinzufügen..."
                   :options="availableItemOptions"
                   @change="onAssignItem"
@@ -536,7 +536,11 @@ function navigateToAssignment(path: string) {
 }
 
 .assign-dropdown {
-  min-width: min(100%, 320px);
+  min-width: min(100%, 15rem);
+}
+
+.sheet-section {
+  margin-bottom: 1rem;
 }
 
 @container main (width < 480px) {
