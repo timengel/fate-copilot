@@ -1,10 +1,11 @@
 import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import DashboardView from './DashboardView.vue';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
+import { useToastStore } from '../stores/toast';
 import type { Campaign, Item } from '../types';
 
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
@@ -43,11 +44,15 @@ describe('DashboardView archived item filter', () => {
     return container.querySelectorAll<HTMLElement>('.sidebar-group .fate-checkbox')[3];
   }
 
+  function getItemEditButton(container: HTMLElement) {
+    return container.querySelector<HTMLButtonElement>('.item-name-bar-end button');
+  }
+
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
-  function setup(itemOverrides: Partial<Item> = {}, isGMMode = false) {
+  function setup(itemOverrides: Partial<Item> = {}, isGMMode = false, stubItemSheet = true) {
     const pinia = createPinia();
     setActivePinia(pinia);
 
@@ -71,10 +76,12 @@ describe('DashboardView archived item filter', () => {
           FateButton: { template: '<button><slot /></button>' },
           FateRadioButtonGroup: { template: '<div />' },
           CharacterSheet: { template: '<div class="character-sheet-stub" />' },
-          ItemSheet: {
-            props: ['item'],
-            template: '<div class="item-sheet-stub">{{ item.name }}</div>',
-          },
+          ItemSheet: stubItemSheet
+            ? {
+                props: ['item'],
+                template: '<div class="item-sheet-stub">{{ item.name }}</div>',
+              }
+            : false,
         },
       },
     });
@@ -96,5 +103,59 @@ describe('DashboardView archived item filter', () => {
     await fireEvent.click(getItemArchivedFilter(view.container)!);
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
+  });
+
+  it('shows an edit button for visible items when editing is enabled', () => {
+    const view = setup({}, false, false);
+    expect(getItemEditButton(view.container)).toBeTruthy();
+  });
+
+  it('switches an item into edit mode and cancels without saving', async () => {
+    const view = setup({}, false, false);
+    await fireEvent.click(getItemEditButton(view.container)!);
+    expect(view.getByText('Abbrechen')).toBeTruthy();
+    expect(view.getByText('Speichern')).toBeTruthy();
+
+    await fireEvent.click(view.getByText('Abbrechen'));
+    expect(getItemEditButton(view.container)).toBeTruthy();
+  });
+
+  it('saves an edited item inline and shows a success toast', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    const itemsStore = useItemsStore();
+    const toastStore = useToastStore();
+    const gmModeStore = useGMModeStore();
+
+    gmModeStore.isGMMode = true;
+
+    const campaign = makeCampaign();
+    const item = makeItem();
+
+    campaignsStore.addCampaign(campaign);
+    itemsStore.addItem(item);
+    campaignsStore.assignItem(campaign.id, item.id);
+
+    const updateSpy = vi.spyOn(itemsStore, 'updateItem');
+
+    const view = render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateRadioButtonGroup: { template: '<div />' },
+          CharacterSheet: { template: '<div class="character-sheet-stub" />' },
+        },
+      },
+    });
+
+    await fireEvent.click(getItemEditButton(view.container)!);
+    await fireEvent.update(view.getByPlaceholderText('Name des Gegenstands'), 'Neues Schwert');
+    await fireEvent.click(view.getByText('Speichern'));
+
+    expect(updateSpy).toHaveBeenCalledOnce();
+    expect(updateSpy.mock.calls[0]?.[0].name).toBe('Neues Schwert');
+    expect(toastStore.message).toBe('Gegenstand gespeichert');
   });
 });

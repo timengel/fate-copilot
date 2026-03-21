@@ -11,10 +11,12 @@ import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
-import type { Character } from '../types';
+import { useItemsStore } from '../stores/items';
+import type { Character, Item } from '../types';
 
 const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
+const itemsStore = useItemsStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const {
@@ -30,8 +32,10 @@ const {
 } = storeToRefs(useDashboardPreferencesStore());
 
 const sidebarCollapsed = ref(false);
-const editingId = ref<string | null>(null);
-const formRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
+const editingCharacterId = ref<string | null>(null);
+const editingItemId = ref<string | null>(null);
+const characterFormRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
+const itemFormRef = ref<InstanceType<typeof ItemSheet>[]>([]);
 
 const allCampaigns = computed(() =>
   gmModeStore.isGMMode
@@ -76,12 +80,22 @@ const characters = computed(() => {
 
 function handleSave(updated: Character) {
   charactersStore.updateCharacter(updated);
-  editingId.value = null;
+  editingCharacterId.value = null;
   toastStore.show('Charakter gespeichert');
 }
 
-function saveEditing() {
-  formRef.value?.[0]?.save();
+function handleItemSave(updated: Item) {
+  itemsStore.updateItem(updated);
+  editingItemId.value = null;
+  toastStore.show('Gegenstand gespeichert');
+}
+
+function saveCharacterEditing() {
+  characterFormRef.value?.[0]?.save();
+}
+
+function saveItemEditing() {
+  itemFormRef.value?.[0]?.save();
 }
 
 watch(sidebarCollapsed, (val) => {
@@ -247,26 +261,26 @@ onUnmounted(() => {
     >
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
         <CharacterSheet
-          v-if="editingId === character.id"
-          ref="formRef"
+          v-if="editingCharacterId === character.id"
+          ref="characterFormRef"
           mode="edit"
           :character="character"
           :hideActions="true"
           @save="handleSave"
-          @cancel="editingId = null"
+          @cancel="editingCharacterId = null"
         >
           <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="M" @click="editingId = null"
+            <FateButton icon="close" variant="outline" size="M" @click="editingCharacterId = null"
               ><span class="btn-label">Abbrechen</span></FateButton
             >
-            <FateButton icon="check" variant="outline" size="M" @click="saveEditing"
+            <FateButton icon="check" variant="outline" size="M" @click="saveCharacterEditing"
               ><span class="btn-label">Speichern</span></FateButton
             >
           </template>
         </CharacterSheet>
         <CharacterSheet v-else :character="character" :sections="visibleSections">
           <template v-if="showEditButton" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="M" @click="editingId = character.id"
+            <FateButton icon="edit" variant="outline" size="M" @click="editingCharacterId = character.id"
               ><span class="btn-label">Bearbeiten</span></FateButton
             >
           </template>
@@ -280,7 +294,32 @@ onUnmounted(() => {
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
       <div v-for="item in items" :key="item.id" class="dashboard-entry">
-        <ItemSheet :item="item" :sections="visibleSections" />
+        <ItemSheet
+          v-if="editingItemId === item.id"
+          ref="itemFormRef"
+          mode="edit"
+          :item="item"
+          :hideActions="true"
+          :sections="visibleSections"
+          @save="handleItemSave"
+          @cancel="editingItemId = null"
+        >
+          <template #edit-bar-actions>
+            <FateButton icon="close" variant="outline" size="M" @click="editingItemId = null"
+              ><span class="btn-label">Abbrechen</span></FateButton
+            >
+            <FateButton icon="check" variant="outline" size="M" @click="saveItemEditing"
+              ><span class="btn-label">Speichern</span></FateButton
+            >
+          </template>
+        </ItemSheet>
+        <ItemSheet v-else :item="item" :sections="visibleSections">
+          <template v-if="showEditButton" #name-bar-actions>
+            <FateButton icon="edit" variant="outline" size="M" @click="editingItemId = item.id"
+              ><span class="btn-label">Bearbeiten</span></FateButton
+            >
+          </template>
+        </ItemSheet>
       </div>
     </div>
   </div>
