@@ -6,10 +6,12 @@ import FateButton from '../components/shared/FateButton.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { useGMModeStore } from '../stores/gmMode';
 import type { SkillInfo } from '../types';
 
 const store = useSkillsStore();
 const toastStore = useToastStore();
+const gmModeStore = useGMModeStore();
 const newSkillName = ref('');
 const infoSkill = ref<string | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
@@ -315,7 +317,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 <template>
   <div class="list-view">
     <FateHeader title="Fertigkeiten">
-      <FateButton variant="danger" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
+      <FateButton v-if="gmModeStore.isGMMode" variant="danger" @click="resetToDefaults">Auf Standard zurücksetzen</FateButton>
     </FateHeader>
 
     <p class="skills-hint">
@@ -323,7 +325,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
     </p>
 
     <div class="skills-manage">
-      <div class="skills-list-box">
+      <div>
         <div v-for="skill in sortedSkills" :key="skill" class="skill-manage-row">
           <div class="skill-manage-label">
             <span class="skill-manage-name">{{ skill }}</span>
@@ -337,7 +339,13 @@ const selectedInfo = computed<SkillInfo | null>(() =>
             />
           </div>
           <div class="skill-manage-actions">
-            <FateButton icon="close" variant="danger" size="S" @click="store.removeSkill(skill)" />
+            <FateButton
+              v-if="gmModeStore.isGMMode"
+              icon="close"
+              variant="danger"
+              size="S"
+              @click="store.removeSkill(skill)"
+            />
           </div>
         </div>
         <div v-if="store.skills.length === 0" class="empty-state">
@@ -345,7 +353,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
         </div>
       </div>
 
-      <div class="skill-add-row">
+      <div v-if="gmModeStore.isGMMode" class="skill-add-row">
         <input
           class="skill-add-input"
           v-model="newSkillName"
@@ -401,12 +409,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
-  margin: 0 auto;
-}
-
-.skills-list-box {
-  max-height: 480px;
-  overflow-y: auto;
+  margin: 0 auto 6rem auto;
 }
 
 .skill-manage-row {
