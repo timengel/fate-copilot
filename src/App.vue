@@ -49,17 +49,18 @@ watch(
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
             <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen">
               <FateIcon name="settings" :size="20" />
+              <span class="nav-link-settings-label">Einstellungen</span>
             </RouterLink>
           </div>
-        </div>
 
-        <div
-          v-if="gmModeStore.showGMToggle"
-          class="nav-gm-toggle"
-          :class="{ 'gm-active': gmModeStore.isGMMode }"
-          @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
-        >
-          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
+          <div
+            v-if="gmModeStore.showGMToggle"
+            class="nav-gm-toggle"
+            :class="{ 'gm-active': gmModeStore.isGMMode }"
+            @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
+          >
+            <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
+          </div>
         </div>
       </nav>
     </header>
@@ -114,27 +115,19 @@ watch(
   gap: 1px;
 }
 
+/* Desktop: invisible flex wrapper that fills remaining space */
+.nav-drawer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 1rem;
+}
+
 .nav-links {
   display: flex;
   gap: 0.5rem;
   flex: 1;
   margin-left: 1rem;
-}
-
-.nav-link-settings {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  padding: 0.4rem;
-}
-
-.nav-link-settings:active svg {
-  animation: spin-once 0.8s ease-out;
-}
-
-@keyframes spin-once {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(180deg); }
 }
 
 .nav-link {
@@ -158,21 +151,25 @@ watch(
   transform: scale(0.97);
 }
 
-.app-scroll-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-gutter: stable;
+.nav-link-settings {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
 }
 
-.app-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  width: 100%;
-  container-type: inline-size;
-  container-name: main;
+.nav-link-settings-label {
+  display: none;
+}
+
+.nav-link-settings:active svg {
+  animation: spin-once 0.8s ease-out;
+}
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(180deg); }
 }
 
 .nav-gm-toggle {
@@ -192,15 +189,7 @@ watch(
   box-shadow: none;
 }
 
-/* Nav-Drawer: unsichtbarer Flex-Wrapper auf Desktop */
-.nav-drawer {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* Hamburger-Button: auf Desktop versteckt */
+/* Hamburger: hidden on desktop */
 .nav-hamburger {
   display: none;
   flex-direction: column;
@@ -213,6 +202,11 @@ watch(
   padding: 4px 6px;
   flex: 1;
   height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-hamburger:active {
+  background: transparent;
 }
 
 .hamburger-bar {
@@ -248,7 +242,7 @@ watch(
   .nav-drawer {
     display: none;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     position: absolute;
     top: 56px;
     left: 0;
@@ -257,26 +251,53 @@ watch(
     padding: 0.5rem 1rem 0.75rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 99;
-    gap: 0.25rem;
+    gap: 0;
   }
 
   .nav-drawer.nav-open {
     display: flex;
+    border-top: 1px solid white;
   }
 
-  /* Nav-Links im Drawer: vertikal, volle Breite */
   .nav-drawer .nav-links {
     flex-direction: column;
     width: 100%;
-    gap: 0;
+    margin-left: 0;
+    gap: 0.25rem;
   }
 
-  /* 44px Touch-Targets für Nav-Links */
+  /* Full-width touch targets */
   .nav-drawer .nav-link {
-    display: block;
-    padding: 0.7rem 0.8rem;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0.5rem 0.75rem 0.85rem;
+    border-radius: 6px;
   }
 
+  .nav-drawer .nav-link:active {
+    transform: none;
+  }
+
+  /* Settings: show text label and reset alignment */
+  .nav-drawer .nav-link-settings {
+    margin-left: 0;
+    padding: 0.75rem 0.5rem 0.75rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .nav-drawer .nav-link-settings-label {
+    display: inline;
+  }
+
+  /* GM toggle: separator + full width */
+  .nav-drawer .nav-gm-toggle {
+    margin-top: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 @container header (width < 360px) {
@@ -285,7 +306,23 @@ watch(
   }
 }
 
-/* .app-main kann sich nicht selbst per @container stylen */
+.app-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+  container-type: inline-size;
+  container-name: main;
+}
+
 @media (max-width: 480px) {
   .app-main {
     padding: 0.75rem;

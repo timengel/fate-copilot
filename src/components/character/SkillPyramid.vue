@@ -281,11 +281,14 @@ function removeCol() {
 
 @container (width < 500px) {
   .level-label {
-    flex: 0 0 32px;
+    flex: 0 0 90px;
     overflow: hidden;
   }
-  .level-name {
-    display: none;
+  .pyramid-row {
+    margin-bottom: 1rem;
+  }
+  .pyramid-row:last-of-type {
+    margin-bottom: 0.25rem;
   }
   .pyramid-actions {
     flex-wrap: wrap;
@@ -298,15 +301,15 @@ function removeCol() {
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
-    margin-bottom: 8px;
+    margin-bottom: 1rem;
+  }
+  .pyramid-row:last-of-type {
+    margin-bottom: 0.25rem;
   }
   .level-label {
     flex: none;
     min-width: 0;
     overflow: visible;
-  }
-  .level-name {
-    display: inline;
   }
   .level-slots {
     width: 100%;

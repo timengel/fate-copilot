@@ -273,8 +273,40 @@ function getCharCampaign(charId: string): string | null {
   .home-grid {
     grid-template-columns: 1fr;
   }
+
+  .item-name,
+  .item-desc,
+  .char-campaign {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
   .welcome-cards {
     grid-template-columns: 1fr;
+  }
+
+  .home-header {
+    padding: 1rem 0 1.5rem;
+  }
+
+  .fate-logo {
+    font-size: 2.5rem;
+  }
+
+  .fate-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .home-section {
+    max-height: 380px;
+    overflow-x: hidden;
+    width: 100%;
   }
 }
 
@@ -285,6 +317,7 @@ function getCharCampaign(charId: string): string | null {
   display: flex;
   flex-direction: column;
   max-height: 520px;
+  min-width: 0;
 }
 
 .section-scroll {
