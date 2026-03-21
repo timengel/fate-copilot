@@ -237,7 +237,7 @@ defineExpose({ save });
           <div class="general-right">
             <div
               v-if="isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
-              class="field-row field-row--stats"
+              class="field-stats-edit"
             >
               <div v-if="sections?.generalFatePoints !== false" class="field-stat">
                 <label class="field-label">Fate-Punkte</label>
@@ -250,7 +250,7 @@ defineExpose({ save });
             </div>
             <div
               v-if="!isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
-              class="field-row field-row--stats"
+              class="field-stats-view"
             >
               <div v-if="sections?.generalFatePoints !== false" class="field-stat">
                 <span class="field-label">Fate-Punkte</span>
@@ -646,9 +646,10 @@ defineExpose({ save });
 .general-right {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
   gap: 0.25rem;
   min-width: 160px;
+  justify-self: end;
 }
 
 .general-grid .field-label {
@@ -680,13 +681,28 @@ defineExpose({ save });
   justify-content: flex-end;
 }
 
+.field-stats-edit {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.field-stats-view {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
 .field-stat {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: flex-end;
 }
 
-.field-stat + .field-stat {
+.field-row--stats .field-stat + .field-stat {
   border-left: 1px solid color-mix(in srgb, var(--fate-blue) 28%, white 72%);
   padding-left: 1rem;
 }
@@ -1054,8 +1070,9 @@ defineExpose({ save });
   }
 
   .general-right {
-    align-items: flex-start;
+    align-items: stretch;
     min-width: 0;
+    justify-self: end;
   }
 
   .form-actions {
@@ -1107,8 +1124,9 @@ defineExpose({ save });
   }
 
   .general-right {
-    align-items: flex-start;
+    align-items: stretch;
     min-width: 0;
+    justify-self: end;
   }
 
   .form-actions {
