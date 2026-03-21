@@ -1076,7 +1076,12 @@ defineExpose({ save });
   }
 }
 
-@container character-card (width < 480px) {
+@container character-card (width <= 325px) {
+  .field-stat + .field-stat {
+    border-left: none;
+    padding-left: 0;
+  }
+
   .form-actions .btn-label,
   .character-name-bar :deep(.btn-label) {
     display: none;
@@ -1124,7 +1129,12 @@ defineExpose({ save });
   }
 }
 
-@container main (width < 480px) {
+@container main (width <= 325px) {
+  .field-stat + .field-stat {
+    border-left: none;
+    padding-left: 0;
+  }
+
   .form-actions .btn-label,
   .character-name-bar :deep(.btn-label) {
     display: none;
