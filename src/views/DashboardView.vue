@@ -17,7 +17,16 @@ const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
-const { selectedCampaignId, showSC, showNSC, showItems, showEditButton, layout, visibleSections } = storeToRefs(useDashboardPreferencesStore());
+const {
+  selectedCampaignId,
+  showSC,
+  showNSC,
+  showArchivedCharacters,
+  showItems,
+  showEditButton,
+  layout,
+  visibleSections,
+} = storeToRefs(useDashboardPreferencesStore());
 
 const sidebarCollapsed = ref(false);
 const editingId = ref<string | null>(null);
@@ -53,6 +62,7 @@ const characters = computed(() => {
   return allCharactersInCampaign.value.filter((c) => {
     const type = c.type ?? 'sc';
     if (!gmModeStore.isGMMode && type === 'nsc') return false;
+    if (c.archived && !showArchivedCharacters.value) return false;
     if (type === 'sc' && !showSC.value) return false;
     if (type === 'nsc' && !showNSC.value) return false;
     return true;
@@ -133,6 +143,7 @@ onUnmounted(() => {
           <div class="sidebar-group-label">Charaktere</div>
           <FateCheckbox v-model="showSC" label="Zeige SC" />
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="Zeige NSC" />
+          <FateCheckbox v-model="showArchivedCharacters" label="Archiviert" />
         </div>
 
         <div class="sidebar-group">
@@ -186,6 +197,7 @@ onUnmounted(() => {
         <span class="filters-inline-label">Charaktere:</span>
         <FateCheckbox v-model="showSC" label="SC" />
         <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="NSC" />
+        <FateCheckbox v-model="showArchivedCharacters" label="Archivierte" />
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Items:</span>

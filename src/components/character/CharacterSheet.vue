@@ -13,6 +13,7 @@ import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
+import FateCheckbox from '../shared/FateCheckbox.vue';
 
 // Module-level constant — not reactive, shared across all instances
 const CONSEQUENCE_TYPES: {
@@ -178,6 +179,7 @@ defineExpose({ save });
         <span v-if="!isEditing" class="character-type-badge">{{
           data.type === 'nsc' ? 'NSC' : 'SC'
         }}</span>
+        <span v-if="!isEditing && data.archived" class="character-archived-badge">ARCHIVIERT</span>
         <div class="character-name-bar-end">
           <slot v-if="!isEditing" name="name-bar-actions" />
           <slot v-else name="edit-bar-actions" :isDirty="isDirty" />
@@ -504,6 +506,7 @@ defineExpose({ save });
           placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
         />
         <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
+        <FateCheckbox v-if="isEditing" v-model="form.archived" label="Archiviert" />
       </section>
 
       <!-- FORM ACTIONS (edit mode only) -->
@@ -579,6 +582,18 @@ defineExpose({ save });
   font-weight: 700;
   color: white;
   background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.character-archived-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff6cf;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 3px;
   padding: 1px 5px;
   letter-spacing: 0.06em;

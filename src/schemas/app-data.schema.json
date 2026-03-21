@@ -106,6 +106,7 @@
           "type": "string",
           "enum": ["sc", "nsc"]
         },
+        "archived": { "type": "boolean" },
         "name": { "type": "string" },
         "description": { "type": "string" },
         "highConcept": { "type": "string" },

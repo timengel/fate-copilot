@@ -12,6 +12,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.selectedCampaignId).toBeNull();
     expect(store.showSC).toBe(true);
     expect(store.showNSC).toBe(true);
+    expect(store.showArchivedCharacters).toBe(false);
     expect(store.showItems).toBe(true);
     expect(store.showEditButton).toBe(true);
     expect(store.layout).toBe('list');
@@ -47,10 +48,12 @@ describe('useDashboardPreferencesStore', () => {
     const store = useDashboardPreferencesStore();
     store.showSC = false;
     store.showNSC = false;
+    store.showArchivedCharacters = true;
     store.showItems = false;
     store.showEditButton = false;
     expect(store.showSC).toBe(false);
     expect(store.showNSC).toBe(false);
+    expect(store.showArchivedCharacters).toBe(true);
     expect(store.showItems).toBe(false);
     expect(store.showEditButton).toBe(false);
   });
@@ -74,6 +77,7 @@ describe('useDashboardPreferencesStore', () => {
     store.selectedCampaignId = 'camp-1';
     store.showSC = false;
     store.showNSC = false;
+    store.showArchivedCharacters = true;
     store.showItems = false;
     store.showEditButton = false;
     store.layout = 'grid';
@@ -83,6 +87,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.selectedCampaignId).toBeNull();
     expect(store.showSC).toBe(true);
     expect(store.showNSC).toBe(true);
+    expect(store.showArchivedCharacters).toBe(false);
     expect(store.showItems).toBe(true);
     expect(store.showEditButton).toBe(true);
     expect(store.layout).toBe('list');

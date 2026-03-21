@@ -17,6 +17,7 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
   return {
     id: generateId(),
     type,
+    archived: false,
     name: '',
     description: '',
     highConcept: '',

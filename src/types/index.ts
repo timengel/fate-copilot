@@ -97,6 +97,7 @@ export interface Consequence {
 export interface Character {
   id: string;
   type?: CharacterType;
+  archived?: boolean;
   name: string;
   description: string;
   highConcept: string;

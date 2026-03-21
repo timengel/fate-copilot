@@ -187,6 +187,7 @@ function isRenderableNode(node: VNode): boolean {
 
 .fate-card__badge {
   margin-left: auto;
+  margin-top: 0.25rem;
   font-size: 0.6rem;
   font-weight: 700;
   padding: 0.1rem 0.35rem;

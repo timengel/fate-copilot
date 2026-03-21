@@ -8,6 +8,7 @@ import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
+import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
@@ -15,6 +16,7 @@ const route = useRoute();
 const store = useCharactersStore();
 const gmModeStore = useGMModeStore();
 const search = ref('');
+const showArchivedCharacters = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 const activeTab = computed<CharacterType>(() => (route.query.tab === 'nsc' ? 'nsc' : 'sc'));
@@ -34,6 +36,8 @@ watch(
 const filtered = computed(() =>
   store.characters.filter((c) => {
     const type = c.type ?? 'sc';
+    if (c.archived && !showArchivedCharacters.value) return false;
+    if (!gmModeStore.isGMMode && type === 'nsc') return false;
     return (
       type === activeTab.value &&
       (c.name.toLowerCase().includes(search.value.toLowerCase()) ||
@@ -42,7 +46,13 @@ const filtered = computed(() =>
   }),
 );
 
-const tabTotal = computed(() => store.characters.filter((c) => (c.type ?? 'sc') === activeTab.value).length);
+const tabTotal = computed(() =>
+  store.characters.filter((c) => {
+    const type = c.type ?? 'sc';
+    if (!gmModeStore.isGMMode && type === 'nsc') return false;
+    return type === activeTab.value;
+  }).length,
+);
 
 function deleteCharacter(id: string, name: string) {
   showConfirmDialog(
@@ -77,7 +87,10 @@ function deleteCharacter(id: string, name: string) {
       </button>
     </div>
 
-    <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
+    <div class="characters-input-row">
+      <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
+      <FateCheckbox v-model="showArchivedCharacters" label="Zeige archivierte Charaktere" />
+    </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
       {{
@@ -97,6 +110,8 @@ function deleteCharacter(id: string, name: string) {
         :color="char.color"
         :avatar="char.avatar"
         :title="char.name || 'Unbenannt'"
+        :badge-label="char.archived ? 'ARCHIVIERT' : undefined"
+        badge-variant="status"
         clickable
         @click="router.push(`/characters/${char.id}`)"
       >
@@ -144,14 +159,22 @@ function deleteCharacter(id: string, name: string) {
   overflow: hidden;
 }
 
+.characters-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
 .search-input {
-  width: 100%;
+  flex: 1;
+  min-width: min(260px, 100%);
   max-width: 400px;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--fate-border);
   border-radius: 4px;
   font-size: 0.875rem;
-  margin-bottom: 1rem;
   color: var(--fate-text);
   background: white;
 }

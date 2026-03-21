@@ -7,6 +7,7 @@ export const useDashboardPreferencesStore = defineStore(
     const selectedCampaignId = ref<string | null>(null);
     const showSC = ref(true);
     const showNSC = ref(true);
+    const showArchivedCharacters = ref(false);
     const showItems = ref(true);
     const showEditButton = ref(true);
     const layout = ref<'list' | 'grid'>('list');
@@ -26,6 +27,7 @@ export const useDashboardPreferencesStore = defineStore(
       selectedCampaignId.value = null;
       showSC.value = true;
       showNSC.value = true;
+      showArchivedCharacters.value = false;
       showItems.value = true;
       showEditButton.value = true;
       layout.value = 'list';
@@ -42,7 +44,17 @@ export const useDashboardPreferencesStore = defineStore(
       };
     }
 
-    return { selectedCampaignId, showSC, showNSC, showItems, showEditButton, layout, visibleSections, reset };
+    return {
+      selectedCampaignId,
+      showSC,
+      showNSC,
+      showArchivedCharacters,
+      showItems,
+      showEditButton,
+      layout,
+      visibleSections,
+      reset,
+    };
   },
   { persist: { key: 'fcp-dashboard' } },
 );
