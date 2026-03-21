@@ -6,6 +6,7 @@ import FateToggle from './components/shared/FateToggle.vue';
 import FateToast from './components/shared/FateToast.vue';
 import { initPersistence } from './composables/usePersistence';
 import { useGMModeStore } from './stores/gmMode';
+import { ToggleVariant } from './types';
 
 initPersistence();
 
@@ -58,7 +59,7 @@ watch(
           :class="{ 'gm-active': gmModeStore.isGMMode }"
           @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
         >
-          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" variant="navbar" @click.stop />
+          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
         </div>
       </nav>
     </header>

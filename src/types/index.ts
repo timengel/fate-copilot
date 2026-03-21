@@ -2,6 +2,12 @@
 // UI Types
 // ============================================================
 
+export enum ToggleVariant {
+  Primary = 'primary',
+  Ghost = 'ghost',
+  Danger = 'danger',
+}
+
 export type ButtonVariant =
   | 'primary'
   | 'secondary'

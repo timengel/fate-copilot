@@ -3,6 +3,7 @@ import ImportExportBar from '../components/shared/ImportExportBar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import FateToggle from '../components/shared/FateToggle.vue';
 import { useGMModeStore } from '../stores/gmMode';
+import { ToggleVariant } from '@fate/types';
 
 const gmModeStore = useGMModeStore();
 </script>
@@ -18,7 +19,7 @@ const gmModeStore = useGMModeStore();
           <span>GM-Modus-Schalter in der Navigation anzeigen</span>
           <span class="settings-row-description">Zeigt den GM-Modus-Toggle in der Navigationsleiste an.</span>
         </div>
-        <FateToggle v-model="gmModeStore.showGMToggle" />
+        <FateToggle v-model="gmModeStore.showGMToggle" :variant="ToggleVariant.Danger" />
       </div>
     </section>
 

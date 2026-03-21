@@ -1,6 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue';
 import { setActivePinia, createPinia } from 'pinia';
 import FateToggle from './FateToggle.vue';
+import { ToggleVariant } from '../../types';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 
 beforeEach(() => {
@@ -18,6 +19,26 @@ describe('FateToggle', () => {
     it('renders with label text', () => {
       const { getByText } = render(FateToggle, { props: { modelValue: false, label: 'GM-Modus' } });
       expect(getByText('GM-Modus')).not.toBeNull();
+    });
+
+    it('applies primary variant class by default', () => {
+      const { container } = render(FateToggle, { props: { modelValue: false } });
+      expect(container.querySelector('.fate-toggle--primary')).not.toBeNull();
+    });
+
+    it('applies the specified variant class', () => {
+      const { container } = render(FateToggle, {
+        props: { modelValue: false, variant: ToggleVariant.Ghost },
+      });
+      expect(container.querySelector('.fate-toggle--ghost')).not.toBeNull();
+      expect(container.querySelector('.fate-toggle--primary')).toBeNull();
+    });
+
+    it('applies danger variant class', () => {
+      const { container } = render(FateToggle, {
+        props: { modelValue: false, variant: ToggleVariant.Danger },
+      });
+      expect(container.querySelector('.fate-toggle--danger')).not.toBeNull();
     });
   });
 
