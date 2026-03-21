@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
-import { useSessionStorage } from '@vueuse/core';
+import { useLocalStorage, useSessionStorage } from '@vueuse/core';
 
 export const useGMModeStore = defineStore('gmMode', () => {
   const isGMMode = useSessionStorage('gm-mode', false);
+  const showGMToggle = useLocalStorage('gm-toggle-visible', false);
 
   function toggle() {
     isGMMode.value = !isGMMode.value;
   }
 
-  return { isGMMode, toggle };
+  return { isGMMode, showGMToggle, toggle };
 });

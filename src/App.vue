@@ -52,8 +52,13 @@ watch(
           </div>
         </div>
 
-        <div class="nav-gm-toggle" :class="{ 'gm-active': gmModeStore.isGMMode }" @click="gmModeStore.isGMMode = !gmModeStore.isGMMode">
-          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" @click.stop />
+        <div
+          v-if="gmModeStore.showGMToggle"
+          class="nav-gm-toggle"
+          :class="{ 'gm-active': gmModeStore.isGMMode }"
+          @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
+        >
+          <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" variant="navbar" @click.stop />
         </div>
       </nav>
     </header>
