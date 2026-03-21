@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
-import { useSessionStorage } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
+import { useDashboardPreferencesStore } from '../stores/dashboardPreferences';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
@@ -16,28 +17,11 @@ const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
+const { selectedCampaignId, showSC, showNSC, showItems, showEditButton, layout, visibleSections } = storeToRefs(useDashboardPreferencesStore());
 
 const sidebarCollapsed = ref(false);
 const editingId = ref<string | null>(null);
 const formRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
-const selectedCampaignId = useSessionStorage<string | null>('dashboard-campaign', null);
-const showSC = useSessionStorage('dashboard-show-sc', true);
-const showNSC = useSessionStorage('dashboard-show-nsc', true);
-const showItems = useSessionStorage('dashboard-show-items', true);
-const showEditButton = useSessionStorage('dashboard-show-edit-btn', true);
-const dashboardLayout = useSessionStorage<'list' | 'grid'>('dashboard-layout', 'list');
-
-const visibleSections = useSessionStorage('dashboard-sections', {
-  general: true,
-  aspects: true,
-  skills: true,
-  extras: true,
-  stunts: true,
-  stress: true,
-  consequences: true,
-  gmNotes: true,
-  dice: true,
-});
 
 const allCampaigns = computed(() =>
   gmModeStore.isGMMode
@@ -89,7 +73,7 @@ watch(sidebarCollapsed, (val) => {
   document.body.classList.toggle('sidebar-collapsed', val);
 });
 
-watch(dashboardLayout, (val) => {
+watch(layout, (val) => {
   document.body.classList.toggle('dashboard-grid-active', val === 'grid');
 }, { immediate: true });
 
@@ -177,7 +161,7 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Layout</div>
           <FateRadioButtonGroup
-            v-model="dashboardLayout"
+            v-model="layout"
             :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
           />
         </div>
@@ -223,7 +207,7 @@ onUnmounted(() => {
       <div class="filters-inline-row">
         <span class="filters-inline-label">Layout:</span>
         <FateRadioButtonGroup
-          v-model="dashboardLayout"
+          v-model="layout"
           :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
         />
       </div>
@@ -240,7 +224,7 @@ onUnmounted(() => {
     <div
       v-if="characters.length > 0"
       class="dashboard-stack"
-      :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
+      :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
       <div v-for="character in characters" :key="character.id" class="dashboard-entry">
         <CharacterSheet
@@ -274,7 +258,7 @@ onUnmounted(() => {
     <div
       v-if="items.length > 0"
       class="dashboard-stack"
-      :class="{ 'dashboard-stack--grid': dashboardLayout === 'grid' }"
+      :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
       <div v-for="item in items" :key="item.id" class="dashboard-entry">
         <ItemSheet :item="item" :sections="visibleSections" />
