@@ -141,6 +141,7 @@ defineExpose({ save });
       <FateAvatar :value="data.avatar" />
       <span class="item-name-text">{{ data.name || 'Unbenannt' }}</span>
       <span v-if="!isEditing" class="item-type-badge">ITEM</span>
+      <span v-if="!isEditing && data.archived" class="item-archived-badge">ARCHIVIERT</span>
       <span v-if="!isEditing && gmModeStore.isGMMode && data.hidden" class="item-hidden-badge">VERSTECKT</span>
       <div class="item-name-bar-end">
         <slot v-if="!isEditing" name="name-bar-actions" />
@@ -369,23 +370,29 @@ defineExpose({ save });
       </p>
     </section>
 
-    <!-- GM-NOTIZEN -->
+    <!-- GM OPTIONS -->
     <section
       v-if="show.gmNotes && gmModeStore.isGMMode && (isEditing || data.gmNotes)"
       class="sheet-section gm-notes-section"
     >
-      <div class="sheet-section-header">GM-NOTIZEN</div>
+      <div class="sheet-section-header">GM OPTIONS</div>
       <textarea
         v-if="isEditing"
         class="text-area-input"
         v-model="form.gmNotes"
-        placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
+        placeholder="GM Notizen"
       />
       <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
       <FateCheckbox
         v-if="isEditing"
+        :modelValue="!!form.archived"
+        label="Archiviert"
+        @update:modelValue="form.archived = $event"
+      />
+      <FateCheckbox
+        v-if="isEditing"
         :modelValue="!!form.hidden"
-        label="Nur im GM-Modus sichtbar (versteckt)"
+        label="Versteckt (GM-only)"
         @update:modelValue="form.hidden = $event"
       />
     </section>
@@ -425,6 +432,17 @@ defineExpose({ save });
 }
 
 .item-hidden-badge {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff6cf;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.item-archived-badge {
   background: rgba(255, 255, 255, 0.18);
   color: #fff6cf;
   font-size: 0.65rem;

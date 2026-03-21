@@ -14,6 +14,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.showNSC).toBe(true);
     expect(store.showArchivedCharacters).toBe(false);
     expect(store.showItems).toBe(true);
+    expect(store.showArchivedItems).toBe(false);
     expect(store.showEditButton).toBe(true);
     expect(store.layout).toBe('list');
   });
@@ -50,11 +51,13 @@ describe('useDashboardPreferencesStore', () => {
     store.showNSC = false;
     store.showArchivedCharacters = true;
     store.showItems = false;
+    store.showArchivedItems = true;
     store.showEditButton = false;
     expect(store.showSC).toBe(false);
     expect(store.showNSC).toBe(false);
     expect(store.showArchivedCharacters).toBe(true);
     expect(store.showItems).toBe(false);
+    expect(store.showArchivedItems).toBe(true);
     expect(store.showEditButton).toBe(false);
   });
 
@@ -79,6 +82,7 @@ describe('useDashboardPreferencesStore', () => {
     store.showNSC = false;
     store.showArchivedCharacters = true;
     store.showItems = false;
+    store.showArchivedItems = true;
     store.showEditButton = false;
     store.layout = 'grid';
     store.visibleSections.skills = false;
@@ -89,6 +93,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.showNSC).toBe(true);
     expect(store.showArchivedCharacters).toBe(false);
     expect(store.showItems).toBe(true);
+    expect(store.showArchivedItems).toBe(false);
     expect(store.showEditButton).toBe(true);
     expect(store.layout).toBe('list');
     expect(store.visibleSections.skills).toBe(true);

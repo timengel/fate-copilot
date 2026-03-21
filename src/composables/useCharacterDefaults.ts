@@ -60,6 +60,7 @@ export function createDefaultItem(): Item {
   return {
     id: generateId(),
     type: 'item',
+    archived: false,
     name: '',
     description: '',
     aspects: [''],

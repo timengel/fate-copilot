@@ -122,6 +122,7 @@ export interface Character {
 export interface Item {
   id: string;
   type: 'item';
+  archived?: boolean;
   name: string;
   description: string;
   aspects: string[];

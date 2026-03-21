@@ -9,6 +9,7 @@ export const useDashboardPreferencesStore = defineStore(
     const showNSC = ref(true);
     const showArchivedCharacters = ref(false);
     const showItems = ref(true);
+    const showArchivedItems = ref(false);
     const showEditButton = ref(true);
     const layout = ref<'list' | 'grid'>('list');
     const visibleSections = ref({
@@ -29,6 +30,7 @@ export const useDashboardPreferencesStore = defineStore(
       showNSC.value = true;
       showArchivedCharacters.value = false;
       showItems.value = true;
+      showArchivedItems.value = false;
       showEditButton.value = true;
       layout.value = 'list';
       visibleSections.value = {
@@ -50,6 +52,7 @@ export const useDashboardPreferencesStore = defineStore(
       showNSC,
       showArchivedCharacters,
       showItems,
+      showArchivedItems,
       showEditButton,
       layout,
       visibleSections,

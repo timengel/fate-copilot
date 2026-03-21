@@ -23,6 +23,7 @@ const {
   showNSC,
   showArchivedCharacters,
   showItems,
+  showArchivedItems,
   showEditButton,
   layout,
   visibleSections,
@@ -55,7 +56,11 @@ const allItemsInCampaign = computed(() =>
 
 const items = computed(() => {
   if (!showItems.value) return [];
-  return allItemsInCampaign.value.filter((i) => gmModeStore.isGMMode || !i.hidden);
+  return allItemsInCampaign.value.filter((item) => {
+    if (!gmModeStore.isGMMode && item.hidden) return false;
+    if (item.archived && !showArchivedItems.value) return false;
+    return true;
+  });
 });
 
 const characters = computed(() => {
@@ -149,6 +154,7 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Items</div>
           <FateCheckbox v-model="showItems" label="Zeige Items" />
+          <FateCheckbox v-model="showArchivedItems" label="Zeige archivierte Items" />
         </div>
 
         <div class="sidebar-group">
@@ -202,6 +208,7 @@ onUnmounted(() => {
       <div class="filters-inline-row">
         <span class="filters-inline-label">Items:</span>
         <FateCheckbox v-model="showItems" label="Zeige Items" />
+        <FateCheckbox v-model="showArchivedItems" label="Archivierte" />
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Sektionen:</span>

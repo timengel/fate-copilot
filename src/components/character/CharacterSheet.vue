@@ -493,12 +493,12 @@ defineExpose({ save });
         </section>
       </div>
 
-      <!-- GM-NOTIZEN -->
+      <!-- GM OPTIONS -->
       <section
         v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
         class="sheet-section gm-notes-section"
       >
-        <div class="sheet-section-header">GM-NOTIZEN</div>
+        <div class="sheet-section-header">GM OPTIONS</div>
         <textarea
           v-if="isEditing"
           class="text-area-input"
