@@ -92,4 +92,12 @@ describe('useCharactersStore', () => {
     store.replaceAll([]);
     expect(store.characters).toHaveLength(0);
   });
+
+  it('reset clears all characters', () => {
+    const store = useCharactersStore();
+    store.addCharacter(makeChar({ id: 'c1' }));
+    store.addCharacter(makeChar({ id: 'c2' }));
+    store.reset();
+    expect(store.characters).toHaveLength(0);
+  });
 });

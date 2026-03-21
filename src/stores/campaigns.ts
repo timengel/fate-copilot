@@ -135,6 +135,12 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     itemAssignments.value = incomingItemAssignments;
   }
 
+  function reset() {
+    campaigns.value = [];
+    assignments.value = [];
+    itemAssignments.value = [];
+  }
+
   const activeCampaigns = computed(() => campaigns.value.filter((c) => c.status === 'active'));
 
   const characterCountsForCampaign = computed(() => (campaignId: string) => {
@@ -167,6 +173,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     removeMilestone,
     updateMilestone,
     replaceAll,
+    reset,
   };
 }, {
   persist: { key: 'fcp-campaigns' },

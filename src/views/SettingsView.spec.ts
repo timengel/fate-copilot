@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import SettingsView from './SettingsView.vue';
 import { useGMModeStore } from '../stores/gmMode';
+import { useCharactersStore } from '../stores/characters';
 
 describe('SettingsView', () => {
   let pinia: ReturnType<typeof createPinia>;
@@ -66,13 +67,13 @@ describe('SettingsView', () => {
 
     it('confirm dialog is not shown initially', () => {
       setup();
-      expect(screen.queryByText('Alle Daten löschen')).toBeNull();
+      expect(screen.queryByText('Wirklich alle Daten löschen?')).toBeNull();
     });
 
     it('clicking "Zurücksetzen" shows the confirm dialog', async () => {
       setup();
       await fireEvent.click(screen.getByText('Zurücksetzen'));
-      expect(screen.getByText('Alle Daten löschen')).toBeTruthy();
+      expect(screen.getByText('Wirklich alle Daten löschen?')).toBeTruthy();
     });
 
     it('clicking "Abbrechen" closes the dialog without clearing storage', async () => {
@@ -80,13 +81,11 @@ describe('SettingsView', () => {
       setup();
       await fireEvent.click(screen.getByText('Zurücksetzen'));
       await fireEvent.click(screen.getByText('Abbrechen'));
-      expect(screen.queryByText('Alle Daten löschen')).toBeNull();
+      expect(screen.queryByText('Wirklich alle Daten löschen?')).toBeNull();
       expect(localStorage.getItem('test-key')).toBe('test-value');
     });
 
-    it('clicking "Bestätigen" clears localStorage, sessionStorage, and reloads', async () => {
-      const reloadMock = vi.fn();
-      vi.stubGlobal('location', { reload: reloadMock });
+    it('clicking "Bestätigen" clears localStorage and sessionStorage', async () => {
       const localClear = vi.spyOn(localStorage, 'clear');
       const sessionClear = vi.spyOn(sessionStorage, 'clear');
 
@@ -96,16 +95,37 @@ describe('SettingsView', () => {
 
       expect(localClear).toHaveBeenCalledOnce();
       expect(sessionClear).toHaveBeenCalledOnce();
-      expect(reloadMock).toHaveBeenCalledOnce();
     });
 
-    it('clicking "Bestätigen" closes the dialog before reloading', async () => {
-      vi.stubGlobal('location', { reload: vi.fn() });
+    it('clicking "Bestätigen" resets characters store', async () => {
+      const charactersStore = useCharactersStore();
+      charactersStore.characters.push({ id: '1', name: 'Test', type: 'sc', description: '', highConcept: '', trouble: '', aspects: [], skills: [], extras: '', stunts: [], refresh: 3, fatePoints: 3, stressPhysical: [], stressMental: [], consequences: [], notes: '' });
 
       setup();
       await fireEvent.click(screen.getByText('Zurücksetzen'));
       await fireEvent.click(screen.getByText('Bestätigen'));
-      expect(screen.queryByText('Alle Daten löschen')).toBeNull();
+
+      expect(charactersStore.characters).toHaveLength(0);
+    });
+
+    it('clicking "Bestätigen" resets GM mode', async () => {
+      const gmModeStore = useGMModeStore();
+      gmModeStore.isGMMode = true;
+      gmModeStore.showGMToggle = true;
+
+      setup();
+      await fireEvent.click(screen.getByText('Zurücksetzen'));
+      await fireEvent.click(screen.getByText('Bestätigen'));
+
+      expect(gmModeStore.isGMMode).toBe(false);
+      expect(gmModeStore.showGMToggle).toBe(false);
+    });
+
+    it('clicking "Bestätigen" closes the dialog', async () => {
+      setup();
+      await fireEvent.click(screen.getByText('Zurücksetzen'));
+      await fireEvent.click(screen.getByText('Bestätigen'));
+      expect(screen.queryByText('Wirklich alle Daten löschen?')).toBeNull();
     });
   });
 });

@@ -6,7 +6,11 @@ const toastStore = useToastStore();
 
 <template>
   <Transition name="toast">
-    <div v-if="toastStore.visible" class="fate-toast">
+    <div
+      v-if="toastStore.visible"
+      class="fate-toast"
+      :class="`fate-toast--${toastStore.type}`"
+    >
       {{ toastStore.message }}
     </div>
   </Transition>
@@ -18,7 +22,6 @@ const toastStore = useToastStore();
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: #1c9ed6;
   color: #fff;
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
@@ -28,6 +31,14 @@ const toastStore = useToastStore();
   z-index: 1000;
   white-space: nowrap;
   pointer-events: none;
+}
+
+.fate-toast--success {
+  background: #1c9ed6;
+}
+
+.fate-toast--error {
+  background: var(--fate-red);
 }
 
 .toast-enter-active,

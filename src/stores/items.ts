@@ -28,7 +28,11 @@ export const useItemsStore = defineStore('items', () => {
     items.value = incoming;
   }
 
-  return { items, addItem, updateItem, deleteItem, getById, replaceAll };
+  function reset() {
+    items.value = [];
+  }
+
+  return { items, addItem, updateItem, deleteItem, getById, replaceAll, reset };
 }, {
   persist: { key: 'fcp-items' },
 });

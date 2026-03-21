@@ -5,20 +5,47 @@ import FateToggle from '../components/shared/FateToggle.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from '../stores/gmMode';
+import { useCampaignsStore } from '../stores/campaigns';
+import { useCharactersStore } from '../stores/characters';
+import { useItemsStore } from '../stores/items';
+import { useSkillsStore } from '../stores/skills';
+import { useDashboardPreferencesStore } from '../stores/dashboardPreferences';
+import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { ToggleVariant } from '@fate/types';
 
 const gmModeStore = useGMModeStore();
+const campaignsStore = useCampaignsStore();
+const charactersStore = useCharactersStore();
+const itemsStore = useItemsStore();
+const skillsStore = useSkillsStore();
+const dashboardStore = useDashboardPreferencesStore();
+const toastStore = useToastStore();
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+
+function handleConfirm() {
+  confirmDialog.value?.onConfirm();
+  confirmDialog.value = null;
+}
+
+function handleCancel() {
+  confirmDialog.value = null;
+}
 
 function clearAllData() {
   showConfirmDialog(
-    'Alle Daten löschen',
+    'Wirklich alle Daten löschen?',
     'Alle Kampagnen, Charaktere, Gegenstände und Einstellungen werden unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
     () => {
       localStorage.clear();
       sessionStorage.clear();
-      location.reload();
+      campaignsStore.reset();
+      charactersStore.reset();
+      itemsStore.reset();
+      skillsStore.resetToDefaults();
+      gmModeStore.reset();
+      dashboardStore.reset();
+      toastStore.show('Alle Daten wurden gelöscht');
     },
   );
 }
@@ -63,8 +90,8 @@ function clearAllData() {
       v-if="confirmDialog"
       :title="confirmDialog.title"
       :message="confirmDialog.message"
-      @confirm="confirmDialog.onConfirm(); confirmDialog = null"
-      @cancel="confirmDialog = null"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
     />
   </div>
 </template>

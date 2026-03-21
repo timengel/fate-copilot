@@ -11,7 +11,6 @@ const toastStore = useToastStore();
 
 const showConfirm = ref(false);
 const pendingData = ref<AppData | null>(null);
-const importError = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 const pasteText = ref('');
 
@@ -20,36 +19,33 @@ function triggerImport() {
 }
 
 async function copyToClipboard() {
-  importError.value = '';
   try {
     await exportToClipboard();
     toastStore.show('In die Zwischenablage kopiert!');
   } catch (e) {
-    importError.value = e instanceof Error ? e.message : 'Kopieren fehlgeschlagen';
+    toastStore.show(e instanceof Error ? e.message : 'Kopieren fehlgeschlagen', 4000, 'error');
   }
 }
 
 function onPasteImport() {
-  importError.value = '';
   try {
     pendingData.value = importFromString(pasteText.value);
     pasteText.value = '';
     showConfirm.value = true;
   } catch (e) {
-    importError.value = e instanceof Error ? e.message : 'Ungültiger JSON-String';
+    toastStore.show(e instanceof Error ? e.message : 'Ungültiger JSON-String', 4000, 'error');
   }
 }
 
 async function onFileSelected(event: Event) {
   if (!(event.target instanceof HTMLInputElement)) return;
-  importError.value = '';
   const file = event.target.files?.[0];
   if (!file) return;
   try {
     pendingData.value = await importJSON(file);
     showConfirm.value = true;
   } catch (e) {
-    importError.value = e instanceof Error ? e.message : 'Unbekannter Fehler';
+    toastStore.show(e instanceof Error ? e.message : 'Unbekannter Fehler', 4000, 'error');
   } finally {
     event.target.value = '';
   }
@@ -117,8 +113,6 @@ function cancelImport() {
       style="display: none"
       @change="onFileSelected"
     />
-
-    <p v-if="importError" class="import-error">{{ importError }}</p>
 
     <ConfirmDialog
       v-if="showConfirm"
@@ -200,14 +194,5 @@ function cancelImport() {
 
 .text-import-textarea:focus {
   border-color: var(--fate-blue);
-}
-
-.import-error {
-  font-size: 0.8rem;
-  color: var(--fate-red);
-  margin: 0;
-  padding: 0.5rem 0.75rem;
-  background: #fde8e6;
-  border-radius: 4px;
 }
 </style>

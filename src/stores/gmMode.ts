@@ -9,5 +9,10 @@ export const useGMModeStore = defineStore('gmMode', () => {
     isGMMode.value = !isGMMode.value;
   }
 
-  return { isGMMode, showGMToggle, toggle };
+  function reset() {
+    isGMMode.value = false;
+    showGMToggle.value = false;
+  }
+
+  return { isGMMode, showGMToggle, toggle, reset };
 });

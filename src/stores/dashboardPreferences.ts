@@ -22,7 +22,27 @@ export const useDashboardPreferencesStore = defineStore(
       dice: true,
     });
 
-    return { selectedCampaignId, showSC, showNSC, showItems, showEditButton, layout, visibleSections };
+    function reset() {
+      selectedCampaignId.value = null;
+      showSC.value = true;
+      showNSC.value = true;
+      showItems.value = true;
+      showEditButton.value = true;
+      layout.value = 'list';
+      visibleSections.value = {
+        general: true,
+        aspects: true,
+        skills: true,
+        extras: true,
+        stunts: true,
+        stress: true,
+        consequences: true,
+        gmNotes: true,
+        dice: true,
+      };
+    }
+
+    return { selectedCampaignId, showSC, showNSC, showItems, showEditButton, layout, visibleSections, reset };
   },
   { persist: { key: 'fcp-dashboard' } },
 );

@@ -119,7 +119,7 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Kampagne</div>
           <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
-            Keine Kampagnen vorhanden.
+            Keine Kampagnen.
           </div>
           <select v-else v-model="selectedCampaignId" class="campaign-select">
             <option :value="null" disabled>Wählen…</option>
@@ -173,7 +173,7 @@ onUnmounted(() => {
       <div class="filters-inline-row">
         <span class="filters-inline-label">Kampagne:</span>
         <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
-          Keine Kampagnen vorhanden.
+          Keine Kampagnen.
         </div>
         <select v-else v-model="selectedCampaignId" class="campaign-select-inline">
           <option :value="null" disabled>Wählen…</option>
@@ -310,6 +310,7 @@ onUnmounted(() => {
   color: var(--fate-text-light);
   font-size: 0.82rem;
   margin-top: 0.25rem;
+  white-space: nowrap;
 }
 
 .dashboard-sidebar {

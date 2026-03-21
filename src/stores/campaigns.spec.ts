@@ -207,4 +207,15 @@ describe('useCampaignsStore', () => {
     expect(() => store.unassignCharacter('c1', 'nobody')).not.toThrow();
     expect(store.assignments).toHaveLength(0);
   });
+
+  it('reset clears campaigns, assignments, and itemAssignments', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1' }));
+    store.assignCharacter('c1', 'char1');
+    store.assignItem('c1', 'item1');
+    store.reset();
+    expect(store.campaigns).toHaveLength(0);
+    expect(store.assignments).toHaveLength(0);
+    expect(store.itemAssignments).toHaveLength(0);
+  });
 });

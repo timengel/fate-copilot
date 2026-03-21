@@ -67,9 +67,9 @@ describe('ImportExportBar', () => {
       expect(container.querySelector('.dialog-overlay')).toBeNull();
     });
 
-    it('does not show an error message initially', () => {
-      const { container } = render(ImportExportBar);
-      expect(container.querySelector('.import-error')).toBeNull();
+    it('does not show an error toast initially', () => {
+      render(ImportExportBar);
+      expect(mockToastShow).not.toHaveBeenCalled();
     });
   });
 
@@ -95,20 +95,20 @@ describe('ImportExportBar', () => {
       expect(mockToastShow).toHaveBeenCalledWith('In die Zwischenablage kopiert!');
     });
 
-    it('shows importError when exportToClipboard rejects', async () => {
+    it('shows error toast when exportToClipboard rejects', async () => {
       mockExportToClipboard.mockRejectedValueOnce(new Error('Kein Clipboard-Zugriff'));
-      const { container } = render(ImportExportBar);
+      render(ImportExportBar);
       await fireEvent.click(screen.getByText('Kopieren'));
       await new Promise((r) => setTimeout(r, 0));
-      expect(container.querySelector('.import-error')?.textContent).toBe('Kein Clipboard-Zugriff');
+      expect(mockToastShow).toHaveBeenCalledWith('Kein Clipboard-Zugriff', 4000, 'error');
     });
 
-    it('does not show toast when copy fails', async () => {
+    it('does not show success toast when copy fails', async () => {
       mockExportToClipboard.mockRejectedValueOnce(new Error('Fehler'));
       render(ImportExportBar);
       await fireEvent.click(screen.getByText('Kopieren'));
       await new Promise((r) => setTimeout(r, 0));
-      expect(mockToastShow).not.toHaveBeenCalled();
+      expect(mockToastShow).not.toHaveBeenCalledWith('In die Zwischenablage kopiert!');
     });
   });
 
@@ -141,14 +141,14 @@ describe('ImportExportBar', () => {
       expect(textarea.value).toBe('');
     });
 
-    it('shows importError when importFromString throws', async () => {
+    it('shows error toast when importFromString throws', async () => {
       mockImportFromString.mockImplementationOnce(() => {
         throw new Error('Ungültiger JSON-String');
       });
       const { container } = render(ImportExportBar);
       await fireEvent.update(container.querySelector('textarea')!, 'not json');
       await fireEvent.click(getTextImportButton());
-      expect(container.querySelector('.import-error')?.textContent).toBe('Ungültiger JSON-String');
+      expect(mockToastShow).toHaveBeenCalledWith('Ungültiger JSON-String', 4000, 'error');
     });
 
     it('does not show ConfirmDialog when importFromString throws', async () => {
@@ -195,12 +195,12 @@ describe('ImportExportBar', () => {
       expect(container.querySelector('.dialog-overlay')).toBeTruthy();
     });
 
-    it('shows importError when importJSON rejects', async () => {
+    it('shows error toast when importJSON rejects', async () => {
       mockImportJSON.mockRejectedValueOnce(new Error('Ungültige Datei'));
-      const { container } = render(ImportExportBar);
-      await selectFile(container, 'bad');
+      render(ImportExportBar);
+      await selectFile(document.body, 'bad');
       await new Promise((r) => setTimeout(r, 0));
-      expect(container.querySelector('.import-error')?.textContent).toBe('Ungültige Datei');
+      expect(mockToastShow).toHaveBeenCalledWith('Ungültige Datei', 4000, 'error');
     });
 
     it('calls applyImport and hides dialog on confirm', async () => {

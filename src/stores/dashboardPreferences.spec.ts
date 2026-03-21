@@ -68,4 +68,25 @@ describe('useDashboardPreferencesStore', () => {
     const store = useDashboardPreferencesStore();
     expect(store.$id).toBe('dashboardPreferences');
   });
+
+  it('reset restores all default values', () => {
+    const store = useDashboardPreferencesStore();
+    store.selectedCampaignId = 'camp-1';
+    store.showSC = false;
+    store.showNSC = false;
+    store.showItems = false;
+    store.showEditButton = false;
+    store.layout = 'grid';
+    store.visibleSections.skills = false;
+    store.visibleSections.stress = false;
+    store.reset();
+    expect(store.selectedCampaignId).toBeNull();
+    expect(store.showSC).toBe(true);
+    expect(store.showNSC).toBe(true);
+    expect(store.showItems).toBe(true);
+    expect(store.showEditButton).toBe(true);
+    expect(store.layout).toBe('list');
+    expect(store.visibleSections.skills).toBe(true);
+    expect(store.visibleSections.stress).toBe(true);
+  });
 });
