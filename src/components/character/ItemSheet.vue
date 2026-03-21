@@ -164,7 +164,7 @@ defineExpose({ save });
             />
             <span v-else class="field-value">{{ data.name || '—' }}</span>
           </div>
-          <div class="field-row field-row--multiline">
+          <div v-if="isEditing || data.description" class="field-row field-row--multiline">
             <label class="field-label">Beschreibung</label>
             <textarea
               v-if="isEditing"
@@ -172,9 +172,7 @@ defineExpose({ save });
               v-model="form.description"
               placeholder="Kurzbeschreibung"
             />
-            <span v-else class="field-value field-description">{{
-              data.description || '—'
-            }}</span>
+            <span v-else class="field-value field-description">{{ data.description }}</span>
           </div>
           <div v-if="isEditing" class="field-row">
             <label class="field-label">Farbe</label>
