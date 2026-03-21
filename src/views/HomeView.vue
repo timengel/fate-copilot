@@ -59,12 +59,15 @@ function getCharCampaign(charId: string): string | null {
     </div>
 
     <div v-if="hasAnyData" class="quick-actions">
-      <FateButton @click="router.push('/dashboard')">Dashboard öffnen →</FateButton>
-      <FateButton variant="secondary" @click="router.push('/campaigns/new')"
-        >+ Neue Kampagne</FateButton
+      <FateButton icon="arrow-right" @click="router.push('/dashboard')">Dashboard öffnen</FateButton>
+      <FateButton variant="secondary" icon="add" @click="router.push('/campaigns/new')"
+        >Neue Kampagne</FateButton
       >
-      <FateButton variant="secondary" @click="router.push('/characters/new')"
-        >+ Neuer Charakter</FateButton
+      <FateButton variant="secondary" icon="add" @click="router.push('/characters/new')"
+        >Neuer Charakter</FateButton
+      >
+      <FateButton variant="secondary" icon="add" @click="router.push('/items/new')"
+        >Neuer Gegenstand</FateButton
       >
     </div>
 
@@ -89,8 +92,8 @@ function getCharCampaign(charId: string): string | null {
       <section class="home-section">
         <div class="section-header">
           <h2>Aktive Kampagnen</h2>
-          <FateButton variant="outline" size="S" @click.stop="router.push('/campaigns/new')"
-            >+ Neu</FateButton
+          <FateButton variant="outline" size="S" icon="add" @click.stop="router.push('/campaigns/new')"
+            >Neu</FateButton
           >
         </div>
         <div class="section-scroll">
@@ -119,16 +122,16 @@ function getCharCampaign(charId: string): string | null {
             </li>
           </ul>
         </div>
-        <FateButton variant="link" @click="router.push('/campaigns')"
-          >Alle Kampagnen ansehen →</FateButton
+        <FateButton variant="link" icon="arrow-right" @click="router.push('/campaigns')"
+          >Alle Kampagnen ansehen</FateButton
         >
       </section>
 
       <section class="home-section">
         <div class="section-header">
           <h2>Charaktere</h2>
-          <FateButton variant="outline" size="S" @click.stop="router.push('/characters/new')"
-            >+ Neu</FateButton
+          <FateButton variant="outline" size="S" icon="add" @click.stop="router.push('/characters/new')"
+            >Neu</FateButton
           >
         </div>
         <div class="section-scroll">
@@ -162,8 +165,8 @@ function getCharCampaign(charId: string): string | null {
             </li>
           </ul>
         </div>
-        <FateButton variant="link" @click="router.push('/characters')"
-          >Alle Charaktere ansehen →</FateButton
+        <FateButton variant="link" icon="arrow-right" @click="router.push('/characters')"
+          >Alle Charaktere ansehen</FateButton
         >
       </section>
     </div>
