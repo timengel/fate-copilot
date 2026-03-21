@@ -5,8 +5,8 @@ import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
 
-const FORMAT_VERSION: AppDataVersion = '1.1';
-const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0', '1.1'];
+const FORMAT_VERSION: AppDataVersion = '1.0';
+const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0'];
 
 export function useImportExport() {
   function exportJSON() {

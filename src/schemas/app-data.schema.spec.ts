@@ -64,8 +64,8 @@ const fullCharacter: Character = {
   avatar: '🧙',
 };
 
-const minimalV11: AppData = {
-  formatVersion: '1.1',
+const minimalV10: AppData = {
+  formatVersion: '1.0',
   exportDate: '2024-03-15T10:30:00.000Z',
   campaigns: [],
   characters: [],
@@ -78,26 +78,21 @@ const minimalV11: AppData = {
 // ---------------------------------------------------------------------------
 describe('app-data JSON Schema', () => {
   describe('valid AppData', () => {
-    it('accepts minimal v1.1 data (empty arrays)', () => {
-      expect(isValid(minimalV11)).toBe(true);
-    });
-
-    it('accepts v1.0 data without skills field', () => {
-      const { skills: _s, ...v10 } = minimalV11;
-      expect(isValid({ ...v10, formatVersion: '1.0' })).toBe(true);
+    it('accepts minimal v1.0 data (empty arrays)', () => {
+      expect(isValid(minimalV10)).toBe(true);
     });
 
     it('accepts a minimal character', () => {
-      expect(isValid({ ...minimalV11, characters: [minimalCharacter] })).toBe(true);
+      expect(isValid({ ...minimalV10, characters: [minimalCharacter] })).toBe(true);
     });
 
     it('accepts a fully populated character (all optional fields)', () => {
-      expect(isValid({ ...minimalV11, characters: [fullCharacter] })).toBe(true);
+      expect(isValid({ ...minimalV10, characters: [fullCharacter] })).toBe(true);
     });
 
     it('accepts a campaign with milestones', () => {
       const data: AppData = {
-        ...minimalV11,
+        ...minimalV10,
         campaigns: [
           {
             id: 'camp-1',
@@ -117,7 +112,7 @@ describe('app-data JSON Schema', () => {
 
     it('accepts campaign-character assignments', () => {
       const data: AppData = {
-        ...minimalV11,
+        ...minimalV10,
         campaignCharacterAssignments: [{ campaignId: 'camp-1', characterId: 'char-1' }],
       };
       expect(isValid(data)).toBe(true);
@@ -129,7 +124,7 @@ describe('app-data JSON Schema', () => {
         label: (['mild', 'moderate', 'severe', 'extreme'] as const)[i]!,
         value: '',
       }));
-      expect(isValid({ ...minimalV11, characters: [{ ...minimalCharacter, consequences }] })).toBe(
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, consequences }] })).toBe(
         true,
       );
     });
@@ -137,7 +132,7 @@ describe('app-data JSON Schema', () => {
     it('accepts all valid CampaignStatus values', () => {
       for (const status of ['active', 'inactive', 'completed'] as const) {
         const data = {
-          ...minimalV11,
+          ...minimalV10,
           campaigns: [{ id: 'c', name: 'x', description: '', status, notes: '', milestones: [] }],
         };
         expect(isValid(data)).toBe(true);
@@ -147,55 +142,59 @@ describe('app-data JSON Schema', () => {
 
   describe('invalid AppData — top level', () => {
     it('rejects missing formatVersion', () => {
-      const { formatVersion: _v, ...data } = minimalV11;
+      const { formatVersion: _v, ...data } = minimalV10;
       expect(isValid(data)).toBe(false);
     });
 
     it('rejects unknown formatVersion', () => {
-      expect(isValid({ ...minimalV11, formatVersion: '2.0' })).toBe(false);
+      expect(isValid({ ...minimalV10, formatVersion: '2.0' })).toBe(false);
+    });
+
+    it('rejects previous schema version 1.1', () => {
+      expect(isValid({ ...minimalV10, formatVersion: '1.1' })).toBe(false);
     });
 
     it('rejects missing campaigns array', () => {
-      const { campaigns: _c, ...data } = minimalV11;
+      const { campaigns: _c, ...data } = minimalV10;
       expect(isValid(data)).toBe(false);
     });
 
     it('rejects missing characters array', () => {
-      const { characters: _c, ...data } = minimalV11;
+      const { characters: _c, ...data } = minimalV10;
       expect(isValid(data)).toBe(false);
     });
 
     it('rejects missing campaignCharacterAssignments array', () => {
-      const { campaignCharacterAssignments: _a, ...data } = minimalV11;
+      const { campaignCharacterAssignments: _a, ...data } = minimalV10;
       expect(isValid(data)).toBe(false);
     });
 
     it('rejects additional unknown top-level properties', () => {
-      expect(isValid({ ...minimalV11, unknownField: true })).toBe(false);
+      expect(isValid({ ...minimalV10, unknownField: true })).toBe(false);
     });
   });
 
   describe('invalid Character', () => {
     it('rejects character with missing required field (name)', () => {
       const { name: _n, ...noName } = minimalCharacter;
-      expect(isValid({ ...minimalV11, characters: [noName] })).toBe(false);
+      expect(isValid({ ...minimalV10, characters: [noName] })).toBe(false);
     });
 
     it('rejects character with invalid type value', () => {
       expect(
-        isValid({ ...minimalV11, characters: [{ ...minimalCharacter, type: 'player' }] }),
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, type: 'player' }] }),
       ).toBe(false);
     });
 
     it('rejects character with invalid color value', () => {
-      expect(isValid({ ...minimalV11, characters: [{ ...minimalCharacter, color: 'rot' }] })).toBe(
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, color: 'rot' }] })).toBe(
         false,
       );
     });
 
     it('rejects SkillEntry with level out of range', () => {
       const char = { ...minimalCharacter, skills: [{ skill: 'Kämpfen', level: 0 }] };
-      expect(isValid({ ...minimalV11, characters: [char] })).toBe(false);
+      expect(isValid({ ...minimalV10, characters: [char] })).toBe(false);
     });
 
     it('rejects Consequence with invalid severity', () => {
@@ -203,7 +202,7 @@ describe('app-data JSON Schema', () => {
         ...minimalCharacter,
         consequences: [{ severity: 3, label: 'mild', value: '' }],
       };
-      expect(isValid({ ...minimalV11, characters: [char] })).toBe(false);
+      expect(isValid({ ...minimalV10, characters: [char] })).toBe(false);
     });
 
     it('rejects Consequence with invalid label', () => {
@@ -211,7 +210,7 @@ describe('app-data JSON Schema', () => {
         ...minimalCharacter,
         consequences: [{ severity: 2, label: 'light', value: '' }],
       };
-      expect(isValid({ ...minimalV11, characters: [char] })).toBe(false);
+      expect(isValid({ ...minimalV10, characters: [char] })).toBe(false);
     });
   });
 
