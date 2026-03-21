@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
+import FateIcon from './components/shared/FateIcon.vue';
 import FateToast from './components/shared/FateToast.vue';
 import { useGMModeStore } from './stores/gmMode';
 import { ToggleVariant } from './types';
@@ -24,7 +25,7 @@ watch(
     <header class="app-header">
       <nav class="app-nav">
         <RouterLink to="/" class="nav-logo">
-          <FatePlusLogo />
+          <FatePlusLogo class="fate-plus-logo"/>
         </RouterLink>
 
         <button
@@ -46,7 +47,9 @@ watch(
             <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
             <RouterLink to="/items" class="nav-link">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
-            <RouterLink to="/settings" class="nav-link">Einstellungen</RouterLink>
+            <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen">
+              <FateIcon name="settings" :size="20" />
+            </RouterLink>
           </div>
         </div>
 
@@ -92,7 +95,7 @@ watch(
 .app-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.5rem;
   padding: 0 1.5rem;
   height: 56px;
   max-width: 1200px;
@@ -114,6 +117,24 @@ watch(
 .nav-links {
   display: flex;
   gap: 0.5rem;
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.nav-link-settings {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 0.4rem;
+}
+
+.nav-link-settings:active svg {
+  animation: spin-once 0.8s ease-out;
+}
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(180deg); }
 }
 
 .nav-link {
@@ -130,6 +151,11 @@ watch(
 .nav-link.router-link-active {
   background: rgba(255, 255, 255, 0.2);
   color: white !important;
+}
+
+.nav-link:active {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(0.97);
 }
 
 .app-scroll-area {
@@ -161,9 +187,9 @@ watch(
 }
 
 .nav-gm-toggle.gm-active {
-  background: rgba(220, 38, 38, 0.25);
-  border-color: #dc2626;
-  box-shadow: 0 0 0 1px #dc2626;
+  background: var(--fate-red);
+  border-color: var(--fate-red);
+  box-shadow: none;
 }
 
 /* Nav-Drawer: unsichtbarer Flex-Wrapper auf Desktop */
