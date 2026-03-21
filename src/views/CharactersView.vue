@@ -5,10 +5,9 @@ import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import type { CharacterType } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
-import FateAvatar from '../components/shared/FateAvatar.vue';
+import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
-import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 
 const router = useRouter();
@@ -43,13 +42,7 @@ const filtered = computed(() =>
   }),
 );
 
-const tabTotal = computed(
-  () => store.characters.filter((c) => (c.type ?? 'sc') === activeTab.value).length,
-);
-
-function cardHeaderStyle(colorId?: string) {
-  return { background: getColorVars(colorId)['--fate-blue'] };
-}
+const tabTotal = computed(() => store.characters.filter((c) => (c.type ?? 'sc') === activeTab.value).length);
 
 function deleteCharacter(id: string, name: string) {
   showConfirmDialog(
@@ -98,27 +91,24 @@ function deleteCharacter(id: string, name: string) {
     </div>
 
     <div v-else class="card-grid">
-      <div
+      <FateCard
         v-for="char in filtered"
         :key="char.id"
-        class="character-card"
+        :color="char.color"
+        :avatar="char.avatar"
+        :title="char.name || 'Unbenannt'"
+        clickable
         @click="router.push(`/characters/${char.id}`)"
       >
-        <div class="card-header" :style="cardHeaderStyle(char.color)">
-          <FateAvatar :value="char.avatar" size="S" />
-          <span class="card-header-title">{{ char.name || 'Unbenannt' }}</span>
-        </div>
-        <div class="card-description">
-          <div class="card-concept">{{ char.highConcept || '—' }}</div>
-          <div class="card-trouble" v-if="char.trouble">
-            <em>{{ char.trouble }}</em>
-          </div>
-        </div>
-        <div class="card-actions">
+        {{ char.highConcept || '—' }}
+        <template #meta>
+          <span v-if="char.trouble" class="card-trouble"><em>{{ char.trouble }}</em></span>
+        </template>
+        <template #actions>
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/characters/${char.id}/edit`)" />
           <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteCharacter(char.id, char.name)" />
-        </div>
-      </div>
+        </template>
+      </FateCard>
     </div>
   </div>
 
@@ -135,62 +125,7 @@ function deleteCharacter(id: string, name: string) {
 </template>
 
 <style scoped>
-.character-card {
-  background: white;
-  border: 1px solid var(--fate-border);
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  max-height: 210px;
-}
-
-.character-card:hover {
-  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
-  border-color: var(--fate-blue);
-}
-
-.card-header {
-  background: var(--fate-blue);
-  color: white;
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.6rem 0.9rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.card-header-title {
-  min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-concept {
-  padding: 0.25rem 0.9rem;
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: var(--fate-text);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 .card-trouble {
-  padding: 0 0.9rem 0.25rem;
-  font-size: 0.8rem;
-  color: var(--fate-text-light);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -198,12 +133,15 @@ function deleteCharacter(id: string, name: string) {
   overflow: hidden;
 }
 
-.card-actions {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0.9rem 0.75rem;
-  margin-top: auto;
-  justify-content: flex-end;
+:deep(.fate-card__meta) .card-trouble {
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+  flex: 1 1 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .search-input {

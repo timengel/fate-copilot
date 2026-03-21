@@ -3,12 +3,11 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import FateButton from '../components/shared/FateButton.vue';
-import FateAvatar from '../components/shared/FateAvatar.vue';
+import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { CAMPAIGN_STATUS_LABEL } from '../types';
 import type { CampaignStatus } from '../types';
-import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useGMModeStore } from '../stores/gmMode';
 
@@ -50,21 +49,19 @@ function deleteCampaign(id: string, name: string) {
       <div v-for="group in groupedCampaigns" :key="group.status" class="status-group">
         <h2 class="status-group-title" :class="`title-${group.status}`">{{ group.label }}</h2>
         <div class="card-grid">
-          <div
+          <FateCard
             v-for="campaign in group.campaigns"
             :key="campaign.id"
-            class="campaign-card"
-            :style="getColorVars(campaign.color)"
+            :color="campaign.color"
+            :avatar="campaign.avatar"
+            :title="campaign.name"
+            clickable
             @click="router.push(`/campaigns/${campaign.id}`)"
           >
-            <div class="card-header">
-              <FateAvatar :value="campaign.avatar" size="S" />
-              <span class="card-header-title">{{ campaign.name }}</span>
-            </div>
-            <div class="card-description" v-if="campaign.description">
+            <template v-if="campaign.description">
               {{ campaign.description }}
-            </div>
-            <div class="card-meta">
+            </template>
+            <template #meta>
               <span>
                 {{ store.getCharactersForCampaign(campaign.id).filter((c) => (c.type ?? 'sc') === 'sc').length }} SC
               </span>
@@ -77,12 +74,12 @@ function deleteCampaign(id: string, name: string) {
               <span v-if="campaign.milestones.length > 0">
                 · {{ campaign.milestones.length }} Meilenstein{{ campaign.milestones.length !== 1 ? 'e' : '' }}
               </span>
-            </div>
-            <div class="card-actions">
+            </template>
+            <template #actions>
               <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/campaigns/${campaign.id}/edit`)" />
               <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteCampaign(campaign.id, campaign.name)" />
-            </div>
-          </div>
+            </template>
+          </FateCard>
         </div>
       </div>
     </template>
@@ -121,72 +118,4 @@ function deleteCampaign(id: string, name: string) {
   color: var(--fate-blue);
 }
 
-.campaign-card {
-  background: white;
-  border: 1px solid var(--fate-border);
-  border-radius: 6px;
-  padding: 0;
-  cursor: pointer;
-  transition:
-    box-shadow 0.15s,
-    border-color 0.15s;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  max-height: 210px;
-}
-
-.campaign-card:hover {
-  box-shadow: 0 2px 12px rgba(28, 158, 214, 0.15);
-  border-color: var(--fate-blue);
-}
-
-.card-header {
-  background: var(--fate-blue);
-  color: white;
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.6rem 0.9rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.card-header-title {
-  min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-description {
-  padding: 0.25rem 0.9rem;
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: var(--fate-text);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.25rem;
-  padding: 0.25rem 0.9rem;
-  font-size: 0.8rem;
-  color: var(--fate-text-light);
-}
-
-.card-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 0.5rem 0.9rem 0.75rem;
-  margin-top: auto;
-}
 </style>

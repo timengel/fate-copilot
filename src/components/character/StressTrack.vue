@@ -53,7 +53,7 @@ function toggle(index: number) {
 .stress-boxes {
   display: flex;
   gap: 4px;
-  min-height: 40px;
+  min-height: 50px;
 }
 
 .stress-box {
