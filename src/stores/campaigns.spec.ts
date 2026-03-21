@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useCampaignsStore } from './campaigns';
 import { useCharactersStore } from './characters';
-import type { Campaign, Character, Milestone } from '../types';
+import { useItemsStore } from './items';
+import type { Campaign, Character, Item, Milestone } from '../types';
 
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
   return {
@@ -33,6 +34,23 @@ function makeChar(overrides: Partial<Character> = {}): Character {
     stressMental: [],
     consequences: [],
     notes: '',
+    ...overrides,
+  };
+}
+
+function makeItem(overrides: Partial<Item> = {}): Item {
+  return {
+    id: 'item1',
+    type: 'item',
+    name: 'Schwert',
+    description: '',
+    aspects: [],
+    stunts: [],
+    extras: '',
+    stressPhysical: [],
+    stressMental: [],
+    redDice: 0,
+    blueDice: 0,
     ...overrides,
   };
 }
@@ -71,6 +89,13 @@ describe('useCampaignsStore', () => {
     expect(store.getById('c1')?.name).toBe('New');
   });
 
+  it('updateCampaign with unknown id does nothing', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1', name: 'Old' }));
+    store.updateCampaign(makeCampaign({ id: 'missing', name: 'New' }));
+    expect(store.getById('c1')?.name).toBe('Old');
+  });
+
   it('deletes a campaign', () => {
     const store = useCampaignsStore();
     store.addCampaign(makeCampaign({ id: 'c1' }));
@@ -84,6 +109,14 @@ describe('useCampaignsStore', () => {
     store.assignCharacter('c1', 'char1');
     store.deleteCampaign('c1');
     expect(store.assignments).toHaveLength(0);
+  });
+
+  it('deleteCampaign also removes associated item assignments', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1' }));
+    store.assignItem('c1', 'item1');
+    store.deleteCampaign('c1');
+    expect(store.itemAssignments).toHaveLength(0);
   });
 
   it('activeCampaigns only includes active status', () => {
@@ -132,6 +165,48 @@ describe('useCampaignsStore', () => {
     store.addCampaign(makeCampaign({ id: 'c2', name: 'Campaign 2' }));
     store.assignCharacter('c1', 'char1');
     const result = store.getCampaignsForCharacter('char1');
+    expect(result).toHaveLength(1);
+    expect(result[0]!.name).toBe('Campaign 1');
+  });
+
+  it('assignItem adds an item assignment', () => {
+    const store = useCampaignsStore();
+    store.assignItem('c1', 'item1');
+    expect(store.itemAssignments).toHaveLength(1);
+  });
+
+  it('assignItem does not add duplicates', () => {
+    const store = useCampaignsStore();
+    store.assignItem('c1', 'item1');
+    store.assignItem('c1', 'item1');
+    expect(store.itemAssignments).toHaveLength(1);
+  });
+
+  it('unassignItem removes only the targeted item assignment', () => {
+    const store = useCampaignsStore();
+    store.assignItem('c1', 'item1');
+    store.assignItem('c1', 'item2');
+    store.unassignItem('c1', 'item1');
+    expect(store.itemAssignments).toEqual([{ campaignId: 'c1', itemId: 'item2' }]);
+  });
+
+  it('getItemsForCampaign returns assigned items', () => {
+    const store = useCampaignsStore();
+    const itemsStore = useItemsStore();
+    itemsStore.addItem(makeItem({ id: 'item1', name: 'Schwert' }));
+    itemsStore.addItem(makeItem({ id: 'item2', name: 'Schild' }));
+    store.assignItem('c1', 'item1');
+    const result = store.getItemsForCampaign('c1');
+    expect(result).toHaveLength(1);
+    expect(result[0]!.name).toBe('Schwert');
+  });
+
+  it('getCampaignsForItem returns assigned campaigns', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1', name: 'Campaign 1' }));
+    store.addCampaign(makeCampaign({ id: 'c2', name: 'Campaign 2' }));
+    store.assignItem('c1', 'item1');
+    const result = store.getCampaignsForItem('item1');
     expect(result).toHaveLength(1);
     expect(result[0]!.name).toBe('Campaign 1');
   });
@@ -189,6 +264,16 @@ describe('useCampaignsStore', () => {
     expect(store.assignments[0]!.campaignId).toBe('new');
   });
 
+  it('replaceAll preserves incoming itemAssignments', () => {
+    const store = useCampaignsStore();
+    store.replaceAll(
+      [makeCampaign({ id: 'new' })],
+      [{ campaignId: 'new', characterId: 'c1' }],
+      [{ campaignId: 'new', itemId: 'item1' }],
+    );
+    expect(store.itemAssignments).toEqual([{ campaignId: 'new', itemId: 'item1' }]);
+  });
+
   it('addMilestone with non-existent campaignId does nothing', () => {
     const store = useCampaignsStore();
     const milestone: Milestone = { id: 'm1', type: 'small', description: 'Ghost' };
@@ -217,5 +302,15 @@ describe('useCampaignsStore', () => {
     expect(store.campaigns).toHaveLength(0);
     expect(store.assignments).toHaveLength(0);
     expect(store.itemAssignments).toHaveLength(0);
+  });
+
+  it('characterCountsForCampaign returns SC and NSC totals', () => {
+    const store = useCampaignsStore();
+    const charactersStore = useCharactersStore();
+    charactersStore.addCharacter(makeChar({ id: 'sc1', type: 'sc' }));
+    charactersStore.addCharacter(makeChar({ id: 'nsc1', type: 'nsc' }));
+    store.assignCharacter('c1', 'sc1');
+    store.assignCharacter('c1', 'nsc1');
+    expect(store.characterCountsForCampaign('c1')).toEqual({ sc: 1, nsc: 1 });
   });
 });

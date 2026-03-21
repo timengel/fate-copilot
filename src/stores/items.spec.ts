@@ -52,6 +52,14 @@ describe('useItemsStore', () => {
     expect(store.items[0]!.name).toBe('New');
   });
 
+  it('updateItem with unknown id does nothing', () => {
+    const store = useItemsStore();
+    store.addItem(makeItem({ id: 'i1', name: 'Old' }));
+    store.updateItem(makeItem({ id: 'missing', name: 'New' }));
+    expect(store.items).toHaveLength(1);
+    expect(store.items[0]!.name).toBe('Old');
+  });
+
   it('deletes an item', () => {
     const store = useItemsStore();
     store.addItem(makeItem({ id: 'i1' }));
