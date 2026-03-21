@@ -169,6 +169,15 @@ button {
   opacity: 0.7;
 }
 
+.fate-btn--subtle {
+  background: none;
+  box-shadow: none;
+}
+.fate-btn--subtle:hover {
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 .fate-btn--counter {
   background: var(--fate-blue);
   color: white;

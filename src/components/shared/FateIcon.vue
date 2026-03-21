@@ -59,6 +59,14 @@ defineProps<{ name: ButtonIcon; size?: number }>();
       <polyline points="12 5 19 12 12 19" />
     </template>
 
+    <template v-else-if="name === 'chevron-left'">
+      <polyline points="15 18 9 12 15 6" />
+    </template>
+
+    <template v-else-if="name === 'chevron-right'">
+      <polyline points="9 18 15 12 9 6" />
+    </template>
+
     <template v-else-if="name === 'download'">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />

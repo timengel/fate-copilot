@@ -120,6 +120,7 @@ watch(
   border-radius: 4px;
   font-weight: 500;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 
 .nav-link:hover,
@@ -132,6 +133,7 @@ watch(
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-gutter: stable;
 }
 

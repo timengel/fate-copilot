@@ -12,7 +12,8 @@ export type ButtonVariant =
   | 'add'
   | 'info'
   | 'counter'
-  | 'ghost';
+  | 'ghost'
+  | 'subtle';
 
 export type ButtonSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
 
@@ -25,6 +26,8 @@ export type ButtonIcon =
   | 'info'
   | 'arrow-left'
   | 'arrow-right'
+  | 'chevron-left'
+  | 'chevron-right'
   | 'download'
   | 'upload';
 

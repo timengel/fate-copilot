@@ -113,16 +113,21 @@ onUnmounted(() => {
 <template>
   <div class="dashboard-view">
     <!-- Sidebar (desktop) -->
-    <aside class="dashboard-sidebar" :class="{ collapsed: sidebarCollapsed }">
+    <aside
+      class="dashboard-sidebar"
+      :class="{ collapsed: sidebarCollapsed }"
+      @click="sidebarCollapsed && (sidebarCollapsed = false)"
+    >
       <div class="sidebar-header">
         <h3 class="sidebar-title" v-show="!sidebarCollapsed">Filter</h3>
-        <button
+        <FateButton
           class="sidebar-toggle"
-          @click="sidebarCollapsed = !sidebarCollapsed"
+          variant="subtle"
+          size="S"
+          :icon="sidebarCollapsed ? 'chevron-right' : 'chevron-left'"
           :title="sidebarCollapsed ? 'Sidebar öffnen' : 'Sidebar schließen'"
-        >
-          {{ sidebarCollapsed ? '›' : '‹' }}
-        </button>
+          @click.stop="sidebarCollapsed = !sidebarCollapsed"
+        />
       </div>
 
       <div v-show="!sidebarCollapsed">
@@ -337,9 +342,9 @@ onUnmounted(() => {
   bottom: 0;
   width: 160px;
   background: var(--fate-white);
-  border-right: 1px solid var(--fate-border);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
   padding: 1.25rem 1rem;
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 10;
   transition:
     width 0.2s ease,
@@ -349,7 +354,7 @@ onUnmounted(() => {
 .dashboard-sidebar.collapsed {
   width: 36px;
   padding: 1.25rem 0.5rem;
-  overflow: hidden;
+  cursor: pointer;
 }
 
 .sidebar-header {
@@ -369,23 +374,14 @@ onUnmounted(() => {
 }
 
 .sidebar-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: var(--fate-text-light);
-  padding: 0.1rem 0.25rem;
-  line-height: 1;
   flex-shrink: 0;
+  color: var(--fate-text-light);
 }
 
-.sidebar-toggle:hover {
-  color: var(--fate-blue);
-}
 
 .dashboard-sidebar.collapsed .sidebar-toggle {
   width: 100%;
-  text-align: center;
+  justify-content: center;
 }
 
 .sidebar-group {
@@ -399,6 +395,7 @@ onUnmounted(() => {
   letter-spacing: 0.08em;
   color: var(--fate-blue);
   margin-bottom: 0.4rem;
+  white-space: nowrap;
 }
 
 .filter-label {
@@ -408,6 +405,7 @@ onUnmounted(() => {
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.25rem 0;
+  white-space: nowrap;
 }
 
 .dashboard-filters-inline {

@@ -64,5 +64,6 @@ const emit = defineEmits<{
 .checkbox-label {
   font-size: 0.8rem;
   color: var(--fate-text-light);
+  white-space: nowrap;
 }
 </style>
