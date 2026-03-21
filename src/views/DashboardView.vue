@@ -9,6 +9,7 @@ import CharacterSheet from '../components/character/CharacterSheet.vue';
 import ItemSheet from '../components/character/ItemSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
 import type { Character } from '../types';
 
 const campaignsStore = useCampaignsStore();
@@ -175,14 +176,10 @@ onUnmounted(() => {
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Layout</div>
-          <label class="filter-label">
-            <input type="radio" v-model="dashboardLayout" value="list" />
-            Liste
-          </label>
-          <label class="filter-label">
-            <input type="radio" v-model="dashboardLayout" value="grid" />
-            Zwei Spalten
-          </label>
+          <FateRadioButtonGroup
+            v-model="dashboardLayout"
+            :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
+          />
         </div>
       </div>
     </aside>
@@ -225,14 +222,10 @@ onUnmounted(() => {
       </div>
       <div class="filters-inline-row">
         <span class="filters-inline-label">Layout:</span>
-        <label class="filter-label">
-          <input type="radio" v-model="dashboardLayout" value="list" />
-          Liste
-        </label>
-        <label class="filter-label">
-          <input type="radio" v-model="dashboardLayout" value="grid" />
-          Zwei Spalten
-        </label>
+        <FateRadioButtonGroup
+          v-model="dashboardLayout"
+          :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
+        />
       </div>
     </div>
 
@@ -395,16 +388,6 @@ onUnmounted(() => {
   letter-spacing: 0.08em;
   color: var(--fate-blue);
   margin-bottom: 0.4rem;
-  white-space: nowrap;
-}
-
-.filter-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0.25rem 0;
   white-space: nowrap;
 }
 
