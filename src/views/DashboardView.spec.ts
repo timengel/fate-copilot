@@ -39,6 +39,10 @@ function makeItem(overrides: Partial<Item> = {}): Item {
 }
 
 describe('DashboardView archived item filter', () => {
+  function getItemArchivedFilter(container: HTMLElement) {
+    return container.querySelectorAll<HTMLElement>('.sidebar-group .fate-checkbox')[3];
+  }
+
   beforeEach(() => {
     setActivePinia(createPinia());
   });
@@ -81,7 +85,7 @@ describe('DashboardView archived item filter', () => {
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
 
-    await fireEvent.click(view.getByText('Archiviert'));
+    await fireEvent.click(getItemArchivedFilter(view.container)!);
 
     expect(view.getByText('Altes Schwert')).toBeTruthy();
   });
@@ -89,7 +93,7 @@ describe('DashboardView archived item filter', () => {
   it('still hides hidden archived items for non-GM users even when the archived filter is enabled', async () => {
     const view = setup({ archived: true, hidden: true });
 
-    await fireEvent.click(view.getByText('Archiviert'));
+    await fireEvent.click(getItemArchivedFilter(view.container)!);
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
   });

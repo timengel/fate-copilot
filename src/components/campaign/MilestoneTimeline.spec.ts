@@ -23,6 +23,10 @@ function renderTimeline(props: {
 }
 
 describe('MilestoneTimeline', () => {
+  function getAddButton(container: HTMLElement) {
+    return container.querySelector<HTMLButtonElement>('.milestone-add-form .fate-btn');
+  }
+
   describe('readonly mode', () => {
     it('hides the add form', () => {
       const { container } = renderTimeline({ milestones, readonly: true });
@@ -58,7 +62,7 @@ describe('MilestoneTimeline', () => {
       const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, 'New Milestone');
-      await fireEvent.click(screen.getByText('+ Hinzufügen'));
+      await fireEvent.click(getAddButton(container)!);
       expect(onAdd).toHaveBeenCalledOnce();
       const added: Milestone = onAdd.mock.calls[0]![0];
       expect(added.description).toBe('New Milestone');
@@ -67,8 +71,8 @@ describe('MilestoneTimeline', () => {
 
     it('does not call onAdd when description is empty', async () => {
       const onAdd = vi.fn();
-      renderTimeline({ milestones: [], readonly: false, onAdd });
-      await fireEvent.click(screen.getByText('+ Hinzufügen'));
+      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
+      await fireEvent.click(getAddButton(container)!);
       expect(onAdd).not.toHaveBeenCalled();
     });
 
@@ -109,7 +113,7 @@ describe('MilestoneTimeline', () => {
       const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, '  trimmed  ');
-      await fireEvent.click(screen.getByText('+ Hinzufügen'));
+      await fireEvent.click(getAddButton(container)!);
       expect(onAdd.mock.calls[0][0].description).toBe('trimmed');
     });
 
@@ -118,7 +122,7 @@ describe('MilestoneTimeline', () => {
       const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, '   ');
-      await fireEvent.click(screen.getByText('+ Hinzufügen'));
+      await fireEvent.click(getAddButton(container)!);
       expect(onAdd).not.toHaveBeenCalled();
     });
 
@@ -126,7 +130,7 @@ describe('MilestoneTimeline', () => {
       const { container } = renderTimeline({ milestones: [], readonly: false });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, 'A new milestone');
-      await fireEvent.click(screen.getByText('+ Hinzufügen'));
+      await fireEvent.click(getAddButton(container)!);
       expect(input.value).toBe('');
     });
 

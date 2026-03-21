@@ -61,13 +61,13 @@ describe('CharactersView – card interactions', () => {
 
   it('clicking the card navigates to the character view page', async () => {
     const { container, charId } = setup();
-    await fireEvent.click(container.querySelector('.character-card')!);
+    await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
     expect(mockPush).toHaveBeenCalledWith(`/characters/${charId}`);
   });
 
   it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
     const { container, charId } = setup();
-    const [editBtn] = container.querySelectorAll('.card-actions button');
+    const [editBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(editBtn!);
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(`/characters/${charId}/edit`);
@@ -75,7 +75,7 @@ describe('CharactersView – card interactions', () => {
 
   it('clicking the delete button does not trigger navigation', async () => {
     const { container } = setup();
-    const [, deleteBtn] = container.querySelectorAll('.card-actions button');
+    const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
   });

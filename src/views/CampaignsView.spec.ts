@@ -51,13 +51,13 @@ describe('CampaignsView – card interactions', () => {
 
   it('clicking the card navigates to the campaign view page', async () => {
     const { container, campaignId } = setup();
-    await fireEvent.click(container.querySelector('.campaign-card')!);
+    await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
     expect(mockPush).toHaveBeenCalledWith(`/campaigns/${campaignId}`);
   });
 
   it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
     const { container, campaignId } = setup();
-    const [editBtn] = container.querySelectorAll('.card-actions button');
+    const [editBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(editBtn!);
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(`/campaigns/${campaignId}/edit`);
@@ -65,7 +65,7 @@ describe('CampaignsView – card interactions', () => {
 
   it('clicking the delete button does not trigger navigation', async () => {
     const { container } = setup();
-    const [, deleteBtn] = container.querySelectorAll('.card-actions button');
+    const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
   });

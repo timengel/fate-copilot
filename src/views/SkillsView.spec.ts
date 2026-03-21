@@ -4,6 +4,7 @@ import { beforeEach, describe, it, expect } from 'vitest';
 import SkillsView from './SkillsView.vue';
 import { useSkillsStore } from '../stores/skills';
 import { useToastStore } from '../stores/toast';
+import { useGMModeStore } from '../stores/gmMode';
 import { SKILL_LIST } from '../types';
 
 describe('SkillsView', () => {
@@ -15,6 +16,8 @@ describe('SkillsView', () => {
   });
 
   function setup() {
+    const gmModeStore = useGMModeStore();
+    gmModeStore.isGMMode = true;
     return render(SkillsView, {
       global: {
         plugins: [pinia],
