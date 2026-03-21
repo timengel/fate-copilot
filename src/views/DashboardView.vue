@@ -154,7 +154,7 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Items</div>
           <FateCheckbox v-model="showItems" label="Zeige Items" />
-          <FateCheckbox v-model="showArchivedItems" label="Zeige archivierte Items" />
+          <FateCheckbox v-model="showArchivedItems" label="Archiviert" />
         </div>
 
         <div class="sidebar-group">

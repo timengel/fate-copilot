@@ -81,7 +81,7 @@ describe('DashboardView archived item filter', () => {
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
 
-    await fireEvent.click(view.getByText('Zeige archivierte Items'));
+    await fireEvent.click(view.getByText('Archiviert'));
 
     expect(view.getByText('Altes Schwert')).toBeTruthy();
   });
@@ -89,7 +89,7 @@ describe('DashboardView archived item filter', () => {
   it('still hides hidden archived items for non-GM users even when the archived filter is enabled', async () => {
     const view = setup({ archived: true, hidden: true });
 
-    await fireEvent.click(view.getByText('Zeige archivierte Items'));
+    await fireEvent.click(view.getByText('Archiviert'));
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
   });

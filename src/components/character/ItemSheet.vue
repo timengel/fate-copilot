@@ -376,13 +376,6 @@ defineExpose({ save });
       class="sheet-section gm-notes-section"
     >
       <div class="sheet-section-header">GM OPTIONS</div>
-      <textarea
-        v-if="isEditing"
-        class="text-area-input"
-        v-model="form.gmNotes"
-        placeholder="GM Notizen"
-      />
-      <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
       <FateCheckbox
         v-if="isEditing"
         :modelValue="!!form.archived"
@@ -395,6 +388,14 @@ defineExpose({ save });
         label="Versteckt (GM-only)"
         @update:modelValue="form.hidden = $event"
       />
+      <div v-if="isEditing" class="gm-options-divider" />
+      <textarea
+        v-if="isEditing"
+        class="text-area-input"
+        v-model="form.gmNotes"
+        placeholder="GM Notizen..."
+      />
+      <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
     </section>
 
     <!-- FORM ACTIONS (edit mode only) -->
@@ -793,6 +794,12 @@ defineExpose({ save });
 /* GM NOTES */
 .gm-notes-section {
   background: white;
+}
+
+.gm-options-divider {
+  height: 1px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .gm-notes-display {
