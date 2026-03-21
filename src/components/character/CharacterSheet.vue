@@ -627,9 +627,20 @@ defineExpose({ save });
   min-width: 160px;
 }
 
+.general-grid .field-label {
+  width: 110px;
+  min-width: 110px;
+}
+
+.general-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .field-row {
   display: flex;
-  align-items: baseline;
+  align-items: start;
   gap: 0.5rem;
   padding: 3px 0;
 }
@@ -654,6 +665,11 @@ defineExpose({ save });
   padding: 0.3rem 0.45rem;
   color: var(--fate-text);
   font-size: 0.875rem;
+}
+
+.general-left .field-value {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .field-value.field-description {
