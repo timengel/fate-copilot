@@ -10,15 +10,15 @@ export interface FateDropdownOption {
 
 export interface FateDropdownGroup {
   label: string;
-  options: FateDropdownOption[];
+  options: ReadonlyArray<FateDropdownOption>;
 }
 
 withDefaults(
   defineProps<{
     modelValue?: string;
     placeholder?: string;
-    options?: FateDropdownOption[];
-    groups?: FateDropdownGroup[];
+    options?: ReadonlyArray<FateDropdownOption>;
+    groups?: ReadonlyArray<FateDropdownGroup>;
     variant?: DropdownVariant;
     size?: ButtonSize;
     disabled?: boolean;

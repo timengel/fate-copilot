@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Milestone, MilestoneType, TagColor } from '../../types';
+import { DropdownVariant, type Milestone, type MilestoneType, type TagColor } from '../../types';
 import FateButton from '../shared/FateButton.vue';
 import FateDropdown from '../shared/FateDropdown.vue';
 import FateTag from '../shared/FateTag.vue';
@@ -85,7 +85,13 @@ function cancelEdit() {
 
         <!-- Edit mode -->
         <div v-if="!readonly && editingId === m.id" class="timeline-content timeline-content--edit">
-          <FateDropdown v-model="editType" class="milestone-type-select" :options="TYPE_OPTIONS" size="S" variant="secondary" />
+          <FateDropdown
+            v-model="editType"
+            class="milestone-type-select"
+            :options="TYPE_OPTIONS"
+            size="S"
+            :variant="DropdownVariant.Secondary"
+          />
           <input
             v-model="editDescription"
             class="milestone-desc-input"
@@ -122,7 +128,13 @@ function cancelEdit() {
     </div>
 
     <div v-if="!readonly" class="milestone-add-form">
-      <FateDropdown v-model="newType" class="milestone-type-select" :options="TYPE_OPTIONS" size="S" variant="secondary" />
+      <FateDropdown
+        v-model="newType"
+        class="milestone-type-select"
+        :options="TYPE_OPTIONS"
+        size="S"
+        :variant="DropdownVariant.Secondary"
+      />
       <input
         v-model="newDescription"
         class="milestone-desc-input"
