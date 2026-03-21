@@ -29,6 +29,7 @@ const CONSEQUENCE_TYPES: {
 const props = defineProps<{
   character: Character;
   mode?: 'view' | 'edit';
+  isNew?: boolean;
   hideActions?: boolean;
   sections?: {
     general?: boolean;
@@ -49,16 +50,21 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 const gmModeStore = useGMModeStore();
 
 const form = reactive<Character>(deepClone(props.character));
+const savedSnapshot = ref(deepClone(props.character));
 
 watch(
   () => props.character,
   (character) => {
     Object.assign(form, deepClone(character));
+    savedSnapshot.value = deepClone(character);
   },
   { deep: true },
 );
 
 const isEditing = computed(() => props.mode === 'edit');
+const isDirty = computed(
+  () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
+);
 
 const data = computed(() => (isEditing.value ? form : props.character));
 
@@ -142,7 +148,9 @@ function removeStressBox(track: 'physical' | 'mental') {
 }
 
 function save() {
-  emit('save', deepClone(form));
+  const saved = deepClone(form);
+  emit('save', saved);
+  savedSnapshot.value = saved;
 }
 
 defineExpose({ save });
@@ -172,7 +180,7 @@ defineExpose({ save });
         }}</span>
         <div class="character-name-bar-end">
           <slot v-if="!isEditing" name="name-bar-actions" />
-          <slot v-else name="edit-bar-actions" />
+          <slot v-else name="edit-bar-actions" :isDirty="isDirty" />
         </div>
       </div>
 
@@ -501,7 +509,7 @@ defineExpose({ save });
       <!-- FORM ACTIONS (edit mode only) -->
       <div v-if="isEditing && !hideActions" class="form-actions">
         <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
-        <FateButton icon="check" @click="save"><span class="btn-label">Speichern</span></FateButton>
+        <FateButton icon="check" :disabled="!isDirty" @click="save"><span class="btn-label">Speichern</span></FateButton>
       </div>
     </template>
   </div>

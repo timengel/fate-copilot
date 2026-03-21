@@ -10,13 +10,15 @@ const campaign: Campaign = {
   description: 'A description',
   status: 'active',
   notes: '',
+  avatar: '🗺️',
+  milestones: [],
 };
 
 function renderForm(
-  props: Partial<Campaign & { onSave?: () => void; onCancel?: () => void }> = {},
+  props: Partial<Campaign & { isNew?: boolean; onSave?: () => void; onCancel?: () => void }> = {},
 ) {
   return render(CampaignForm, {
-    props: { campaign, ...props },
+    props: { campaign, isNew: true, ...props },
     global: { plugins: [createPinia()] },
   });
 }
@@ -47,7 +49,7 @@ describe('CampaignForm', () => {
     window.alert = vi.fn();
     const onSave = vi.fn();
     render(CampaignForm, {
-      props: { campaign: { ...campaign, name: '' }, onSave },
+      props: { campaign: { ...campaign, name: '' }, isNew: true, onSave },
       global: { plugins: [createPinia()] },
     });
     await fireEvent.click(screen.getByText('Speichern'));
@@ -61,5 +63,60 @@ describe('CampaignForm', () => {
     await fireEvent.update(input, 'Updated Name');
     await fireEvent.click(screen.getByText('Speichern'));
     expect(onSave.mock.calls[0][0].name).toBe('Updated Name');
+  });
+
+  it('emits the updated avatar when changed before saving', async () => {
+    const onSave = vi.fn();
+    const { container } = renderForm({ onSave });
+    const avatarInput = container.querySelector<HTMLInputElement>('.avatar-input')!;
+    await fireEvent.update(avatarInput, '🐉');
+    await fireEvent.click(screen.getByText('Speichern'));
+    expect(onSave.mock.calls[0][0].avatar).toBe('🐉');
+  });
+});
+
+describe('CampaignForm dirty-state', () => {
+  it('shows cancel and disables save when form is unchanged (existing campaign)', () => {
+    const { getByText } = render(CampaignForm, {
+      props: { campaign, isNew: false },
+      global: { plugins: [createPinia()] },
+    });
+    expect(getByText('Abbrechen')).toBeTruthy();
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('enables save after a field is changed', async () => {
+    const { container } = render(CampaignForm, {
+      props: { campaign, isNew: false },
+      global: { plugins: [createPinia()] },
+    });
+    const input = container.querySelector<HTMLInputElement>('input.form-control')!;
+    await fireEvent.update(input, 'Changed Name');
+    expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+    expect(screen.getByText('Abbrechen')).toBeTruthy();
+  });
+
+  it('shows save/cancel buttons immediately when isNew=true', () => {
+    const { getByText } = render(CampaignForm, {
+      props: { campaign, isNew: true },
+      global: { plugins: [createPinia()] },
+    });
+    expect(getByText('Speichern')).toBeTruthy();
+    expect(getByText('Abbrechen')).toBeTruthy();
+  });
+
+  it('disables save again after saving', async () => {
+    const onSave = vi.fn();
+    const { container, getByText } = render(CampaignForm, {
+      props: { campaign, isNew: false, onSave },
+      global: { plugins: [createPinia()] },
+    });
+    const input = container.querySelector<HTMLInputElement>('input.form-control')!;
+    await fireEvent.update(input, 'Changed Name');
+    await fireEvent.click(screen.getByText('Speichern'));
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
+    expect(getByText('Abbrechen')).toBeTruthy();
   });
 });

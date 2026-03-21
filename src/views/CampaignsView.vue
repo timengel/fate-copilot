@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import FateButton from '../components/shared/FateButton.vue';
+import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { CAMPAIGN_STATUS_LABEL } from '../types';
@@ -56,7 +57,10 @@ function deleteCampaign(id: string, name: string) {
             :style="getColorVars(campaign.color)"
             @click="router.push(`/campaigns/${campaign.id}`)"
           >
-            <div class="card-header">{{ campaign.name }}</div>
+            <div class="card-header">
+              <FateAvatar :value="campaign.avatar" size="S" />
+              {{ campaign.name }}
+            </div>
             <div class="card-description" v-if="campaign.description">
               {{ campaign.description }}
             </div>
@@ -144,6 +148,9 @@ function deleteCampaign(id: string, name: string) {
   font-size: 1rem;
   padding: 0.6rem 0.9rem;
   margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .card-description {

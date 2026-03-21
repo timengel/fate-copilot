@@ -58,7 +58,7 @@ function getCharCampaign(charId: string): string | null {
       <p class="fate-subtitle">Digitaler Copilot für Fate Core</p>
     </div>
 
-    <div class="quick-actions">
+    <div v-if="hasAnyData" class="quick-actions">
       <FateButton @click="router.push('/dashboard')">Dashboard öffnen →</FateButton>
       <FateButton variant="secondary" @click="router.push('/campaigns/new')"
         >+ Neue Kampagne</FateButton
@@ -71,19 +71,16 @@ function getCharCampaign(charId: string): string | null {
     <p v-if="statsLine" class="stats-line">{{ statsLine }}</p>
 
     <div v-if="!hasAnyData" class="welcome">
-      <p class="welcome-text">
-        Willkommen bei FATE+ &ndash; deinem digitalen Copiloten für Fate Core.
-      </p>
       <div class="welcome-cards">
         <div class="welcome-card" @click="router.push('/campaigns/new')">
           <div class="welcome-card-title">Neue Kampagne</div>
           <div class="welcome-card-desc">
-            Erstelle deine erste Kampagne und lade Charaktere ein.
+            Erstelle deine erste Kampagne und weise Charaktere zu.
           </div>
         </div>
         <div class="welcome-card" @click="router.push('/characters/new')">
           <div class="welcome-card-title">Neuer Charakter</div>
-          <div class="welcome-card-desc">Lege deinen ersten Spielercharakter oder NSC an.</div>
+          <div class="welcome-card-desc">Lege deinen ersten Charakter an.</div>
         </div>
       </div>
     </div>
@@ -220,13 +217,7 @@ function getCharCampaign(charId: string): string | null {
 /* ---- Welcome (empty state) ---- */
 
 .welcome {
-  margin-top: 2rem;
   text-align: center;
-}
-
-.welcome-text {
-  color: var(--fate-text-light);
-  margin-bottom: 1.5rem;
 }
 
 .welcome-cards {

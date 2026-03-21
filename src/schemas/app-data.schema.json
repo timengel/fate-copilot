@@ -71,6 +71,7 @@
             "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
           ]
         },
+        "avatar": { "type": "string" },
         "milestones": {
           "type": "array",
           "items": { "$ref": "#/$defs/Milestone" }
@@ -146,7 +147,8 @@
             "pfau", "heidelbeere", "lavendel", "weintraube",
             "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
           ]
-        }
+        },
+        "avatar": { "type": "string" }
       }
     },
     "Item": {
@@ -193,6 +195,7 @@
             "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
           ]
         },
+        "avatar": { "type": "string" },
         "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
         "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 }
       }

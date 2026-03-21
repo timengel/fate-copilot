@@ -130,7 +130,7 @@ function cancelEdit() {
         placeholder="Beschreibung..."
         @keydown.enter="submit"
       />
-      <FateButton variant="add" @click="submit">+ Hinzufügen</FateButton>
+      <FateButton variant="add" icon="add" size="S" :disabled="newDescription === ''" @click="submit"></FateButton>
     </div>
   </div>
 </template>

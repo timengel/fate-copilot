@@ -10,7 +10,7 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   const pinia = createPinia();
   setActivePinia(pinia);
   return render(CharacterSheet, {
-    props: { character: character ?? createDefaultCharacter(), mode: 'edit', ...extraProps },
+    props: { character: character ?? createDefaultCharacter(), mode: 'edit', isNew: true, ...extraProps },
     global: {
       plugins: [pinia],
       stubs: { SkillPyramid: true },
@@ -246,5 +246,59 @@ describe('CharacterSheet (edit mode)', () => {
     expect(saved).not.toBe(char);
     expect(saved.stressPhysical).not.toBe(char.stressPhysical);
     expect(saved.consequences).not.toBe(char.consequences);
+  });
+});
+
+// ─── Dirty-state: save/cancel button visibility ───────────────────────────
+
+describe('CharacterSheet dirty-state', () => {
+  function renderExisting(character: Character, extraProps: Record<string, unknown> = {}) {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    return render(CharacterSheet, {
+      props: { character, mode: 'edit', isNew: false, ...extraProps },
+      global: { plugins: [pinia], stubs: { SkillPyramid: true } },
+    });
+  }
+
+  it('shows cancel and disables save when form is unchanged (existing character)', () => {
+    const char = { ...createDefaultCharacter(), name: 'Existing Hero' };
+    const { getByText } = renderExisting(char);
+    expect(getByText('Abbrechen')).toBeTruthy();
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('enables save after a field is changed', async () => {
+    const char = { ...createDefaultCharacter(), name: 'Existing Hero' };
+    const { container } = renderExisting(char);
+    const nameInput = container.querySelector<HTMLInputElement>('input[placeholder]')!;
+    await fireEvent.update(nameInput, 'Changed Name');
+    expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+    expect(screen.getByText('Abbrechen')).toBeTruthy();
+  });
+
+  it('shows save/cancel buttons immediately when isNew=true', () => {
+    const char = createDefaultCharacter();
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const { getByText } = render(CharacterSheet, {
+      props: { character: char, mode: 'edit', isNew: true },
+      global: { plugins: [pinia], stubs: { SkillPyramid: true } },
+    });
+    expect(getByText('Speichern')).toBeTruthy();
+    expect(getByText('Abbrechen')).toBeTruthy();
+  });
+
+  it('disables save again after saving', async () => {
+    const char = { ...createDefaultCharacter(), name: 'Existing Hero' };
+    const onSave = vi.fn();
+    const { container, getByText } = renderExisting(char, { onSave });
+    const nameInput = container.querySelector<HTMLInputElement>('input[placeholder]')!;
+    await fireEvent.update(nameInput, 'Changed Name');
+    await fireEvent.click(screen.getByText('Speichern'));
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
+    expect(getByText('Abbrechen')).toBeTruthy();
   });
 });

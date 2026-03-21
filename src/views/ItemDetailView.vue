@@ -95,15 +95,16 @@ function deleteItem() {
         v-if="isEditing"
         ref="itemSheetRef"
         mode="edit"
+        :isNew="isNew"
         :key="item.id"
         :item="item"
         :hideActions="true"
         @save="handleSave"
         @cancel="handleCancel"
       >
-        <template #edit-bar-actions>
+        <template #edit-bar-actions="{ isDirty }">
           <FateButton icon="close" variant="outline" size="M" @click="handleCancel"><span class="btn-label">Abbrechen</span></FateButton>
-          <FateButton icon="check" variant="outline" size="M" @click="itemSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
+          <FateButton icon="check" variant="outline" size="M" :disabled="!isDirty" @click="itemSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
         </template>
       </ItemSheet>
 

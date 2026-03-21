@@ -118,15 +118,16 @@ function queryCharacterType(): CharacterType {
         v-if="isEditing"
         ref="charSheetRef"
         mode="edit"
+        :isNew="isNew"
         :key="character.id"
         :character="character"
         :hideActions="true"
         @save="handleSave"
         @cancel="handleCancel"
       >
-        <template #edit-bar-actions>
+        <template #edit-bar-actions="{ isDirty }">
           <FateButton icon="close" variant="outline" size="M" @click="handleCancel"><span class="btn-label">Abbrechen</span></FateButton>
-          <FateButton icon="check" variant="outline" size="M" @click="charSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
+          <FateButton icon="check" variant="outline" size="M" :disabled="!isDirty" @click="charSheetRef?.save()"><span class="btn-label">Speichern</span></FateButton>
         </template>
       </CharacterSheet>
 

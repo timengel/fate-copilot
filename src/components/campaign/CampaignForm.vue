@@ -1,22 +1,43 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import type { Campaign } from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { getColorVars } from '../../composables/useColorVars';
+import { useGMModeStore } from '../../stores/gmMode';
+import AvatarPicker from '../shared/AvatarPicker.vue';
 import ColorPicker from '../shared/ColorPicker.vue';
+import FateAvatar from '../shared/FateAvatar.vue';
 import FateButton from '../shared/FateButton.vue';
 
-const props = defineProps<{ campaign: Campaign }>();
+const gmModeStore = useGMModeStore();
+
+const props = defineProps<{ campaign: Campaign; isNew?: boolean }>();
 const emit = defineEmits<{ save: [campaign: Campaign]; cancel: [] }>();
 
 const form = reactive<Campaign>(deepClone(props.campaign));
+const savedSnapshot = ref(deepClone(props.campaign));
+
+watch(
+  () => props.campaign,
+  (campaign) => {
+    Object.assign(form, deepClone(campaign));
+    savedSnapshot.value = deepClone(campaign);
+  },
+  { deep: true },
+);
+
+const isDirty = computed(
+  () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
+);
 
 function save() {
   if (!form.name.trim()) {
     alert('Bitte einen Kampagnennamen eingeben.');
     return;
   }
-  emit('save', deepClone(form));
+  const saved = deepClone(form);
+  emit('save', saved);
+  savedSnapshot.value = saved;
 }
 </script>
 
@@ -43,6 +64,14 @@ function save() {
     </div>
 
     <div class="form-group">
+      <label class="form-label">Avatar</label>
+      <div class="avatar-field">
+        <FateAvatar :value="form.avatar" />
+        <AvatarPicker v-model="form.avatar" />
+      </div>
+    </div>
+
+    <div class="form-group">
       <label class="form-label">Status</label>
       <select class="form-control" v-model="form.status">
         <option value="active">Aktiv</option>
@@ -56,7 +85,7 @@ function save() {
       <textarea class="form-control" v-model="form.notes" placeholder="Kampagnennotizen" rows="4" />
     </div>
 
-    <div class="form-group">
+    <div v-if="gmModeStore.isGMMode" class="form-group">
       <label class="form-label">GM-Notizen</label>
       <textarea
         class="form-control"
@@ -68,7 +97,7 @@ function save() {
 
     <div class="form-actions">
       <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
-      <FateButton icon="check" @click="save"><span class="btn-label">Speichern</span></FateButton>
+      <FateButton icon="check" :disabled="!isDirty" @click="save"><span class="btn-label">Speichern</span></FateButton>
     </div>
   </div>
 </template>
@@ -119,6 +148,16 @@ function save() {
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 0.75rem;
+}
+
+.avatar-field {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar-field :deep(.avatar-picker) {
+  flex: 1;
 }
 
 @container campaign-form (width < 480px) {

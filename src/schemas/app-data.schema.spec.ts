@@ -61,6 +61,7 @@ const fullCharacter: Character = {
   pyramidMaxLevel: 5,
   pyramidMaxCols: 5,
   color: 'pfau',
+  avatar: '🧙',
 };
 
 const minimalV11: AppData = {
@@ -106,6 +107,7 @@ describe('app-data JSON Schema', () => {
             notes: 'Notizen',
             gmNotes: 'GM-Notizen',
             color: 'basilikum',
+            avatar: '🗺️',
             milestones: [{ id: 'ms-1', type: 'significant', description: 'Erste Konfrontation' }],
           },
         ],

@@ -138,6 +138,7 @@ export interface Campaign {
   notes: string;
   gmNotes?: string;
   color?: string;
+  avatar?: string;
   milestones: Milestone[];
 }
 

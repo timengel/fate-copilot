@@ -174,6 +174,7 @@ describe('useImportExport', () => {
         description: '',
         status: 'active',
         notes: '',
+        avatar: '🗺️',
         milestones: [],
       };
       applyImport({ ...validV11, campaigns: [campaign] });
@@ -352,13 +353,29 @@ describe('useImportExport', () => {
 
     it('written JSON contains campaigns from the store', async () => {
       const campaign: Campaign = {
-        id: 'camp1', name: 'Mittelerde', description: '', status: 'active', notes: '', milestones: [],
+        id: 'camp1', name: 'Mittelerde', description: '', status: 'active', notes: '', avatar: '🗺️', milestones: [],
       };
       useCampaignsStore().addCampaign(campaign);
       const { exportToClipboard } = useImportExport();
       await exportToClipboard();
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.campaigns[0].name).toBe('Mittelerde');
+    });
+
+    it('written JSON preserves campaign avatars', async () => {
+      useCampaignsStore().addCampaign({
+        id: 'camp1',
+        name: 'Mittelerde',
+        description: '',
+        status: 'active',
+        notes: '',
+        avatar: '🗺️',
+        milestones: [],
+      });
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.campaigns[0].avatar).toBe('🗺️');
     });
 
     it('includes all required AppData fields', async () => {

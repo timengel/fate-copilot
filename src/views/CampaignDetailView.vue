@@ -7,6 +7,7 @@ import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
 import CampaignForm from '../components/campaign/CampaignForm.vue';
 import MilestoneTimeline from '../components/campaign/MilestoneTimeline.vue';
+import FateAvatar from '../components/shared/FateAvatar.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import type { Campaign, Milestone } from '../types';
@@ -164,6 +165,7 @@ function updateMilestone(milestone: Milestone) {
 
       <CampaignForm
         v-if="isEditing"
+        :isNew="isNew"
         :campaign="campaign"
         @save="handleSave"
         @cancel="handleCancel"
@@ -172,7 +174,10 @@ function updateMilestone(milestone: Milestone) {
       <template v-else>
         <div class="campaign-detail">
           <div class="campaign-detail-header">
-            <h1>{{ campaign.name }}</h1>
+            <div class="campaign-title">
+              <FateAvatar :value="campaign.avatar" />
+              <h1>{{ campaign.name }}</h1>
+            </div>
             <span class="badge" :class="`status-${campaign.status}`">
               {{ CAMPAIGN_STATUS_LABEL[campaign.status] }}
             </span>
@@ -332,9 +337,17 @@ function updateMilestone(milestone: Milestone) {
   margin-bottom: 0.75rem;
 }
 
+.campaign-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
 .campaign-detail-header h1 {
   font-size: 1.75rem;
   color: var(--fate-blue);
+  margin: 0;
 }
 
 .badge {

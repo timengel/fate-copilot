@@ -81,6 +81,8 @@ export function createDefaultCampaign(): Campaign {
     status: 'active',
     notes: '',
     milestones: [],
+    color: 'pfau',
+    avatar: '',
   };
 }
 

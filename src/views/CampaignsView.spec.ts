@@ -17,6 +17,7 @@ function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
     description: 'Eine Beschreibung',
     status: 'active',
     notes: '',
+    avatar: '🗺️',
     milestones: [],
     ...overrides,
   };
@@ -67,5 +68,10 @@ describe('CampaignsView – card interactions', () => {
     const [, deleteBtn] = container.querySelectorAll('.card-actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('renders the campaign avatar in the card header', () => {
+    const { getByText } = setup();
+    expect(getByText('🗺️')).toBeTruthy();
   });
 });

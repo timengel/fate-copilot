@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import type { Item, Stunt } from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
@@ -15,6 +15,7 @@ import FateButton from '../shared/FateButton.vue';
 const props = defineProps<{
   item: Item;
   mode?: 'view' | 'edit';
+  isNew?: boolean;
   hideActions?: boolean;
   sections?: {
     general?: boolean;
@@ -32,16 +33,21 @@ const emit = defineEmits<{ save: [item: Item]; cancel: [] }>();
 const gmModeStore = useGMModeStore();
 
 const form = reactive<Item>(deepClone(props.item));
+const savedSnapshot = ref(deepClone(props.item));
 
 watch(
   () => props.item,
   (item) => {
     Object.assign(form, deepClone(item));
+    savedSnapshot.value = deepClone(item);
   },
   { deep: true },
 );
 
 const isEditing = computed(() => props.mode === 'edit');
+const isDirty = computed(
+  () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
+);
 const data = computed(() => (isEditing.value ? form : props.item));
 
 const show = computed(() => ({
@@ -110,7 +116,9 @@ function removeAspect(index: number) {
 }
 
 function save() {
-  emit('save', deepClone(form));
+  const saved = deepClone(form);
+  emit('save', saved);
+  savedSnapshot.value = saved;
 }
 
 defineExpose({ save });
@@ -136,7 +144,7 @@ defineExpose({ save });
       <span v-if="!isEditing && !(gmModeStore.isGMMode && data.hidden)" class="item-type-badge">ITEM</span>
       <div class="item-name-bar-end">
         <slot v-if="!isEditing" name="name-bar-actions" />
-        <slot v-else name="edit-bar-actions" />
+        <slot v-else name="edit-bar-actions" :isDirty="isDirty" />
       </div>
     </div>
 
@@ -377,7 +385,7 @@ defineExpose({ save });
     <!-- FORM ACTIONS (edit mode only) -->
     <div v-if="isEditing && !hideActions" class="form-actions">
       <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
-      <FateButton icon="check" @click="save"><span class="btn-label">Speichern</span></FateButton>
+      <FateButton icon="check" :disabled="!isDirty" @click="save"><span class="btn-label">Speichern</span></FateButton>
     </div>
   </div>
 </template>
