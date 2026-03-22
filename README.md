@@ -1,9 +1,6 @@
 <div align="center">
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 80" width="220" height="80">
-  <rect width="220" height="80" rx="12" fill="#1c9ed6"/>
-  <text x="110" y="58" font-family="'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif" font-size="52" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-2">FATE<tspan font-size="36" dy="-10">+</tspan></text>
-</svg>
+<img src="logo.svg" width="220" height="80" alt="FATE+ logo"/>
 
 # FATE+ Copilot
 
@@ -22,9 +19,8 @@ FATE+ Copilot is a browser-based character sheet and campaign manager built for 
 
 ## Features
 
-- **Character Sheets** — Track aspects, skills (pyramid), stress boxes, and consequences
-- **Fate Points** — Manage fate point refresh and current totals per character
-- **Campaign Management** — Organize multiple characters under a single campaign
+- **Character and Item Sheets** — Track aspects, skills, stress boxes, fate points, consequences, and more
+- **Campaign Management** — Organize your campaigns and assign characters and items
 - **GM Mode** — Toggle a GM view with elevated access across the campaign
 - **Persistent State** — All data is saved locally via `pinia-plugin-persistedstate`
 - **Import / Export** — App data can be exported to JSON and re-imported for backup or sharing
