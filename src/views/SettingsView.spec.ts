@@ -1,6 +1,7 @@
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import SettingsView from './SettingsView.vue';
 import { useGMModeStore } from '../stores/gmMode';
 import { useCharactersStore } from '../stores/characters';
@@ -18,9 +19,10 @@ describe('SettingsView', () => {
   });
 
   function setup() {
+    const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/', component: { template: '<div />' } }] });
     return render(SettingsView, {
       global: {
-        plugins: [pinia],
+        plugins: [pinia, router],
         stubs: {
           ImportExportBar: true,
           FateHeader: { template: '<div />' },
