@@ -9,6 +9,7 @@ import AspectFields from './AspectFields.vue';
 import SkillPyramid from './SkillPyramid.vue';
 import StressTrack from './StressTrack.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
+import DiceTrack from './DiceTrack.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
@@ -74,6 +75,9 @@ const hasVisibleStress = computed(
 );
 const hasVisibleConsequences = computed(
   () => isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
+);
+const hasVisibleDice = computed(
+  () => isEditing.value || !!(data.value.redDice || data.value.blueDice),
 );
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
@@ -518,6 +522,29 @@ defineExpose({ save });
         </section>
       </div>
 
+      <!-- WÜRFEL -->
+      <section v-if="hasVisibleDice" class="sheet-section dice-section">
+        <div class="sheet-section-header">WÜRFEL</div>
+        <div class="dice-tracks">
+          <DiceTrack
+            v-if="isEditing || data.redDice"
+            label="ROTE WÜRFEL"
+            color="red"
+            :count="isEditing ? (form.redDice ?? 0) : (data.redDice ?? 0)"
+            :readonly="!isEditing"
+            @update="form.redDice = $event"
+          />
+          <DiceTrack
+            v-if="isEditing || data.blueDice"
+            label="BLAUE WÜRFEL"
+            color="blue"
+            :count="isEditing ? (form.blueDice ?? 0) : (data.blueDice ?? 0)"
+            :readonly="!isEditing"
+            @update="form.blueDice = $event"
+          />
+        </div>
+      </section>
+
       <!-- GM OPTIONS -->
       <section
         v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
@@ -565,6 +592,7 @@ defineExpose({ save });
 .general,
 .sheet-stress-row,
 .red-blue-dice-section,
+.dice-section,
 .gm-notes-section,
 .form-actions {
   grid-column: 1 / -1;
@@ -992,6 +1020,14 @@ defineExpose({ save });
   color: var(--fate-text);
   min-width: 70px;
   text-align: center;
+}
+
+/* Würfel section */
+.dice-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
 }
 
 /* GM notes section */

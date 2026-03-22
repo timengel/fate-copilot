@@ -53,6 +53,8 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     notes: '',
     color: 'pfau',
     avatar: '',
+    redDice: 0,
+    blueDice: 0,
   };
 }
 

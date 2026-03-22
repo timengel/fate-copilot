@@ -174,6 +174,44 @@ describe('app-data JSON Schema', () => {
     });
   });
 
+  describe('Character dice fields', () => {
+    it('accepts a character with redDice and blueDice', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 2, blueDice: 3 }] })).toBe(true);
+    });
+
+    it('accepts redDice=0 and blueDice=0', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 0 }] })).toBe(true);
+    });
+
+    it('accepts redDice=4 and blueDice=4 (max)', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 4, blueDice: 4 }] })).toBe(true);
+    });
+
+    it('accepts a character without redDice/blueDice (backwards compat)', () => {
+      expect(isValid({ ...minimalV10, characters: [minimalCharacter] })).toBe(true);
+    });
+
+    it('rejects redDice > 4', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 5, blueDice: 0 }] })).toBe(false);
+    });
+
+    it('rejects blueDice > 4', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 5 }] })).toBe(false);
+    });
+
+    it('rejects redDice < 0', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: -1, blueDice: 0 }] })).toBe(false);
+    });
+
+    it('rejects blueDice < 0', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: -1 }] })).toBe(false);
+    });
+
+    it('rejects non-integer redDice', () => {
+      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 1.5, blueDice: 0 }] })).toBe(false);
+    });
+  });
+
   describe('invalid Character', () => {
     it('rejects character with missing required field (name)', () => {
       const { name: _n, ...noName } = minimalCharacter;

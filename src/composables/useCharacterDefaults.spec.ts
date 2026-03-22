@@ -52,6 +52,14 @@ describe('createDefaultCharacter', () => {
   it("returns default color 'pfau'", () => {
     expect(createDefaultCharacter().color).toBe('pfau');
   });
+
+  it('returns redDice=0', () => {
+    expect(createDefaultCharacter().redDice).toBe(0);
+  });
+
+  it('returns blueDice=0', () => {
+    expect(createDefaultCharacter().blueDice).toBe(0);
+  });
 });
 
 describe('createDefaultCharacter (NSC)', () => {

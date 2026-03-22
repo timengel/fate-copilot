@@ -72,7 +72,7 @@ function handleClick(index: number) {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--die-color);
-  background: var(--die-color-light);
+  background: color-mix(in srgb, var(--die-color) 15%, var(--fate-white));
   padding: 2px 4px;
   margin-bottom: 4px;
 }
@@ -103,7 +103,7 @@ function handleClick(index: number) {
 }
 
 .die.interactive:hover:not(.active) {
-  background: var(--die-color-light);
+  background: color-mix(in srgb, var(--die-color) 15%, var(--fate-white));
 }
 
 .die.interactive:hover.active {

@@ -132,6 +132,8 @@ export interface Character {
   pyramidMaxCols?: number;
   color?: string;
   avatar?: string;
+  redDice?: number;
+  blueDice?: number;
 }
 
 export interface Item {

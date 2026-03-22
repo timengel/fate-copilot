@@ -138,7 +138,9 @@
         "pyramidMaxLevel": { "type": "integer", "minimum": 1, "maximum": 8 },
         "pyramidMaxCols": { "type": "integer", "minimum": 1 },
         "color": { "$ref": "#/$defs/TagColor" },
-        "avatar": { "type": "string" }
+        "avatar": { "type": "string" },
+        "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 }
       }
     },
     "Item": {

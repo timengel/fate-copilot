@@ -132,6 +132,22 @@ describe('useImportExport', () => {
     });
   });
 
+  describe('importFromString — character dice fields', () => {
+    it('preserves redDice and blueDice on import', () => {
+      const { importFromString } = useImportExport();
+      const charWithDice = { ...minimalCharacter, redDice: 3, blueDice: 1 };
+      const result = importFromString(JSON.stringify({ ...validV10, characters: [charWithDice] }));
+      expect(result.characters[0]!.redDice).toBe(3);
+      expect(result.characters[0]!.blueDice).toBe(1);
+    });
+
+    it('accepts old character data without redDice/blueDice (backwards compat)', () => {
+      const { importFromString } = useImportExport();
+      const result = importFromString(JSON.stringify({ ...validV10, characters: [minimalCharacter] }));
+      expect(result.characters[0]!.name).toBe('Alice');
+    });
+  });
+
   describe('applyImport', () => {
     it('replaces characters in the store', () => {
       const { applyImport } = useImportExport();
@@ -366,6 +382,15 @@ describe('useImportExport', () => {
       await exportToClipboard();
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.campaigns[0].avatar).toBe('🗺️');
+    });
+
+    it('exported JSON preserves character redDice and blueDice', async () => {
+      useCharactersStore().addCharacter({ ...minimalCharacter, redDice: 2, blueDice: 4 });
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.characters[0].redDice).toBe(2);
+      expect(parsed.characters[0].blueDice).toBe(4);
     });
 
     it('includes all required AppData fields', async () => {
