@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
+import { onClickOutside } from '@vueuse/core';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateIcon from './components/shared/FateIcon.vue';
@@ -12,6 +13,8 @@ import { useConfirmDialog } from './composables/useConfirmDialog';
 import { ToggleVariant } from './types';
 
 const navOpen = ref(false);
+const headerRef = ref<HTMLElement | null>(null);
+onClickOutside(headerRef, () => { navOpen.value = false; });
 const router = useRouter();
 const gmModeStore = useGMModeStore();
 const themeStore = useThemeStore();
@@ -50,7 +53,7 @@ watch(
 
 <template>
   <div id="app-wrapper">
-    <header class="app-header">
+    <header ref="headerRef" class="app-header">
       <nav class="app-nav">
         <RouterLink to="/" class="nav-logo">
           <FatePlusLogo class="fate-plus-logo"/>
