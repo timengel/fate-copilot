@@ -149,6 +149,7 @@ function cancelEdit() {
 <style scoped>
 .milestone-timeline {
   padding: 0.5rem 0.75rem;
+  container-type: inline-size;
 }
 
 .milestone-empty {
@@ -239,6 +240,7 @@ function cancelEdit() {
   gap: 0.4rem;
   align-items: center;
   flex: 1;
+  flex-wrap: wrap;
 }
 
 .milestone-add-form {
@@ -269,5 +271,24 @@ function cancelEdit() {
 .milestone-desc-input:focus {
   outline: none;
   border-color: var(--fate-blue);
+}
+
+@container (width < 480px) {
+  .milestone-type-select {
+    flex: 1 1 100%;
+    --dropdown-max-width: 100%;
+    flex-shrink: 1;
+  }
+
+  .milestone-desc-input {
+    min-width: 80px;
+  }
+}
+
+@container (width < 380px) {
+  .timeline-content :deep(.fate-tag) {
+    flex: 1 1 100%;
+    margin-top: 3px;
+  }
 }
 </style>

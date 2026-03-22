@@ -38,7 +38,7 @@ function deleteCampaign(id: string, name: string) {
 <template>
   <div class="list-view">
     <FateHeader title="Kampagnen">
-      <FateButton variant="primary" icon="add" @click="router.push('/campaigns/new')">Neue Kampagne</FateButton>
+      <FateButton variant="primary" icon="add" @click="router.push('/campaigns/new')"><span class="btn-label">Neue Kampagne</span></FateButton>
     </FateHeader>
 
     <div v-if="store.campaigns.length === 0" class="empty-state">
@@ -118,4 +118,9 @@ function deleteCampaign(id: string, name: string) {
   color: var(--fate-blue);
 }
 
+@container main (width < 480px) {
+  .btn-label {
+    display: none;
+  }
+}
 </style>

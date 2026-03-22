@@ -39,8 +39,8 @@ function onSelectChange(e: Event) {
         <span class="assignment-name" @click="emit('navigate', campaign.id)">
           {{ campaign.name }}
         </span>
-        <FateButton variant="danger" size="M" @click="emit('unassign', campaign.id)">
-          Entfernen
+        <FateButton variant="danger" size="M" icon="close" @click="emit('unassign', campaign.id)">
+          <span class="btn-label">Entfernen</span>
         </FateButton>
       </div>
 
@@ -72,7 +72,7 @@ function onSelectChange(e: Event) {
 .assignment-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.4rem 0;
   border-bottom: 1px solid var(--fate-blue-light);
 }
@@ -85,6 +85,11 @@ function onSelectChange(e: Event) {
   cursor: pointer;
   color: var(--fate-blue);
   font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .assignment-name:hover {
@@ -109,5 +114,11 @@ function onSelectChange(e: Event) {
 .assign-select:focus {
   outline: none;
   border-color: var(--fate-blue);
+}
+
+@container (width < 480px) {
+  .btn-label {
+    display: none;
+  }
 }
 </style>

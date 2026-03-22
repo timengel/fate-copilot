@@ -173,12 +173,12 @@ function navigateToAssignment(path: string) {
     <template v-else-if="campaign">
       <div class="detail-toolbar">
         <div class="back-btn">
-          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/campaigns')">Kampagnen</FateButton>
+          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/campaigns')"><span class="btn-label">Kampagnen</span></FateButton>
         </div>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
-            <FateButton icon="edit" @click="isEditing = true">Bearbeiten</FateButton>
-            <FateButton variant="danger-outline" @click="deleteCampaign">Löschen</FateButton>
+            <FateButton variant="secondary" icon="edit" @click="isEditing = true" />
+            <FateButton variant="danger" icon="delete" @click="deleteCampaign" />
           </template>
         </div>
       </div>
@@ -261,8 +261,8 @@ function navigateToAssignment(path: string) {
                     </div>
                   </button>
                   <div class="assignment-actions">
-                    <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
-                      >Entfernen</FateButton
+                    <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"
+                      ><span class="btn-label">Entfernen</span></FateButton
                     >
                   </div>
                 </div>
@@ -296,8 +296,8 @@ function navigateToAssignment(path: string) {
                       </div>
                     </button>
                     <div class="assignment-actions">
-                      <FateButton variant="danger" size="S" @click="unassignCharacter(char.id)"
-                        >Entfernen</FateButton
+                      <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"
+                        ><span class="btn-label">Entfernen</span></FateButton
                       >
                     </div>
                   </div>
@@ -347,7 +347,7 @@ function navigateToAssignment(path: string) {
                   </div>
                 </button>
                 <div class="assignment-actions">
-                  <FateButton variant="danger" size="S" @click="unassignItem(item.id)">Entfernen</FateButton>
+                  <FateButton variant="danger" size="S" icon="close" @click="unassignItem(item.id)"><span class="btn-label">Entfernen</span></FateButton>
                 </div>
               </div>
 
@@ -464,7 +464,7 @@ function navigateToAssignment(path: string) {
 
 .assignment-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.4rem;
@@ -477,7 +477,7 @@ function navigateToAssignment(path: string) {
 
 .assignment-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   flex: 1;
   min-width: 0;
@@ -513,9 +513,19 @@ function navigateToAssignment(path: string) {
 }
 
 
+.assignment-info strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .assignment-concept {
   font-size: 0.8rem;
   color: var(--fate-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .char-group-header {
@@ -549,6 +559,14 @@ function navigateToAssignment(path: string) {
   .campaign-detail-header {
     flex-wrap: wrap;
     gap: 0.5rem;
+  }
+
+  .detail-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .btn-label {
+    display: none;
   }
 }
 </style>
