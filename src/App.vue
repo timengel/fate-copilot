@@ -11,6 +11,14 @@ import { ToggleVariant } from './types';
 const navOpen = ref(false);
 const router = useRouter();
 const gmModeStore = useGMModeStore();
+const settingsSpinning = ref(false);
+
+function handleSettingsClick() {
+  if (!settingsSpinning.value) {
+    settingsSpinning.value = true;
+    setTimeout(() => { settingsSpinning.value = false; }, 500);
+  }
+}
 
 watch(
   () => router.currentRoute.value.path,
@@ -47,20 +55,23 @@ watch(
             <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
             <RouterLink to="/items" class="nav-link">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
-            <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen">
-              <FateIcon name="settings" :size="20" />
+            <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen" @click="handleSettingsClick">
+              <FateIcon name="settings" :size="20" :class="{ 'settings-spinning': settingsSpinning }" />
               <span class="nav-link-settings-label">Einstellungen</span>
             </RouterLink>
           </div>
 
-          <div
-            v-if="gmModeStore.showGMToggle"
-            class="nav-gm-toggle"
-            :class="{ 'gm-active': gmModeStore.isGMMode }"
-            @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
-          >
-            <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
-          </div>
+          <Transition name="gm-toggle">
+            <div v-if="gmModeStore.showGMToggle" class="nav-gm-toggle-clip">
+              <div
+                class="nav-gm-toggle"
+                :class="{ 'gm-active': gmModeStore.isGMMode }"
+                @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
+              >
+                <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
+              </div>
+            </div>
+          </Transition>
         </div>
       </nav>
     </header>
@@ -85,7 +96,7 @@ watch(
   background-color: var(--fate-blue);
   color: white;
   padding: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
   position: relative;
   flex-shrink: 0;
   z-index: 100;
@@ -95,7 +106,7 @@ watch(
 
 .app-nav {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
   padding: 0 1.5rem;
   height: 56px;
@@ -113,42 +124,57 @@ watch(
   display: flex;
   align-items: center;
   gap: 1px;
+  align-self: center;
 }
 
 /* Desktop: invisible flex wrapper that fills remaining space */
 .nav-drawer {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: stretch;
   gap: 1rem;
 }
 
 .nav-links {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   flex: 1;
   margin-left: 1rem;
+  align-items: stretch;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   text-decoration: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
+  padding: 0 0.9rem;
+  border-radius: 6px 6px 0 0;
   font-weight: 500;
-  transition: background 0.15s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
-.nav-link:hover,
-.nav-link.router-link-active {
-  background: rgba(255, 255, 255, 0.2);
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.12);
   color: white !important;
 }
 
+.nav-link.router-link-active {
+  background: white;
+  color: var(--fate-blue) !important;
+  font-weight: 600;
+}
+
 .nav-link:active {
-  background: rgba(255, 255, 255, 0.28);
-  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.nav-link.router-link-active:active {
+  background: white;
 }
 
 .nav-link-settings {
@@ -156,15 +182,15 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.55rem;
+  padding: 0 0.55rem;
 }
 
 .nav-link-settings-label {
   display: none;
 }
 
-.nav-link-settings:active svg {
-  animation: spin-once 0.8s ease-out;
+.settings-spinning {
+  animation: spin-once 0.5s ease-out;
 }
 
 @keyframes spin-once {
@@ -172,12 +198,18 @@ watch(
   to   { transform: rotate(180deg); }
 }
 
+.nav-gm-toggle-clip {
+  overflow: hidden;
+  flex-shrink: 0;
+  align-self: center;
+}
+
 .nav-gm-toggle {
   padding: 0.4rem 0.6rem;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 6px;
-  flex-shrink: 0;
   cursor: pointer;
+  white-space: nowrap;
   transition:
     background 0.2s ease,
     border-color 0.2s ease;
@@ -187,6 +219,20 @@ watch(
   background: var(--fate-red);
   border-color: var(--fate-red);
   box-shadow: none;
+}
+
+.gm-toggle-enter-active,
+.gm-toggle-leave-active {
+  transition:
+    max-width 0.35s ease,
+    opacity 0.25s ease;
+  max-width: 200px;
+}
+
+.gm-toggle-enter-from,
+.gm-toggle-leave-to {
+  max-width: 0;
+  opacity: 0;
 }
 
 /* Hamburger: hidden on desktop */
@@ -201,7 +247,7 @@ watch(
   cursor: pointer;
   padding: 4px 6px;
   flex: 1;
-  height: 100%;
+  align-self: center;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -256,7 +302,7 @@ watch(
 
   .nav-drawer.nav-open {
     display: flex;
-    border-top: 1px solid white;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .nav-drawer .nav-links {
@@ -266,12 +312,26 @@ watch(
     gap: 0.25rem;
   }
 
-  /* Full-width touch targets */
+  /* Reset tab styles for mobile drawer links */
   .nav-drawer .nav-link {
     display: flex;
     align-items: center;
     padding: 0.75rem 0.5rem 0.75rem 0.85rem;
     border-radius: 6px;
+    margin-top: 0;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .nav-drawer .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white !important;
+  }
+
+  .nav-drawer .nav-link.router-link-active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    font-weight: 600;
   }
 
   .nav-drawer .nav-link:active {
@@ -290,13 +350,19 @@ watch(
   }
 
   /* GM toggle: separator + full width */
-  .nav-drawer .nav-gm-toggle {
+  .nav-drawer .nav-gm-toggle-clip {
+    width: 100%;
+    max-width: none;
     margin-top: 0.5rem;
+  }
+
+  .nav-drawer .nav-gm-toggle {
     padding: 0.6rem 0.75rem;
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.25);
     width: 100%;
     box-sizing: border-box;
+    margin-top: 0;
   }
 }
 
@@ -322,6 +388,7 @@ watch(
   container-type: inline-size;
   container-name: main;
 }
+
 
 @media (max-width: 480px) {
   .app-main {
