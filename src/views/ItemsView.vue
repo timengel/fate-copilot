@@ -94,8 +94,8 @@ function toggleArchived(item: Item) {
         :color="item.color"
         :avatar="item.avatar"
         :title="item.name || 'Unbenannt'"
-        :badge-label="item.hidden ? 'GM' : undefined"
-        badge-variant="gm"
+        :badge-label="item.archived ? 'ARCHIV' : item.hidden ? 'GM' : undefined"
+        :badge-variant="item.archived ? 'status' : 'gm'"
         clickable
         @click="router.push(`/items/${item.id}`)"
       >

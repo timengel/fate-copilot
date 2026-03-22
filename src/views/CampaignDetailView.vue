@@ -107,12 +107,12 @@ function deleteCampaign() {
 
 const campaignItems = computed(() => {
   const items = campaign.value ? campaignsStore.getItemsForCampaign(campaign.value.id) : [];
-  return items.filter((i) => gmModeStore.isGMMode || !i.hidden);
+  return items.filter((i) => !i.archived && (gmModeStore.isGMMode || !i.hidden));
 });
 
 const availableItems = computed(() =>
   itemsStore.items.filter(
-    (i) => !campaignItems.value.some((ci) => ci.id === i.id) && (gmModeStore.isGMMode || !i.hidden),
+    (i) => !i.archived && !campaignItems.value.some((ci) => ci.id === i.id) && (gmModeStore.isGMMode || !i.hidden),
   ),
 );
 

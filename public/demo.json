@@ -1,7 +1,6 @@
 {
-  "$schema": "../src/schemas/app-data.schema.json",
   "formatVersion": "1.0",
-  "exportDate": "2026-03-22T10:15:17.585Z",
+  "exportDate": "2026-03-22T11:45:02.455Z",
   "campaigns": [
     {
       "id": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
@@ -976,7 +975,7 @@
       "redDice": 0,
       "blueDice": 0,
       "hidden": false,
-      "archived": false
+      "archived": true
     },
     {
       "id": "e9f2b473-6d1c-4a8e-b5f3-9c7a2d4e6b8f",
@@ -1013,7 +1012,7 @@
         }
       ],
       "stressMental": [],
-      "color": "pfau",
+      "color": "banane",
       "avatar": "🛰️",
       "redDice": 1,
       "blueDice": 0,

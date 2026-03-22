@@ -144,7 +144,7 @@ function toggleArchived(character: Character) {
         :color="char.color"
         :avatar="char.avatar"
         :title="char.name || 'Unbenannt'"
-        :badge-label="char.archived ? 'ARCHIVIERT' : undefined"
+        :badge-label="char.archived ? 'ARCHIV' : undefined"
         badge-variant="status"
         clickable
         @click="router.push(`/characters/${char.id}`)"
