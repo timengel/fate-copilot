@@ -4,7 +4,10 @@ import { useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
+import { useImportExport } from '../composables/useImportExport';
+import { useToastStore } from '../stores/toast';
 import FateButton from '../components/shared/FateButton.vue';
+import FateIcon from '../components/shared/FateIcon.vue';
 import FatePlusLogo from '../components/shared/FatePlusLogo.vue';
 import FateTag from '../components/shared/FateTag.vue';
 
@@ -12,6 +15,15 @@ const router = useRouter();
 const charactersStore = useCharactersStore();
 const campaignsStore = useCampaignsStore();
 const gmModeStore = useGMModeStore();
+const { importFromString, applyImport } = useImportExport();
+const toastStore = useToastStore();
+
+async function loadDemoData() {
+  const res = await fetch(`${import.meta.env.BASE_URL}demo.json`);
+  const text = await res.text();
+  applyImport(importFromString(text));
+  toastStore.show('Demo-Daten geladen!');
+}
 
 const scCount = computed(
   () => charactersStore.characters.filter((c) => (c.type ?? 'sc') === 'sc').length,
@@ -55,7 +67,9 @@ function getCharCampaign(charId: string): string | null {
   <div class="home-view">
     <div class="home-header">
       <div class="fate-logo"><FatePlusLogo /></div>
-      <p class="fate-subtitle">Digitaler Copilot für Fate Core</p>
+      <p class="fate-subtitle">
+        Digitaler Copilot für Fate Core
+      </p>
     </div>
 
     <div v-if="hasAnyData" class="quick-actions">
@@ -76,14 +90,24 @@ function getCharCampaign(charId: string): string | null {
     <div v-if="!hasAnyData" class="welcome">
       <div class="welcome-cards">
         <div class="welcome-card" @click="router.push('/campaigns/new')">
-          <div class="welcome-card-title">Neue Kampagne</div>
+          <div class="welcome-card-title">Neue Kampagne <FateIcon name="plus" :size="14" /></div>
           <div class="welcome-card-desc">
-            Erstelle deine erste Kampagne und weise Charaktere zu.
+            Erstelle deine erste Kampagne.
           </div>
         </div>
         <div class="welcome-card" @click="router.push('/characters/new')">
-          <div class="welcome-card-title">Neuer Charakter</div>
+          <div class="welcome-card-title">Neuer Charakter <FateIcon name="plus" :size="14" /></div>
           <div class="welcome-card-desc">Lege deinen ersten Charakter an.</div>
+        </div>
+        <div class="welcome-card" @click="router.push('/items/new')">
+          <div class="welcome-card-title">Neuer Gegenstand <FateIcon name="plus" :size="14" /></div>
+          <div class="welcome-card-desc">Erstelle deinen ersten Gegenstand.</div>
+        </div>
+        <div class="welcome-card welcome-card--demo" @click="loadDemoData">
+          <div class="welcome-card-title">
+            Demo Daten laden <FateIcon name="arrow-up" :size="14" />
+          </div>
+          <div class="welcome-card-desc">Lade Beispieldaten, um die App zu testen.</div>
         </div>
       </div>
     </div>
@@ -194,6 +218,10 @@ function getCharCampaign(charId: string): string | null {
 }
 
 .fate-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   margin: 0.4rem 0 0;
   font-size: 1.1rem;
   color: var(--fate-text-light);
@@ -227,11 +255,13 @@ function getCharCampaign(charId: string): string | null {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  max-width: 520px;
+  max-width: 640px;
   margin: 0 auto;
 }
 
 .welcome-card {
+  display: flex;
+  flex-direction: column;
   background: white;
   border: 1px solid var(--fate-border);
   border-radius: 6px;
@@ -249,6 +279,9 @@ function getCharCampaign(charId: string): string | null {
 }
 
 .welcome-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   font-weight: 700;
   font-size: 0.95rem;
   color: var(--fate-blue);
@@ -259,6 +292,18 @@ function getCharCampaign(charId: string): string | null {
   font-size: 0.82rem;
   color: var(--fate-text-light);
   line-height: 1.4;
+  height: calc(0.82rem * 1.4);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.demo-action {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
 }
 
 /* ---- Main grid ---- */
@@ -267,6 +312,22 @@ function getCharCampaign(charId: string): string | null {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+}
+
+.home-section {
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 520px;
+  min-width: 0;
+}
+
+.section-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 @container main (width < 640px) {
@@ -304,26 +365,15 @@ function getCharCampaign(charId: string): string | null {
   }
 
   .home-section {
-    max-height: 380px;
-    overflow-x: hidden;
+    max-height: none;
     width: 100%;
   }
-}
 
-.home-section {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  max-height: 520px;
-  min-width: 0;
-}
-
-.section-scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  .home-section .section-scroll {
+    flex: none;
+    overflow-y: visible;
+    min-height: auto;
+  }
 }
 
 .home-list {

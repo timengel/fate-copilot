@@ -99,6 +99,11 @@ defineProps<{ name: ButtonIcon; size?: number }>();
       <polyline points="12 5 19 12 12 19" />
     </template>
 
+    <template v-else-if="name === 'arrow-up'">
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
+    </template>
+
     <template v-else-if="name === 'chevron-left'">
       <polyline points="15 18 9 12 15 6" />
     </template>
@@ -132,6 +137,21 @@ defineProps<{ name: ButtonIcon; size?: number }>();
     <template v-else-if="name === 'reset'">
       <path d="M3 2v6h6" />
       <path d="M3 13a9 9 0 1 0 3-7.7L3 8" />
+    </template>
+
+    <template v-else-if="name === 'die-plus'">
+      <rect x="2" y="2" width="20" height="20" rx="4" ry="4" />
+      <line x1="8" y1="12" x2="16" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="16" />
+    </template>
+
+    <template v-else-if="name === 'die-blank'">
+      <rect x="2" y="2" width="20" height="20" rx="4" ry="4" />
+    </template>
+
+    <template v-else-if="name === 'die-minus'">
+      <rect x="2" y="2" width="20" height="20" rx="4" ry="4" />
+      <line x1="8" y1="12" x2="16" y2="12" />
     </template>
 
     <template v-else-if="name === 'settings'">

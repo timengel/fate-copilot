@@ -1,0 +1,1112 @@
+{
+  "formatVersion": "1.0",
+  "exportDate": "2026-03-22T10:15:17.585Z",
+  "campaigns": [
+    {
+      "id": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "name": "Adeptus Aspektus",
+      "description": "Eine Freihändler-Crew wagt sich in die dunklen Randgebiete des Imperiums, um einer Spur aus Reichtum, Rivalität und Geheimnissen zu folgen.",
+      "status": "active",
+      "notes": "",
+      "milestones": [
+        {
+          "id": "a6dec6f2-a0b2-4cd4-aa60-43dbb488f35a",
+          "type": "small",
+          "description": "Pläne eines Genestealer Kults auf der Minenwelt \"Lucin's Atem\" vereitelt"
+        },
+        {
+          "id": "db4fda1f-76c5-4e3a-818d-8c2bc9984ae2",
+          "type": "significant",
+          "description": "Inquisitorin Lyra Voss als ambivalente Verbündete gewonnen – zu welchem Preis?"
+        },
+        {
+          "id": "2bf0c1c7-8074-4a42-8813-bcd8d0608595",
+          "type": "major",
+          "description": "Das häretische Artefaktnetzwerk auf Varaktus Prime aufgedeckt und zerstört"
+        },
+        {
+          "id": "1dc3105e-c3e6-4b81-80fc-c91cafbd7fed",
+          "type": "small",
+          "description": "Kontakt zu Techmarin Bruder Orix hergestellt und Zugang zu Mechanicus-Archiven erhalten"
+        }
+      ],
+      "color": "pfau",
+      "avatar": "🚀"
+    },
+    {
+      "id": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "name": "Lucin's Atem",
+      "description": "Die erste Mission der Crew führte sie auf die Minenwelt Lucin's Atem, wo ein Genestealer-Kult die Produktion sabotierte und sich auf eine planetare Infektion vorbereitete.",
+      "status": "completed",
+      "notes": "Abgeschlossene Kampagne. Ravi entdeckte hier seine Psionik-Begabung. Gorgon erbeutete biologisches Kultistenmaterial für seine Forschung. Kein Charakter ist gestorben – dieses Mal.",
+      "milestones": [
+        {
+          "id": "b1c2d3e4-f5a6-7b8c-9d0e-f1a2b3c4d5e6",
+          "type": "small",
+          "description": "Sicherer Abstieg in den alten Minenschacht 7 trotz Sabotage der Aufzüge"
+        },
+        {
+          "id": "c2d3e4f5-a6b7-8c9d-0e1f-a2b3c4d5e6f7",
+          "type": "small",
+          "description": "Bergarbeiter-Vorarbeiter Tern Malkus als Informant gewonnen und erstes Kultisten-Netz aufgedeckt"
+        },
+        {
+          "id": "d3e4f5a6-b7c8-9d0e-1f2a-b3c4d5e6f7a8",
+          "type": "significant",
+          "description": "Schwarm-Brüter-Kammer unter dem Hauptschacht zerstört – Gorgon erlitt dabei eine schwere Konsequenz"
+        },
+        {
+          "id": "e4f5a6b7-c8d9-0e1f-2a3b-c4d5e6f7a8b9",
+          "type": "major",
+          "description": "Kultist Magen 'Der Blinde' Ferris gefangen genommen und Beweise an den Planeten-Gouverneur übergeben"
+        }
+      ],
+      "color": "salbei",
+      "avatar": "⛏️"
+    },
+    {
+      "id": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
+      "name": "Das Erbe der Ravensburger",
+      "description": "Ravi Ole Ravensburger ist der letzte Überlebende seines Hauses. Irgendwo in den alten Archiven der Adeptus Terra schlummert das Erbe seiner Familie – und das Geheimnis ihres Untergangs.",
+      "status": "inactive",
+      "notes": "Kampagne auf Eis gelegt. Warten auf Ravens Entscheidung, ob er das Erbe wirklich antreten will.",
+      "milestones": [],
+      "color": "weintraube",
+      "avatar": "📚"
+    }
+  ],
+  "characters": [
+    {
+      "id": "9c801b83-8da0-4ffe-8332-a07306538162",
+      "type": "sc",
+      "name": "Rovan Schattengold aka. Uwe",
+      "description": "Unterwelt-Freihändler und Informationsmakler",
+      "highConcept": "Eiskalter Unterwelt-Freihändler mit weit verbreitetem Netzwerk",
+      "trouble": "Mein eigener Stab hat mich verraten",
+      "aspects": [
+        "Xenos-Artefaktjäger",
+        "Kybernetisch augmentiertes Spezialauge",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Nachforschung",
+          "level": 4
+        },
+        {
+          "skill": "Diebeskünste",
+          "level": 3
+        },
+        {
+          "skill": "Schießen",
+          "level": 3
+        },
+        {
+          "skill": "Kämpfen",
+          "level": 2
+        },
+        {
+          "skill": "Wille",
+          "level": 2
+        },
+        {
+          "skill": "Kraft",
+          "level": 1
+        },
+        {
+          "skill": "Psionik",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Deckungsfeuer",
+          "description": "1x pro Szene: +2 auf Schießen wenn Angriff aus der Deckung"
+        }
+      ],
+      "extras": "- Tigerzahnkette",
+      "refresh": 3,
+      "fatePoints": 3,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "",
+      "color": "basilikum",
+      "avatar": "🏴‍☠️"
+    },
+    {
+      "id": "1eb86a6c-1066-4d4a-9310-2b18a2d1af76",
+      "type": "sc",
+      "name": "Gorgon Zola",
+      "description": "Ein bionisch augmentierter Magos, besessen davon die perfekte Biomaschine zu werden.",
+      "highConcept": "Bionisch augmentierter Magos Biologis des Adeptus Mechanicus",
+      "trouble": "Besessen von der perfekten Biomaschine",
+      "aspects": [
+        "\"Du willst mir nichts Gutes\" - außer Uwe",
+        "Mechanische Extremitäten",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Kraft",
+          "level": 4
+        },
+        {
+          "skill": "Kämpfen",
+          "level": 3
+        },
+        {
+          "skill": "Wissen",
+          "level": 3
+        },
+        {
+          "skill": "Schießen",
+          "level": 2
+        },
+        {
+          "skill": "Wille",
+          "level": 2
+        },
+        {
+          "skill": "Wahrnehmung",
+          "level": 2
+        },
+        {
+          "skill": "Handwerk",
+          "level": 1
+        },
+        {
+          "skill": "Provozieren",
+          "level": 1
+        },
+        {
+          "skill": "Athletik",
+          "level": 1
+        },
+        {
+          "skill": "Empathie",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Gezielte Vivisektion",
+          "description": "Wissen statt Wahrnehmung +1 Aspekt (?)"
+        },
+        {
+          "name": "Traumafleisch",
+          "description": "Mentaler Schaden darf auf körperliche Stressboxen verteilt werden"
+        }
+      ],
+      "extras": "- Phiole mit Tigerblut",
+      "refresh": 3,
+      "fatePoints": 3,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        },
+        {
+          "value": 4,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "",
+      "color": "tomate",
+      "avatar": "🤖"
+    },
+    {
+      "id": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175",
+      "type": "sc",
+      "name": "Ravi Ole Ravensburger",
+      "description": "",
+      "highConcept": "Der letze Überlebende der Ravensburger",
+      "trouble": "Socially awkward",
+      "aspects": [
+        "Raffinierter Rätsellöser",
+        "\"Zeig mir die Welt, Uwe!\"",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Wissen",
+          "level": 4
+        },
+        {
+          "skill": "Nachforschung",
+          "level": 3
+        },
+        {
+          "skill": "Täuschung",
+          "level": 1
+        },
+        {
+          "skill": "Kämpfen",
+          "level": 1
+        },
+        {
+          "skill": "Wille",
+          "level": 2
+        },
+        {
+          "skill": "Psionik",
+          "level": 2
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Peinliches Studium",
+          "description": "+2 auf Wissen + Nachforschung wenn unbeobachtet"
+        },
+        {
+          "name": "Davon hab ich gelesen!",
+          "description": "1 FP → Wissen für beliebige Probe, wenn begründbar"
+        },
+        {
+          "name": "Schneller Lerner",
+          "description": "+2 auf Probe, wenn es mir vorher jemand ausführlich erklärt hat"
+        }
+      ],
+      "extras": "",
+      "refresh": 3,
+      "fatePoints": 3,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "",
+      "color": "weintraube",
+      "avatar": "🫅🏻"
+    },
+    {
+      "id": "c5ab1879-b8d5-4dc7-8ad4-143c8a7e5731",
+      "type": "sc",
+      "archived": true,
+      "name": "Master Mustermann",
+      "description": "",
+      "highConcept": "Bababa bibibi",
+      "trouble": "Lulululu",
+      "aspects": [
+        "",
+        "",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Athletik",
+          "level": 3
+        },
+        {
+          "skill": "Charisma",
+          "level": 2
+        },
+        {
+          "skill": "Handwerk",
+          "level": 1
+        }
+      ],
+      "stunts": [],
+      "extras": "",
+      "refresh": 3,
+      "fatePoints": 3,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        },
+        {
+          "value": 4,
+          "checked": false
+        },
+        {
+          "value": 5,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": "Matschbirne"
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": "Todeskater"
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "",
+      "color": "pfau",
+      "avatar": ""
+    },
+    {
+      "id": "67281cff-7b07-4588-95f5-cec387eed21e",
+      "type": "nsc",
+      "name": "Inquisitorin Lyra Voss",
+      "description": "Agentin der Ordo Xenos, entsandt um den Genestealer-Kult auf Lucin's Atem zu untersuchen. Arbeitet widerwillig mit der Crew zusammen – solange ihre Ziele übereinstimmen.",
+      "highConcept": "Fanatische Inquisitorin der Ordo Xenos auf der Jagd nach Häresie",
+      "trouble": "Das Ziel heiligt immer die Mittel",
+      "aspects": [
+        "Eiserne Autorität des Imperators",
+        "Netzwerk von Informanten und Spitzeln",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Wille",
+          "level": 4
+        },
+        {
+          "skill": "Provozieren",
+          "level": 3
+        },
+        {
+          "skill": "Nachforschung",
+          "level": 3
+        },
+        {
+          "skill": "Empathie",
+          "level": 2
+        },
+        {
+          "skill": "Kämpfen",
+          "level": 2
+        },
+        {
+          "skill": "Wahrnehmung",
+          "level": 2
+        },
+        {
+          "skill": "Schießen",
+          "level": 1
+        },
+        {
+          "skill": "Charisma",
+          "level": 1
+        },
+        {
+          "skill": "Täuschung",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Verhörmeisterin",
+          "description": "+2 auf Provozieren in Verhör-Situationen oder wenn das Gegenüber unter Druck steht"
+        },
+        {
+          "name": "Zeuge des Imperiums",
+          "description": "Einmal pro Szene: +2 auf Wille gegen Warp-Effekte, Einschüchterung oder Chaos-Einfluss"
+        }
+      ],
+      "extras": "- Rosette der Heiligen Inquisition (öffnet Türen und Münder)\n- Bolt Pistole (Extraschaden: +1 Stress bei Treffern)",
+      "refresh": 1,
+      "fatePoints": 1,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        },
+        {
+          "value": 4,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "GM-Notiz: Voss weiß mehr über die Krone der Konsequenzen als sie zugibt. Sie lässt die Crew vorerst gewähren.",
+      "color": "flamingo",
+      "avatar": "👁️"
+    },
+    {
+      "id": "e2c9b047-3f8d-4a6e-b1c5-9d7f2a4e8b6d",
+      "type": "nsc",
+      "archived": true,
+      "name": "Magen \"Der Blinde\" Ferris",
+      "description": "Schläfer-Agent des Genestealer-Kults auf Lucin's Atem. Jahrelang als loyaler Bergarbeiter getarnt. Wurde von der Crew gefangen genommen und an die Gouverneurs-Behörden übergeben.",
+      "highConcept": "Fanatischer Genestealer-Kultist und Schläfer auf Lucin's Atem",
+      "trouble": "Der Patriarch ruft mich zurück in den Schwarm",
+      "aspects": [
+        "Tarnung als loyaler Bergarbeiter",
+        "Verborgene Xenos-Mutation (Tentakelarm)",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Heimlichkeit",
+          "level": 3
+        },
+        {
+          "skill": "Kämpfen",
+          "level": 3
+        },
+        {
+          "skill": "Täuschung",
+          "level": 2
+        },
+        {
+          "skill": "Kraft",
+          "level": 2
+        },
+        {
+          "skill": "Athletik",
+          "level": 1
+        },
+        {
+          "skill": "Wille",
+          "level": 1
+        },
+        {
+          "skill": "Wahrnehmung",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Schwarmgeist",
+          "description": "+2 auf Wille-Proben wenn andere Kultisten in der Szene anwesend sind"
+        },
+        {
+          "name": "Klettergreifer",
+          "description": "Verborgene Mutationen: +2 auf Athletik beim Klettern und in engen, dunklen Räumen"
+        }
+      ],
+      "extras": "- Mutierter Tentakelarm (versteckt, zählt als Waffe: +1 Stress bei Kämpfen-Angriffen)",
+      "refresh": 1,
+      "fatePoints": 0,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": true
+        },
+        {
+          "value": 2,
+          "checked": true
+        },
+        {
+          "value": 3,
+          "checked": true
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": "Gebrochen und überwältigt"
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "Antagonist der Lucin's Atem-Kampagne. Besiegt und archiviert.",
+      "color": "salbei",
+      "avatar": "👽"
+    },
+    {
+      "id": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b",
+      "type": "nsc",
+      "name": "Techmarin Bruder Orix",
+      "description": "Neugieriger und unorthodox offener Techmarin des Adeptus Mechanicus. Ein alter Bekannter von Gorgon Zola, dem er einen Gefallen schuldet – immer zur ungünstigsten Zeit.",
+      "highConcept": "Neugieriger Techmarin und Vertrauter des Magos Zola",
+      "trouble": "Schuldet dem Magos einen Gefallen – immer zur falschen Zeit",
+      "aspects": [
+        "Mechanicus-Kontakte in drei Sektoren",
+        "Faszination für verbotene und vergessene Technologien",
+        ""
+      ],
+      "skills": [
+        {
+          "skill": "Handwerk",
+          "level": 4
+        },
+        {
+          "skill": "Wissen",
+          "level": 3
+        },
+        {
+          "skill": "Nachforschung",
+          "level": 2
+        },
+        {
+          "skill": "Kraft",
+          "level": 2
+        },
+        {
+          "skill": "Wille",
+          "level": 2
+        },
+        {
+          "skill": "Empathie",
+          "level": 1
+        },
+        {
+          "skill": "Ressourcen",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Notfallreparatur",
+          "description": "+2 auf Handwerk bei Feldreparaturen unter Zeitdruck oder in gefährlicher Umgebung"
+        },
+        {
+          "name": "Archiv des Omnissiah",
+          "description": "Kann Wissen statt Nachforschung verwenden, wenn es um technische Daten, Maschinenpläne oder Archiv-Recherche geht"
+        }
+      ],
+      "extras": "- Mechadendrit-Werkzeugarm (gibt +1 auf alle Handwerk-Proben)\n- Zugang zu lokalen Mechanicus-Archiven",
+      "refresh": 1,
+      "fatePoints": 0,
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        },
+        {
+          "severity": 8,
+          "label": "extreme",
+          "value": ""
+        }
+      ],
+      "notes": "",
+      "color": "heidelbeere",
+      "avatar": "⚙️"
+    }
+  ],
+  "items": [
+    {
+      "id": "0db40f21-ed15-4849-bf3a-f7c4140ad948",
+      "type": "item",
+      "name": "Krone der Konsequenzen",
+      "description": "Mächtiger Gegenstand mit Resonanz im Warp. Fängt Konsequenzen ab und fügt sie per Zufall einer Person in der Nähe zu. Höchst häretisch.",
+      "aspects": [
+        "Starke Warp-Resonanz",
+        "Befleckt vom Chaos"
+      ],
+      "stunts": [],
+      "extras": "Nutzung lässt den Schleier zw. Realität und Warp schwächer werden. Pro Nutzung → 1 Stress. Wenn 3 Stress → Nutzer muss Wille 5 verteidigen, alle im Umkreis Wille 3. Krone glüht danach kurzzeitig extrem heiß.",
+      "stressPhysical": [],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "color": "gray",
+      "avatar": "👑",
+      "redDice": 0,
+      "blueDice": 0,
+      "hidden": false,
+      "archived": false
+    },
+    {
+      "id": "c595b363-42f2-4a5c-911c-d14b1263ed31",
+      "type": "item",
+      "name": "Plasmawerfer",
+      "description": "Plasmawerfer des Adeptus Mechanicus. Instabil.",
+      "aspects": [
+        "Überhitzungsgefahr bei jedem Schuss",
+        "Vernichtende Plasmawolke"
+      ],
+      "stunts": [
+        {
+          "name": "Sperrfeuer",
+          "description": "Kann einmal pro Szene alle Charaktere in der Zone angreifen. Malus -1. Danach muss nachgeladen werden."
+        }
+      ],
+      "extras": "- Munitionsvorrat von 4 pro Szene (Phys. Stress).\n- Nachladen: Probe 1 auf Schießen → Fail: 2 Stress Phys. Schaden",
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        },
+        {
+          "value": 4,
+          "checked": false
+        }
+      ],
+      "stressMental": [],
+      "color": "pfau",
+      "avatar": "🔫",
+      "redDice": 2,
+      "blueDice": 0,
+      "hidden": false,
+      "archived": false
+    },
+    {
+      "id": "b4e7f219-8c3a-4d6b-a5f1-2e9c7d4b8a6f",
+      "type": "item",
+      "name": "Häretisches Dataslate",
+      "description": "Ein verschlüsseltes Dataslate mit Aufzeichnungen über verbotene Xenos-Technologie, Warp-Phänomene und Genestealer-Kult-Rituale. Hochgradig häretisch – Besitz allein reicht für eine Inquisitions-Befragung.",
+      "aspects": [
+        "Verbotenes Xenos- und Warp-Wissen",
+        "Begehrliches Ziel für die Inquisition"
+      ],
+      "stunts": [
+        {
+          "name": "Verbotenes Wissen",
+          "description": "Bei Wissen-Proben zu Xenos, Warp oder Kult-Ritualen: +2. Aber es wird ein Situationsaspekt \"Spuren von Häresie\" erzeugt, den Gegner frei einsetzen können."
+        }
+      ],
+      "extras": "Jede Nutzung hinterlässt digitale Spuren → 1 Mentalstress (Paranoia). Kann mit Handwerk 3 teilweise bereinigt werden. Inquisitorin Voss weiß von seiner Existenz.",
+      "stressPhysical": [],
+      "stressMental": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "color": "heidelbeere",
+      "avatar": "📜",
+      "redDice": 0,
+      "blueDice": 1,
+      "hidden": false,
+      "archived": false
+    },
+    {
+      "id": "d6a3c851-2f7e-4b9d-c8a4-7f5e1b3d9c2a",
+      "type": "item",
+      "name": "Tarnkleid des Assassinen",
+      "description": "Ein hochtechnologisches Tarnkleid aus Arachni-Rigg-Fasern, standardmäßig bei Officio-Assassinorum-Agenten. Unbekannter Herkunft – Rovan \"hat es einfach gefunden\".",
+      "aspects": [
+        "Nano-Tarnmembran aus Militärbeständen",
+        "Wer hat das hier vergessen?"
+      ],
+      "stunts": [
+        {
+          "name": "Unsichtbarer Angriff",
+          "description": "Wenn aus dem Verborgenen heraus angegriffen wird: +2 auf Schießen oder Kämpfen für den ersten Angriff der Szene"
+        },
+        {
+          "name": "Tarnfeld aktiv",
+          "description": "Einmal pro Szene: Eine Heimlichkeit-Probe entfällt komplett (automatischer Erfolg mit einem Stunt-Einsatz)"
+        }
+      ],
+      "extras": "Hält 2 physischen Stress als \"Tarnschaden\" bevor es sichtbar wird. Reparatur erfordert Handwerk 2 oder Materialien.",
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        }
+      ],
+      "stressMental": [],
+      "color": "lavendel",
+      "avatar": "🕶️",
+      "redDice": 0,
+      "blueDice": 0,
+      "hidden": false,
+      "archived": false
+    },
+    {
+      "id": "e9f2b473-6d1c-4a8e-b5f3-9c7a2d4e6b8f",
+      "type": "item",
+      "name": "Wächterdrohne MK.VII",
+      "description": "Eine autonome Mechanicus-Wächterdrohne, umprogrammiert und modifiziert von Gorgon Zola. Schützt ihren designierten Benutzer und ist mit einem Lascutter bewaffnet. Manchmal etwas zu enthusiastisch.",
+      "aspects": [
+        "Autonomes Schutzsystem mit eigener Agenda",
+        "Lascutter: Nützlich für Türen und Feinde"
+      ],
+      "stunts": [
+        {
+          "name": "Schutzmodus",
+          "description": "Einmal pro Konflikt kann die Drohne einen Treffer für den Besitzer abfangen und absorbiert damit eine milde Konsequenz"
+        },
+        {
+          "name": "Laserscanner",
+          "description": "+2 auf Wahrnehmung-Proben zum Aufspüren verborgener Feinde, Fallen oder versteckter Mechanismen"
+        }
+      ],
+      "extras": "Erfordert Handwerk 2 für Wartung nach jedem Konflikt. Bei 3 Phys. Stress → ausgeschaltet, Reparatur mit Handwerk 3 nötig. Lascutter: +1 Stress bei Kämpfen-Angriffen.",
+      "stressPhysical": [
+        {
+          "value": 1,
+          "checked": false
+        },
+        {
+          "value": 2,
+          "checked": false
+        },
+        {
+          "value": 3,
+          "checked": false
+        }
+      ],
+      "stressMental": [],
+      "color": "pfau",
+      "avatar": "🛰️",
+      "redDice": 1,
+      "blueDice": 0,
+      "hidden": false,
+      "archived": false
+    }
+  ],
+  "campaignCharacterAssignments": [
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "9c801b83-8da0-4ffe-8332-a07306538162"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "1eb86a6c-1066-4d4a-9310-2b18a2d1af76"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "67281cff-7b07-4588-95f5-cec387eed21e"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b"
+    },
+    {
+      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "characterId": "9c801b83-8da0-4ffe-8332-a07306538162"
+    },
+    {
+      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "characterId": "1eb86a6c-1066-4d4a-9310-2b18a2d1af76"
+    },
+    {
+      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "characterId": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175"
+    },
+    {
+      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "characterId": "e2c9b047-3f8d-4a6e-b1c5-9d7f2a4e8b6d"
+    },
+    {
+      "campaignId": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
+      "characterId": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175"
+    },
+    {
+      "campaignId": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
+      "characterId": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b"
+    }
+  ],
+  "campaignItemAssignments": [
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "0db40f21-ed15-4849-bf3a-f7c4140ad948"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "c595b363-42f2-4a5c-911c-d14b1263ed31"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "b4e7f219-8c3a-4d6b-a5f1-2e9c7d4b8a6f"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "d6a3c851-2f7e-4b9d-c8a4-7f5e1b3d9c2a"
+    },
+    {
+      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
+      "itemId": "e9f2b473-6d1c-4a8e-b5f3-9c7a2d4e6b8f"
+    }
+  ],
+  "skills": [
+    "Athletik",
+    "Charisma",
+    "Diebeskünste",
+    "Empathie",
+    "Fahren",
+    "Handwerk",
+    "Heimlichkeit",
+    "Kämpfen",
+    "Kontakte",
+    "Kraft",
+    "Nachforschung",
+    "Provozieren",
+    "Ressourcen",
+    "Schießen",
+    "Täuschung",
+    "Wahrnehmung",
+    "Wille",
+    "Wissen",
+    "Psionik"
+  ]
+}

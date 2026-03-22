@@ -24,6 +24,7 @@ withDefaults(defineProps<{ value?: string; size?: 'S' | 'M'; background?: string
   justify-content: center;
   flex-shrink: 0;
   line-height: 1;
+  overflow: hidden;
 }
 
 .fate-avatar__content {
