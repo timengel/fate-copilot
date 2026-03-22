@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
-import { createPinia } from 'pinia';
+import { createPinia, setActivePinia } from 'pinia';
 import MilestoneTimeline from './MilestoneTimeline.vue';
+import { useGMModeStore } from '../../stores/gmMode';
 import type { Milestone } from '../../types';
 
 const milestones: Milestone[] = [
@@ -12,13 +13,20 @@ const milestones: Milestone[] = [
 function renderTimeline(props: {
   milestones: Milestone[];
   readonly?: boolean;
+  gmMode?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
   onUpdate?: () => void;
 }) {
+  const pinia = createPinia();
+  setActivePinia(pinia);
+  if (props.gmMode) {
+    useGMModeStore().isGMMode = true;
+  }
+  const { gmMode: _, ...componentProps } = props;
   return render(MilestoneTimeline, {
-    props,
-    global: { plugins: [createPinia()] },
+    props: componentProps,
+    global: { plugins: [pinia] },
   });
 }
 
@@ -48,18 +56,18 @@ describe('MilestoneTimeline', () => {
 
   describe('edit mode (readonly=false)', () => {
     it('shows the add form', () => {
-      const { container } = renderTimeline({ milestones: [], readonly: false });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true });
       expect(container.querySelector('.milestone-add-form')).toBeTruthy();
     });
 
     it('renders existing milestone descriptions', () => {
-      renderTimeline({ milestones, readonly: false });
+      renderTimeline({ milestones, readonly: false, gmMode: true });
       expect(screen.getByText('First milestone')).toBeTruthy();
     });
 
     it('calls onAdd with a new milestone when description is entered and submitted', async () => {
       const onAdd = vi.fn();
-      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, 'New Milestone');
       await fireEvent.click(getAddButton(container)!);
@@ -71,28 +79,28 @@ describe('MilestoneTimeline', () => {
 
     it('does not call onAdd when description is empty', async () => {
       const onAdd = vi.fn();
-      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true, onAdd });
       await fireEvent.click(getAddButton(container)!);
       expect(onAdd).not.toHaveBeenCalled();
     });
 
     it('calls onRemove with the last milestone id when ✕ is clicked', async () => {
       const onRemove = vi.fn();
-      const { container } = renderTimeline({ milestones, readonly: false, onRemove });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true, onRemove });
       const removeBtn = container.querySelector<HTMLButtonElement>('.milestone-remove')!;
       await fireEvent.click(removeBtn);
       expect(onRemove).toHaveBeenCalledWith('m2');
     });
 
     it('switches to edit mode when ✎ is clicked', async () => {
-      const { container } = renderTimeline({ milestones, readonly: false });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       expect(container.querySelector('.timeline-content--edit')).toBeTruthy();
     });
 
     it('calls onUpdate when saving in edit mode', async () => {
       const onUpdate = vi.fn();
-      const { container } = renderTimeline({ milestones, readonly: false, onUpdate });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true, onUpdate });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       await fireEvent.click(container.querySelector('.milestone-save')!);
       expect(onUpdate).toHaveBeenCalledOnce();
@@ -100,7 +108,7 @@ describe('MilestoneTimeline', () => {
 
     it('exits edit mode without calling onUpdate when ✕ is clicked in edit mode', async () => {
       const onUpdate = vi.fn();
-      const { container } = renderTimeline({ milestones, readonly: false, onUpdate });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true, onUpdate });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       const editContent = container.querySelector('.timeline-content--edit')!;
       await fireEvent.click(editContent.querySelector('.milestone-remove')!);
@@ -110,7 +118,7 @@ describe('MilestoneTimeline', () => {
 
     it('trims whitespace from description before emitting add', async () => {
       const onAdd = vi.fn();
-      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, '  trimmed  ');
       await fireEvent.click(getAddButton(container)!);
@@ -119,7 +127,7 @@ describe('MilestoneTimeline', () => {
 
     it('does not call onAdd when description is whitespace only', async () => {
       const onAdd = vi.fn();
-      const { container } = renderTimeline({ milestones: [], readonly: false, onAdd });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true, onAdd });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, '   ');
       await fireEvent.click(getAddButton(container)!);
@@ -127,7 +135,7 @@ describe('MilestoneTimeline', () => {
     });
 
     it('clears the description input after a successful submit', async () => {
-      const { container } = renderTimeline({ milestones: [], readonly: false });
+      const { container } = renderTimeline({ milestones: [], readonly: false, gmMode: true });
       const input = container.querySelector<HTMLInputElement>('input.milestone-desc-input')!;
       await fireEvent.update(input, 'A new milestone');
       await fireEvent.click(getAddButton(container)!);
@@ -136,7 +144,7 @@ describe('MilestoneTimeline', () => {
 
     it('does not call onUpdate when saving edit with empty description', async () => {
       const onUpdate = vi.fn();
-      const { container } = renderTimeline({ milestones, readonly: false, onUpdate });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true, onUpdate });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!;
       await fireEvent.update(editInput, '');
@@ -146,7 +154,7 @@ describe('MilestoneTimeline', () => {
 
     it('trims description when saving an edit', async () => {
       const onUpdate = vi.fn();
-      const { container } = renderTimeline({ milestones, readonly: false, onUpdate });
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true, onUpdate });
       await fireEvent.click(container.querySelector('.milestone-edit')!);
       const editInput = container.querySelector<HTMLInputElement>('.timeline-content--edit input')!;
       await fireEvent.update(editInput, '  updated  ');
@@ -155,8 +163,8 @@ describe('MilestoneTimeline', () => {
     });
 
     it('remove button is only present on the last milestone', () => {
-      const { container } = renderTimeline({ milestones, readonly: false });
-      // Only the last milestone's view row should have the danger-outline remove button
+      const { container } = renderTimeline({ milestones, readonly: false, gmMode: true });
+      // Only the last milestone's view row should have the remove button
       const viewRows = container.querySelectorAll('.timeline-content:not(.timeline-content--edit)');
       const rowsWithRemove = Array.from(viewRows).filter((row) =>
         row.querySelector('.milestone-remove'),
