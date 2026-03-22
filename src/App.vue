@@ -205,7 +205,6 @@ watch(
 .nav-link.router-link-active {
   background: var(--fate-nav-active-bg);
   color: var(--fate-nav-active-color) !important;
-  font-weight: 600;
 }
 
 .nav-link:active {

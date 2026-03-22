@@ -275,9 +275,9 @@ html[data-theme='dark'] .sheet-section-header {
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --fate-bg: #0f1923;
-    --fate-white: #1a2530;
+    --fate-white: #22333f;
     --fate-blue-light: #0c2438;
-    --fate-hover-bg: #223545;
+    --fate-hover-bg: #2a3f4e;
     --fate-card-mix-base: #081825;
 
     --fate-text: #e8edf0;
@@ -298,10 +298,10 @@ html[data-theme='dark'] .sheet-section-header {
     --fate-toggle-track-border: rgba(255, 255, 255, 0.18);
     --fate-toggle-ghost-track: rgba(255, 255, 255, 0.15);
 
-    --fate-header-bg: #0e2030;
-    --fate-nav-active-bg: #1e3347;
+    --fate-header-bg: #1e5a8a;
+    --fate-nav-active-bg: #2a7ab8;
     --fate-nav-active-color: white;
 
-    --fate-btn-primary-bg: #0e2030;
+    --fate-btn-primary-bg: #1e5a8a;
   }
 }
