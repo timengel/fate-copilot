@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/vue';
+import { setActivePinia, createPinia } from 'pinia';
 import FateTag from './FateTag.vue';
 
 describe('FateTag', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
   it('renders the label text', () => {
     render(FateTag, { props: { color: 'pfau', label: 'Aktiv' } });
     expect(screen.getByText('Aktiv')).toBeTruthy();

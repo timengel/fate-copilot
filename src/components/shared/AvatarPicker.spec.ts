@@ -1,8 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/vue';
+import { setActivePinia, createPinia } from 'pinia';
 import AvatarPicker from './AvatarPicker.vue';
 
 describe('AvatarPicker', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
   it('emits a simple emoji unchanged', async () => {
     const onUpdate = vi.fn();
     const { container } = render(AvatarPicker, {
