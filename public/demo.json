@@ -1,4 +1,5 @@
 {
+  "$schema": "../src/schemas/app-data.schema.json",
   "formatVersion": "1.0",
   "exportDate": "2026-03-22T10:15:17.585Z",
   "campaigns": [

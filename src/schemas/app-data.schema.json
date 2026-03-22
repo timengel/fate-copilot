@@ -13,6 +13,7 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "$schema": { "type": "string" },
     "formatVersion": {
       "type": "string",
       "enum": ["1.0"],
@@ -64,13 +65,7 @@
         },
         "notes": { "type": "string" },
         "gmNotes": { "type": "string" },
-        "color": {
-          "type": "string",
-          "enum": [
-            "pfau", "heidelbeere", "lavendel", "weintraube",
-            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
-          ]
-        },
+        "color": { "$ref": "#/$defs/TagColor" },
         "avatar": { "type": "string" },
         "milestones": {
           "type": "array",
@@ -142,20 +137,14 @@
         "gmNotes": { "type": "string" },
         "pyramidMaxLevel": { "type": "integer", "minimum": 1, "maximum": 8 },
         "pyramidMaxCols": { "type": "integer", "minimum": 1 },
-        "color": {
-          "type": "string",
-          "enum": [
-            "pfau", "heidelbeere", "lavendel", "weintraube",
-            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
-          ]
-        },
+        "color": { "$ref": "#/$defs/TagColor" },
         "avatar": { "type": "string" }
       }
     },
     "Item": {
       "type": "object",
       "required": [
-        "id", "type", "name", "description", "highConcept", "trouble",
+        "id", "type", "name", "description",
         "aspects", "stunts", "extras",
         "stressPhysical", "stressMental",
         "redDice", "blueDice"
@@ -168,10 +157,9 @@
           "enum": ["item"]
         },
         "archived": { "type": "boolean" },
+        "hidden": { "type": "boolean" },
         "name": { "type": "string" },
         "description": { "type": "string" },
-        "highConcept": { "type": "string" },
-        "trouble": { "type": "string" },
         "aspects": {
           "type": "array",
           "items": { "type": "string" }
@@ -190,17 +178,19 @@
           "items": { "$ref": "#/$defs/StressBox" }
         },
         "gmNotes": { "type": "string" },
-        "color": {
-          "type": "string",
-          "enum": [
-            "pfau", "heidelbeere", "lavendel", "weintraube",
-            "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum"
-          ]
-        },
+        "color": { "$ref": "#/$defs/TagColor" },
         "avatar": { "type": "string" },
         "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
         "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 }
       }
+    },
+    "TagColor": {
+      "type": "string",
+      "enum": [
+        "pfau", "heidelbeere", "lavendel", "weintraube",
+        "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum",
+        "gray", "türkis", "rose"
+      ]
     },
     "SkillEntry": {
       "type": "object",
