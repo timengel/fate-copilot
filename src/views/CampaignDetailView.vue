@@ -260,7 +260,7 @@ function navigateToAssignment(path: string) {
                       }}</span>
                     </div>
                   </button>
-                  <div class="assignment-actions">
+                  <div v-if="gmModeStore.isGMMode" class="assignment-actions">
                     <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"
                       ><span class="btn-label">Entfernen</span></FateButton
                     >
@@ -304,7 +304,7 @@ function navigateToAssignment(path: string) {
                 </template>
               </template>
 
-              <div v-if="availableCharacters.length > 0" class="assign-row">
+              <div v-if="gmModeStore.isGMMode && availableCharacters.length > 0" class="assign-row">
                 <FateDropdown
                   v-model="selectedCharacterId"
                   class="assign-dropdown"
@@ -346,12 +346,12 @@ function navigateToAssignment(path: string) {
                     <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
                   </div>
                 </button>
-                <div class="assignment-actions">
+                <div v-if="gmModeStore.isGMMode" class="assignment-actions">
                   <FateButton variant="danger" size="S" icon="close" @click="unassignItem(item.id)"><span class="btn-label">Entfernen</span></FateButton>
                 </div>
               </div>
 
-              <div v-if="availableItems.length > 0" class="assign-row">
+              <div v-if="gmModeStore.isGMMode && availableItems.length > 0" class="assign-row">
                 <FateDropdown
                   v-model="selectedItemId"
                   class="assign-dropdown"
@@ -567,6 +567,12 @@ function navigateToAssignment(path: string) {
 
   .btn-label {
     display: none;
+  }
+
+  .assignment-actions :deep(.fate-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
   }
 }
 </style>

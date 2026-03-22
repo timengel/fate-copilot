@@ -210,4 +210,10 @@ function isRenderableNode(node: VNode): boolean {
   background: rgba(255, 255, 255, 0.2);
   color: white;
 }
+
+@media (pointer: coarse) {
+  .fate-card__actions :deep(.fate-btn) {
+    --btn-size: 36px;
+  }
+}
 </style>

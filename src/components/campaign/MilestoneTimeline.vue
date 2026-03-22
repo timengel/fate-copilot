@@ -4,6 +4,9 @@ import { DropdownVariant, type Milestone, type MilestoneType, type TagColor } fr
 import FateButton from '../shared/FateButton.vue';
 import FateDropdown from '../shared/FateDropdown.vue';
 import FateTag from '../shared/FateTag.vue';
+import { useGMModeStore } from '../../stores/gmMode';
+
+const gmModeStore = useGMModeStore();
 
 const props = defineProps<{
   milestones: Milestone[];
@@ -107,15 +110,15 @@ function cancelEdit() {
           <FateTag :color="TYPE_COLORS[m.type]" :label="TYPE_LABELS[m.type]" />
           <span class="milestone-desc">{{ m.description }}</span>
           <FateButton
-            v-if="!readonly && i === milestones.length - 1"
-            variant="danger-outline"
+            v-if="!readonly && gmModeStore.isGMMode && i === milestones.length - 1"
+            variant="danger"
             size="S"
             icon="close"
             class="milestone-remove"
             @click="emit('remove', m.id)">
             </FateButton>
           <FateButton
-            v-if="!readonly"
+            v-if="!readonly && gmModeStore.isGMMode"
             variant="ghost"
             icon="edit"
             size="S"
@@ -127,22 +130,22 @@ function cancelEdit() {
       </div>
     </div>
 
-    <div v-if="!readonly" class="milestone-add-form">
-      <FateDropdown
-        v-model="newType"
-        class="milestone-type-select"
-        :options="TYPE_OPTIONS"
-        size="S"
-        :variant="DropdownVariant.Secondary"
-      />
-      <input
-        v-model="newDescription"
-        class="milestone-desc-input"
-        placeholder="Beschreibung..."
-        @keydown.enter="submit"
-      />
-      <FateButton variant="add" icon="add" size="S" :disabled="newDescription === ''" @click="submit"></FateButton>
-    </div>
+      <div v-if="!readonly && gmModeStore.isGMMode" class="milestone-add-form">
+        <FateDropdown
+          v-model="newType"
+          class="milestone-type-select"
+          :options="TYPE_OPTIONS"
+          size="S"
+          :variant="DropdownVariant.Secondary"
+        />
+        <input
+          v-model="newDescription"
+          class="milestone-desc-input"
+          placeholder="Beschreibung..."
+          @keydown.enter="submit"
+        />
+        <FateButton variant="add" icon="add" size="S" :disabled="newDescription === ''" @click="submit"></FateButton>
+      </div>
   </div>
 </template>
 
@@ -161,7 +164,6 @@ function cancelEdit() {
 .timeline-list {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.75rem;
 }
 
 .timeline-entry {
@@ -212,6 +214,7 @@ function cancelEdit() {
   flex: 1;
   padding-bottom: 10px;
   flex-wrap: wrap;
+  min-height: 34px;
 }
 
 .milestone-desc {
@@ -220,13 +223,7 @@ function cancelEdit() {
   flex: 1;
 }
 
-.milestone-remove {
-  color: #888;
-  font-size: 0.7rem;
-}
-.milestone-remove:hover {
-  color: var(--fate-red);
-}
+
 
 .milestone-edit {
   color: #888;
@@ -248,7 +245,6 @@ function cancelEdit() {
   gap: 0.4rem;
   align-items: center;
   flex-wrap: wrap;
-  padding-top: 0.25rem;
 }
 
 .milestone-type-select {
