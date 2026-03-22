@@ -73,6 +73,16 @@ function handleCancel() {
   }
 }
 
+function toggleArchived() {
+  if (!item.value) return;
+  itemsStore.updateItem({ ...item.value, archived: !item.value.archived });
+  toastStore.show(
+    item.value.archived
+      ? `Gegenstand "${item.value.name || 'Unbenannt'}" entarchiviert`
+      : `Gegenstand "${item.value.name || 'Unbenannt'}" archiviert`,
+  );
+}
+
 function deleteItem() {
   if (!item.value) return;
   showConfirmDialog(
@@ -121,6 +131,15 @@ function deleteItem() {
         <ItemSheet :item="item">
           <template v-if="!isNew && (gmModeStore.isGMMode || !item.hidden)" #name-bar-actions>
             <FateButton icon="copy" variant="outline" size="M" @click="copyItem" />
+            <FateButton
+              v-if="gmModeStore.isGMMode"
+              :icon="item.archived ? 'unarchive' : 'archive'"
+              variant="outline"
+              size="M"
+              :aria-label="item.archived ? 'Gegenstand entarchivieren' : 'Gegenstand archivieren'"
+              :title="item.archived ? 'Entarchivieren' : 'Archivieren'"
+              @click="toggleArchived"
+            />
             <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
           </template>

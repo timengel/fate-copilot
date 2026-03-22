@@ -11,6 +11,7 @@ import type { Character, CharacterType } from '../types';
 import { createDefaultCharacter } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useToastStore } from '../stores/toast';
+import { useGMModeStore } from '../stores/gmMode';
 import { useSingleImportExport } from '../composables/useSingleImportExport';
 
 const props = defineProps<{
@@ -22,6 +23,7 @@ const route = useRoute();
 const router = useRouter();
 const charactersStore = useCharactersStore();
 const campaignsStore = useCampaignsStore();
+const gmModeStore = useGMModeStore();
 
 const id = computed(() => {
   const param = route.params.id;
@@ -87,6 +89,16 @@ function toggleEdit() {
   isEditing.value = !isEditing.value;
 }
 
+function toggleArchived() {
+  if (!character.value) return;
+  charactersStore.updateCharacter({ ...character.value, archived: !character.value.archived });
+  toastStore.show(
+    character.value.archived
+      ? `Charakter "${character.value.name || 'Unbenannt'}" entarchiviert`
+      : `Charakter "${character.value.name || 'Unbenannt'}" archiviert`,
+  );
+}
+
 function deleteCharacter() {
   if (!character.value) return;
   showConfirmDialog(
@@ -144,6 +156,15 @@ function queryCharacterType(): CharacterType {
         <CharacterSheet :character="character">
           <template v-if="!isNew" #name-bar-actions>
             <FateButton icon="copy" variant="outline" size="M" @click="copyCharacter" />
+            <FateButton
+              v-if="gmModeStore.isGMMode"
+              :icon="character.archived ? 'unarchive' : 'archive'"
+              variant="outline"
+              size="M"
+              :aria-label="character.archived ? 'Charakter entarchivieren' : 'Charakter archivieren'"
+              :title="character.archived ? 'Entarchivieren' : 'Archivieren'"
+              @click="toggleArchived"
+            />
             <FateButton class="edit-btn" icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteCharacter" />
           </template>
