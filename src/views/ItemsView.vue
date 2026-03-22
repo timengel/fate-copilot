@@ -4,11 +4,13 @@ import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
 import type { Item, Character } from '../types';
+import { DropdownVariant } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import FateDropdown from '../components/shared/FateDropdown.vue';
 import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import PasteImportDialog from '../components/shared/PasteImportDialog.vue';
@@ -20,6 +22,14 @@ const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const search = ref('');
 const showArchivedItems = ref(false);
+const sortOrder = ref('name-asc');
+
+const sortOptions = [
+  { value: 'name-asc', label: 'Name (A–Z)' },
+  { value: 'name-desc', label: 'Name (Z–A)' },
+  { value: 'dice-desc', label: 'Meiste Würfel' },
+  { value: 'creation', label: 'Reihenfolge' },
+];
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const { copyToClipboard } = useSingleImportExport();
 
@@ -40,14 +50,17 @@ function handleItemImport(entity: Character | Item) {
   router.push(`/items/${entity.id}`);
 }
 
-const filtered = computed(() =>
-  store.items.filter(
+const filtered = computed(() => {
+  const result = store.items.filter(
     (item) =>
       item.name.toLowerCase().includes(search.value.toLowerCase()) &&
       (showArchivedItems.value || !item.archived) &&
       (gmModeStore.isGMMode || !item.hidden),
-  ),
-);
+  );
+  if (sortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
+  if (sortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice));
+  return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+});
 
 const totalItems = computed(() => store.items.length);
 
@@ -91,7 +104,11 @@ function toggleArchived(item: Item) {
 
     <div class="items-input-row">
       <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
-      <FateCheckbox :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige archivierte Gegenstände" />
+      <div class="sort-archive-row">
+        <FateDropdown v-model="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" />
+        <FateCheckbox class="label-full" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige archivierte Gegenstände" />
+        <FateCheckbox class="label-short" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige Archiv" />
+      </div>
     </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
@@ -180,6 +197,39 @@ function toggleArchived(item: Item) {
   gap: 0.75rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+
+.sort-archive-row {
+  display: contents;
+}
+
+.sort-archive-row :deep(.label-short) {
+  display: none;
+}
+
+@container main (width < 480px) {
+  .sort-archive-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .sort-archive-row :deep(.fate-dropdown) {
+    flex: 1;
+    min-width: 0;
+    --dropdown-min-width: 0;
+    --dropdown-max-width: 100%;
+  }
+
+  .sort-archive-row :deep(.label-full) {
+    display: none;
+  }
+
+  .sort-archive-row :deep(.label-short) {
+    display: inline-flex;
+    flex: 1;
+  }
 }
 
 .search-input {

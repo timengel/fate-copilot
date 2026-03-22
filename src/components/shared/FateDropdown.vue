@@ -199,8 +199,9 @@ function onChange(event: Event) {
 .fate-dropdown--subtle {
   --dropdown-bg: transparent;
   --dropdown-bg-hover: rgba(0, 0, 0, 0.06);
-  --dropdown-fg: var(--fate-text);
+  --dropdown-fg: var(--fate-text-light);
   --dropdown-shadow: none;
+  border: 1px solid var(--fate-border);
 }
 
 .fate-dropdown--ghost {

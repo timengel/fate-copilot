@@ -4,11 +4,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import type { Character, CharacterType, Item } from '../types';
+import { DropdownVariant } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
+import FateDropdown from '../components/shared/FateDropdown.vue';
 import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import PasteImportDialog from '../components/shared/PasteImportDialog.vue';
@@ -21,6 +23,12 @@ const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const search = ref('');
 const showArchivedCharacters = ref(false);
+const sortOrder = ref('name-asc');
+
+const sortOptions = [
+  { value: 'name-asc', label: 'Name (A–Z)' },
+  { value: 'name-desc', label: 'Name (Z–A)' },
+];
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const { copyToClipboard } = useSingleImportExport();
 
@@ -55,8 +63,8 @@ watch(
   },
 );
 
-const filtered = computed(() =>
-  store.characters.filter((c) => {
+const filtered = computed(() => {
+  const result = store.characters.filter((c) => {
     const type = c.type ?? 'sc';
     if (c.archived && !showArchivedCharacters.value) return false;
     if (!gmModeStore.isGMMode && type === 'nsc') return false;
@@ -65,8 +73,10 @@ const filtered = computed(() =>
       (c.name.toLowerCase().includes(search.value.toLowerCase()) ||
         c.highConcept.toLowerCase().includes(search.value.toLowerCase()))
     );
-  }),
-);
+  });
+  if (sortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
+  return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+});
 
 const tabTotal = computed(() =>
   store.characters.filter((c) => {
@@ -134,7 +144,11 @@ function toggleArchived(character: Character) {
 
     <div class="characters-input-row">
       <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
-      <FateCheckbox :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige archivierte Charaktere" />
+      <div class="sort-archive-row">
+        <FateDropdown v-model="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" />
+        <FateCheckbox class="label-full" :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige archivierte Charaktere" />
+        <FateCheckbox class="label-short" :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige Archiv" />
+      </div>
     </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
@@ -245,6 +259,39 @@ function toggleArchived(character: Character) {
   gap: 0.75rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+
+.sort-archive-row {
+  display: contents;
+}
+
+.sort-archive-row :deep(.label-short) {
+  display: none;
+}
+
+@container main (width < 480px) {
+  .sort-archive-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .sort-archive-row :deep(.fate-dropdown) {
+    flex: 1;
+    min-width: 0;
+    --dropdown-min-width: 0;
+    --dropdown-max-width: 100%;
+  }
+
+  .sort-archive-row :deep(.label-full) {
+    display: none;
+  }
+
+  .sort-archive-row :deep(.label-short) {
+    display: inline-flex;
+    flex: 1;
+  }
 }
 
 .search-input {

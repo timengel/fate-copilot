@@ -59,7 +59,9 @@ export type ButtonIcon =
   | 'copy'
   | 'paste'
   | 'settings'
-  | 'reset';
+  | 'reset'
+  | 'chevrons-down'
+  | 'chevrons-up';
 
 // ============================================================
 // Domain Types

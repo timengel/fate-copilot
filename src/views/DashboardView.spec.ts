@@ -39,6 +39,97 @@ function makeItem(overrides: Partial<Item> = {}): Item {
   };
 }
 
+const filterStubs = {
+  FateButton: { template: '<button><slot /></button>' },
+  FateDropdown: {
+    props: ['modelValue', 'options', 'placeholder'],
+    template: `
+      <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+        <option value="">{{ placeholder }}</option>
+        <option v-for="o in options" :key="o.value" :value="o.value">{{ o.label }}</option>
+      </select>
+    `,
+  },
+  FateRadioButtonGroup: { template: '<div />' },
+  CharacterSheet: { template: '<div />' },
+  ItemSheet: { template: '<div />' },
+};
+
+function setupFilters() {
+  const pinia = createPinia();
+  setActivePinia(pinia);
+  return render(DashboardView, { global: { plugins: [pinia], stubs: filterStubs } });
+}
+
+describe('DashboardView inline filter collapsing', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('hides the filters body by default', () => {
+    const { container } = setupFilters();
+    expect(container.querySelector('.filters-body')).toBeNull();
+  });
+
+  it('shows the filters body when the Filter toggle is clicked', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    expect(container.querySelector('.filters-body')).toBeTruthy();
+  });
+
+  it('hides the filters body again when the Filter toggle is clicked twice', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    expect(container.querySelector('.filters-body')).toBeNull();
+  });
+
+  it('all sections are collapsed by default when filters are opened', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+  });
+
+  it('clicking a section toggle expands only that section', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    const sectionToggles = container.querySelectorAll<HTMLElement>('.filters-section-toggle');
+    await fireEvent.click(sectionToggles[1]!); // Karaktere section
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
+  });
+
+  it('clicking an expanded section toggle collapses it', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    const toggle = container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!;
+    await fireEvent.click(toggle);
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
+    await fireEvent.click(toggle);
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+  });
+
+  it('expand-all button opens the filters panel and expands all sections', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-expand-all')!);
+    expect(container.querySelector('.filters-body')).toBeTruthy();
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(5);
+  });
+
+  it('expand-all button becomes collapse-all when at least one section is expanded', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!);
+    expect(container.querySelector<HTMLElement>('.filters-expand-all')!.title).toBe('Alle zuklappen');
+  });
+
+  it('collapse-all button collapses all sections', async () => {
+    const { container } = setupFilters();
+    await fireEvent.click(container.querySelector('.filters-expand-all')!); // expand all
+    await fireEvent.click(container.querySelector('.filters-expand-all')!); // collapse all
+    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+  });
+});
+
 describe('DashboardView archived item filter', () => {
   function getItemArchivedFilter(container: HTMLElement) {
     return container.querySelectorAll<HTMLElement>('.sidebar-group .fate-checkbox')[3];
