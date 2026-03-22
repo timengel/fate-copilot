@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
@@ -84,6 +84,17 @@ function deleteCharacter(id: string, name: string) {
   );
 }
 
+function setShowArchived(val: boolean) {
+  if (!document.startViewTransition) {
+    showArchivedCharacters.value = val;
+    return;
+  }
+  document.startViewTransition(async () => {
+    showArchivedCharacters.value = val;
+    await nextTick();
+  });
+}
+
 function toggleArchived(character: Character) {
   store.updateCharacter({ ...character, archived: !character.archived });
   toastStore.show(
@@ -123,7 +134,7 @@ function toggleArchived(character: Character) {
 
     <div class="characters-input-row">
       <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
-      <FateCheckbox v-model="showArchivedCharacters" label="Zeige archivierte Charaktere" />
+      <FateCheckbox :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige archivierte Charaktere" />
     </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
@@ -141,6 +152,7 @@ function toggleArchived(character: Character) {
       <FateCard
         v-for="char in filtered"
         :key="char.id"
+        :style="`view-transition-name: char-${char.id}`"
         :color="char.color"
         :avatar="char.avatar"
         :title="char.name || 'Unbenannt'"

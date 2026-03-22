@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
@@ -59,6 +59,17 @@ function deleteItem(id: string, name: string) {
   );
 }
 
+function setShowArchived(val: boolean) {
+  if (!document.startViewTransition) {
+    showArchivedItems.value = val;
+    return;
+  }
+  document.startViewTransition(async () => {
+    showArchivedItems.value = val;
+    await nextTick();
+  });
+}
+
 function toggleArchived(item: Item) {
   store.updateItem({ ...item, archived: !item.archived });
   toastStore.show(
@@ -80,7 +91,7 @@ function toggleArchived(item: Item) {
 
     <div class="items-input-row">
       <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
-      <FateCheckbox v-model="showArchivedItems" label="Zeige archivierte Gegenstände" />
+      <FateCheckbox :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige archivierte Gegenstände" />
     </div>
 
     <div v-if="filtered.length === 0" class="empty-state">
@@ -91,6 +102,7 @@ function toggleArchived(item: Item) {
       <FateCard
         v-for="item in filtered"
         :key="item.id"
+        :style="`view-transition-name: item-${item.id}`"
         :color="item.color"
         :avatar="item.avatar"
         :title="item.name || 'Unbenannt'"
