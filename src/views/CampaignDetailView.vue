@@ -166,8 +166,8 @@ function navigateToAssignment(path: string) {
 <template>
   <div class="detail-view" :style="colorVars">
     <div v-if="!campaign && !isNew" class="not-found">
-      Kampagne nicht gefunden.
-      <FateButton variant="link" @click="router.push('/campaigns')">← Zurück</FateButton>
+      <p class="not-found-title">Kampagne nicht gefunden</p>
+      <FateButton variant="secondary" @click="router.push('/campaigns')">← Zurück zur Übersicht</FateButton>
     </div>
 
     <template v-else-if="campaign">
@@ -389,9 +389,18 @@ function navigateToAssignment(path: string) {
 }
 
 .not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 2rem;
   text-align: center;
+}
+
+.not-found-title {
+  font-size: 1.1rem;
   color: var(--fate-text-light);
+  margin: 0;
 }
 
 .campaign-detail-header {

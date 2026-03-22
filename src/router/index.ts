@@ -30,6 +30,7 @@ const router = createRouter({
     { path: '/items/:id/edit', component: ItemDetailView, props: { editMode: true } },
     { path: '/skills', component: SkillsView },
     { path: '/settings', component: SettingsView },
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 });
 

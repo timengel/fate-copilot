@@ -89,8 +89,8 @@ function deleteItem() {
 <template>
   <div class="detail-view">
     <div v-if="!item && !isNew" class="not-found">
-      Gegenstand nicht gefunden.
-      <FateButton variant="link" @click="router.push('/items')">← Zurück</FateButton>
+      <p class="not-found-title">Gegenstand nicht gefunden</p>
+      <FateButton variant="secondary" @click="router.push('/items')">← Zurück zur Übersicht</FateButton>
     </div>
 
     <template v-else-if="item">
@@ -159,8 +159,17 @@ function deleteItem() {
 }
 
 .not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 2rem;
   text-align: center;
+}
+
+.not-found-title {
+  font-size: 1.1rem;
   color: var(--fate-text-light);
+  margin: 0;
 }
 </style>

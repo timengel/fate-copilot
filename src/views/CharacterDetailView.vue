@@ -112,8 +112,8 @@ function queryCharacterType(): CharacterType {
 <template>
   <div class="detail-view">
     <div v-if="!character && !isNew" class="not-found">
-      Charakter nicht gefunden.
-      <FateButton variant="link" @click="router.push(backPath)">← Zurück</FateButton>
+      <p class="not-found-title">Charakter nicht gefunden</p>
+      <FateButton variant="secondary" @click="router.push(backPath)">← Zurück zur Übersicht</FateButton>
     </div>
 
     <template v-else-if="character">
@@ -181,9 +181,18 @@ function queryCharacterType(): CharacterType {
 }
 
 .not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 2rem;
   text-align: center;
+}
+
+.not-found-title {
+  font-size: 1.1rem;
   color: var(--fate-text-light);
+  margin: 0;
 }
 
 @container main (width < 480px) {
