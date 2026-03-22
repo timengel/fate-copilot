@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
@@ -123,6 +123,18 @@ watch(layout, (val) => {
   document.body.classList.toggle('dashboard-grid-active', val === 'grid');
 }, { immediate: true });
 
+function setLayout(val: string) {
+  if (val !== 'list' && val !== 'grid') return;
+  if (!document.startViewTransition) {
+    layout.value = val;
+    return;
+  }
+  document.startViewTransition(async () => {
+    layout.value = val;
+    await nextTick();
+  });
+}
+
 onMounted(() => {
   // sidebar-no-transition disables the CSS transition on mount so the initial
   // padding-left jump is not animated. Double rAF ensures at least one frame
@@ -211,7 +223,8 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Layout</div>
           <FateRadioButtonGroup
-            v-model="layout"
+            :model-value="layout"
+            @update:model-value="setLayout"
             :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
           />
         </div>
@@ -265,7 +278,8 @@ onUnmounted(() => {
         <div class="filters-inline-row">
           <span class="filters-inline-label">Layout:</span>
           <FateRadioButtonGroup
-            v-model="layout"
+            :model-value="layout"
+            @update:model-value="setLayout"
             :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
           />
         </div>
@@ -285,7 +299,7 @@ onUnmounted(() => {
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
-      <div v-for="character in characters" :key="character.id" class="dashboard-entry">
+      <div v-for="character in characters" :key="character.id" :style="`view-transition-name: char-${character.id}`" class="dashboard-entry">
         <CharacterSheet
           v-if="editingCharacterId === character.id"
           ref="characterFormRef"
@@ -319,7 +333,7 @@ onUnmounted(() => {
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
-      <div v-for="item in items" :key="item.id" class="dashboard-entry">
+      <div v-for="item in items" :key="item.id" :style="`view-transition-name: item-${item.id}`" class="dashboard-entry">
         <ItemSheet
           v-if="editingItemId === item.id"
           ref="itemFormRef"

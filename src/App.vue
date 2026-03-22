@@ -182,7 +182,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0 0.55rem;
+  padding: 0 0.8rem;
 }
 
 .nav-link-settings-label {
