@@ -489,9 +489,11 @@ defineExpose({ save });
   padding: 0.6rem 0.75rem;
   background: var(--fate-blue-dark);
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .item-name-text {
+  flex: 1 1 auto;
   font-size: 1.05rem;
   font-weight: 700;
   color: white;
@@ -506,6 +508,7 @@ defineExpose({ save });
   align-items: center;
   gap: 0.4rem;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .item-type-badge {
