@@ -12,6 +12,7 @@ import { useSkillsStore } from '../stores/skills';
 import { useDashboardPreferencesStore } from '../stores/dashboardPreferences';
 import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { useRouter } from 'vue-router';
 import { ToggleVariant } from '@fate/types';
 
 const gmModeStore = useGMModeStore();
@@ -21,6 +22,7 @@ const itemsStore = useItemsStore();
 const skillsStore = useSkillsStore();
 const dashboardStore = useDashboardPreferencesStore();
 const toastStore = useToastStore();
+const router = useRouter();
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 
 function handleConfirm() {
@@ -46,6 +48,7 @@ function clearAllData() {
       gmModeStore.reset();
       dashboardStore.reset();
       toastStore.show('Alle Daten wurden gelöscht');
+      router.push('/');
     },
   );
 }
