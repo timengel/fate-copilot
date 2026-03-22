@@ -34,7 +34,7 @@ const toastStore = useToastStore();
 }
 
 .fate-toast--success {
-  background: var(--fate-blue);
+  background: var(--fate-btn-primary-bg, var(--fate-blue));
 }
 
 .fate-toast--error {
