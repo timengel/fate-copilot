@@ -1,15 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import DashboardView from '../views/DashboardView.vue';
-
-const CharactersView = () => import('../views/CharactersView.vue');
-const CharacterDetailView = () => import('../views/CharacterDetailView.vue');
-const CampaignsView = () => import('../views/CampaignsView.vue');
-const CampaignDetailView = () => import('../views/CampaignDetailView.vue');
-const ItemsView = () => import('../views/ItemsView.vue');
-const ItemDetailView = () => import('../views/ItemDetailView.vue');
-const SkillsView = () => import('../views/SkillsView.vue');
-const SettingsView = () => import('../views/SettingsView.vue');
+import CharactersView from '../views/CharactersView.vue';
+import CharacterDetailView from '../views/CharacterDetailView.vue';
+import CampaignsView from '../views/CampaignsView.vue';
+import CampaignDetailView from '../views/CampaignDetailView.vue';
+import ItemsView from '../views/ItemsView.vue';
+import ItemDetailView from '../views/ItemDetailView.vue';
+import SkillsView from '../views/SkillsView.vue';
+import SettingsView from '../views/SettingsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
