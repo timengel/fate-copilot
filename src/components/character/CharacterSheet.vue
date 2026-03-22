@@ -789,7 +789,6 @@ defineExpose({ save });
   font-size: 0.875rem;
   color: var(--fate-text);
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .text-area-input {
@@ -895,7 +894,6 @@ defineExpose({ save });
   display: grid;
   grid-template-columns: max-content 1fr;
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .stress-section {
@@ -1018,7 +1016,6 @@ defineExpose({ save });
   gap: 0.75rem;
   padding: 0.75rem;
   background: color-mix(in srgb, var(--fate-white) 88%, var(--fate-blue-light) 12%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 /* NSC hidden in Player View */
