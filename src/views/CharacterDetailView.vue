@@ -157,7 +157,6 @@ function queryCharacterType(): CharacterType {
           <template v-if="!isNew" #name-bar-actions>
             <FateButton icon="copy" variant="outline" size="M" @click="copyCharacter" />
             <FateButton
-              v-if="gmModeStore.isGMMode"
               :icon="character.archived ? 'unarchive' : 'archive'"
               variant="outline"
               size="M"
@@ -166,7 +165,7 @@ function queryCharacterType(): CharacterType {
               @click="toggleArchived"
             />
             <FateButton class="edit-btn" icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
-            <FateButton icon="delete" variant="danger" size="M" @click="deleteCharacter" />
+            <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="M" @click="deleteCharacter" />
           </template>
         </CharacterSheet>
 

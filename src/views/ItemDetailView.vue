@@ -132,7 +132,6 @@ function deleteItem() {
           <template v-if="!isNew && (gmModeStore.isGMMode || !item.hidden)" #name-bar-actions>
             <FateButton icon="copy" variant="outline" size="M" @click="copyItem" />
             <FateButton
-              v-if="gmModeStore.isGMMode"
               :icon="item.archived ? 'unarchive' : 'archive'"
               variant="outline"
               size="M"
@@ -141,7 +140,7 @@ function deleteItem() {
               @click="toggleArchived"
             />
             <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
-            <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
+            <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="M" @click="deleteItem" />
           </template>
         </ItemSheet>
 

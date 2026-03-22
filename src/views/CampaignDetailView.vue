@@ -177,7 +177,7 @@ function navigateToAssignment(path: string) {
         </div>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
-            <FateButton variant="secondary" icon="edit" @click="isEditing = true" />
+            <FateButton variant="secondary" icon="edit" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton v-if="gmModeStore.isGMMode" variant="danger" icon="delete" @click="deleteCampaign" />
           </template>
         </div>
@@ -572,6 +572,12 @@ function navigateToAssignment(path: string) {
 
   .detail-toolbar {
     flex-wrap: nowrap;
+  }
+
+  .detail-toolbar :deep(.fate-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
   }
 
   .btn-label {

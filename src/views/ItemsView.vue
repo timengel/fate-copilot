@@ -150,7 +150,6 @@ function toggleArchived(item: Item) {
           <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(item)" />
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/items/${item.id}/edit`)" />
           <FateButton
-            v-if="gmModeStore.isGMMode"
             :icon="item.archived ? 'unarchive' : 'archive'"
             variant="secondary"
             size="S"
@@ -158,7 +157,7 @@ function toggleArchived(item: Item) {
             :title="item.archived ? 'Entarchivieren' : 'Archivieren'"
             @click.stop="toggleArchived(item)"
           />
-          <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteItem(item.id, item.name)" />
+          <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="S" @click.stop="deleteItem(item.id, item.name)" />
         </template>
       </FateCard>
     </div>
