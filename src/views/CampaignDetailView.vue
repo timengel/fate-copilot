@@ -178,7 +178,7 @@ function navigateToAssignment(path: string) {
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
             <FateButton variant="secondary" icon="edit" @click="isEditing = true" />
-            <FateButton variant="danger" icon="delete" @click="deleteCampaign" />
+            <FateButton v-if="gmModeStore.isGMMode" variant="danger" icon="delete" @click="deleteCampaign" />
           </template>
         </div>
       </div>

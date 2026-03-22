@@ -79,7 +79,7 @@ function deleteCampaign(id: string, name: string) {
             </template>
             <template #actions>
               <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/campaigns/${campaign.id}/edit`)" />
-              <FateButton icon="delete" variant="danger" size="S" @click.stop="deleteCampaign(campaign.id, campaign.name)" />
+              <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="S" @click.stop="deleteCampaign(campaign.id, campaign.name)" />
             </template>
           </FateCard>
         </div>
