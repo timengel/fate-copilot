@@ -28,7 +28,6 @@ const sortOptions = [
   { value: 'name-asc', label: 'Name (A–Z)' },
   { value: 'name-desc', label: 'Name (Z–A)' },
   { value: 'dice-desc', label: 'Meiste Würfel' },
-  { value: 'creation', label: 'Reihenfolge' },
 ];
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const { copyToClipboard } = useSingleImportExport();
@@ -58,7 +57,7 @@ const filtered = computed(() => {
       (gmModeStore.isGMMode || !item.hidden),
   );
   if (sortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
-  if (sortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice));
+  if (sortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'));
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
@@ -79,6 +78,17 @@ function setShowArchived(val: boolean) {
   }
   document.startViewTransition(async () => {
     showArchivedItems.value = val;
+    await nextTick();
+  });
+}
+
+function setSortOrder(val: string) {
+  if (!document.startViewTransition) {
+    sortOrder.value = val;
+    return;
+  }
+  document.startViewTransition(async () => {
+    sortOrder.value = val;
     await nextTick();
   });
 }
@@ -105,7 +115,7 @@ function toggleArchived(item: Item) {
     <div class="items-input-row">
       <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
       <div class="sort-archive-row">
-        <FateDropdown v-model="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" />
+        <FateDropdown :model-value="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" @update:model-value="setSortOrder" />
         <FateCheckbox class="label-full" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige archivierte Gegenstände" />
         <FateCheckbox class="label-short" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige Archiv" />
       </div>

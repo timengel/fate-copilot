@@ -103,7 +103,7 @@ const items = computed(() => {
     return true;
   });
   if (itemSortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
-  if (itemSortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice));
+  if (itemSortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'));
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
@@ -148,19 +148,20 @@ watch(layout, (val) => {
   document.body.classList.toggle('dashboard-grid-active', val === 'grid');
 }, { immediate: true });
 
+function withViewTransition(fn: () => void) {
+  if (!document.startViewTransition) { fn(); return; }
+  document.startViewTransition(async () => { fn(); await nextTick(); });
+}
+
 function setLayout(val: string) {
   if (val !== 'list' && val !== 'grid') return;
-  if (!document.startViewTransition) {
-    layout.value = val;
-    return;
-  }
-  document.startViewTransition(async () => {
-    layout.value = val;
-    await nextTick();
-  });
+  withViewTransition(() => { layout.value = val; });
 }
 
 const anyExpanded = computed(() => Object.values(filterSections.value).some(Boolean));
+
+function setCharSortOrder(val: string) { withViewTransition(() => { charSortOrder.value = val; }); }
+function setItemSortOrder(val: string) { withViewTransition(() => { itemSortOrder.value = val; }); }
 
 function expandAllSections() {
   filtersOpen.value = true;
@@ -237,7 +238,7 @@ onUnmounted(() => {
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Charaktere</div>
-          <FateDropdown v-model="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" />
+          <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
           <FateCheckbox v-model="showSC" label="Zeige SC" />
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="Zeige NSC" />
           <FateCheckbox v-model="showArchivedCharacters" label="Archiviert" />
@@ -245,7 +246,7 @@ onUnmounted(() => {
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Items</div>
-          <FateDropdown v-model="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" />
+          <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
           <FateCheckbox v-model="showItems" label="Zeige Items" />
           <FateCheckbox v-model="showArchivedItems" label="Archiviert" />
         </div>
@@ -313,7 +314,7 @@ onUnmounted(() => {
             <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.charaktere }" />
           </button>
           <div v-if="filterSections.charaktere" class="filters-section-body">
-            <FateDropdown v-model="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" />
+            <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
             <FateCheckbox v-model="showSC" label="SC" />
             <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="NSC" />
             <FateCheckbox v-model="showArchivedCharacters" label="Archiviert" />
@@ -326,7 +327,7 @@ onUnmounted(() => {
             <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.items }" />
           </button>
           <div v-if="filterSections.items" class="filters-section-body">
-            <FateDropdown v-model="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" />
+            <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
             <FateCheckbox v-model="showItems" label="Zeige Items" />
             <FateCheckbox v-model="showArchivedItems" label="Archiviert" />
           </div>

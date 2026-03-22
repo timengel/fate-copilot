@@ -105,6 +105,17 @@ function setShowArchived(val: boolean) {
   });
 }
 
+function setSortOrder(val: string) {
+  if (!document.startViewTransition) {
+    sortOrder.value = val;
+    return;
+  }
+  document.startViewTransition(async () => {
+    sortOrder.value = val;
+    await nextTick();
+  });
+}
+
 function toggleArchived(character: Character) {
   store.updateCharacter({ ...character, archived: !character.archived });
   toastStore.show(
@@ -145,7 +156,7 @@ function toggleArchived(character: Character) {
     <div class="characters-input-row">
       <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
       <div class="sort-archive-row">
-        <FateDropdown v-model="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" />
+        <FateDropdown :model-value="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" @update:model-value="setSortOrder" />
         <FateCheckbox class="label-full" :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige archivierte Charaktere" />
         <FateCheckbox class="label-short" :model-value="showArchivedCharacters" @update:model-value="setShowArchived" label="Zeige Archiv" />
       </div>
