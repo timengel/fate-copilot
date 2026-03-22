@@ -115,11 +115,13 @@ function toggle(index: number) {
 
 :global([data-theme="dark"] .stress-label) {
   background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
+  color: white;
 }
 
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme="light"]) .stress-label) {
     background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
+    color: white;
   }
 }
 </style>
