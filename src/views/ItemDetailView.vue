@@ -12,6 +12,7 @@ import { createDefaultItem } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useToastStore } from '../stores/toast';
 import { useGMModeStore } from '../stores/gmMode';
+import { useSingleImportExport } from '../composables/useSingleImportExport';
 
 const props = defineProps<{
   isNew?: boolean;
@@ -29,6 +30,14 @@ const isEditing = ref(props.isNew || props.editMode || false);
 const itemSheetRef = ref<InstanceType<typeof ItemSheet> | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();
+const { copyToClipboard } = useSingleImportExport();
+
+async function copyItem() {
+  if (item.value) {
+    await copyToClipboard(item.value);
+    toastStore.show('Gegenstand kopiert');
+  }
+}
 
 const item = computed(() => {
   if (props.isNew) return createDefaultItem();
@@ -111,6 +120,7 @@ function deleteItem() {
       <template v-else>
         <ItemSheet :item="item">
           <template v-if="!isNew && (gmModeStore.isGMMode || !item.hidden)" #name-bar-actions>
+            <FateButton icon="copy" variant="outline" size="M" @click="copyItem" />
             <FateButton icon="edit" variant="outline" size="M" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteItem" />
           </template>

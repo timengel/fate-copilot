@@ -11,6 +11,7 @@ import type { Character, CharacterType } from '../types';
 import { createDefaultCharacter } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useToastStore } from '../stores/toast';
+import { useSingleImportExport } from '../composables/useSingleImportExport';
 
 const props = defineProps<{
   isNew?: boolean;
@@ -30,6 +31,14 @@ const isEditing = ref(props.isNew || props.editMode || false);
 const charSheetRef = ref<InstanceType<typeof CharacterSheet> | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const toastStore = useToastStore();
+const { copyToClipboard } = useSingleImportExport();
+
+async function copyCharacter() {
+  if (character.value) {
+    await copyToClipboard(character.value);
+    toastStore.show('Charakter kopiert');
+  }
+}
 
 const character = computed(() => {
   if (props.isNew) {
@@ -134,6 +143,7 @@ function queryCharacterType(): CharacterType {
       <template v-else>
         <CharacterSheet :character="character">
           <template v-if="!isNew" #name-bar-actions>
+            <FateButton icon="copy" variant="outline" size="M" @click="copyCharacter" />
             <FateButton class="edit-btn" icon="edit" variant="outline" size="M" @click="toggleEdit"><span class="btn-label">Bearbeiten</span></FateButton>
             <FateButton icon="delete" variant="danger" size="M" @click="deleteCharacter" />
           </template>

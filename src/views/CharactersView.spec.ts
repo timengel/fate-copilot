@@ -5,7 +5,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import type { Character } from '../types';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockPush = vi.fn();
 vi.mock('vue-router', () => ({
@@ -92,7 +92,7 @@ describe('CharactersView – card interactions', () => {
 
   it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
     const { container, charId } = setup();
-    const [editBtn] = container.querySelectorAll('.fate-card__actions button');
+    const [, editBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(editBtn!);
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(`/characters/${charId}/edit`);
@@ -100,7 +100,7 @@ describe('CharactersView – card interactions', () => {
 
   it('clicking the delete button does not trigger navigation', async () => {
     const { container } = setup();
-    const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
+    const [, , deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
   });
@@ -123,5 +123,58 @@ describe('CharactersView – card interactions', () => {
     const { getByLabelText, getByText } = setupGM({ archived: true });
     await fireEvent.click(getByText('Zeige archivierte Charaktere'));
     expect(getByLabelText('Charakter entarchivieren')).toBeTruthy();
+  });
+
+  describe('copy button', () => {
+    let writeText: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('copy button is the first action button on a card', () => {
+      const { container } = setup();
+      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
+      expect(copyBtn).toBeTruthy();
+    });
+
+    it('clicking the copy button calls clipboard.writeText', async () => {
+      const { container } = setup();
+      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
+      await fireEvent.click(copyBtn!);
+      expect(writeText).toHaveBeenCalledOnce();
+    });
+
+    it('clipboard JSON contains the character name', async () => {
+      const { container } = setup();
+      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
+      await fireEvent.click(copyBtn!);
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.name).toBe('Test Charakter');
+    });
+
+    it('clipboard JSON contains the correct character type', async () => {
+      const { container } = setup();
+      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
+      await fireEvent.click(copyBtn!);
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.type).toBe('sc');
+    });
+
+    it('clicking the copy button does not trigger navigation', async () => {
+      const { container } = setup();
+      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
+      await fireEvent.click(copyBtn!);
+      expect(mockPush).not.toHaveBeenCalled();
+    });
   });
 });

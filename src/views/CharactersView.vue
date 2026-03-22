@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
-import type { Character, CharacterType } from '../types';
+import type { Character, CharacterType, Item } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
@@ -11,6 +11,8 @@ import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
+import PasteImportDialog from '../components/shared/PasteImportDialog.vue';
+import { useSingleImportExport } from '../composables/useSingleImportExport';
 
 const router = useRouter();
 const route = useRoute();
@@ -20,6 +22,24 @@ const toastStore = useToastStore();
 const search = ref('');
 const showArchivedCharacters = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+const { copyToClipboard } = useSingleImportExport();
+
+async function handleCopy(char: Character) {
+  try {
+    await copyToClipboard(char);
+    toastStore.show('Charakter kopiert');
+  } catch {
+    toastStore.show('Kopieren fehlgeschlagen');
+  }
+}
+const showImportDialog = ref(false);
+
+function handleCharacterImport(entity: Character | Item) {
+  store.addCharacter(entity as Character);
+  toastStore.show('Charakter importiert');
+  showImportDialog.value = false;
+  router.push(`/characters/${entity.id}`);
+}
 
 const activeTab = computed<CharacterType>(() => (route.query.tab === 'nsc' ? 'nsc' : 'sc'));
 
@@ -77,7 +97,10 @@ function toggleArchived(character: Character) {
 <template>
   <div class="list-view">
     <FateHeader title="Charaktere">
-      <FateButton variant="primary" icon="add" @click="router.push(`/characters/new?type=${activeTab}`)">Neuer Charakter</FateButton>
+      <div class="header-actions">
+        <FateButton variant="secondary" icon="paste" @click="showImportDialog = true"><span class="btn-label">Importieren</span></FateButton>
+        <FateButton variant="primary" icon="add" @click="router.push(`/characters/new?type=${activeTab}`)"><span class="btn-label">Neuer Charakter</span></FateButton>
+      </div>
     </FateHeader>
 
     <div class="tab-bar">
@@ -131,6 +154,7 @@ function toggleArchived(character: Character) {
           <span v-if="char.trouble" class="card-trouble"><em>{{ char.trouble }}</em></span>
         </template>
         <template #actions>
+          <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(char)" />
           <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/characters/${char.id}/edit`)" />
           <FateButton
             v-if="gmModeStore.isGMMode"
@@ -147,6 +171,13 @@ function toggleArchived(character: Character) {
     </div>
   </div>
 
+  <PasteImportDialog
+    v-if="showImportDialog"
+    entity-type="character"
+    @import="handleCharacterImport"
+    @cancel="showImportDialog = false"
+  />
+
   <ConfirmDialog
     v-if="confirmDialog"
     :title="confirmDialog.title"
@@ -160,6 +191,23 @@ function toggleArchived(character: Character) {
 </template>
 
 <style scoped>
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@container main (width < 480px) {
+  .header-actions .btn-label {
+    display: none;
+  }
+
+  .header-actions :deep(.fate-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
+  }
+}
+
 .card-trouble {
   display: -webkit-box;
   -webkit-line-clamp: 2;
