@@ -33,7 +33,7 @@ const {
   visibleSections,
 } = storeToRefs(useDashboardPreferencesStore());
 
-const sidebarCollapsed = ref(false);
+const sidebarCollapsed = ref(sessionStorage.getItem('sidebarCollapsed') === 'true');
 const filtersOpen = ref(false);
 const filterSections = ref({
   kampagne: false,
@@ -142,6 +142,7 @@ function saveItemEditing() {
 
 watch(sidebarCollapsed, (val) => {
   document.body.classList.toggle('sidebar-collapsed', val);
+  sessionStorage.setItem('sidebarCollapsed', String(val));
 });
 
 watch(layout, (val) => {
@@ -190,6 +191,7 @@ onMounted(() => {
   // padding-left jump is not animated. Double rAF ensures at least one frame
   // has been painted before re-enabling the transition.
   document.body.classList.add('has-dashboard-sidebar', 'sidebar-no-transition');
+  if (sidebarCollapsed.value) document.body.classList.add('sidebar-collapsed');
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       document.body.classList.remove('sidebar-no-transition');
@@ -206,24 +208,32 @@ onUnmounted(() => {
 <template>
   <div class="dashboard-view">
     <!-- Sidebar (desktop) -->
+    <FateButton
+      v-if="sidebarCollapsed"
+      class="sidebar-lash"
+      variant="subtle"
+      size="M"
+      icon="chevron-right"
+      title="Sidebar öffnen"
+      @click="sidebarCollapsed = false"
+    />
     <aside
       class="dashboard-sidebar"
       :class="{ collapsed: sidebarCollapsed }"
-      @click="sidebarCollapsed && (sidebarCollapsed = false)"
     >
       <div class="sidebar-header">
         <h3 class="sidebar-title" v-show="!sidebarCollapsed">Filter</h3>
         <FateButton
           class="sidebar-toggle"
           variant="subtle"
-          size="S"
+          size="M"
           :icon="sidebarCollapsed ? 'chevron-right' : 'chevron-left'"
           :title="sidebarCollapsed ? 'Sidebar öffnen' : 'Sidebar schließen'"
           @click.stop="sidebarCollapsed = !sidebarCollapsed"
         />
       </div>
 
-      <div v-show="!sidebarCollapsed">
+      <div v-show="!sidebarCollapsed" class="sidebar-content">
         <div class="sidebar-group">
           <div class="sidebar-group-label">Kampagne</div>
           <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
@@ -471,7 +481,7 @@ onUnmounted(() => {
 }
 
 .dashboard-sidebar :deep(.campaign-dropdown.fate-dropdown) {
-  width: 128px;
+  width: 165px;
 }
 
 :deep(.campaign-dropdown .fate-dropdown__select) {
@@ -512,28 +522,66 @@ onUnmounted(() => {
   left: 0;
   top: 56px;
   bottom: 0;
-  width: 160px;
+  width: 188px;
   background: var(--fate-white);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  padding: 1.25rem 1rem;
   overflow: hidden;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
   transition:
-    width 0.2s ease,
-    padding 0.2s ease;
+    transform 0.2s ease,
+    height 0.2s ease,
+    border-radius 0.2s ease;
+}
+
+.sidebar-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  padding-bottom: 1.25rem;
+  padding-left: 0.5rem;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 8px;
 }
 
 .dashboard-sidebar.collapsed {
-  width: 36px;
-  padding: 1.25rem 0.5rem;
+  transform: translateX(-188px);
+}
+
+.sidebar-lash {
+  position: fixed;
+  left: 0;
+  top: 62px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fate-white);
+  border: none;
+  border-radius: 0 6px 6px 0;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.12);
+  color: var(--fate-text-light);
   cursor: pointer;
+}
+
+.sidebar-lash:hover {
+  background: var(--fate-blue-light);
+  color: var(--fate-blue);
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.5rem 0.3rem 0.7rem;
+  border-bottom: 1px solid var(--fate-border);
 }
 
 .sidebar-title {
@@ -551,6 +599,7 @@ onUnmounted(() => {
 }
 
 
+
 .dashboard-sidebar.collapsed .sidebar-toggle {
   width: 100%;
   justify-content: center;
@@ -559,6 +608,10 @@ onUnmounted(() => {
 .sidebar-group {
   margin-top: 1rem;
   min-width: 0;
+}
+
+.sidebar-group:first-child {
+  margin-top: 0.75rem;
 }
 
 .sidebar-group :deep(.campaign-dropdown) {
@@ -652,6 +705,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--fate-border);
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .filters-section + .filters-section {
