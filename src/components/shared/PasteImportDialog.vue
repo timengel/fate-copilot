@@ -61,7 +61,7 @@ function handleImport() {
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--fate-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,7 +69,7 @@ function handleImport() {
 }
 
 .dialog-box {
-  background: white;
+  background: var(--fate-white);
   border-radius: 8px;
   padding: 1.5rem;
   max-width: 560px;
@@ -100,7 +100,7 @@ function handleImport() {
   font-size: 0.8rem;
   font-family: monospace;
   color: var(--fate-text);
-  background: #fafafa;
+  background: var(--fate-bg);
   resize: vertical;
   outline: none;
   box-sizing: border-box;

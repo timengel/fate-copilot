@@ -252,6 +252,6 @@ function toggleArchived(item: Item) {
   border-radius: 4px;
   font-size: 0.875rem;
   color: var(--fate-text);
-  background: white;
+  background: var(--fate-white);
 }
 </style>

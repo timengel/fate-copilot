@@ -314,7 +314,7 @@ function toggleArchived(character: Character) {
   border-radius: 4px;
   font-size: 0.875rem;
   color: var(--fate-text);
-  background: white;
+  background: var(--fate-white);
 }
 
 .tab-bar {
@@ -342,12 +342,12 @@ function toggleArchived(character: Character) {
 }
 
 .tab-btn:hover {
-  color: var(--fate-blue);
+  color: var(--fate-heading);
 }
 
 .tab-btn--active {
-  color: var(--fate-blue);
-  border-bottom-color: var(--fate-blue);
+  color: var(--fate-heading);
+  border-bottom-color: var(--fate-heading);
   font-weight: 700;
 }
 </style>

@@ -47,7 +47,7 @@ const emit = defineEmits<{
   height: 20px;
   border-radius: 50%;
   border: 1.5px solid var(--fate-border);
-  background: white;
+  background: var(--fate-white);
   transition: border-color 0.15s;
   display: flex;
   align-items: center;

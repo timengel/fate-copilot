@@ -174,11 +174,6 @@ function queryCharacterType(): CharacterType {
 </template>
 
 <style scoped>
-.back-btn {
-  --fate-blue: #1c9ed6;
-  --fate-blue-dark: #1480b0;
-  --fate-blue-light: #e8f4fb;
-}
 
 .not-found {
   display: flex;

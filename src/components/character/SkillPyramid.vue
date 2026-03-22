@@ -320,4 +320,28 @@ function removeCol() {
     min-width: 55px;
   }
 }
+
+:global([data-theme="dark"] .skill-value--filled),
+:global([data-theme="dark"] .skill-select),
+:global([data-theme="dark"] .skill-select--filled),
+:global([data-theme="dark"] .skill-input:focus) {
+  background: color-mix(in srgb, var(--fate-blue) 20%, var(--fate-white) 80%);
+}
+
+:global([data-theme="dark"] .skill-select:focus) {
+  background: color-mix(in srgb, var(--fate-blue) 35%, var(--fate-white) 65%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .skill-value--filled),
+  :global(:root:not([data-theme="light"]) .skill-select),
+  :global(:root:not([data-theme="light"]) .skill-select--filled),
+  :global(:root:not([data-theme="light"]) .skill-input:focus) {
+    background: color-mix(in srgb, var(--fate-blue) 20%, var(--fate-white) 80%);
+  }
+
+  :global(:root:not([data-theme="light"]) .skill-select:focus) {
+    background: color-mix(in srgb, var(--fate-blue) 35%, var(--fate-white) 65%);
+  }
+}
 </style>

@@ -553,7 +553,7 @@ defineExpose({ save });
 .character-sheet {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: color-mix(in srgb, white 72%, var(--fate-blue-light) 28%);
+  background: color-mix(in srgb, var(--fate-white) 72%, var(--fate-blue-light) 28%);
   border-radius: 6px;
   overflow: clip;
   font-size: 0.875rem;
@@ -703,7 +703,7 @@ defineExpose({ save });
 }
 
 .field-row--stats .field-stat + .field-stat {
-  border-left: 1px solid color-mix(in srgb, var(--fate-blue) 28%, white 72%);
+  border-left: 1px solid color-mix(in srgb, var(--fate-blue) 28%, var(--fate-white) 72%);
   padding-left: 1rem;
 }
 
@@ -719,9 +719,9 @@ defineExpose({ save });
 
 /* View mode field display */
 .field-value {
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
-  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
   min-width: 120px;
   min-height: 1.4em;
   padding: 0.3rem 0.45rem;
@@ -758,13 +758,13 @@ defineExpose({ save });
 
 /* Edit mode field inputs */
 .field-input {
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
   padding: 0.3rem 0.45rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
+  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
   width: 100%;
   outline: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -772,7 +772,7 @@ defineExpose({ save });
 
 .field-input:focus {
   border-color: var(--fate-blue);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, white 30%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, var(--fate-white) 30%);
 }
 
 .field-textarea {
@@ -788,20 +788,20 @@ defineExpose({ save });
   white-space: pre-wrap;
   font-size: 0.875rem;
   color: var(--fate-text);
-  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .text-area-input {
   field-sizing: content;
   width: 100%;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
+  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
   resize: vertical;
   outline: none;
   min-height: 80px;
@@ -835,14 +835,14 @@ defineExpose({ save });
 }
 
 .stunt-name-input {
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
   padding: 0.3rem 0.45rem;
   font-size: 0.8rem;
   font-family: inherit;
   font-weight: 600;
   color: var(--fate-text);
-  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
+  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
   outline: none;
   width: 100%;
 }
@@ -850,13 +850,13 @@ defineExpose({ save });
 .stunt-desc-textarea {
   field-sizing: content;
   resize: none;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
   padding: 0.3rem 0.45rem;
   font-size: 0.75rem;
   font-family: inherit;
   color: var(--fate-text-light);
-  background: color-mix(in srgb, white 94%, var(--fate-blue-light) 6%);
+  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
   outline: none;
   width: 100%;
   min-height: 1.5em;
@@ -894,7 +894,7 @@ defineExpose({ save });
 .sheet-stress-row {
   display: grid;
   grid-template-columns: max-content 1fr;
-  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
@@ -947,7 +947,7 @@ defineExpose({ save });
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
-  background: color-mix(in srgb, white 91%, var(--fate-blue-light) 9%);
+  background: color-mix(in srgb, var(--fate-white) 91%, var(--fate-blue-light) 9%);
 }
 
 .consequence-config-item {
@@ -955,7 +955,7 @@ defineExpose({ save });
   align-items: center;
   gap: 3px;
   padding-right: 0.75rem;
-  border-right: 1px solid color-mix(in srgb, var(--fate-blue-light) 68%, white 32%);
+  border-right: 1px solid color-mix(in srgb, var(--fate-blue-light) 68%, var(--fate-white) 32%);
 }
 
 .consequence-config-item:last-child {
@@ -966,9 +966,9 @@ defineExpose({ save });
 .consequence-config-btn {
   width: 24px;
   height: 24px;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, white 28%);
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
-  background: color-mix(in srgb, white 92%, var(--fate-blue-light) 8%);
+  background: color-mix(in srgb, var(--fate-white) 92%, var(--fate-blue-light) 8%);
   color: var(--fate-text);
   font-size: 1rem;
   line-height: 1;
@@ -998,7 +998,7 @@ defineExpose({ save });
 
 /* GM notes section */
 .gm-notes-section {
-  background: color-mix(in srgb, white 90%, var(--fate-blue-light) 10%);
+  background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
 }
 
 .gm-options-divider {
@@ -1017,7 +1017,7 @@ defineExpose({ save });
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: color-mix(in srgb, white 88%, var(--fate-blue-light) 12%);
+  background: color-mix(in srgb, var(--fate-white) 88%, var(--fate-blue-light) 12%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
@@ -1151,6 +1151,46 @@ defineExpose({ save });
     padding: 0;
     width: var(--btn-size, 32px);
     justify-content: center;
+  }
+}
+
+:global([data-theme="dark"] .character-sheet),
+:global([data-theme="dark"] .sheet-stress-row),
+:global([data-theme="dark"] .consequence-row-flex),
+:global([data-theme="dark"] .gm-notes-section),
+:global([data-theme="dark"] .form-actions),
+:global([data-theme="dark"] .sheet-section),
+:global([data-theme="dark"] .text-area-display),
+:global([data-theme="dark"] .field-value) {
+  background: var(--fate-white);
+}
+
+:global([data-theme="dark"] .field-input),
+:global([data-theme="dark"] .text-area-input),
+:global([data-theme="dark"] .stunt-name-input),
+:global([data-theme="dark"] .stunt-desc-textarea),
+:global([data-theme="dark"] .consequence-config-btn) {
+  background: var(--fate-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .character-sheet),
+  :global(:root:not([data-theme="light"]) .sheet-stress-row),
+  :global(:root:not([data-theme="light"]) .consequence-row-flex),
+  :global(:root:not([data-theme="light"]) .gm-notes-section),
+  :global(:root:not([data-theme="light"]) .form-actions),
+  :global(:root:not([data-theme="light"]) .sheet-section),
+  :global(:root:not([data-theme="light"]) .text-area-display),
+  :global(:root:not([data-theme="light"]) .field-value) {
+    background: var(--fate-white);
+  }
+
+  :global(:root:not([data-theme="light"]) .field-input),
+  :global(:root:not([data-theme="light"]) .text-area-input),
+  :global(:root:not([data-theme="light"]) .stunt-name-input),
+  :global(:root:not([data-theme="light"]) .stunt-desc-textarea),
+  :global(:root:not([data-theme="light"]) .consequence-config-btn) {
+    background: var(--fate-bg);
   }
 }
 </style>

@@ -59,28 +59,28 @@ button {
 }
 
 .fate-btn--primary {
-  background: var(--fate-blue);
+  background: var(--fate-btn-primary-bg, var(--fate-blue));
   color: white;
 }
 .fate-btn--primary:hover {
-  background: var(--fate-blue-dark);
+  background: color-mix(in srgb, var(--fate-btn-primary-bg, var(--fate-blue)) 80%, white);
 }
 
 .fate-btn--secondary {
-  background: #e0e8ed;
+  background: var(--fate-btn-secondary-bg);
   color: var(--fate-text);
 }
 .fate-btn--secondary:hover {
-  background: #c8d8e0;
+  background: var(--fate-btn-secondary-hover);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .fate-btn--danger-outline {
-  background: #fde8e6;
+  background: var(--fate-btn-danger-outline-bg);
   color: var(--fate-red);
 }
 .fate-btn--danger-outline:hover {
-  background: #f9c8c3;
+  background: var(--fate-btn-danger-outline-hover);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
@@ -89,7 +89,7 @@ button {
   color: white;
 }
 .fate-btn--danger:hover {
-  background: #a93226;
+  background: var(--fate-btn-danger-hover);
 }
 
 /* SIZE CLASSES – control padding, font-size, height and --btn-size */

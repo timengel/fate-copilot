@@ -122,4 +122,14 @@ function onAspectInput(index: number, e: Event) {
 .aspect-input:focus {
   border-bottom-color: var(--fate-blue);
 }
+
+:global([data-theme="dark"] .aspect-row) {
+  background: var(--fate-white);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .aspect-row) {
+    background: var(--fate-white);
+  }
+}
 </style>

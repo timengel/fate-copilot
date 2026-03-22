@@ -5,6 +5,7 @@ import FateToggle from '../components/shared/FateToggle.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from '../stores/gmMode';
+import { useThemeStore, type ThemeMode } from '../stores/theme';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
@@ -14,8 +15,17 @@ import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { useRouter } from 'vue-router';
 import { ToggleVariant } from '@fate/types';
+import FateIcon from '../components/shared/FateIcon.vue';
+import type { ButtonIcon } from '../types';
 
 const gmModeStore = useGMModeStore();
+const themeStore = useThemeStore();
+
+const themeOptions: { value: ThemeMode; label: string; icon: ButtonIcon }[] = [
+  { value: 'light', label: 'Hell', icon: 'sun' },
+  { value: 'dark', label: 'Dunkel', icon: 'moon' },
+  { value: 'system', label: 'System', icon: 'monitor' },
+];
 const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const itemsStore = useItemsStore();
@@ -60,6 +70,24 @@ function clearAllData() {
 
     <section class="settings-section">
       <h2>Oberfläche</h2>
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <span>Erscheinungsbild</span>
+          <span class="settings-row-description">Wähle zwischen hellem, dunklem oder systembasiertem Design.</span>
+        </div>
+        <div class="theme-selector" role="group" aria-label="Erscheinungsbild">
+          <button
+            v-for="opt in themeOptions"
+            :key="opt.value"
+            class="theme-btn"
+            :class="{ 'theme-btn--active': themeStore.mode === opt.value }"
+            @click="themeStore.mode = opt.value"
+          >
+            <FateIcon :name="opt.icon" :size="14" />
+            {{ opt.label }}
+          </button>
+        </div>
+      </div>
       <div class="settings-row">
         <div class="settings-row-label">
           <span>GM-Modus-Schalter in der Navigation anzeigen</span>
@@ -111,7 +139,7 @@ function clearAllData() {
   background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 8px;
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 1.5rem 0.5rem;
 }
 
 .settings-section h2 {
@@ -119,8 +147,10 @@ function clearAllData() {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--fate-blue);
-  margin: 0 0 0.5rem;
+  color: var(--fate-heading);
+  margin: 0 0 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--fate-light-border);
 }
 
 .settings-description {
@@ -134,6 +164,11 @@ function clearAllData() {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.75rem 0;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--fate-light-border);
 }
 
 .settings-row-label {
@@ -154,6 +189,44 @@ function clearAllData() {
 
 .settings-section--danger h2 {
   color: var(--fate-red);
+}
+
+.theme-selector {
+  display: flex;
+  border: 1px solid var(--fate-border);
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  background: var(--fate-white);
+  color: var(--fate-text-light);
+  border: none;
+  border-right: 1px solid var(--fate-border);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-btn:last-child {
+  border-right: none;
+}
+
+.theme-btn:hover:not(.theme-btn--active) {
+  background: var(--fate-hover-bg);
+  color: var(--fate-text);
+}
+
+.theme-btn--active {
+  background: var(--fate-blue);
+  color: white;
+  font-weight: 600;
 }
 
 @container main (max-width: 480px) {

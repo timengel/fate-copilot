@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import FateButton from './FateButton.vue';
+import type { ButtonVariant } from '../../types';
 
-defineProps<{
+withDefaults(defineProps<{
   title: string;
   message: string;
-}>();
+  confirmVariant?: ButtonVariant;
+}>(), {
+  confirmVariant: 'danger',
+});
 
 const emit = defineEmits<{
   confirm: [];
@@ -19,7 +23,7 @@ const emit = defineEmits<{
       <div class="dialog-message">{{ message }}</div>
       <div class="dialog-actions">
         <FateButton icon="close" variant="secondary" @click="emit('cancel')">Abbrechen</FateButton>
-        <FateButton icon="check" variant="danger" @click="emit('confirm')">Bestätigen</FateButton>
+        <FateButton icon="check" :variant="confirmVariant" @click="emit('confirm')">Bestätigen</FateButton>
       </div>
     </div>
   </div>
@@ -29,7 +33,7 @@ const emit = defineEmits<{
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--fate-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +41,7 @@ const emit = defineEmits<{
 }
 
 .dialog-box {
-  background: white;
+  background: var(--fate-white);
   border-radius: 8px;
   padding: 1.5rem;
   max-width: 440px;

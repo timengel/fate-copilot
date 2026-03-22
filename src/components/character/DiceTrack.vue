@@ -87,7 +87,7 @@ function handleClick(index: number) {
   height: 32px;
   border-radius: 6px;
   border: 2px solid var(--die-color);
-  background: white;
+  background: var(--fate-white);
   padding: 0;
   cursor: default;
   display: flex;

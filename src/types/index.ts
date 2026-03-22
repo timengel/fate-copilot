@@ -61,7 +61,10 @@ export type ButtonIcon =
   | 'settings'
   | 'reset'
   | 'chevrons-down'
-  | 'chevrons-up';
+  | 'chevrons-up'
+  | 'sun'
+  | 'moon'
+  | 'monitor';
 
 // ============================================================
 // Domain Types

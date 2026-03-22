@@ -1,17 +1,37 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateIcon from './components/shared/FateIcon.vue';
 import FateToast from './components/shared/FateToast.vue';
+import ConfirmDialog from './components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from './stores/gmMode';
+import { useThemeStore } from './stores/theme';
+import { useConfirmDialog } from './composables/useConfirmDialog';
 import { ToggleVariant } from './types';
 
 const navOpen = ref(false);
 const router = useRouter();
 const gmModeStore = useGMModeStore();
+const themeStore = useThemeStore();
 const settingsSpinning = ref(false);
+const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+
+const themeIcon = computed(() => themeStore.isDark ? 'moon' as const : 'sun' as const);
+const themeLabel = computed(() => themeStore.isDark ? 'Dunkel' : 'Hell');
+
+function cycleTheme() {
+  if (themeStore.mode === 'system') {
+    showConfirmDialog(
+      'Dynamisches Design deaktivieren?',
+      'Du verwendest gerade das dynamische Design, basierend auf deinen Systemeinstellungen. Möchtest du das dynamische Design deaktivieren? Du kannst es jederzeit in den Einstellungen reaktivieren.',
+      () => { themeStore.mode = themeStore.isDark ? 'light' : 'dark'; },
+    );
+  } else {
+    themeStore.mode = themeStore.isDark ? 'light' : 'dark';
+  }
+}
 
 function handleSettingsClick() {
   if (!settingsSpinning.value) {
@@ -55,6 +75,14 @@ watch(
             <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
             <RouterLink to="/items" class="nav-link">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
+            <button class="nav-link nav-theme-toggle" :aria-label="themeLabel" @click="cycleTheme">
+              <span class="theme-icon-wrap">
+                <Transition name="theme-icon" mode="out-in">
+                  <FateIcon :key="themeIcon" :name="themeIcon" :size="20" />
+                </Transition>
+              </span>
+              <span class="nav-theme-label">{{ themeLabel }}</span>
+            </button>
             <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen" @click="handleSettingsClick">
               <FateIcon name="settings" :size="20" :class="{ 'settings-spinning': settingsSpinning }" />
               <span class="nav-link-settings-label">Einstellungen</span>
@@ -82,6 +110,14 @@ watch(
       </main>
     </div>
     <FateToast />
+    <ConfirmDialog
+      v-if="confirmDialog"
+      :title="confirmDialog.title"
+      :message="confirmDialog.message"
+      confirm-variant="primary"
+      @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+      @cancel="confirmDialog = null"
+    />
   </div>
 </template>
 
@@ -93,7 +129,7 @@ watch(
 }
 
 .app-header {
-  background-color: var(--fate-blue);
+  background-color: var(--fate-header-bg);
   color: white;
   padding: 0;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
@@ -164,8 +200,8 @@ watch(
 }
 
 .nav-link.router-link-active {
-  background: white;
-  color: var(--fate-blue) !important;
+  background: var(--fate-nav-active-bg);
+  color: var(--fate-nav-active-color) !important;
   font-weight: 600;
 }
 
@@ -174,11 +210,50 @@ watch(
 }
 
 .nav-link.router-link-active:active {
-  background: white;
+  background: var(--fate-nav-active-bg);
+}
+
+.nav-theme-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.8rem;
+}
+
+.theme-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.theme-icon-enter-active {
+  animation: theme-icon-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.theme-icon-leave-active {
+  animation: theme-icon-out 0.2s ease-in;
+  position: absolute;
+}
+
+@keyframes theme-icon-in {
+  from { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+  to   { opacity: 1; transform: rotate(0deg) scale(1); }
+}
+@keyframes theme-icon-out {
+  from { opacity: 1; transform: rotate(0deg) scale(1); }
+  to   { opacity: 0; transform: rotate(90deg) scale(0.5); }
+}
+
+.nav-theme-label {
+  display: none;
 }
 
 .nav-link-settings {
-  margin-left: auto;
+  margin-left: 0;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -293,7 +368,7 @@ watch(
     top: 56px;
     left: 0;
     right: 0;
-    background-color: var(--fate-blue);
+    background-color: var(--fate-header-bg);
     padding: 0.5rem 1rem 0.75rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 99;
@@ -338,9 +413,13 @@ watch(
     transform: none;
   }
 
+  /* Theme toggle: hidden on mobile */
+  .nav-drawer .nav-theme-toggle {
+    display: none;
+  }
+
   /* Settings: show text label and reset alignment */
   .nav-drawer .nav-link-settings {
-    margin-left: 0;
     padding: 0.75rem 0.5rem 0.75rem 0.85rem;
     gap: 0.6rem;
   }

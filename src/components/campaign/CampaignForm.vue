@@ -104,7 +104,7 @@ function save() {
 
 <style scoped>
 .campaign-form {
-  background: white;
+  background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   padding: 1.25rem;
@@ -135,7 +135,7 @@ function save() {
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: white;
+  background: var(--fate-white);
   outline: none;
 }
 

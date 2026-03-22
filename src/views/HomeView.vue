@@ -212,7 +212,7 @@ function getCharCampaign(charId: string): string | null {
 .fate-logo {
   font-size: 3.5rem;
   font-weight: 900;
-  color: var(--fate-blue);
+  color: var(--fate-heading);
   letter-spacing: -2px;
   line-height: 1;
 }
@@ -262,7 +262,7 @@ function getCharCampaign(charId: string): string | null {
 .welcome-card {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   padding: 1.25rem;
@@ -315,7 +315,7 @@ function getCharCampaign(charId: string): string | null {
 }
 
 .home-section {
-  background: white;
+  background: var(--fate-white);
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -391,7 +391,7 @@ function getCharCampaign(charId: string): string | null {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--fate-blue);
+  background: var(--fate-header-bg);
   color: white;
   padding: 0.5rem 0.9rem;
   border-radius: 6px 6px 0 0;

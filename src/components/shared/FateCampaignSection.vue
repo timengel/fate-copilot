@@ -59,7 +59,7 @@ function onSelectChange(e: Event) {
 <style scoped>
 .campaigns-section {
   margin-top: 1rem;
-  background: white;
+  background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
@@ -107,7 +107,7 @@ function onSelectChange(e: Event) {
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: white;
+  background: var(--fate-white);
   cursor: pointer;
 }
 

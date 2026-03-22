@@ -17,6 +17,32 @@
   --fate-red: #c0392b;
   --fate-green: #27ae60;
 
+  /* Button / Dropdown secondary & danger variants */
+  --fate-btn-secondary-bg:         #e0e8ed;
+  --fate-btn-secondary-hover:      #c8d8e0;
+  --fate-btn-danger-outline-bg:    #fde8e6;
+  --fate-btn-danger-outline-hover: #f9c8c3;
+  --fate-btn-danger-hover:         #a93226;
+
+  /* Modal overlay */
+  --fate-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Toggle track */
+  --fate-toggle-track-bg:     rgba(0, 0, 0, 0.10);
+  --fate-toggle-track-border: rgba(0, 0, 0, 0.18);
+  --fate-toggle-ghost-track:  rgba(180, 180, 180, 0.40);
+
+  /* Card color-mix base */
+  --fate-card-mix-base: white;
+
+  /* Page heading */
+  --fate-heading: var(--fate-blue);
+
+  /* Navigation */
+  --fate-header-bg:        var(--fate-blue);
+  --fate-nav-active-bg:    white;
+  --fate-nav-active-color: var(--fate-blue);
+
   font-family: 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -195,5 +221,88 @@ body.dashboard-grid-active .app-main {
 @container main (width < 360px) {
   .card-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   DARK MODE — component overrides
+   ============================================================ */
+
+/* Sheet section headers in character/item sheets use the flavor color — mute it in dark mode */
+html[data-theme="dark"] .sheet-section-header {
+  background: color-mix(in srgb, var(--fate-blue) 45%, var(--fate-white) 55%);
+}
+
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+[data-theme="dark"] {
+  --fate-bg:          #0f1923;
+  --fate-white:       #1a2530;
+  --fate-blue-light:  #050f1e;
+  --fate-hover-bg:    #223545;
+  --fate-card-mix-base: #020a14;
+
+  --fate-text:        #e8edf0;
+  --fate-text-light:  #a0bccc;
+
+  --fate-border:       #2d4555;
+  --fate-light-border: #243344;
+
+  --fate-btn-secondary-bg:         #243344;
+  --fate-btn-secondary-hover:      #2d4555;
+  --fate-btn-danger-outline-bg:    #2d1a19;
+  --fate-btn-danger-outline-hover: #3d2220;
+  --fate-btn-danger-hover:         #c0392b;
+
+  --fate-overlay: rgba(0, 0, 0, 0.65);
+
+  --fate-toggle-track-bg:     rgba(255, 255, 255, 0.10);
+  --fate-toggle-track-border: rgba(255, 255, 255, 0.18);
+  --fate-toggle-ghost-track:  rgba(255, 255, 255, 0.15);
+
+  --fate-heading:          white;
+
+  --fate-header-bg:        #0f4060;
+  --fate-nav-active-bg:    #1a5c80;
+  --fate-nav-active-color: white;
+
+  --fate-btn-primary-bg:   #0f4060;
+}
+
+/* System preference fallback — applies dark when no explicit choice is stored */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fate-bg:          #0f1923;
+    --fate-white:       #1a2530;
+    --fate-blue-light:  #0c2438;
+    --fate-hover-bg:    #223545;
+    --fate-card-mix-base: #081825;
+
+    --fate-text:        #e8edf0;
+    --fate-text-light:  #a0bccc;
+
+    --fate-border:       #2d4555;
+    --fate-light-border: #243344;
+
+    --fate-btn-secondary-bg:         #243344;
+    --fate-btn-secondary-hover:      #2d4555;
+    --fate-btn-danger-outline-bg:    #2d1a19;
+    --fate-btn-danger-outline-hover: #3d2220;
+    --fate-btn-danger-hover:         #c0392b;
+
+    --fate-overlay: rgba(0, 0, 0, 0.65);
+
+    --fate-toggle-track-bg:     rgba(255, 255, 255, 0.10);
+    --fate-toggle-track-border: rgba(255, 255, 255, 0.18);
+    --fate-toggle-ghost-track:  rgba(255, 255, 255, 0.15);
+
+    --fate-header-bg:        #0e2030;
+    --fate-nav-active-bg:    #1e3347;
+    --fate-nav-active-color: white;
+
+    --fate-btn-primary-bg:   #0e2030;
   }
 }

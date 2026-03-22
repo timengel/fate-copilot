@@ -100,8 +100,7 @@ function isRenderableNode(node: VNode): boolean {
 
 <style scoped>
 .fate-card {
-  background: color-mix(in srgb, white 45%, var(--fate-blue-light) 55%);
-  border: 1px solid var(--fate-blue-light);
+  background: color-mix(in srgb, var(--fate-card-mix-base) 45%, var(--fate-blue-light) 55%);
   border-radius: 6px;
   overflow: hidden;
   display: flex;
@@ -214,6 +213,16 @@ function isRenderableNode(node: VNode): boolean {
 @media (pointer: coarse) {
   .fate-card__actions :deep(.fate-btn) {
     --btn-size: 36px;
+  }
+}
+
+:global([data-theme="dark"] .fate-card) {
+  background: var(--fate-white);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .fate-card) {
+    background: var(--fate-white);
   }
 }
 </style>

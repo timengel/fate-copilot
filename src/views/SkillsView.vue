@@ -410,7 +410,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 }
 
 .skills-manage {
-  background: white;
+  background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 6px;
   overflow: hidden;
@@ -463,7 +463,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 }
 
 .skill-info-modal {
-  background: white;
+  background: var(--fate-white);
   border-radius: 8px;
   padding: 1.5rem;
   max-width: 480px;
@@ -485,7 +485,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 .skill-info-header h2 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--fate-blue);
+  color: var(--fate-heading);
   margin: 0;
 }
 
@@ -574,7 +574,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--fate-text);
-  background: white;
+  background: var(--fate-white);
   outline: none;
 }
 

@@ -21,7 +21,7 @@ h1 {
   font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
-  color: var(--fate-blue);
+  color: var(--fate-heading);
 }
 
 @container main (width < 480px) {

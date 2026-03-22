@@ -90,8 +90,8 @@ const emit = defineEmits<{
 }
 
 .fate-toggle--primary .toggle-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.18);
+  background: var(--fate-toggle-track-bg);
+  border-color: var(--fate-toggle-track-border);
 }
 
 .fate-toggle--primary .toggle-track--on {
@@ -117,7 +117,7 @@ const emit = defineEmits<{
 }
 
 .fate-toggle--ghost .toggle-track {
-  background: rgba(180, 180, 180, 0.4);
+  background: var(--fate-toggle-ghost-track);
   border-color: rgba(255, 255, 255, 0.35);
 }
 

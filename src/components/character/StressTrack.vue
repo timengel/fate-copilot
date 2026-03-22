@@ -73,7 +73,7 @@ function toggle(index: number) {
   border: 3px solid var(--fate-blue);
   box-sizing: border-box;
   border-radius: 2px;
-  background: white;
+  background: var(--fate-white);
   position: relative;
   transition: background 0.1s;
 }
@@ -110,6 +110,16 @@ function toggle(index: number) {
   /* Stress-Boxen: größere Tap-Area via Padding */
   .stress-box {
     padding: 6px 4px;
+  }
+}
+
+:global([data-theme="dark"] .stress-label) {
+  background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .stress-label) {
+    background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
   }
 }
 </style>

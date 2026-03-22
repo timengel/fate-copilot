@@ -35,7 +35,7 @@ const emit = defineEmits<{
   height: 20px;
   border-radius: 4px;
   border: 1.5px solid var(--fate-border);
-  background: white;
+  background: var(--fate-white);
   transition:
     background 0.15s,
     border-color 0.15s;

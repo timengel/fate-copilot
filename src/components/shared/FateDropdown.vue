@@ -89,8 +89,8 @@ function onChange(event: Event) {
 
 <style scoped>
 .fate-dropdown {
-  --dropdown-bg: #e0e8ed;
-  --dropdown-bg-hover: #c8d8e0;
+  --dropdown-bg: var(--fate-btn-secondary-bg);
+  --dropdown-bg-hover: var(--fate-btn-secondary-hover);
   --dropdown-fg: var(--fate-text);
   --dropdown-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   --btn-size: 32px;
@@ -166,20 +166,20 @@ function onChange(event: Event) {
 }
 
 .fate-dropdown--secondary {
-  --dropdown-bg: #e0e8ed;
-  --dropdown-bg-hover: #c8d8e0;
+  --dropdown-bg: var(--fate-btn-secondary-bg);
+  --dropdown-bg-hover: var(--fate-btn-secondary-hover);
   --dropdown-fg: var(--fate-text);
 }
 
 .fate-dropdown--danger-outline {
-  --dropdown-bg: #fde8e6;
-  --dropdown-bg-hover: #f9c8c3;
+  --dropdown-bg: var(--fate-btn-danger-outline-bg);
+  --dropdown-bg-hover: var(--fate-btn-danger-outline-hover);
   --dropdown-fg: var(--fate-red);
 }
 
 .fate-dropdown--danger {
   --dropdown-bg: var(--fate-red);
-  --dropdown-bg-hover: #a93226;
+  --dropdown-bg-hover: var(--fate-btn-danger-hover);
   --dropdown-fg: white;
 }
 

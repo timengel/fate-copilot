@@ -122,7 +122,7 @@ function deleteCampaign(id: string, name: string) {
 .title-active,
 .title-inactive,
 .title-completed {
-  color: var(--fate-blue);
+  color: var(--fate-heading);
 }
 
 @container main (width < 480px) {

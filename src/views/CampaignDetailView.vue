@@ -382,6 +382,10 @@ function navigateToAssignment(path: string) {
 </template>
 
 <style scoped>
+.sheet-section-header {
+  background: var(--fate-header-bg);
+}
+
 .back-btn {
   --fate-blue: #1c9ed6;
   --fate-blue-dark: #1480b0;
@@ -419,7 +423,7 @@ function navigateToAssignment(path: string) {
 
 .campaign-detail-header h1 {
   font-size: 1.75rem;
-  color: var(--fate-blue);
+  color: var(--fate-heading);
   margin: 0;
 }
 
@@ -437,8 +441,8 @@ function navigateToAssignment(path: string) {
   color: var(--fate-green);
 }
 .status-inactive {
-  background: #f0f0f0;
-  color: #666;
+  background: var(--fate-btn-secondary-bg);
+  color: var(--fate-text-light);
 }
 .status-completed {
   background: #d1ecf1;
@@ -507,7 +511,7 @@ function navigateToAssignment(path: string) {
 }
 
 .assignment-main--clickable:hover {
-  background: var(--fate-blue-light);
+  background: var(--fate-hover-bg);
 }
 
 .assignment-info {
