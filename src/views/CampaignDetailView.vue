@@ -261,9 +261,7 @@ function navigateToAssignment(path: string) {
                     </div>
                   </button>
                   <div v-if="gmModeStore.isGMMode" class="assignment-actions">
-                    <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"
-                      ><span class="btn-label">Entfernen</span></FateButton
-                    >
+                    <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"></FateButton>
                   </div>
                 </div>
 
@@ -296,9 +294,7 @@ function navigateToAssignment(path: string) {
                       </div>
                     </button>
                     <div class="assignment-actions">
-                      <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"
-                        ><span class="btn-label">Entfernen</span></FateButton
-                      >
+                      <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"></FateButton>
                     </div>
                   </div>
                 </template>
@@ -347,7 +343,7 @@ function navigateToAssignment(path: string) {
                   </div>
                 </button>
                 <div v-if="gmModeStore.isGMMode" class="assignment-actions">
-                  <FateButton variant="danger" size="S" icon="close" @click="unassignItem(item.id)"><span class="btn-label">Entfernen</span></FateButton>
+                  <FateButton variant="danger" size="S" icon="close" @click="unassignItem(item.id)"></FateButton>
                 </div>
               </div>
 

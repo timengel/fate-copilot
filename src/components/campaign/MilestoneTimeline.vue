@@ -110,22 +110,21 @@ function cancelEdit() {
           <FateTag :color="TYPE_COLORS[m.type]" :label="TYPE_LABELS[m.type]" />
           <span class="milestone-desc">{{ m.description }}</span>
           <FateButton
-            v-if="!readonly && gmModeStore.isGMMode && i === milestones.length - 1"
-            variant="danger"
-            size="S"
-            icon="close"
-            class="milestone-remove"
-            @click="emit('remove', m.id)">
-            </FateButton>
-          <FateButton
             v-if="!readonly && gmModeStore.isGMMode"
             variant="ghost"
             icon="edit"
             size="S"
             class="milestone-edit"
             @click="startEdit(m)"
-            ></FateButton
-          >
+          ></FateButton>
+          <FateButton
+            v-if="!readonly && gmModeStore.isGMMode && i === milestones.length - 1"
+            variant="danger"
+            size="S"
+            icon="delete"
+            class="milestone-remove"
+            @click="emit('remove', m.id)">
+          </FateButton>
         </div>
       </div>
     </div>
