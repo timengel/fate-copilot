@@ -60,4 +60,6 @@ The file [FATE.md](./FATE.md) contains the Fate rules reference used by this pro
 
 ## License
 
-This project is for personal use. The Fate Core system is published under the [Creative Commons Attribution 3.0 Unported](https://creativecommons.org/licenses/by/3.0/) license by Evil Hat Productions.
+This project is licensed under the [MIT License](./LICENSE) — © 2026 Tim Engel.
+
+The Fate Core system is published under the [Creative Commons Attribution 3.0 Unported](https://creativecommons.org/licenses/by/3.0/) license by Evil Hat Productions.
