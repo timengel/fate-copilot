@@ -10,6 +10,7 @@ import SkillPyramid from './SkillPyramid.vue';
 import StressTrack from './StressTrack.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import DiceTrack from './DiceTrack.vue';
+import FateIconCounter from './FateIconCounter.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
@@ -78,6 +79,9 @@ const hasVisibleConsequences = computed(
 );
 const hasVisibleDice = computed(
   () => isEditing.value || !!(data.value.redDice || data.value.blueDice),
+);
+const hasVisiblePureDamage = computed(
+  () => isEditing.value || !!(data.value.pureDamage || data.value.deflection),
 );
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
@@ -247,7 +251,7 @@ defineExpose({ save });
                 <label class="field-label">Fate-Punkte</label>
                 <FateCounter v-model="form.fatePoints" />
               </div>
-              <div v-if="sections?.generalRefresh !== false" class="field-stat">
+              <div v-if="sections?.generalRefresh !== false && form.type !== 'nsc'" class="field-stat">
                 <label class="field-label">Erholungsrate</label>
                 <FateCounter v-model="form.refresh" :min="1" :max="10" />
               </div>
@@ -260,7 +264,7 @@ defineExpose({ save });
                 <span class="field-label">Fate-Punkte</span>
                 <span class="field-value fate-points">{{ data.fatePoints }}</span>
               </div>
-              <div v-if="sections?.generalRefresh !== false" class="field-stat">
+              <div v-if="sections?.generalRefresh !== false && data.type !== 'nsc'" class="field-stat">
                 <span class="field-label">Erholungsrate</span>
                 <span class="field-value refresh-value">{{ data.refresh }}</span>
               </div>
@@ -545,6 +549,30 @@ defineExpose({ save });
         </div>
       </section>
 
+      <!-- PURER SCHADEN & DEFLEKTION -->
+      <section v-if="hasVisiblePureDamage" class="sheet-section pure-damage-section">
+        <div class="sheet-section-header">PURER SCHADEN &amp; DEFLEKTION</div>
+        <div class="dice-tracks">
+          <FateIconCounter
+            v-if="isEditing || data.pureDamage"
+            label="PURER SCHADEN"
+            icon="die-plus"
+            :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
+            :readonly="!isEditing"
+            @update="form.pureDamage = $event"
+          />
+          <FateIconCounter
+            v-if="isEditing || data.deflection"
+            label="DEFLEKTION"
+            icon="die-minus"
+            color="blue"
+            :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
+            :readonly="!isEditing"
+            @update="form.deflection = $event"
+          />
+        </div>
+      </section>
+
       <!-- GM OPTIONS -->
       <section
         v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
@@ -592,7 +620,6 @@ defineExpose({ save });
 .general,
 .sheet-stress-row,
 .red-blue-dice-section,
-.dice-section,
 .gm-notes-section,
 .form-actions {
   grid-column: 1 / -1;

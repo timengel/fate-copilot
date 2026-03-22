@@ -224,7 +224,7 @@ function clearAllData() {
 }
 
 .theme-btn--active {
-  background: var(--fate-blue);
+  background: var(--fate-btn-primary-bg, var(--fate-blue));
   color: white;
   font-weight: 600;
 }

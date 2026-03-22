@@ -134,6 +134,8 @@ export interface Character {
   avatar?: string;
   redDice?: number;
   blueDice?: number;
+  pureDamage?: number;
+  deflection?: number;
 }
 
 export interface Item {
