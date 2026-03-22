@@ -1,0 +1,131 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent, screen } from '@testing-library/vue';
+import FateIconCounter from './FateIconCounter.vue';
+
+describe('FateIconCounter', () => {
+  it('renders the label', () => {
+    render(FateIconCounter, { props: { count: 0, label: 'PURER SCHADEN', icon: 'die-plus' } });
+    expect(screen.getByText('PURER SCHADEN')).toBeTruthy();
+  });
+
+  it('displays the current count in the badge', () => {
+    const { container } = render(FateIconCounter, {
+      props: { count: 3, label: 'Test', icon: 'die-plus' },
+    });
+    expect(container.querySelector('.icon-count')!.textContent).toBe('3');
+  });
+
+  it('renders the correct number of icons', () => {
+    const { container } = render(FateIconCounter, {
+      props: { count: 4, label: 'Test', icon: 'die-plus' },
+    });
+    expect(container.querySelectorAll('.icon-item')).toHaveLength(4);
+  });
+
+  it('renders no icons when count is 0', () => {
+    const { container } = render(FateIconCounter, {
+      props: { count: 0, label: 'Test', icon: 'die-plus' },
+    });
+    expect(container.querySelectorAll('.icon-item')).toHaveLength(0);
+  });
+
+  it('emits update with count+1 when + is clicked', async () => {
+    const onUpdate = vi.fn();
+    render(FateIconCounter, { props: { count: 3, label: 'Test', icon: 'die-plus', onUpdate } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Erhöhen' }));
+    expect(onUpdate).toHaveBeenCalledWith(4);
+  });
+
+  it('emits update with count-1 when − is clicked', async () => {
+    const onUpdate = vi.fn();
+    render(FateIconCounter, { props: { count: 3, label: 'Test', icon: 'die-plus', onUpdate } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Verringern' }));
+    expect(onUpdate).toHaveBeenCalledWith(2);
+  });
+
+  it('does not emit when − is clicked while disabled at minimum', async () => {
+    const onUpdate = vi.fn();
+    render(FateIconCounter, { props: { count: 0, label: 'Test', icon: 'die-plus', onUpdate } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Verringern' }));
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  it('minus button is disabled at 0', () => {
+    render(FateIconCounter, { props: { count: 0, label: 'Test', icon: 'die-plus' } });
+    const btn = screen.getByRole('button', { name: 'Verringern' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+  });
+
+  it('does not emit when + is clicked while disabled at max', async () => {
+    const onUpdate = vi.fn();
+    render(FateIconCounter, { props: { count: 8, label: 'Test', icon: 'die-plus', onUpdate } });
+    await fireEvent.click(screen.getByRole('button', { name: 'Erhöhen' }));
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  it('plus button is disabled at max', () => {
+    render(FateIconCounter, { props: { count: 8, label: 'Test', icon: 'die-plus' } });
+    const btn = screen.getByRole('button', { name: 'Erhöhen' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+  });
+
+  it('respects a custom max prop — plus is disabled and does not emit at that max', async () => {
+    const onUpdate = vi.fn();
+    render(FateIconCounter, {
+      props: { count: 5, label: 'Test', icon: 'die-plus', max: 5, onUpdate },
+    });
+    const btn = screen.getByRole('button', { name: 'Erhöhen' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    await fireEvent.click(btn);
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  describe('readonly mode', () => {
+    it('hides the increment and decrement buttons', () => {
+      render(FateIconCounter, {
+        props: { count: 3, label: 'Test', icon: 'die-plus', readonly: true },
+      });
+      expect(screen.queryByRole('button', { name: 'Erhöhen' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Verringern' })).toBeNull();
+    });
+
+    it('still shows the count badge', () => {
+      const { container } = render(FateIconCounter, {
+        props: { count: 3, label: 'Test', icon: 'die-plus', readonly: true },
+      });
+      expect(container.querySelector('.icon-count')!.textContent).toBe('3');
+    });
+
+    it('still shows the icons', () => {
+      const { container } = render(FateIconCounter, {
+        props: { count: 3, label: 'Test', icon: 'die-plus', readonly: true },
+      });
+      expect(container.querySelectorAll('.icon-item')).toHaveLength(3);
+    });
+  });
+
+  describe('color prop', () => {
+    it('applies the blue class for color=blue', () => {
+      const { container } = render(FateIconCounter, {
+        props: { count: 0, label: 'Test', icon: 'die-minus', color: 'blue' },
+      });
+      expect(container.querySelector('.icon-counter')!.classList.contains('blue')).toBe(true);
+    });
+
+    it('applies the red class for color=red', () => {
+      const { container } = render(FateIconCounter, {
+        props: { count: 0, label: 'Test', icon: 'die-plus', color: 'red' },
+      });
+      expect(container.querySelector('.icon-counter')!.classList.contains('red')).toBe(true);
+    });
+
+    it('applies no color class when color is not set', () => {
+      const { container } = render(FateIconCounter, {
+        props: { count: 0, label: 'Test', icon: 'die-plus' },
+      });
+      const el = container.querySelector('.icon-counter')!;
+      expect(el.classList.contains('blue')).toBe(false);
+      expect(el.classList.contains('red')).toBe(false);
+    });
+  });
+});
