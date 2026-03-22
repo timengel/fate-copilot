@@ -141,7 +141,7 @@ function toggleArchived(character: Character) {
         :class="{ 'tab-btn--active': activeTab === 'sc' }"
         @click="setTab('sc')"
       >
-        Spielercharaktere (SC)
+        <span class="tab-btn-full">Spielercharaktere (SC)</span><span class="tab-btn-short">Spieler (SC)</span>
       </button>
       <button
         v-if="gmModeStore.isGMMode"
@@ -149,7 +149,7 @@ function toggleArchived(character: Character) {
         :class="{ 'tab-btn--active': activeTab === 'nsc' }"
         @click="setTab('nsc')"
       >
-        Nicht-Spieler-Charaktere (NSC)
+        <span class="tab-btn-full">Nicht-Spieler-Charaktere (NSC)</span><span class="tab-btn-short">Nicht-Spieler (NSC)</span>
       </button>
     </div>
 
@@ -232,7 +232,20 @@ function toggleArchived(character: Character) {
   gap: 0.5rem;
 }
 
-@container main (width < 480px) {
+.tab-btn-short {
+  display: none;
+}
+
+@container main (width < 768px) {
+  .tab-btn-full {
+    display: none;
+  }
+
+  .tab-btn-short {
+    display: inline;
+  }
+
+
   .header-actions .btn-label {
     display: none;
   }
@@ -318,7 +331,7 @@ function toggleArchived(character: Character) {
 
 .tab-bar {
   display: flex;
-  gap: 0;
+  gap: 1.5rem;
   margin-bottom: 1rem;
   border-bottom: 2px solid var(--fate-border);
 }
@@ -326,13 +339,14 @@ function toggleArchived(character: Character) {
 .tab-btn {
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  margin-bottom: -2px;
-  padding: 0.5rem 1.1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-bottom: none;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   color: var(--fate-text-light);
+  white-space: nowrap;
   cursor: pointer;
   box-shadow: none;
   transition:
@@ -346,7 +360,10 @@ function toggleArchived(character: Character) {
 
 .tab-btn--active {
   color: var(--fate-heading);
-  border-bottom-color: var(--fate-heading);
-  font-weight: 700;
+  box-shadow: 0 2px 0 var(--fate-heading);
+}
+
+.tab-btn:not(.tab-btn--active) {
+  color: var(--fate-text-light);
 }
 </style>
