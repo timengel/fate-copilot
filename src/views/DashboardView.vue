@@ -652,7 +652,7 @@ onUnmounted(() => {
   justify-content: space-between;
   width: 100%;
   padding: 0.5rem 0.75rem;
-  background: var(--fate-blue);
+  background: var(--fate-btn-primary-bg, var(--fate-blue));
   border: none;
   font-size: 0.75rem;
   font-weight: 700;
@@ -664,7 +664,7 @@ onUnmounted(() => {
 }
 
 .filters-toggle:hover {
-  background: color-mix(in srgb, var(--fate-blue) 88%, white);
+  background: color-mix(in srgb, var(--fate-btn-primary-bg, var(--fate-blue)) 88%, white);
 }
 
 .filters-expand-all {
@@ -672,16 +672,16 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 0 0.6rem;
-  background: color-mix(in srgb, var(--fate-blue) 80%, white);
+  background: color-mix(in srgb, var(--fate-btn-primary-bg, var(--fate-blue)) 80%, white);
   border: none;
-  border-left: 1px solid color-mix(in srgb, var(--fate-blue) 70%, white);
+  border-left: 1px solid color-mix(in srgb, var(--fate-btn-primary-bg, var(--fate-blue)) 70%, white);
   color: white;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .filters-expand-all:hover {
-  background: color-mix(in srgb, var(--fate-blue) 70%, white);
+  background: color-mix(in srgb, var(--fate-btn-primary-bg, var(--fate-blue)) 70%, white);
 }
 
 .filters-toggle-icon {
