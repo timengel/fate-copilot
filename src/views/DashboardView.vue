@@ -162,6 +162,10 @@ const anyExpanded = computed(() => Object.values(filterSections.value).some(Bool
 
 function setCharSortOrder(val: string) { withViewTransition(() => { charSortOrder.value = val; }); }
 function setItemSortOrder(val: string) { withViewTransition(() => { itemSortOrder.value = val; }); }
+function setShowSC(val: boolean) { withViewTransition(() => { showSC.value = val; }); }
+function setShowNSC(val: boolean) { withViewTransition(() => { showNSC.value = val; }); }
+function setShowArchivedCharacters(val: boolean) { withViewTransition(() => { showArchivedCharacters.value = val; }); }
+function setShowArchivedItems(val: boolean) { withViewTransition(() => { showArchivedItems.value = val; }); }
 
 function expandAllSections() {
   filtersOpen.value = true;
@@ -239,16 +243,16 @@ onUnmounted(() => {
         <div class="sidebar-group">
           <div class="sidebar-group-label">Charaktere</div>
           <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
-          <FateCheckbox v-model="showSC" label="Zeige SC" />
-          <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="Zeige NSC" />
-          <FateCheckbox v-model="showArchivedCharacters" label="Archiviert" />
+          <FateCheckbox :model-value="showSC" label="Zeige SC" @update:model-value="setShowSC" />
+          <FateCheckbox v-if="gmModeStore.isGMMode" :model-value="showNSC" label="Zeige NSC" @update:model-value="setShowNSC" />
+          <FateCheckbox :model-value="showArchivedCharacters" label="Archiviert" @update:model-value="setShowArchivedCharacters" />
         </div>
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Items</div>
           <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
           <FateCheckbox v-model="showItems" label="Zeige Items" />
-          <FateCheckbox v-model="showArchivedItems" label="Archiviert" />
+          <FateCheckbox :model-value="showArchivedItems" label="Archiviert" @update:model-value="setShowArchivedItems" />
         </div>
 
         <div class="sidebar-group">
@@ -315,9 +319,9 @@ onUnmounted(() => {
           </button>
           <div v-if="filterSections.charaktere" class="filters-section-body">
             <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
-            <FateCheckbox v-model="showSC" label="SC" />
-            <FateCheckbox v-if="gmModeStore.isGMMode" v-model="showNSC" label="NSC" />
-            <FateCheckbox v-model="showArchivedCharacters" label="Archiviert" />
+            <FateCheckbox :model-value="showSC" label="SC" @update:model-value="setShowSC" />
+            <FateCheckbox v-if="gmModeStore.isGMMode" :model-value="showNSC" label="NSC" @update:model-value="setShowNSC" />
+            <FateCheckbox :model-value="showArchivedCharacters" label="Archiviert" @update:model-value="setShowArchivedCharacters" />
           </div>
         </div>
 
@@ -329,7 +333,7 @@ onUnmounted(() => {
           <div v-if="filterSections.items" class="filters-section-body">
             <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
             <FateCheckbox v-model="showItems" label="Zeige Items" />
-            <FateCheckbox v-model="showArchivedItems" label="Archiviert" />
+            <FateCheckbox :model-value="showArchivedItems" label="Archiviert" @update:model-value="setShowArchivedItems" />
           </div>
         </div>
 
