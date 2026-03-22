@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import CampaignsView from './CampaignsView.vue';
 import { useCampaignsStore } from '../stores/campaigns';
+import { useGMModeStore } from '../stores/gmMode';
 import type { Campaign } from '../types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -64,7 +65,24 @@ describe('CampaignsView – card interactions', () => {
   });
 
   it('clicking the delete button does not trigger navigation', async () => {
-    const { container } = setup();
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign());
+    useGMModeStore().isGMMode = true;
+
+    const { container } = render(CampaignsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
     const [, deleteBtn] = container.querySelectorAll('.fate-card__actions button');
     await fireEvent.click(deleteBtn!);
     expect(mockPush).not.toHaveBeenCalled();
