@@ -1,10 +1,16 @@
 <script setup lang="ts">
-const props = defineProps<{
-  highConcept: string;
-  trouble: string;
-  aspects: string[];
-  readonly?: boolean;
-}>();
+import FateButton from '../shared/FateButton.vue';
+
+const props = withDefaults(
+  defineProps<{
+    highConcept: string;
+    trouble: string;
+    aspects: string[];
+    readonly?: boolean;
+    withHighConcept?: boolean;
+  }>(),
+  { withHighConcept: true },
+);
 
 const emit = defineEmits<{
   'update:highConcept': [value: string];
@@ -29,47 +35,63 @@ function onTroubleInput(e: Event) {
 function onAspectInput(index: number, e: Event) {
   if (e.target instanceof HTMLInputElement) updateAspect(index, e.target.value);
 }
+
+function addAspect() {
+  emit('update:aspects', [...props.aspects, '']);
+}
+
+function removeAspect(index: number) {
+  emit('update:aspects', props.aspects.filter((_, i) => i !== index));
+}
 </script>
 
 <template>
   <div class="aspect-fields">
-    <div v-if="!readonly || highConcept" class="aspect-row">
-      <label class="aspect-label">Konzept</label>
-      <span v-if="readonly" class="aspect-value">{{ highConcept }}</span>
-      <input
-        v-else
-        class="aspect-input"
-        :value="highConcept"
-        placeholder="High Concept"
-        @input="onHighConceptInput"
-      />
-    </div>
-
-    <div v-if="!readonly || trouble" class="aspect-row">
-      <label class="aspect-label">Dilemma</label>
-      <span v-if="readonly" class="aspect-value">{{ trouble }}</span>
-      <input
-        v-else
-        class="aspect-input"
-        :value="trouble"
-        placeholder="Trouble"
-        @input="onTroubleInput"
-      />
-    </div>
-
-    <template v-for="(aspect, i) in aspects" :key="i">
-      <div v-if="!readonly || aspect" class="aspect-row">
-        <label class="aspect-label"></label>
-        <span v-if="readonly" class="aspect-value">{{ aspect }}</span>
+    <template v-if="withHighConcept">
+      <div v-if="!readonly || highConcept" class="aspect-row">
+        <label class="aspect-label">Konzept</label>
+        <span v-if="readonly" class="aspect-value">{{ highConcept }}</span>
         <input
           v-else
           class="aspect-input"
-          :value="aspect"
-          placeholder="Weiterer Aspekt"
-          @input="onAspectInput(i, $event)"
+          :value="highConcept"
+          placeholder="High Concept"
+          @input="onHighConceptInput"
+        />
+      </div>
+
+      <div v-if="!readonly || trouble" class="aspect-row">
+        <label class="aspect-label">Dilemma</label>
+        <span v-if="readonly" class="aspect-value">{{ trouble }}</span>
+        <input
+          v-else
+          class="aspect-input"
+          :value="trouble"
+          placeholder="Trouble"
+          @input="onTroubleInput"
         />
       </div>
     </template>
+
+    <template v-for="(aspect, i) in aspects" :key="i">
+      <div v-if="!readonly || aspect" class="aspect-row">
+        <label v-if="withHighConcept" class="aspect-label"></label>
+        <span v-if="readonly" class="aspect-value">{{ aspect }}</span>
+        <template v-else>
+          <input
+            class="aspect-input"
+            :value="aspect"
+            placeholder="Weiterer Aspekt"
+            @input="onAspectInput(i, $event)"
+          />
+          <FateButton variant="danger" size="S" icon="close" @click="removeAspect(i)" />
+        </template>
+      </div>
+    </template>
+
+    <div v-if="!readonly" class="aspect-add-row">
+      <FateButton variant="secondary" size="S" class="btn-flavor" @click="addAspect">+ Aspekt</FateButton>
+    </div>
   </div>
 </template>
 
@@ -80,14 +102,10 @@ function onAspectInput(index: number, e: Event) {
 
 .aspect-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   padding: 3px 0.75rem;
   border-bottom: 1px solid var(--fate-light-border);
-}
-
-.aspect-row:last-child {
-  border-bottom: none;
 }
 
 .aspect-label {
@@ -121,6 +139,22 @@ function onAspectInput(index: number, e: Event) {
 
 .aspect-input:focus {
   border-bottom-color: var(--fate-blue);
+}
+
+.aspect-add-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  align-items: center;
+}
+
+.btn-flavor {
+  background: var(--fate-blue) !important;
+  color: white !important;
+}
+
+.btn-flavor:hover {
+  background: var(--fate-blue-dark) !important;
 }
 
 :global([data-theme="dark"] .aspect-row) {

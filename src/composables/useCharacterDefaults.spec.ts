@@ -45,8 +45,8 @@ describe('createDefaultCharacter', () => {
     expect(char.notes).toBe('');
   });
 
-  it('returns 3 empty aspect slots', () => {
-    expect(createDefaultCharacter().aspects).toEqual(['', '', '']);
+  it('returns an empty aspects array', () => {
+    expect(createDefaultCharacter().aspects).toEqual([]);
   });
 
   it("returns default color 'pfau'", () => {

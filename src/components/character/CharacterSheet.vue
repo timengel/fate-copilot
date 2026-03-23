@@ -281,6 +281,7 @@ defineExpose({ save });
           :highConcept="form.highConcept"
           :trouble="form.trouble"
           :aspects="form.aspects"
+          :withHighConcept="form.type !== 'nsc'"
           @update:highConcept="form.highConcept = $event"
           @update:trouble="form.trouble = $event"
           @update:aspects="form.aspects = $event"
@@ -290,6 +291,7 @@ defineExpose({ save });
           :highConcept="data.highConcept"
           :trouble="data.trouble"
           :aspects="data.aspects"
+          :withHighConcept="data.type !== 'nsc'"
           :readonly="true"
         />
       </section>

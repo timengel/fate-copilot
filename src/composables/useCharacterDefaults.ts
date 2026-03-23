@@ -22,7 +22,7 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     description: '',
     highConcept: '',
     trouble: '',
-    aspects: ['', '', ''],
+    aspects: [],
     skills: [],
     stunts: [],
     extras: '',

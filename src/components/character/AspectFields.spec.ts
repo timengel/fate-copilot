@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import AspectFields from './AspectFields.vue';
 
@@ -54,6 +54,60 @@ describe('AspectFields', () => {
       const updated: string[] = onUpdateAspects.mock.calls[0][0];
       expect(updated[0]).toBe('New Aspect');
     });
+
+    it('renders a remove button for each normal aspect', () => {
+      const { container } = render(AspectFields, { props: defaultProps });
+      const removeBtns = container.querySelectorAll('button[aria-label="Schließen"], button[title="Schließen"]');
+      // one remove button per aspect
+      expect(container.querySelectorAll('.aspect-row button')).toHaveLength(3);
+    });
+
+    it('clicking remove emits update:aspects with that item removed', async () => {
+      const onUpdateAspects = vi.fn();
+      const { container } = render(AspectFields, {
+        props: { ...defaultProps, 'onUpdate:aspects': onUpdateAspects },
+      });
+      const removeBtn = container.querySelectorAll('.aspect-row button')[0] as HTMLButtonElement;
+      await fireEvent.click(removeBtn);
+      expect(onUpdateAspects).toHaveBeenCalledOnce();
+      const updated: string[] = onUpdateAspects.mock.calls[0][0];
+      expect(updated).toEqual(['Quick', 'Cunning']);
+    });
+
+    it('shows an add button', () => {
+      render(AspectFields, { props: defaultProps });
+      expect(screen.getByText('+ Aspekt')).toBeTruthy();
+    });
+
+    it('clicking add emits update:aspects with an empty string appended', async () => {
+      const onUpdateAspects = vi.fn();
+      render(AspectFields, {
+        props: { ...defaultProps, 'onUpdate:aspects': onUpdateAspects },
+      });
+      await fireEvent.click(screen.getByText('+ Aspekt'));
+      expect(onUpdateAspects).toHaveBeenCalledOnce();
+      const updated: string[] = onUpdateAspects.mock.calls[0][0];
+      expect(updated).toEqual(['Brave', 'Quick', 'Cunning', '']);
+    });
+  });
+
+  describe('withHighConcept prop', () => {
+    it('hides highConcept and trouble rows when withHighConcept=false', () => {
+      const { container } = render(AspectFields, {
+        props: { ...defaultProps, withHighConcept: false },
+      });
+      const inputs = container.querySelectorAll<HTMLInputElement>('input.aspect-input');
+      // only the 3 normal aspect inputs, no highConcept/trouble
+      expect(inputs).toHaveLength(3);
+      expect(Array.from(inputs).map(i => i.value)).toEqual(['Brave', 'Quick', 'Cunning']);
+    });
+
+    it('shows highConcept and trouble when withHighConcept=true (default)', () => {
+      const { container } = render(AspectFields, { props: defaultProps });
+      const inputs = container.querySelectorAll<HTMLInputElement>('input.aspect-input');
+      expect(inputs[0].value).toBe('Hero');
+      expect(inputs[1].value).toBe('A dark past');
+    });
   });
 
   describe('readonly mode', () => {
@@ -66,6 +120,11 @@ describe('AspectFields', () => {
     it('does not render any aspect inputs', () => {
       const { container } = render(AspectFields, { props: { ...defaultProps, readonly: true } });
       expect(container.querySelectorAll('input.aspect-input')).toHaveLength(0);
+    });
+
+    it('does not show add or remove buttons', () => {
+      const { container } = render(AspectFields, { props: { ...defaultProps, readonly: true } });
+      expect(container.querySelectorAll('button')).toHaveLength(0);
     });
   });
 });
