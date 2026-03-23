@@ -54,17 +54,18 @@ describe('ConsequenceSlots', () => {
     expect(container.querySelectorAll('button.consequence-clear')).toHaveLength(4);
   });
 
-  it('clears a consequence value via the clear button', async () => {
+  it('removes a consequence slot via the clear button', async () => {
     const onUpdate = vi.fn();
     const { container } = render(ConsequenceSlots, {
       props: { consequences, readonly: false, onUpdate },
     });
     const clearButtons = container.querySelectorAll<HTMLButtonElement>('button.consequence-clear');
-    await fireEvent.click(clearButtons[3]!);
+    await fireEvent.click(clearButtons[3]!); // remove extreme (index 3)
     expect(onUpdate).toHaveBeenCalledOnce();
     const updated: Consequence[] = onUpdate.mock.calls[0]![0];
-    expect(updated[3]!.value).toBe('');
-    expect(updated[0]!.value).toBe('');
+    expect(updated).toHaveLength(3);
+    expect(updated.find((c) => c.label === 'extreme')).toBeUndefined();
+    expect(updated[0]!.value).toBe(''); // others untouched
   });
 
   describe('readonly mode', () => {

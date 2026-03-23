@@ -32,8 +32,8 @@ function onValueInput(i: number, e: Event) {
   if (e.target instanceof HTMLInputElement) updateValue(i, e.target.value);
 }
 
-function clearValue(index: number) {
-  updateValue(index, '');
+function removeSlot(index: number) {
+  emit('update', props.consequences.filter((_, i) => i !== index));
 }
 </script>
 
@@ -53,13 +53,12 @@ function clearValue(index: number) {
       <FateButton
         v-if="!readonly"
         class="consequence-clear"
-        variant="subtle"
+        variant="danger"
         size="S"
         icon="close"
-        :disabled="!con.value"
-        :aria-label="`${LABELS[con.label]}e Konsequenz leeren`"
-        title="Konsequenz leeren"
-        @click="clearValue(i)"
+        :aria-label="`${LABELS[con.label]}e Konsequenz entfernen`"
+        title="Konsequenz entfernen"
+        @click="removeSlot(i)"
       />
     </div>
   </div>

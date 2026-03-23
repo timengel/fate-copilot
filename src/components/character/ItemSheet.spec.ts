@@ -261,17 +261,9 @@ describe('ItemSheet', () => {
       it('add consequence slot button adds a slot of the given severity', async () => {
         const { container } = renderForm(makeItem({ consequences: [] }));
         const addBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-        // Each severity has a − and + button; first + is at index 1 (Leicht)
-        await fireEvent.click(addBtns[1]!);
+        // One button per severity: Leicht(0), Mittel(1), Schwer(2), Extrem(3)
+        await fireEvent.click(addBtns[0]!);
         expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
-      });
-
-      it('remove consequence slot button is disabled when count is 0', () => {
-        const { container } = renderForm(makeItem({ consequences: [] }));
-        const removeBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn:first-child');
-        for (const btn of removeBtns) {
-          expect(btn.disabled).toBe(true);
-        }
       });
 
       it('save emits item with correct consequences array', async () => {

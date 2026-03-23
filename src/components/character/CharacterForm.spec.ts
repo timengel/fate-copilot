@@ -158,9 +158,9 @@ describe('CharacterSheet (edit mode)', () => {
     const onSave = vi.fn();
     const char = createDefaultCharacter('nsc'); // starts with 1 mild consequence
     const { container } = renderForm(char, { onSave });
-    // consequence-config-btn order: Leicht−(0), Leicht+(1), Mittel−(2), Mittel+(3), ...
+    // consequence-config-btn order: Leicht(0), Mittel(1), Schwer(2), Extrem(3)
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[1]!); // Leicht +
+    await fireEvent.click(configBtns[0]!); // Leicht
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.consequences.filter((c) => c.severity === 2)).toHaveLength(2);
@@ -176,20 +176,12 @@ describe('CharacterSheet (edit mode)', () => {
       ] as Consequence[],
     };
     const { container } = renderForm(char, { onSave });
-    const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[0]!); // Leicht −
+    // remove via the close button on the last consequence row
+    const clearBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-clear');
+    await fireEvent.click(clearBtns[clearBtns.length - 1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.consequences.filter((c) => c.severity === 2)).toHaveLength(1);
-  });
-
-  it('NSC: − consequence button is disabled when count for severity is 0', () => {
-    const char = createDefaultCharacter('nsc'); // only 1 mild; moderate/severe/extreme = 0
-    const { container } = renderForm(char);
-    const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    expect(configBtns[2]!.disabled).toBe(true); // Mittel −
-    expect(configBtns[4]!.disabled).toBe(true); // Schwer −
-    expect(configBtns[6]!.disabled).toBe(true); // Extrem −
   });
 
   it('NSC: new consequence slot is inserted after existing slots of same severity', async () => {
@@ -203,7 +195,7 @@ describe('CharacterSheet (edit mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
     const configBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
-    await fireEvent.click(configBtns[1]!); // Leicht + → adds after index 0 (last mild)
+    await fireEvent.click(configBtns[0]!); // Leicht → adds after index 0 (last mild)
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
     const mildIdx = saved.consequences.findIndex((c) => c.severity === 2 && c.value === '');

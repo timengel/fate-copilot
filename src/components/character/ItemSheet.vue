@@ -101,10 +101,6 @@ const hasVisibleConsequences = computed(
   () => isEditing.value || (show.value.consequences && visibleConsequences.value.length > 0),
 );
 
-function countConsequences(severity: ConsequenceSeverity) {
-  return (form.consequences ?? []).filter((c: Consequence) => c.severity === severity).length;
-}
-
 function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: ConsequenceLabel) {
   if (!form.consequences) form.consequences = [];
   const idx = form.consequences.map((c: Consequence) => c.severity).lastIndexOf(severity);
@@ -113,12 +109,6 @@ function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: Consequence
     label: labelKey,
     value: '',
   });
-}
-
-function removeConsequenceSlot(severity: ConsequenceSeverity) {
-  if (!form.consequences) return;
-  const idx = form.consequences.map((c: Consequence) => c.severity).lastIndexOf(severity);
-  if (idx !== -1) form.consequences.splice(idx, 1);
 }
 
 function addStunt() {
@@ -396,20 +386,16 @@ defineExpose({ save });
         <div class="sheet-section-header">KONSEQUENZEN</div>
         <template v-if="isEditing">
           <div class="consequence-config">
-            <span v-for="ct in CONSEQUENCE_TYPES" :key="ct.severity" class="consequence-config-item">
-              <button
-                type="button"
-                class="consequence-config-btn"
-                :disabled="countConsequences(ct.severity) === 0"
-                @click="removeConsequenceSlot(ct.severity)"
-              >−</button>
-              <span class="consequence-config-label">{{ ct.label }} ({{ ct.severity }})</span>
-              <button
-                type="button"
-                class="consequence-config-btn"
-                @click="addConsequenceSlot(ct.severity, ct.labelKey)"
-              >+</button>
-            </span>
+            <FateButton
+              v-for="ct in CONSEQUENCE_TYPES"
+              :key="ct.severity"
+              type="button"
+              variant="secondary"
+              size="S"
+              icon="add"
+              class="consequence-config-btn"
+              @click="addConsequenceSlot(ct.severity, ct.labelKey)"
+            >{{ ct.label }} ({{ ct.severity }})</FateButton>
           </div>
           <ConsequenceSlots
             :consequences="form.consequences ?? []"
@@ -783,6 +769,9 @@ defineExpose({ save });
 
 .stunts-list {
   padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
 .stunt-item {
@@ -793,9 +782,8 @@ defineExpose({ save });
 
 .stunt-edit-row {
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .stunt-edit-fields {
@@ -911,55 +899,9 @@ defineExpose({ save });
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
-  background: color-mix(in srgb, var(--fate-white) 91%, var(--fate-blue-light) 9%);
   overflow: hidden;
 }
 
-.consequence-config-item {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding-right: 0.75rem;
-  border-right: 1px solid color-mix(in srgb, var(--fate-blue-light) 68%, var(--fate-white) 32%);
-}
-
-.consequence-config-item:last-child {
-  padding-right: 0;
-  border-right: none;
-}
-
-.consequence-config-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--fate-white) 92%, var(--fate-blue-light) 8%);
-  color: var(--fate-text);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.consequence-config-btn:hover:not(:disabled) {
-  border-color: var(--fate-blue);
-  color: var(--fate-blue);
-}
-
-.consequence-config-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.consequence-config-label {
-  font-size: 0.8rem;
-  color: var(--fate-text);
-  min-width: 70px;
-  text-align: center;
-}
 
 /* RED & BLUE DICE + PURE DAMAGE */
 .red-blue-dice-section,
@@ -1155,8 +1097,7 @@ defineExpose({ save });
 :global([data-theme="dark"] .field-input),
 :global([data-theme="dark"] .text-area-input),
 :global([data-theme="dark"] .stunt-name-input),
-:global([data-theme="dark"] .stunt-desc-textarea),
-:global([data-theme="dark"] .consequence-config-btn) {
+:global([data-theme="dark"] .stunt-desc-textarea) {
   background: var(--fate-bg);
 }
 
@@ -1175,8 +1116,7 @@ defineExpose({ save });
   :global(:root:not([data-theme="light"]) .field-input),
   :global(:root:not([data-theme="light"]) .text-area-input),
   :global(:root:not([data-theme="light"]) .stunt-name-input),
-  :global(:root:not([data-theme="light"]) .stunt-desc-textarea),
-  :global(:root:not([data-theme="light"]) .consequence-config-btn) {
+  :global(:root:not([data-theme="light"]) .stunt-desc-textarea) {
     background: var(--fate-bg);
   }
 }
