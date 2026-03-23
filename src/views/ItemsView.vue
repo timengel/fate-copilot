@@ -141,10 +141,14 @@ function toggleArchived(item: Item) {
         <template v-if="item.description">
           {{ item.description }}
         </template>
-        <template v-if="item.redDice || item.blueDice" #meta>
+        <template v-if="item.redDice || item.blueDice || item.pureDamage || item.deflection" #meta>
           <span v-if="item.redDice">{{ item.redDice }} 🟥</span>
           <span v-if="item.redDice && item.blueDice"> · </span>
           <span v-if="item.blueDice">{{ item.blueDice }} 🟦</span>
+          <span v-if="(item.redDice || item.blueDice) && (item.pureDamage || item.deflection)"> · </span>
+          <span v-if="item.pureDamage">{{ item.pureDamage }} ⚔️</span>
+          <span v-if="item.pureDamage && item.deflection"> · </span>
+          <span v-if="item.deflection">{{ item.deflection }} 🛡️</span>
         </template>
         <template #actions>
           <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(item)" />

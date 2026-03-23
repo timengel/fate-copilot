@@ -73,6 +73,38 @@ describe('ItemSheet', () => {
       expect(screen.getByText('VERSTECKT')).toBeTruthy();
     });
 
+    it('hides PURER SCHADEN & DEFLEKTION section when both are 0', () => {
+      renderView(makeItem({ pureDamage: 0, deflection: 0 }));
+      expect(screen.queryByText('PURER SCHADEN & DEFLEKTION')).toBeNull();
+    });
+
+    it('shows PURER SCHADEN & DEFLEKTION section when pureDamage > 0', () => {
+      renderView(makeItem({ pureDamage: 2, deflection: 0 }));
+      expect(screen.getByText('PURER SCHADEN & DEFLEKTION')).toBeTruthy();
+    });
+
+    it('shows PURER SCHADEN & DEFLEKTION section when deflection > 0', () => {
+      renderView(makeItem({ pureDamage: 0, deflection: 3 }));
+      expect(screen.getByText('PURER SCHADEN & DEFLEKTION')).toBeTruthy();
+    });
+
+    it('renders both dice sections as siblings under the same parent when both have values', () => {
+      const { container } = renderView(makeItem({ redDice: 2, pureDamage: 1 }));
+      const redBlue = container.querySelector('.red-blue-dice-section');
+      const pureDmg = container.querySelector('.pure-damage-section');
+      expect(redBlue).toBeTruthy();
+      expect(pureDmg).toBeTruthy();
+      expect(redBlue!.parentElement).toBe(pureDmg!.parentElement);
+    });
+
+    it('red-blue and pure-damage sections are not nested inside each other', () => {
+      const { container } = renderView(makeItem({ redDice: 1, deflection: 2 }));
+      const redBlue = container.querySelector('.red-blue-dice-section');
+      const pureDmg = container.querySelector('.pure-damage-section');
+      expect(redBlue!.contains(pureDmg)).toBe(false);
+      expect(pureDmg!.contains(redBlue)).toBe(false);
+    });
+
     it('honors the sections prop in view mode', () => {
       renderView(
         makeItem({
@@ -178,6 +210,23 @@ describe('ItemSheet', () => {
       expect(saved).not.toBe(item);
       expect(saved.stressPhysical).not.toBe(item.stressPhysical);
       expect(saved.aspects).not.toBe(item.aspects);
+    });
+
+    it('updates pureDamage and deflection via the icon counters', async () => {
+      const onSave = vi.fn();
+      const { container } = renderForm(makeItem({ pureDamage: 1, deflection: 2 }), { onSave });
+
+      const plusButtons = Array.from(
+        container.querySelectorAll<HTMLButtonElement>('.icon-counter .icon-controls button[aria-label="Erhöhen"]'),
+      );
+      // First counter is PURER SCHADEN, second is DEFLEKTION
+      await fireEvent.click(plusButtons[0]!); // pureDamage 1 → 2
+      await fireEvent.click(plusButtons[1]!); // deflection 2 → 3
+      await fireEvent.click(screen.getByText('Speichern'));
+
+      const saved = onSave.mock.calls[0]![0] as Item;
+      expect(saved.pureDamage).toBe(2);
+      expect(saved.deflection).toBe(3);
     });
 
     it('disables save when unchanged for an existing item and enables it after edits', async () => {

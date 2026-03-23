@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createDefaultCharacter, useCharacterDefaults } from './useCharacterDefaults';
+import { createDefaultCharacter, createDefaultItem, useCharacterDefaults } from './useCharacterDefaults';
 
 describe('createDefaultCharacter', () => {
   it('returns a non-empty id', () => {
@@ -111,6 +111,30 @@ describe('createDefaultCharacter (SC, explicit)', () => {
     const { consequences } = createDefaultCharacter('sc');
     expect(consequences).toHaveLength(4);
     expect(consequences.map((c) => c.severity)).toEqual([2, 4, 6, 8]);
+  });
+});
+
+describe('createDefaultItem', () => {
+  it('returns a non-empty id', () => {
+    expect(createDefaultItem().id).toBeTruthy();
+  });
+
+  it("returns type 'item'", () => {
+    expect(createDefaultItem().type).toBe('item');
+  });
+
+  it('returns redDice=0 and blueDice=0', () => {
+    const item = createDefaultItem();
+    expect(item.redDice).toBe(0);
+    expect(item.blueDice).toBe(0);
+  });
+
+  it('returns pureDamage=0', () => {
+    expect(createDefaultItem().pureDamage).toBe(0);
+  });
+
+  it('returns deflection=0', () => {
+    expect(createDefaultItem().deflection).toBe(0);
   });
 });
 

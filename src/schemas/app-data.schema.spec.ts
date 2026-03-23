@@ -252,6 +252,54 @@ describe('app-data JSON Schema', () => {
     });
   });
 
+  describe('Item pureDamage and deflection fields', () => {
+    const minimalItem = {
+      id: 'item-1',
+      type: 'item',
+      name: 'Schwert',
+      description: '',
+      aspects: [],
+      stunts: [],
+      extras: '',
+      stressPhysical: [],
+      stressMental: [],
+      redDice: 0,
+      blueDice: 0,
+    };
+
+    it('accepts an item without pureDamage/deflection (backwards compat)', () => {
+      expect(isValid({ ...minimalV10, items: [minimalItem] })).toBe(true);
+    });
+
+    it('accepts an item with pureDamage=0 and deflection=0', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 0, deflection: 0 }] })).toBe(true);
+    });
+
+    it('accepts an item with pureDamage=4 and deflection=4 (max)', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 4, deflection: 4 }] })).toBe(true);
+    });
+
+    it('rejects pureDamage > 4', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 5 }] })).toBe(false);
+    });
+
+    it('rejects deflection > 4', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: 5 }] })).toBe(false);
+    });
+
+    it('rejects pureDamage < 0', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -1 }] })).toBe(false);
+    });
+
+    it('rejects deflection < 0', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: -1 }] })).toBe(false);
+    });
+
+    it('rejects non-integer pureDamage', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 1.5 }] })).toBe(false);
+    });
+  });
+
   describe('exportJSON output conforms to schema', () => {
     beforeEach(() => {
       setActivePinia(createPinia());

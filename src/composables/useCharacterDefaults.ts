@@ -76,6 +76,8 @@ export function createDefaultItem(): Item {
     avatar: '',
     redDice: 0,
     blueDice: 0,
+    pureDamage: 0,
+    deflection: 0,
   };
 }
 

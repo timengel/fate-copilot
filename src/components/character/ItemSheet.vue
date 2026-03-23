@@ -10,6 +10,7 @@ import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
 import StressTrack from './StressTrack.vue';
 import DiceTrack from './DiceTrack.vue';
+import FateIconCounter from './FateIconCounter.vue';
 import FateButton from '../shared/FateButton.vue';
 
 const props = defineProps<{
@@ -368,6 +369,33 @@ defineExpose({ save });
       </p>
     </section>
 
+    <!-- PURER SCHADEN & DEFLEKTION -->
+    <section
+      v-if="show.dice && (isEditing || data.pureDamage || data.deflection)"
+      class="sheet-section pure-damage-section"
+    >
+      <div class="sheet-section-header">PURER SCHADEN &amp; DEFLEKTION</div>
+      <div class="dice-tracks">
+        <FateIconCounter
+          v-if="isEditing || data.pureDamage"
+          label="PURER SCHADEN"
+          icon="die-plus"
+          :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
+          :readonly="!isEditing"
+          @update="form.pureDamage = $event"
+        />
+        <FateIconCounter
+          v-if="isEditing || data.deflection"
+          label="DEFLEKTION"
+          icon="die-minus"
+          color="blue"
+          :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
+          :readonly="!isEditing"
+          @update="form.deflection = $event"
+        />
+      </div>
+    </section>
+
     <!-- GM OPTIONS -->
     <section
       v-if="show.gmNotes && gmModeStore.isGMMode && (isEditing || data.gmNotes)"
@@ -466,7 +494,6 @@ defineExpose({ save });
 .item-name-bar,
 .allgemeines,
 .sheet-stress-row,
-.red-blue-dice-section,
 .gm-notes-section,
 .form-actions {
   grid-column: 1 / -1;
@@ -769,8 +796,9 @@ defineExpose({ save });
   padding: 0;
 }
 
-/* RED & BLUE DICE */
-.red-blue-dice-section {
+/* RED & BLUE DICE + PURE DAMAGE */
+.red-blue-dice-section,
+.pure-damage-section {
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
 }
 

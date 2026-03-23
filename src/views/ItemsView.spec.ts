@@ -172,6 +172,47 @@ describe('ItemsView – card interactions', () => {
     });
   });
 
+  describe('meta display', () => {
+    function setupWithItem(overrides: Partial<Item> = {}) {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const store = useItemsStore();
+      store.addItem(makeItem(overrides));
+      return render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+    }
+
+    it('shows pureDamage count with ⚔️ when pureDamage > 0', () => {
+      const { getByText } = setupWithItem({ pureDamage: 2 });
+      expect(getByText('2 ⚔️')).toBeTruthy();
+    });
+
+    it('shows deflection count with 🛡️ when deflection > 0', () => {
+      const { getByText } = setupWithItem({ deflection: 3 });
+      expect(getByText('3 🛡️')).toBeTruthy();
+    });
+
+    it('shows both pureDamage and deflection when both are set', () => {
+      const { getByText } = setupWithItem({ pureDamage: 1, deflection: 2 });
+      expect(getByText('1 ⚔️')).toBeTruthy();
+      expect(getByText('2 🛡️')).toBeTruthy();
+    });
+
+    it('does not show meta when all dice and pure damage values are 0', () => {
+      const { container } = setupWithItem({ redDice: 0, blueDice: 0, pureDamage: 0, deflection: 0 });
+      expect(container.querySelector('.fate-card__meta')).toBeNull();
+    });
+  });
+
   it('shows archived items only when the archive filter is enabled', async () => {
     const pinia = createPinia();
     setActivePinia(pinia);

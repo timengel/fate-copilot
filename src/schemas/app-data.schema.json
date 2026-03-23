@@ -185,7 +185,9 @@
         "color": { "$ref": "#/$defs/TagColor" },
         "avatar": { "type": "string" },
         "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
-        "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 }
+        "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "pureDamage": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "deflection": { "type": "integer", "minimum": 0, "maximum": 4 }
       }
     },
     "TagColor": {

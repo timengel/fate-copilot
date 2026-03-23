@@ -155,6 +155,8 @@ export interface Item {
   avatar?: string;
   redDice: number;
   blueDice: number;
+  pureDamage?: number;
+  deflection?: number;
 }
 
 export interface Milestone {
