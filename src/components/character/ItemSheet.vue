@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
-import type { Item, Stunt } from '../../types';
+import type { Consequence, ConsequenceLabel, ConsequenceSeverity, Item, Stunt } from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -11,7 +11,11 @@ import FateCheckbox from '../shared/FateCheckbox.vue';
 import StressTrack from './StressTrack.vue';
 import DiceTrack from './DiceTrack.vue';
 import FateIconCounter from './FateIconCounter.vue';
+import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
+import { useMarkdown } from '../../composables/useMarkdown';
+
+const { renderMarkdown } = useMarkdown();
 
 const props = defineProps<{
   item: Item;
@@ -26,6 +30,7 @@ const props = defineProps<{
     stress?: boolean;
     gmNotes?: boolean;
     dice?: boolean;
+    consequences?: boolean;
   };
 }>();
 
@@ -59,6 +64,7 @@ const show = computed(() => ({
   stress: isEditing.value || (props.sections?.stress ?? true),
   gmNotes: isEditing.value || (props.sections?.gmNotes ?? true),
   dice: isEditing.value || (props.sections?.dice ?? true),
+  consequences: props.sections?.consequences !== false,
 }));
 const isItemHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && !!props.item.hidden,
@@ -75,6 +81,45 @@ const colorVars = computed(() => {
 });
 
 
+
+const CONSEQUENCE_TYPES: { label: string; severity: ConsequenceSeverity; labelKey: ConsequenceLabel }[] = [
+  { label: 'Leicht', severity: 2, labelKey: 'mild' },
+  { label: 'Mittel', severity: 4, labelKey: 'moderate' },
+  { label: 'Schwer', severity: 6, labelKey: 'severe' },
+  { label: 'Extrem', severity: 8, labelKey: 'extreme' },
+];
+
+const visibleConsequences = computed(() =>
+  (data.value.consequences ?? []).filter((c: Consequence) => c.value.trim() !== ''),
+);
+
+const hasVisibleStress = computed(
+  () => show.value.stress && (isEditing.value || data.value.stressPhysical.length > 0 || data.value.stressMental.length > 0),
+);
+
+const hasVisibleConsequences = computed(
+  () => isEditing.value || (show.value.consequences && visibleConsequences.value.length > 0),
+);
+
+function countConsequences(severity: ConsequenceSeverity) {
+  return (form.consequences ?? []).filter((c: Consequence) => c.severity === severity).length;
+}
+
+function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: ConsequenceLabel) {
+  if (!form.consequences) form.consequences = [];
+  const idx = form.consequences.map((c: Consequence) => c.severity).lastIndexOf(severity);
+  form.consequences.splice(idx === -1 ? form.consequences.length : idx + 1, 0, {
+    severity,
+    label: labelKey,
+    value: '',
+  });
+}
+
+function removeConsequenceSlot(severity: ConsequenceSeverity) {
+  if (!form.consequences) return;
+  const idx = form.consequences.map((c: Consequence) => c.severity).lastIndexOf(severity);
+  if (idx !== -1) form.consequences.splice(idx, 1);
+}
 
 function addStunt() {
   form.stunts.push({ name: '', description: '' });
@@ -222,7 +267,7 @@ defineExpose({ save });
         v-model="form.extras"
         placeholder="Extras beschreiben..."
       />
-      <div v-else class="text-area-display">{{ data.extras || '' }}</div>
+      <div v-else class="text-area-display markdown-content" v-html="renderMarkdown(data.extras)" />
     </section>
 
     <!-- STUNTS -->
@@ -262,9 +307,13 @@ defineExpose({ save });
       </div>
     </section>
 
-    <!-- STRESS -->
-    <div v-if="show.stress && (isEditing || data.stressPhysical.length > 0 || data.stressMental.length > 0)" class="sheet-stress-row">
-      <div class="stress-section span-full">
+    <!-- STRESS + KONSEQUENZEN -->
+    <div v-if="hasVisibleStress || hasVisibleConsequences" class="sheet-stress-row">
+      <div
+        v-if="hasVisibleStress"
+        class="stress-section"
+        :class="{ 'span-full': !hasVisibleConsequences }"
+      >
         <div class="sheet-section-header">STRESS</div>
         <div class="stress-content">
         <template v-if="isEditing">
@@ -337,6 +386,38 @@ defineExpose({ save });
         </template>
         </div>
       </div>
+
+      <!-- KONSEQUENZEN -->
+      <section
+        v-if="hasVisibleConsequences"
+        class="sheet-section consequences"
+        :class="{ 'span-full': !hasVisibleStress }"
+      >
+        <div class="sheet-section-header">KONSEQUENZEN</div>
+        <template v-if="isEditing">
+          <div class="consequence-config">
+            <span v-for="ct in CONSEQUENCE_TYPES" :key="ct.severity" class="consequence-config-item">
+              <button
+                type="button"
+                class="consequence-config-btn"
+                :disabled="countConsequences(ct.severity) === 0"
+                @click="removeConsequenceSlot(ct.severity)"
+              >−</button>
+              <span class="consequence-config-label">{{ ct.label }} ({{ ct.severity }})</span>
+              <button
+                type="button"
+                class="consequence-config-btn"
+                @click="addConsequenceSlot(ct.severity, ct.labelKey)"
+              >+</button>
+            </span>
+          </div>
+          <ConsequenceSlots
+            :consequences="form.consequences ?? []"
+            @update="form.consequences = $event"
+          />
+        </template>
+        <ConsequenceSlots v-else :consequences="visibleConsequences" :readonly="true" />
+      </section>
     </div>
 
     <!-- ROTE & BLAUE WÜRFEL -->
@@ -421,7 +502,7 @@ defineExpose({ save });
         v-model="form.gmNotes"
         placeholder="GM Notizen..."
       />
-      <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
+      <div v-else class="text-area-display gm-notes-display markdown-content" v-html="renderMarkdown(data.gmNotes)" />
     </section>
 
     <!-- FORM ACTIONS (edit mode only) -->
@@ -663,6 +744,27 @@ defineExpose({ save });
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
 }
 
+.text-area-display.markdown-content {
+  white-space: normal;
+}
+
+.markdown-content :deep(p) { margin: 0 0 0.5em; }
+.markdown-content :deep(p:last-child) { margin-bottom: 0; }
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) { margin: 0.25em 0 0.5em 1.25em; padding: 0; }
+.markdown-content :deep(li) { margin-bottom: 0.15em; }
+.markdown-content :deep(strong) { font-weight: 600; }
+.markdown-content :deep(em) { font-style: italic; }
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3) { margin: 0.5em 0 0.25em; font-size: 1em; font-weight: 700; }
+.markdown-content :deep(code) {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
 .text-area-input {
   field-sizing: content;
   width: 100%;
@@ -753,15 +855,18 @@ defineExpose({ save });
   line-height: 1;
 }
 
-/* STRESS */
+/* STRESS + KONSEQUENZEN row */
 .sheet-stress-row {
   grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: max-content 1fr;
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
 }
 
 .stress-section {
   display: flex;
   flex-direction: column;
+  min-width: 240px;
 }
 
 .stress-content {
@@ -794,6 +899,65 @@ defineExpose({ save });
 
 .stress-ctrl-btn {
   padding: 0;
+}
+
+/* CONSEQUENCES */
+.consequences {
+  border-bottom: none;
+}
+
+.consequence-config {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: color-mix(in srgb, var(--fate-white) 91%, var(--fate-blue-light) 9%);
+}
+
+.consequence-config-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 0.75rem;
+  border-right: 1px solid color-mix(in srgb, var(--fate-blue-light) 68%, var(--fate-white) 32%);
+}
+
+.consequence-config-item:last-child {
+  padding-right: 0;
+  border-right: none;
+}
+
+.consequence-config-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--fate-white) 92%, var(--fate-blue-light) 8%);
+  color: var(--fate-text);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consequence-config-btn:hover:not(:disabled) {
+  border-color: var(--fate-blue);
+  color: var(--fate-blue);
+}
+
+.consequence-config-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.consequence-config-label {
+  font-size: 0.8rem;
+  color: var(--fate-text);
+  min-width: 70px;
+  text-align: center;
 }
 
 /* RED & BLUE DICE + PURE DAMAGE */
@@ -918,6 +1082,10 @@ defineExpose({ save });
   .extras {
     border-right: none;
   }
+
+  .sheet-stress-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @container character-card (width < 480px) {
@@ -946,6 +1114,10 @@ defineExpose({ save });
 
   .extras {
     border-right: none;
+  }
+
+  .sheet-stress-row {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -982,7 +1154,8 @@ defineExpose({ save });
 :global([data-theme="dark"] .field-input),
 :global([data-theme="dark"] .text-area-input),
 :global([data-theme="dark"] .stunt-name-input),
-:global([data-theme="dark"] .stunt-desc-textarea) {
+:global([data-theme="dark"] .stunt-desc-textarea),
+:global([data-theme="dark"] .consequence-config-btn) {
   background: var(--fate-bg);
 }
 
@@ -1001,7 +1174,8 @@ defineExpose({ save });
   :global(:root:not([data-theme="light"]) .field-input),
   :global(:root:not([data-theme="light"]) .text-area-input),
   :global(:root:not([data-theme="light"]) .stunt-name-input),
-  :global(:root:not([data-theme="light"]) .stunt-desc-textarea) {
+  :global(:root:not([data-theme="light"]) .stunt-desc-textarea),
+  :global(:root:not([data-theme="light"]) .consequence-config-btn) {
     background: var(--fate-bg);
   }
 }

@@ -229,6 +229,62 @@ describe('ItemSheet', () => {
       expect(saved.deflection).toBe(3);
     });
 
+    describe('consequences', () => {
+      it('hides KONSEQUENZEN section when consequences array is empty', () => {
+        renderView(makeItem({ consequences: [] }));
+        expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+      });
+
+      it('hides KONSEQUENZEN section when all consequence values are empty strings', () => {
+        renderView(makeItem({ consequences: [{ severity: 2, label: 'mild', value: '' }] }));
+        expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+      });
+
+      it('shows KONSEQUENZEN section when at least one consequence has a value', () => {
+        renderView(makeItem({ consequences: [{ severity: 2, label: 'mild', value: 'Gebrochen' }] }));
+        expect(screen.getByText('KONSEQUENZEN')).toBeTruthy();
+      });
+
+      it('hides KONSEQUENZEN section when sections.consequences is false', () => {
+        renderView(
+          makeItem({ consequences: [{ severity: 2, label: 'mild', value: 'Verletzt' }] }),
+          { sections: { consequences: false } },
+        );
+        expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+      });
+
+      it('shows KONSEQUENZEN section in edit mode even when consequences is empty', () => {
+        renderForm(makeItem({ consequences: [] }));
+        expect(screen.getByText('KONSEQUENZEN')).toBeTruthy();
+      });
+
+      it('add consequence slot button adds a slot of the given severity', async () => {
+        const { container } = renderForm(makeItem({ consequences: [] }));
+        const addBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn');
+        // Each severity has a − and + button; first + is at index 1 (Leicht)
+        await fireEvent.click(addBtns[1]!);
+        expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
+      });
+
+      it('remove consequence slot button is disabled when count is 0', () => {
+        const { container } = renderForm(makeItem({ consequences: [] }));
+        const removeBtns = container.querySelectorAll<HTMLButtonElement>('.consequence-config-btn:first-child');
+        for (const btn of removeBtns) {
+          expect(btn.disabled).toBe(true);
+        }
+      });
+
+      it('save emits item with correct consequences array', async () => {
+        const onSave = vi.fn();
+        const consequences = [{ severity: 2 as const, label: 'mild' as const, value: 'Leichte Wunde' }];
+        renderForm(makeItem({ consequences }), { onSave });
+        await fireEvent.click(screen.getByText('Speichern'));
+        const saved = onSave.mock.calls[0]![0] as Item;
+        expect(saved.consequences).toHaveLength(1);
+        expect(saved.consequences![0]!.value).toBe('Leichte Wunde');
+      });
+    });
+
     it('disables save when unchanged for an existing item and enables it after edits', async () => {
       const item = makeItem({ name: 'Bestehend' });
       const { container } = render(ItemSheet, {

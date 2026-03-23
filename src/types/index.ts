@@ -157,6 +157,7 @@ export interface Item {
   blueDice: number;
   pureDamage?: number;
   deflection?: number;
+  consequences?: Consequence[];
 }
 
 export interface Milestone {
