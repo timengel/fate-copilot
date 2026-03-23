@@ -31,6 +31,7 @@ const props = defineProps<{
     gmNotes?: boolean;
     dice?: boolean;
     consequences?: boolean;
+    modifiers?: boolean;
   };
 }>();
 
@@ -65,6 +66,7 @@ const show = computed(() => ({
   gmNotes: isEditing.value || (props.sections?.gmNotes ?? true),
   dice: isEditing.value || (props.sections?.dice ?? true),
   consequences: props.sections?.consequences !== false,
+  modifiers: isEditing.value || (props.sections?.modifiers ?? true),
 }));
 const isItemHidden = computed(
   () => !isEditing.value && !gmModeStore.isGMMode && !!props.item.hidden,
@@ -438,10 +440,10 @@ defineExpose({ save });
 
     <!-- PURER SCHADEN & DEFLEKTION -->
     <section
-      v-if="show.dice && (isEditing || data.pureDamage || data.deflection)"
-      class="sheet-section pure-damage-section"
+      v-if="show.modifiers && (isEditing || data.pureDamage || data.deflection)"
+      class="sheet-section modifiers-section"
     >
-      <div class="sheet-section-header">PURER SCHADEN &amp; DEFLEKTION</div>
+      <div class="sheet-section-header">MODIFIERS</div>
       <div class="dice-tracks">
         <FateIconCounter
           v-if="isEditing || data.pureDamage"
@@ -903,9 +905,9 @@ defineExpose({ save });
 }
 
 
-/* RED & BLUE DICE + PURE DAMAGE */
+/* RED & BLUE DICE + MODIFIERS */
 .red-blue-dice-section,
-.pure-damage-section {
+.modifiers-section {
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
 }
 

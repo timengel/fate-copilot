@@ -49,6 +49,7 @@ const props = defineProps<{
     consequences?: boolean;
     gmNotes?: boolean;
     dice?: boolean;
+    modifiers?: boolean;
   };
 }>();
 
@@ -84,8 +85,8 @@ const hasVisibleConsequences = computed(
 const hasVisibleDice = computed(
   () => isEditing.value || ((props.sections?.dice ?? true) && !!(data.value.redDice || data.value.blueDice)),
 );
-const hasVisiblePureDamage = computed(
-  () => isEditing.value || !!(data.value.pureDamage || data.value.deflection),
+const hasVisibleModifiers = computed(
+  () => isEditing.value || ((props.sections?.modifiers ?? true) && !!(data.value.pureDamage || data.value.deflection)),
 );
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
@@ -381,7 +382,7 @@ defineExpose({ save });
                 @input="onStuntDescInput(i, $event)"
               />
             </div>
-            <FateButton icon="close" variant="danger" size="M" @click="removeStunt(i)" name="close"></FateButton>
+            <FateButton icon="close" variant="danger" size="S" @click="removeStunt(i)" name="close"></FateButton>
           </div>
           <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
         </div>
@@ -531,8 +532,8 @@ defineExpose({ save });
       </section>
 
       <!-- PURER SCHADEN & DEFLEKTION -->
-      <section v-if="hasVisiblePureDamage" class="sheet-section pure-damage-section">
-        <div class="sheet-section-header">PURER SCHADEN &amp; DEFLEKTION</div>
+      <section v-if="hasVisibleModifiers" class="sheet-section modifiers-section">
+        <div class="sheet-section-header">MODIFIERS</div>
         <div class="dice-tracks">
           <FateIconCounter
             v-if="isEditing || data.pureDamage"

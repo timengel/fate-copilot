@@ -31,6 +31,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(sections.consequences).toBe(true);
     expect(sections.gmNotes).toBe(true);
     expect(sections.dice).toBe(true);
+    expect(sections.modifiers).toBe(true);
   });
 
   it('selectedCampaignId can be set', () => {
@@ -87,6 +88,7 @@ describe('useDashboardPreferencesStore', () => {
     store.layout = 'grid';
     store.visibleSections.skills = false;
     store.visibleSections.stress = false;
+    store.visibleSections.modifiers = false;
     store.reset();
     expect(store.selectedCampaignId).toBeNull();
     expect(store.showSC).toBe(true);
@@ -98,5 +100,6 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.layout).toBe('list');
     expect(store.visibleSections.skills).toBe(true);
     expect(store.visibleSections.stress).toBe(true);
+    expect(store.visibleSections.modifiers).toBe(true);
   });
 });

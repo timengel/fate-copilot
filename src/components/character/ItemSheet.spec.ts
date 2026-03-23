@@ -73,25 +73,30 @@ describe('ItemSheet', () => {
       expect(screen.getByText('VERSTECKT')).toBeTruthy();
     });
 
-    it('hides PURER SCHADEN & DEFLEKTION section when both are 0', () => {
+    it('hides MODIFIERS section when both are 0', () => {
       renderView(makeItem({ pureDamage: 0, deflection: 0 }));
-      expect(screen.queryByText('PURER SCHADEN & DEFLEKTION')).toBeNull();
+      expect(screen.queryByText('MODIFIERS')).toBeNull();
     });
 
-    it('shows PURER SCHADEN & DEFLEKTION section when pureDamage > 0', () => {
+    it('shows MODIFIERS section when pureDamage > 0', () => {
       renderView(makeItem({ pureDamage: 2, deflection: 0 }));
-      expect(screen.getByText('PURER SCHADEN & DEFLEKTION')).toBeTruthy();
+      expect(screen.getByText('MODIFIERS')).toBeTruthy();
     });
 
-    it('shows PURER SCHADEN & DEFLEKTION section when deflection > 0', () => {
+    it('shows MODIFIERS section when deflection > 0', () => {
       renderView(makeItem({ pureDamage: 0, deflection: 3 }));
-      expect(screen.getByText('PURER SCHADEN & DEFLEKTION')).toBeTruthy();
+      expect(screen.getByText('MODIFIERS')).toBeTruthy();
+    });
+
+    it('hides MODIFIERS section when sections.modifiers is false', () => {
+      renderView(makeItem({ pureDamage: 2, deflection: 1 }), { sections: { modifiers: false } });
+      expect(screen.queryByText('MODIFIERS')).toBeNull();
     });
 
     it('renders both dice sections as siblings under the same parent when both have values', () => {
       const { container } = renderView(makeItem({ redDice: 2, pureDamage: 1 }));
       const redBlue = container.querySelector('.red-blue-dice-section');
-      const pureDmg = container.querySelector('.pure-damage-section');
+      const pureDmg = container.querySelector('.modifiers-section');
       expect(redBlue).toBeTruthy();
       expect(pureDmg).toBeTruthy();
       expect(redBlue!.parentElement).toBe(pureDmg!.parentElement);
@@ -100,7 +105,7 @@ describe('ItemSheet', () => {
     it('red-blue and pure-damage sections are not nested inside each other', () => {
       const { container } = renderView(makeItem({ redDice: 1, deflection: 2 }));
       const redBlue = container.querySelector('.red-blue-dice-section');
-      const pureDmg = container.querySelector('.pure-damage-section');
+      const pureDmg = container.querySelector('.modifiers-section');
       expect(redBlue!.contains(pureDmg)).toBe(false);
       expect(pureDmg!.contains(redBlue)).toBe(false);
     });

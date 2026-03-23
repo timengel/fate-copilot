@@ -276,6 +276,7 @@ onUnmounted(() => {
           <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
           <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
+          <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
         </div>
 
         <div class="sidebar-group">
@@ -362,6 +363,7 @@ onUnmounted(() => {
             <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
             <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
             <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
+          <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
             <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
           </div>
         </div>

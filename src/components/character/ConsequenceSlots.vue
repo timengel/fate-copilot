@@ -67,6 +67,9 @@ function removeSlot(index: number) {
 <style scoped>
 .consequence-slots {
   padding: 0.4rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .consequence-row {

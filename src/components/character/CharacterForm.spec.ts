@@ -350,7 +350,7 @@ describe('CharacterSheet dirty-state', () => {
 
 // ─── PURER SCHADEN & DEFLEKTION section ──────────────────────────────────────
 
-describe('CharacterSheet – pure damage / deflection section', () => {
+describe('CharacterSheet – modifiers section', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
@@ -391,7 +391,7 @@ describe('CharacterSheet – pure damage / deflection section', () => {
   it('counters are readonly in view mode (no buttons rendered)', () => {
     const char = { ...createDefaultCharacter(), pureDamage: 2, deflection: 1 };
     const { container } = renderView(char);
-    const section = container.querySelector('.pure-damage-section')!;
+    const section = container.querySelector('.modifiers-section')!;
     expect(section.querySelectorAll('button')).toHaveLength(0);
   });
 
@@ -399,7 +399,7 @@ describe('CharacterSheet – pure damage / deflection section', () => {
     const onSave = vi.fn();
     const char = { ...createDefaultCharacter(), pureDamage: 2, deflection: 0 };
     const { container } = renderForm(char, { onSave });
-    const section = container.querySelector('.pure-damage-section')!;
+    const section = container.querySelector('.modifiers-section')!;
     const btns = section.querySelectorAll<HTMLButtonElement>('button');
     // btns[1] = pureDamage Erhöhen (btns[0] is minus, disabled at 2 > 0 so enabled)
     const pureDamageAdd = [...btns].find((b) => b.getAttribute('aria-label') === 'Erhöhen');
@@ -413,7 +413,7 @@ describe('CharacterSheet – pure damage / deflection section', () => {
     const onSave = vi.fn();
     const char = { ...createDefaultCharacter(), pureDamage: 0, deflection: 1 };
     const { container } = renderForm(char, { onSave });
-    const section = container.querySelector('.pure-damage-section')!;
+    const section = container.querySelector('.modifiers-section')!;
     // two counters; deflection is the second — get all Erhöhen buttons and pick the last
     const addBtns = section.querySelectorAll<HTMLButtonElement>('[aria-label="Erhöhen"]');
     await fireEvent.click(addBtns[addBtns.length - 1]!);
