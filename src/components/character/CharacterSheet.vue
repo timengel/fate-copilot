@@ -16,6 +16,9 @@ import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
+import { useMarkdown } from '../../composables/useMarkdown';
+
+const { renderMarkdown } = useMarkdown();
 
 // Module-level constant — not reactive, shared across all instances
 const CONSEQUENCE_TYPES: {
@@ -350,7 +353,7 @@ defineExpose({ save });
             placeholder="Extras beschreiben..."
           />
         </div>
-        <div v-else class="text-area-display">{{ data.extras || '' }}</div>
+        <div v-else class="text-area-display markdown-content" v-html="renderMarkdown(data.extras)" />
       </section>
 
       <!-- STUNTS -->
@@ -592,7 +595,7 @@ defineExpose({ save });
           v-model="form.gmNotes"
           placeholder="GM Notizen..."
         />
-        <div v-else class="text-area-display gm-notes-display">{{ data.gmNotes }}</div>
+        <div v-else class="text-area-display gm-notes-display markdown-content" v-html="renderMarkdown(data.gmNotes)" />
       </section>
 
       <!-- FORM ACTIONS (edit mode only) -->
@@ -844,6 +847,27 @@ defineExpose({ save });
   font-size: 0.875rem;
   color: var(--fate-text);
   background: color-mix(in srgb, var(--fate-white) 90%, var(--fate-blue-light) 10%);
+}
+
+.text-area-display.markdown-content {
+  white-space: normal;
+}
+
+.markdown-content :deep(p) { margin: 0 0 0.5em; }
+.markdown-content :deep(p:last-child) { margin-bottom: 0; }
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) { margin: 0.25em 0 0.5em 1.25em; padding: 0; }
+.markdown-content :deep(li) { margin-bottom: 0.15em; }
+.markdown-content :deep(strong) { font-weight: 600; }
+.markdown-content :deep(em) { font-style: italic; }
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3) { margin: 0.5em 0 0.25em; font-size: 1em; font-weight: 700; }
+.markdown-content :deep(code) {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0 3px;
+  border-radius: 2px;
 }
 
 .text-area-input {
