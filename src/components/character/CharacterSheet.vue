@@ -1103,6 +1103,18 @@ defineExpose({ save });
   }
 }
 
+@container character-card (width < 480px) {
+  .field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .general-grid .field-label {
+    width: auto;
+    min-width: 0;
+  }
+}
+
 @container character-card (width <= 325px) {
   .field-stat + .field-stat {
     border-left: none;
@@ -1154,6 +1166,18 @@ defineExpose({ save });
   .form-actions {
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+}
+
+@container main (width < 480px) {
+  .field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .general-grid .field-label {
+    width: auto;
+    min-width: 0;
   }
 }
 
