@@ -978,7 +978,7 @@ defineExpose({ save });
 .stress-section {
   display: flex;
   flex-direction: column;
-  min-width: 240px;
+  min-width: 310px;
 }
 
 .stress-content {
@@ -1025,6 +1025,7 @@ defineExpose({ save });
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
   background: color-mix(in srgb, var(--fate-white) 91%, var(--fate-blue-light) 9%);
+  overflow: hidden;
 }
 
 .consequence-config-item {
