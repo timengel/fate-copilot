@@ -48,6 +48,7 @@ const props = defineProps<{
     stress?: boolean;
     consequences?: boolean;
     gmNotes?: boolean;
+    dice?: boolean;
   };
 }>();
 
@@ -81,7 +82,7 @@ const hasVisibleConsequences = computed(
   () => isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
 );
 const hasVisibleDice = computed(
-  () => isEditing.value || !!(data.value.redDice || data.value.blueDice),
+  () => isEditing.value || ((props.sections?.dice ?? true) && !!(data.value.redDice || data.value.blueDice)),
 );
 const hasVisiblePureDamage = computed(
   () => isEditing.value || !!(data.value.pureDamage || data.value.deflection),

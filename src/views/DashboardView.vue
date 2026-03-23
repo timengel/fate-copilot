@@ -275,7 +275,7 @@ onUnmounted(() => {
           <FateCheckbox v-model="visibleSections.stress" label="Stress" />
           <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
-          <FateCheckbox v-if="showItems" v-model="visibleSections.dice" label="Würfel (Items)" />
+          <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
         </div>
 
         <div class="sidebar-group">
@@ -361,7 +361,7 @@ onUnmounted(() => {
             <FateCheckbox v-model="visibleSections.stress" label="Stress" />
             <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
             <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
-            <FateCheckbox v-if="showItems" v-model="visibleSections.dice" label="Würfel (Items)" />
+            <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
             <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
           </div>
         </div>
