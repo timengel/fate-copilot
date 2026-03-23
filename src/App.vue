@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { RouterView, RouterLink, useRouter } from 'vue-router';
+import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
@@ -16,6 +16,7 @@ const navOpen = ref(false);
 const headerRef = ref<HTMLElement | null>(null);
 onClickOutside(headerRef, () => { navOpen.value = false; });
 const router = useRouter();
+const route = useRoute();
 const gmModeStore = useGMModeStore();
 const themeStore = useThemeStore();
 const settingsSpinning = ref(false);
@@ -73,11 +74,11 @@ watch(
 
         <div class="nav-drawer" :class="{ 'nav-open': navOpen }">
           <div class="nav-links">
-            <RouterLink to="/dashboard" class="nav-link">Dashboard</RouterLink>
-            <RouterLink to="/campaigns" class="nav-link">Kampagnen</RouterLink>
-            <RouterLink to="/characters" class="nav-link">Charaktere</RouterLink>
-            <RouterLink to="/items" class="nav-link">Gegenstände</RouterLink>
-            <RouterLink to="/skills" class="nav-link">Fertigkeiten</RouterLink>
+            <RouterLink to="/dashboard" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/dashboard') }">Dashboard</RouterLink>
+            <RouterLink to="/campaigns" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/campaigns') }">Kampagnen</RouterLink>
+            <RouterLink to="/characters" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/characters') }">Charaktere</RouterLink>
+            <RouterLink to="/items" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/items') }">Gegenstände</RouterLink>
+            <RouterLink to="/skills" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/skills') }">Fertigkeiten</RouterLink>
             <button class="nav-link nav-theme-toggle" :aria-label="themeLabel" @click="cycleTheme">
               <span class="theme-icon-wrap">
                 <Transition name="theme-icon" mode="out-in">
