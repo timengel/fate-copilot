@@ -538,17 +538,19 @@ defineExpose({ save });
           <FateIconCounter
             v-if="isEditing || data.pureDamage"
             label="PURER SCHADEN"
-            icon="die-plus"
             :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
+            :min="-8"
+            :max="8"
             :readonly="!isEditing"
             @update="form.pureDamage = $event"
           />
           <FateIconCounter
             v-if="isEditing || data.deflection"
             label="DEFLEKTION"
-            icon="die-minus"
             color="blue"
             :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
+            :min="-8"
+            :max="8"
             :readonly="!isEditing"
             @update="form.deflection = $event"
           />
@@ -990,7 +992,7 @@ defineExpose({ save });
 .stress-track-controls {
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: 4px;
   padding-bottom: 2px;
   flex-shrink: 0;
 }

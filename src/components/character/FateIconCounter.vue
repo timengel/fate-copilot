@@ -7,12 +7,17 @@ withDefaults(
   defineProps<{
     count: number;
     label: string;
-    icon: ButtonIcon;
+    iconPositive?: ButtonIcon;
+    iconNegative?: ButtonIcon;
     readonly?: boolean;
+    min?: number;
     max?: number;
     color?: 'red' | 'blue';
   }>(),
   {
+    iconPositive: 'die-plus',
+    iconNegative: 'die-minus',
+    min: 0,
     max: 8,
   },
 );
@@ -26,16 +31,16 @@ const emit = defineEmits<{
   <div class="icon-counter" :class="color">
     <div class="icon-label">{{ label }}</div>
     <div class="icon-row">
-      <span class="icon-count">{{ count }}</span>
-      <FateIcon v-for="i in count" :key="i" :name="icon" :size="24" class="icon-item" />
+      <span class="icon-count">{{ count > 0 ? '+' + count : count }}</span>
+      <FateIcon v-for="i in Math.abs(count)" :key="i" :name="count >= 0 ? iconPositive : iconNegative" :size="24" class="icon-item" />
       <div v-if="!readonly" class="icon-controls">
         <FateButton
           variant="counter"
           icon="minus"
           size="S"
           aria-label="Verringern"
-          :disabled="count <= 0"
-          @click="emit('update', Math.max(0, count - 1))"
+          :disabled="count <= min"
+          @click="emit('update', Math.max(min, count - 1))"
         />
         <FateButton
           variant="counter"

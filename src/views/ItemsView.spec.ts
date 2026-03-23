@@ -193,18 +193,28 @@ describe('ItemsView – card interactions', () => {
 
     it('shows pureDamage count with ⚔️ when pureDamage > 0', () => {
       const { getByText } = setupWithItem({ pureDamage: 2 });
-      expect(getByText('2 ⚔️')).toBeTruthy();
+      expect(getByText('+2 ⚔️')).toBeTruthy();
     });
 
     it('shows deflection count with 🛡️ when deflection > 0', () => {
       const { getByText } = setupWithItem({ deflection: 3 });
-      expect(getByText('3 🛡️')).toBeTruthy();
+      expect(getByText('+3 🛡️')).toBeTruthy();
     });
 
     it('shows both pureDamage and deflection when both are set', () => {
       const { getByText } = setupWithItem({ pureDamage: 1, deflection: 2 });
-      expect(getByText('1 ⚔️')).toBeTruthy();
-      expect(getByText('2 🛡️')).toBeTruthy();
+      expect(getByText('+1 ⚔️')).toBeTruthy();
+      expect(getByText('+2 🛡️')).toBeTruthy();
+    });
+
+    it('shows negative pureDamage with - prefix', () => {
+      const { getByText } = setupWithItem({ pureDamage: -3 });
+      expect(getByText('-3 ⚔️')).toBeTruthy();
+    });
+
+    it('shows negative deflection with - prefix', () => {
+      const { getByText } = setupWithItem({ deflection: -2 });
+      expect(getByText('-2 🛡️')).toBeTruthy();
     });
 
     it('does not show meta when all dice and pure damage values are 0', () => {

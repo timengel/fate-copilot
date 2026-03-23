@@ -275,24 +275,28 @@ describe('app-data JSON Schema', () => {
       expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 0, deflection: 0 }] })).toBe(true);
     });
 
-    it('accepts an item with pureDamage=4 and deflection=4 (max)', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 4, deflection: 4 }] })).toBe(true);
+    it('accepts an item with pureDamage=8 and deflection=8 (max)', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 8, deflection: 8 }] })).toBe(true);
     });
 
-    it('rejects pureDamage > 4', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 5 }] })).toBe(false);
+    it('accepts an item with pureDamage=-8 and deflection=-8 (min)', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -8, deflection: -8 }] })).toBe(true);
     });
 
-    it('rejects deflection > 4', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: 5 }] })).toBe(false);
+    it('rejects pureDamage > 8', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 9 }] })).toBe(false);
     });
 
-    it('rejects pureDamage < 0', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -1 }] })).toBe(false);
+    it('rejects deflection > 8', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: 9 }] })).toBe(false);
     });
 
-    it('rejects deflection < 0', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: -1 }] })).toBe(false);
+    it('rejects pureDamage < -8', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -9 }] })).toBe(false);
+    });
+
+    it('rejects deflection < -8', () => {
+      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: -9 }] })).toBe(false);
     });
 
     it('rejects non-integer pureDamage', () => {

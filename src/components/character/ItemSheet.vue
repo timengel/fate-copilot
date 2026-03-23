@@ -237,7 +237,7 @@ defineExpose({ save });
               placeholder="Aspekt"
               @input="onAspectInput(i, $event)"
             />
-            <FateButton variant="danger" size="M" icon="close" @click="removeAspect(i)" />
+            <FateButton variant="danger" size="S" icon="close" @click="removeAspect(i)" />
           </template>
         </div>
         <div v-if="isEditing" class="aspect-add-row">
@@ -448,17 +448,19 @@ defineExpose({ save });
         <FateIconCounter
           v-if="isEditing || data.pureDamage"
           label="PURER SCHADEN"
-          icon="die-plus"
           :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
+          :min="-8"
+          :max="8"
           :readonly="!isEditing"
           @update="form.pureDamage = $event"
         />
         <FateIconCounter
           v-if="isEditing || data.deflection"
           label="DEFLEKTION"
-          icon="die-minus"
           color="blue"
           :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
+          :min="-8"
+          :max="8"
           :readonly="!isEditing"
           @update="form.deflection = $event"
         />
@@ -882,7 +884,7 @@ defineExpose({ save });
 .stress-track-controls {
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: 4px;
   padding-bottom: 2px;
   flex-shrink: 0;
 }
@@ -958,7 +960,7 @@ defineExpose({ save });
 
 .aspect-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   padding: 3px 0.75rem;
   background: color-mix(in srgb, var(--fate-white) 91%, var(--fate-blue-light) 9%);
