@@ -138,11 +138,11 @@ button {
 }
 
 .fate-btn--add {
-  background: var(--fate-blue-light);
-  color: var(--fate-blue);
+  background: var(--fate-btn-add-bg, var(--fate-blue-light));
+  color: var(--fate-btn-add-color, var(--fate-blue));
 }
 .fate-btn--add:hover {
-  background: color-mix(in srgb, var(--fate-blue-light) 60%, var(--fate-blue) 40%);
+  background: var(--fate-btn-add-hover, color-mix(in srgb, var(--fate-blue-light) 60%, var(--fate-blue) 40%));
 }
 
 .fate-btn--link {
