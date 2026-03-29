@@ -277,3 +277,92 @@ describe('replaceAllWithInfo', () => {
     expect(store.skillInfo['Athletik']).toBeUndefined();
   });
 });
+
+describe('mergeWithInfo', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('appends new skills after the existing list', () => {
+    const store = useSkillsStore();
+    store.replaceAll(['Athletik', 'Kämpfen']);
+
+    store.mergeWithInfo(['Mystik', 'Alchemie'], {});
+
+    expect(store.skills).toEqual(['Athletik', 'Kämpfen', 'Mystik', 'Alchemie']);
+  });
+
+  it('updates skillInfo for matching skills without removing other skills', () => {
+    const store = useSkillsStore();
+    store.replaceAllWithInfo(
+      ['Athletik', 'Mystik'],
+      {
+        Athletik: {
+          description: 'Alt',
+          actions: [{ name: SkillAction.Defend, examples: 'Alt' }],
+        },
+        Mystik: {
+          description: 'Bestehend',
+          actions: [],
+        },
+      },
+    );
+
+    store.mergeWithInfo(
+      ['Athletik'],
+      {
+        Athletik: {
+          description: 'Neu',
+          actions: [{ name: SkillAction.Attack, examples: 'Neu' }],
+        },
+      },
+    );
+
+    expect(store.skills).toEqual(['Athletik', 'Mystik']);
+    expect(store.skillInfo.Athletik).toEqual({
+      description: 'Neu',
+      actions: [{ name: SkillAction.Attack, examples: 'Neu' }],
+    });
+    expect(store.skillInfo.Mystik).toEqual({
+      description: 'Bestehend',
+      actions: [],
+    });
+  });
+
+  it('creates empty info for appended skills when none is provided', () => {
+    const store = useSkillsStore();
+
+    store.mergeWithInfo(['Mystik'], {});
+
+    expect(store.skillInfo.Mystik).toEqual({ description: '', actions: [] });
+  });
+
+  it('matches existing skills by normalized name when imported names contain whitespace', () => {
+    const store = useSkillsStore();
+    store.replaceAllWithInfo(
+      ['Athletik'],
+      {
+        Athletik: {
+          description: 'Alt',
+          actions: [],
+        },
+      },
+    );
+
+    store.mergeWithInfo(
+      ['  Athletik  '],
+      {
+        '  Athletik  ': {
+          description: 'Neu',
+          actions: [{ name: SkillAction.Attack, examples: 'Aktualisiert' }],
+        },
+      },
+    );
+
+    expect(store.skills).toEqual(['Athletik']);
+    expect(store.skillInfo.Athletik).toEqual({
+      description: 'Neu',
+      actions: [{ name: SkillAction.Attack, examples: 'Aktualisiert' }],
+    });
+  });
+});

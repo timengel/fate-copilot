@@ -24,16 +24,23 @@ const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const showImportDialog = ref(false);
 const importJson = ref('');
 const importError = ref('');
-
-interface LegacySkillInfoImport {
-  description?: string;
-  actions?: { name: SkillAction; note?: string; examples?: string }[];
-}
+type ImportMode = 'merge' | 'replace';
+const importMode = ref<ImportMode>('merge');
 
 interface LegacySkillActionLike {
   name: SkillAction;
   note?: string;
   examples?: string;
+}
+
+type SkillActionImport = {
+  name: SkillAction;
+  note?: string;
+  examples?: string;
+};
+
+function normalizeSkillName(name: string): string {
+  return name.trim();
 }
 
 function getActionExamples(action: LegacySkillActionLike): string {
@@ -46,11 +53,12 @@ function isSkillObject(value: unknown): value is AppSkill {
   );
 }
 
-function normalizeSkillInfo(actions: LegacySkillInfoImport['actions'] = []): SkillInfo['actions'] {
+function normalizeSkillInfo(
+  actions: SkillActionImport[] = [],
+): SkillInfo['actions'] {
   return actions
     .filter(
-      (action): action is NonNullable<LegacySkillInfoImport['actions']>[number] =>
-        !!action && typeof action.name === 'string',
+      (action): action is SkillActionImport => !!action && typeof action.name === 'string',
     )
     .map((action) => ({
       name: action.name,
@@ -62,16 +70,14 @@ async function handleCopy() {
   try {
     await navigator.clipboard.writeText(
       JSON.stringify(
-        {
-          skills: store.skills.map((name) => ({
-            name,
-            description: store.skillInfo[name]?.description ?? '',
-            actions: (store.skillInfo[name]?.actions ?? []).map((action) => ({
-              name: action.name,
-              examples: getActionExamples(action),
-            })),
+        store.skills.map((name) => ({
+          name,
+          description: store.skillInfo[name]?.description ?? '',
+          actions: (store.skillInfo[name]?.actions ?? []).map((action) => ({
+            name: action.name,
+            examples: getActionExamples(action),
           })),
-        },
+        })),
         null,
         2,
       ),
@@ -85,56 +91,59 @@ async function handleCopy() {
 function openImportDialog() {
   importJson.value = '';
   importError.value = '';
+  importMode.value = 'merge';
   showImportDialog.value = true;
+}
+
+function parseImportedSkills(json: string): { names: string[]; info: Record<string, SkillInfo> } {
+  let data: unknown;
+  try {
+    data = JSON.parse(json);
+  } catch {
+    throw new Error('Ungültiges JSON-Format.');
+  }
+
+  if (!Array.isArray(data)) {
+    throw new Error('JSON muss ein Array aus Strings oder Skill-Objekten sein.');
+  }
+
+  if (data.every((s) => typeof s === 'string')) {
+    return {
+      names: (data as string[]).map(normalizeSkillName).filter(Boolean),
+      info: {},
+    };
+  }
+
+  if (data.every(isSkillObject)) {
+    const appSkills = data as AppSkill[];
+    return {
+      names: appSkills.map((skill) => normalizeSkillName(skill.name)).filter(Boolean),
+      info: Object.fromEntries(
+        appSkills.map((skill) => [
+          normalizeSkillName(skill.name),
+          {
+            description: skill.description ?? '',
+            actions: normalizeSkillInfo(skill.actions),
+          },
+        ]),
+      ),
+    };
+  }
+
+  throw new Error('JSON muss ein Array aus Strings oder Skill-Objekten sein.');
 }
 
 function handleImport() {
   importError.value = '';
   try {
-    let data: unknown;
-    try {
-      data = JSON.parse(importJson.value);
-    } catch {
-      throw new Error('Ungültiges JSON-Format.');
-    }
-    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
-      throw new Error('JSON muss ein Objekt sein.');
-    }
-    const obj = data as Record<string, unknown>;
-    if (!Array.isArray(obj.skills)) {
-      throw new Error('Das Feld "skills" muss ein Array sein.');
-    }
+    const importedSkills = parseImportedSkills(importJson.value);
 
-    if (obj.skills.every((s) => typeof s === 'string')) {
-      const legacySkillInfo = (obj.skillInfo as Record<string, LegacySkillInfoImport>) ?? {};
-      const normalizedInfo = Object.fromEntries(
-        Object.entries(legacySkillInfo).map(([name, info]) => [
-          name,
-          {
-            description: info?.description ?? '',
-            actions: normalizeSkillInfo(info?.actions),
-          },
-        ]),
-      );
-
-      store.replaceAllWithInfo(obj.skills as string[], normalizedInfo);
-    } else if (obj.skills.every(isSkillObject)) {
-      const importedSkills = obj.skills as AppSkill[];
-      store.replaceAllWithInfo(
-        importedSkills.map((skill) => skill.name),
-        Object.fromEntries(
-          importedSkills.map((skill) => [
-            skill.name,
-            {
-              description: skill.description ?? '',
-              actions: normalizeSkillInfo(skill.actions),
-            },
-          ]),
-        ),
-      );
+    if (importMode.value === 'replace') {
+      store.replaceAllWithInfo(importedSkills.names, importedSkills.info);
     } else {
-      throw new Error('Das Feld "skills" muss ein Array aus Strings oder Skill-Objekten sein.');
+      store.mergeWithInfo(importedSkills.names, importedSkills.info);
     }
+
     toastStore.show('Fertigkeiten importiert');
     showImportDialog.value = false;
   } catch (e) {
@@ -158,6 +167,14 @@ function resetToDefaults() {
     'Fertigkeiten zurücksetzen',
     'Die Fertigkeitsliste wird auf die Fate-Core-Standardfertigkeiten zurückgesetzt. Eigene Anpassungen gehen verloren.',
     () => store.resetToDefaults(),
+  );
+}
+
+function confirmRemoveSkill(skill: string) {
+  showConfirmDialog(
+    'Fertigkeit löschen',
+    `Fertigkeit "${skill}" wirklich löschen?`,
+    () => store.removeSkill(skill),
   );
 }
 
@@ -272,7 +289,7 @@ function actionOptionsFor(currentName: SkillAction) {
               icon="close"
               variant="danger"
               size="S"
-              @click.stop="store.removeSkill(skill)"
+              @click.stop="confirmRemoveSkill(skill)"
             />
           </div>
         </div>
@@ -313,7 +330,7 @@ function actionOptionsFor(currentName: SkillAction) {
 
   <!-- Info Modal -->
   <Teleport to="body">
-    <div v-if="infoSkill" class="skill-info-overlay" @click.self="closeInfo">
+    <div v-if="infoSkill" class="skill-info-overlay">
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
@@ -435,10 +452,35 @@ function actionOptionsFor(currentName: SkillAction) {
       <div class="dialog-box">
         <div class="dialog-title">Fertigkeiten importieren</div>
         <div class="dialog-message">JSON einfügen (z. B. von einer KI generiert):</div>
+        <div class="import-mode-group" role="group" aria-label="Importmodus">
+          <button
+            type="button"
+            class="import-mode-btn"
+            :class="{ 'import-mode-btn--active': importMode === 'merge' }"
+            @click="importMode = 'merge'"
+          >
+            Anhängen
+          </button>
+          <button
+            type="button"
+            class="import-mode-btn"
+            :class="{ 'import-mode-btn--active': importMode === 'replace' }"
+            @click="importMode = 'replace'"
+          >
+            Ersetzen
+          </button>
+        </div>
+        <div class="import-mode-hint">
+          {{
+            importMode === 'merge'
+              ? 'Neue Fertigkeiten werden ergänzt, gleichnamige aktualisiert.'
+              : 'Die aktuelle Fertigkeitsliste wird komplett ersetzt.'
+          }}
+        </div>
         <textarea
           v-model="importJson"
           class="json-input"
-          placeholder='{ "skills": [{ "name": "Athletik", "description": "", "actions": [{ "name": "Vorteil erschaffen", "examples": "..." }] }] }'
+          placeholder='[{ "name": "Athletik", "description": "", "actions": [{ "name": "Vorteil erschaffen", "examples": "..." }] }]'
           spellcheck="false"
           @keydown.stop
         />
@@ -461,6 +503,19 @@ function actionOptionsFor(currentName: SkillAction) {
   display: flex;
   gap: 0.5rem;
 }
+
+@container main (width < 480px) {
+  .header-actions .btn-label {
+    display: none;
+  }
+
+  .header-actions :deep(.fate-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
+  }
+}
+
 .skills-hint {
   color: var(--fate-text-light);
   font-size: 0.875rem;
@@ -663,6 +718,47 @@ function actionOptionsFor(currentName: SkillAction) {
 
 .reset-label-short {
   display: none;
+}
+
+.import-mode-group {
+  display: inline-flex;
+  gap: 0.3rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.25rem;
+  margin: 0.75rem 0 0.5rem;
+  border-radius: 999px;
+  background: var(--fate-blue-light);
+}
+
+.import-mode-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fate-text-light);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+}
+
+.import-mode-btn--active {
+  background: var(--fate-white);
+  color: var(--fate-blue-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+}
+
+.import-mode-hint {
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--fate-text-light);
+  line-height: 1.4;
 }
 
 @container main (width < 480px) {

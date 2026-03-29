@@ -43,6 +43,10 @@ function createEmptySkillInfo(): SkillInfo {
   };
 }
 
+function normalizeSkillName(name: string): string {
+  return name.trim();
+}
+
 function normalizeSkillInfoForNames(
   names: string[],
   source: Record<string, SkillInfo>,
@@ -384,16 +388,17 @@ export const useSkillsStore = defineStore(
     }
 
     function removeSkill(name: string) {
-      if (!skills.value.includes(name)) {
+      const normalizedName = normalizeSkillName(name);
+      if (!skills.value.includes(normalizedName)) {
         return;
       }
 
-      skills.value = skills.value.filter((s) => s !== name);
-      delete skillInfo.value[name];
+      skills.value = skills.value.filter((s) => s !== normalizedName);
+      delete skillInfo.value[normalizedName];
 
       const charactersStore = useCharactersStore();
       for (const character of charactersStore.characters) {
-        const filtered = character.skills.filter((e) => e.skill !== name);
+        const filtered = character.skills.filter((e) => e.skill !== normalizedName);
         if (filtered.length !== character.skills.length) {
           charactersStore.updateCharacter({ ...character, skills: filtered });
         }
@@ -401,20 +406,50 @@ export const useSkillsStore = defineStore(
     }
 
     function setSkillInfo(name: string, info: SkillInfo) {
+      const normalizedName = normalizeSkillName(name);
       skillInfo.value = {
         ...skillInfo.value,
-        [name]: cloneSkillInfo(info),
+        [normalizedName]: cloneSkillInfo(info),
       };
     }
 
     function replaceAll(incoming: string[]) {
-      skills.value = incoming;
-      skillInfo.value = normalizeSkillInfoForNames(incoming, skillInfo.value);
+      const normalizedIncoming = incoming.map(normalizeSkillName).filter(Boolean);
+      skills.value = normalizedIncoming;
+      skillInfo.value = normalizeSkillInfoForNames(normalizedIncoming, skillInfo.value);
     }
 
     function replaceAllWithInfo(incomingSkills: string[], incomingInfo: Record<string, SkillInfo>) {
-      skills.value = incomingSkills;
-      skillInfo.value = normalizeSkillInfoForNames(incomingSkills, incomingInfo);
+      const normalizedIncoming = incomingSkills.map(normalizeSkillName).filter(Boolean);
+      const normalizedInfo = Object.fromEntries(
+        Object.entries(incomingInfo).map(([name, info]) => [normalizeSkillName(name), info]),
+      );
+
+      skills.value = normalizedIncoming;
+      skillInfo.value = normalizeSkillInfoForNames(normalizedIncoming, normalizedInfo);
+    }
+
+    function mergeWithInfo(incomingSkills: string[], incomingInfo: Record<string, SkillInfo>) {
+      const mergedSkills = [...skills.value];
+      const normalizedIncoming = incomingSkills.map(normalizeSkillName).filter(Boolean);
+      const normalizedInfo = Object.fromEntries(
+        Object.entries(incomingInfo).map(([name, info]) => [normalizeSkillName(name), info]),
+      );
+
+      for (const skill of normalizedIncoming) {
+        if (!mergedSkills.includes(skill)) {
+          mergedSkills.push(skill);
+        }
+      }
+
+      const mergedInfo = normalizeSkillInfoForNames(mergedSkills, skillInfo.value);
+
+      for (const skill of normalizedIncoming) {
+        mergedInfo[skill] = cloneSkillInfo(normalizedInfo[skill] ?? createEmptySkillInfo());
+      }
+
+      skills.value = mergedSkills;
+      skillInfo.value = mergedInfo;
     }
 
     function resetToDefaults() {
@@ -430,6 +465,7 @@ export const useSkillsStore = defineStore(
       setSkillInfo,
       replaceAll,
       replaceAllWithInfo,
+      mergeWithInfo,
       resetToDefaults,
     };
   },

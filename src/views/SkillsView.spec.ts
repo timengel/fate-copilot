@@ -173,6 +173,51 @@ describe('SkillsView', () => {
     });
   });
 
+  describe('skill delete confirmation', () => {
+    it('shows a confirmation dialog before deleting a skill', async () => {
+      const store = useSkillsStore();
+      store.addSkill('Zauberei');
+
+      const { container } = setup();
+      const row = screen.getByText('Zauberei').closest('.skill-manage-row')!;
+
+      await fireEvent.click(row.querySelector('.fate-btn')!);
+
+      expect(screen.getByText('Fertigkeit löschen')).toBeTruthy();
+      expect(screen.getByText('Fertigkeit "Zauberei" wirklich löschen?')).toBeTruthy();
+      expect(store.skills).toContain('Zauberei');
+      expect(container.ownerDocument.querySelector('.dialog-overlay')).not.toBeNull();
+    });
+
+    it('does not delete the skill when the dialog is cancelled', async () => {
+      const store = useSkillsStore();
+      store.addSkill('Zauberei');
+
+      const row = setup().container.querySelectorAll('.skill-manage-row');
+      const targetRow = [...row].find((element) => element.textContent?.includes('Zauberei'))!;
+
+      await fireEvent.click(targetRow.querySelector('.fate-btn')!);
+      await fireEvent.click(screen.getByText('Abbrechen'));
+
+      expect(store.skills).toContain('Zauberei');
+      expect(screen.queryByText('Fertigkeit löschen')).toBeNull();
+    });
+
+    it('deletes the skill when the dialog is confirmed', async () => {
+      const store = useSkillsStore();
+      store.addSkill('Zauberei');
+
+      const row = setup().container.querySelectorAll('.skill-manage-row');
+      const targetRow = [...row].find((element) => element.textContent?.includes('Zauberei'))!;
+
+      await fireEvent.click(targetRow.querySelector('.fate-btn')!);
+      await fireEvent.click(screen.getByText('Bestätigen'));
+
+      expect(store.skills).not.toContain('Zauberei');
+      expect(screen.queryByText('Fertigkeit löschen')).toBeNull();
+    });
+  });
+
   describe('skill detail dialog', () => {
     it('persists a newly added action after saving and reopening the dialog', async () => {
       const { container } = setup();
@@ -189,11 +234,23 @@ describe('SkillsView', () => {
 
       expect(screen.getByText(/Luegen durchschauen/)).toBeTruthy();
 
-      const overlay = container.ownerDocument.querySelector('.skill-info-overlay');
-      await fireEvent.click(overlay!);
+      await fireEvent.click(container.ownerDocument.querySelector('.skill-info-close')!);
       await fireEvent.click(screen.getByText('Empathie'));
 
       expect(screen.getByText(/Luegen durchschauen/)).toBeTruthy();
+    });
+
+    it('does not close when clicking the overlay', async () => {
+      const { container } = setup();
+
+      await fireEvent.click(screen.getByText('Athletik'));
+      const overlay = container.ownerDocument.querySelector('.skill-info-overlay');
+
+      await fireEvent.click(overlay!);
+
+      const modal = container.ownerDocument.querySelector('.skill-info-modal');
+      expect(modal).not.toBeNull();
+      expect(modal?.querySelector('h2')?.textContent).toBe('Athletik');
     });
 
     it('shows legacy action notes from persisted skill info', async () => {
@@ -213,6 +270,72 @@ describe('SkillsView', () => {
 
       expect(screen.getByText('Bewegung und Koordination')).toBeTruthy();
       expect(screen.getByText(/Alte Notiz aus persistiertem Zustand/)).toBeTruthy();
+    });
+  });
+
+  describe('skills import dialog', () => {
+    it('shows both import modes and defaults to Anhängen', async () => {
+      setup();
+
+      await fireEvent.click(screen.getByText('Importieren'));
+
+      expect(screen.getByRole('button', { name: 'Anhängen' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Ersetzen' })).toBeTruthy();
+      expect(screen.getByText(/Neue Fertigkeiten werden ergänzt/)).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Anhängen' }).className).toContain(
+        'import-mode-btn--active',
+      );
+    });
+
+    it('replaces all skills when Ersetzen is selected', async () => {
+      const store = useSkillsStore();
+      store.addSkill('Bestehend');
+
+      setup();
+      await fireEvent.click(screen.getByText('Importieren'));
+      await fireEvent.click(screen.getByRole('button', { name: 'Ersetzen' }));
+      await fireEvent.update(
+        screen.getByPlaceholderText(/\[\{/),
+        JSON.stringify([{ name: 'Mystik', description: 'Magie', actions: [] }]),
+      );
+      await fireEvent.click(screen.getAllByText('Importieren').at(-1)!);
+
+      expect(store.skills).toEqual(['Mystik']);
+      expect(store.skillInfo.Mystik?.description).toBe('Magie');
+      expect(store.skills).not.toContain('Bestehend');
+    });
+
+    it('appends new skills and updates matching ones when Anhängen is selected', async () => {
+      const store = useSkillsStore();
+      store.replaceAllWithInfo(
+        ['Athletik', 'Bestehend'],
+        {
+          Athletik: {
+            description: 'Alt',
+            actions: [{ name: SkillAction.Defend, examples: 'Alt' }],
+          },
+          Bestehend: {
+            description: 'Bleibt',
+            actions: [],
+          },
+        },
+      );
+
+      setup();
+      await fireEvent.click(screen.getByText('Importieren'));
+      await fireEvent.update(
+        screen.getByPlaceholderText(/\[\{/),
+        JSON.stringify([
+          { name: 'Athletik', description: 'Neu', actions: [] },
+          { name: 'Mystik', description: 'Magie', actions: [] },
+        ]),
+      );
+      await fireEvent.click(screen.getAllByText('Importieren').at(-1)!);
+
+      expect(store.skills).toEqual(['Athletik', 'Bestehend', 'Mystik']);
+      expect(store.skillInfo.Athletik?.description).toBe('Neu');
+      expect(store.skillInfo.Bestehend?.description).toBe('Bleibt');
+      expect(store.skillInfo.Mystik?.description).toBe('Magie');
     });
   });
 });

@@ -166,6 +166,14 @@ describe('ItemSheet', () => {
   });
 
   describe('edit mode', () => {
+    it('adds a stunt row even when the item has no stunts array', async () => {
+      const { container } = renderForm({ ...makeItem(), stunts: undefined } as Item);
+
+      expect(container.querySelectorAll('.stunt-edit-row')).toHaveLength(0);
+      await fireEvent.click(screen.getByText('+ Stunt hinzufügen'));
+      expect(container.querySelectorAll('.stunt-edit-row')).toHaveLength(1);
+    });
+
     it('adds and removes physical and mental stress boxes', async () => {
       const onSave = vi.fn();
       const item = makeItem({

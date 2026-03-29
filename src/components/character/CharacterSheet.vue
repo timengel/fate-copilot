@@ -136,14 +136,17 @@ watch(
 
 // Stunt management
 function addStunt() {
+  if (!form.stunts) form.stunts = [];
   form.stunts.push({ name: '', description: '' });
 }
 
 function removeStunt(index: number) {
+  if (!form.stunts) return;
   form.stunts.splice(index, 1);
 }
 
 function updateStunt(index: number, field: keyof Stunt, value: string) {
+  if (!form.stunts) return;
   const stunt = form.stunts[index];
   if (stunt) stunt[field] = value;
 }

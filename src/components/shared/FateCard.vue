@@ -169,11 +169,15 @@ function isRenderableNode(node: VNode): boolean {
 
 .fate-card__meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0 0.25rem;
   padding: 0.25rem 0.9rem;
   font-size: 0.8rem;
   color: var(--fate-text-light);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .fate-card__actions {
