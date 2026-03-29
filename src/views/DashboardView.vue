@@ -427,6 +427,13 @@ onUnmounted(() => {
     </div>
 
     <div
+      v-if="characters.length > 0 && items.length > 0"
+      class="dashboard-section-divider"
+    >
+      <span class="dashboard-section-divider__label">Items</span>
+    </div>
+
+    <div
       v-if="items.length > 0"
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
@@ -749,6 +756,31 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+.dashboard-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: min(100%, 72rem);
+  margin: 0 0 1.5rem;
+  color: var(--fate-text-light);
+  justify-self: stretch;
+}
+
+.dashboard-section-divider::before,
+.dashboard-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--fate-border) 75%, transparent);
+}
+
+.dashboard-section-divider__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .dashboard-stack--grid {
