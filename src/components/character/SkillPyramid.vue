@@ -279,13 +279,13 @@ function removeCol() {
   background: color-mix(in srgb, var(--fate-blue-light) 78%, white 22%);
 }
 
-@container (width < 500px) {
+@container (width < 640px) {
   .level-label {
     flex: 0 0 90px;
     overflow: hidden;
   }
   .pyramid-row {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
   .pyramid-row:last-of-type {
     margin-bottom: 0.25rem;
@@ -296,12 +296,12 @@ function removeCol() {
   }
 }
 
-@container (width < 350px) {
+@container (width < 520px) {
   .pyramid-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
   .pyramid-row:last-of-type {
     margin-bottom: 0.25rem;
@@ -313,34 +313,33 @@ function removeCol() {
   }
   .level-slots {
     width: 100%;
-    flex-wrap: wrap;
   }
   .skill-slot {
-    flex: 1 1 55px;
-    min-width: 55px;
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
 
-:global([data-theme="dark"] .skill-value--filled),
-:global([data-theme="dark"] .skill-select),
-:global([data-theme="dark"] .skill-select--filled),
-:global([data-theme="dark"] .skill-input:focus) {
+:global([data-theme='dark'] .skill-value--filled),
+:global([data-theme='dark'] .skill-select),
+:global([data-theme='dark'] .skill-select--filled),
+:global([data-theme='dark'] .skill-input:focus) {
   background: color-mix(in srgb, var(--fate-blue) 20%, var(--fate-white) 80%);
 }
 
-:global([data-theme="dark"] .skill-select:focus) {
+:global([data-theme='dark'] .skill-select:focus) {
   background: color-mix(in srgb, var(--fate-blue) 35%, var(--fate-white) 65%);
 }
 
 @media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme="light"]) .skill-value--filled),
-  :global(:root:not([data-theme="light"]) .skill-select),
-  :global(:root:not([data-theme="light"]) .skill-select--filled),
-  :global(:root:not([data-theme="light"]) .skill-input:focus) {
+  :global(:root:not([data-theme='light']) .skill-value--filled),
+  :global(:root:not([data-theme='light']) .skill-select),
+  :global(:root:not([data-theme='light']) .skill-select--filled),
+  :global(:root:not([data-theme='light']) .skill-input:focus) {
     background: color-mix(in srgb, var(--fate-blue) 20%, var(--fate-white) 80%);
   }
 
-  :global(:root:not([data-theme="light"]) .skill-select:focus) {
+  :global(:root:not([data-theme='light']) .skill-select:focus) {
     background: color-mix(in srgb, var(--fate-blue) 35%, var(--fate-white) 65%);
   }
 }
