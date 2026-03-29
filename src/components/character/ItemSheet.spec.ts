@@ -14,8 +14,7 @@ function makeItem(overrides: Partial<Item> = {}): Item {
     aspects: [],
     stunts: [],
     extras: '',
-    stressPhysical: [],
-    stressMental: [],
+    stressTracks: [],
     redDice: 0,
     blueDice: 0,
     archived: false,
@@ -135,7 +134,7 @@ describe('ItemSheet', () => {
           aspects: ['A1'],
           extras: 'Extra',
           stunts: [{ name: 'Stunt', description: 'Text' }],
-          stressPhysical: [{ value: 1, checked: false }],
+          stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
           gmNotes: 'Nur GM',
           redDice: 1,
           blueDice: 1,
@@ -170,23 +169,25 @@ describe('ItemSheet', () => {
     it('adds and removes physical and mental stress boxes', async () => {
       const onSave = vi.fn();
       const item = makeItem({
-        stressPhysical: [{ value: 1, checked: false }],
-        stressMental: [{ value: 1, checked: false }],
+        stressTracks: [
+          { label: 'Körperlich', boxes: [{ value: 1, checked: false }] },
+          { label: 'Geistig', boxes: [{ value: 1, checked: false }] },
+        ],
       });
       const { container } = renderForm(item, { onSave });
       const buttons = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
 
       await fireEvent.click(buttons[1]!);
-      await fireEvent.click(buttons[3]!);
+      await fireEvent.click(buttons[4]!);
       await fireEvent.click(buttons[0]!);
-      await fireEvent.click(buttons[2]!);
+      await fireEvent.click(buttons[3]!);
       await fireEvent.click(screen.getByText('Speichern'));
 
       const saved = onSave.mock.calls[0]![0] as Item;
-      expect(saved.stressPhysical).toHaveLength(1);
-      expect(saved.stressMental).toHaveLength(1);
-      expect(saved.stressPhysical[0]!.value).toBe(1);
-      expect(saved.stressMental[0]!.value).toBe(1);
+      expect(saved.stressTracks?.[0]?.boxes).toHaveLength(1);
+      expect(saved.stressTracks?.[1]?.boxes).toHaveLength(1);
+      expect(saved.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
+      expect(saved.stressTracks?.[1]?.boxes[0]!.value).toBe(1);
     });
 
     it('updates red and blue dice via the dice tracks', async () => {
@@ -217,7 +218,7 @@ describe('ItemSheet', () => {
       const onSave = vi.fn();
       const item = makeItem({
         name: 'Original',
-        stressPhysical: [{ value: 1, checked: false }],
+        stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
         aspects: ['Scharf'],
       });
       const { container } = renderForm(item, { onSave });
@@ -231,8 +232,43 @@ describe('ItemSheet', () => {
       const saved = onSave.mock.calls[0]![0] as Item;
       expect(saved.name).toBe('Neuer Name');
       expect(saved).not.toBe(item);
-      expect(saved.stressPhysical).not.toBe(item.stressPhysical);
+      expect(saved.stressTracks).not.toBe(item.stressTracks);
       expect(saved.aspects).not.toBe(item.aspects);
+    });
+
+    it('adds, renames, and removes stress tracks', async () => {
+      const onSave = vi.fn();
+      const { container } = renderForm(makeItem(), { onSave });
+
+      await fireEvent.click(screen.getByText('+ Stress-Track hinzufügen'));
+
+      const labelInput = container.querySelectorAll<HTMLInputElement>('.stress-label-input')[0];
+      await fireEvent.update(labelInput!, 'Armor');
+
+      const rowButtons = container.querySelectorAll('.stress-track-row')[0]!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+      await fireEvent.click(rowButtons[1]!);
+      await fireEvent.click(screen.getByText('Speichern'));
+
+      const saved = onSave.mock.calls[0]![0] as Item;
+      expect(saved.stressTracks?.[0]?.label).toBe('Armor');
+      expect(saved.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
+    });
+
+    it('removes a stress track', async () => {
+      const onSave = vi.fn();
+      const { container } = renderForm(
+        makeItem({
+          stressTracks: [{ label: 'Armor', boxes: [{ value: 1, checked: false }] }],
+        }),
+        { onSave },
+      );
+
+      const rowButtons = container.querySelector('.stress-track-row')!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+      await fireEvent.click(rowButtons[2]!);
+      await fireEvent.click(screen.getByText('Speichern'));
+
+      const saved = onSave.mock.calls[0]![0] as Item;
+      expect(saved.stressTracks).toEqual([]);
     });
 
     it('updates modifier values via the icon counters', async () => {

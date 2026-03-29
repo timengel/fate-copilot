@@ -34,8 +34,7 @@ const minimalCharacter: Character = {
   extras: '',
   refresh: 3,
   fatePoints: 3,
-  stressPhysical: [],
-  stressMental: [],
+  stressTracks: [],
   consequences: [],
   notes: '',
 };
@@ -176,8 +175,7 @@ describe('useImportExport', () => {
         extras: '',
         refresh: 3,
         fatePoints: 3,
-        stressPhysical: [],
-        stressMental: [],
+        stressTracks: [],
         consequences: [],
         notes: '',
       };
@@ -254,8 +252,7 @@ describe('useImportExport', () => {
         extras: '',
         refresh: 3,
         fatePoints: 3,
-        stressPhysical: [],
-        stressMental: [],
+        stressTracks: [],
         consequences: [],
         notes: '',
       };
@@ -279,13 +276,28 @@ describe('useImportExport', () => {
         extras: '',
         refresh: 3,
         fatePoints: 3,
-        stressPhysical: [],
-        stressMental: [],
+        stressTracks: [],
         consequences: [],
         notes: '',
       };
       applyImport({ ...validV10, characters: [nsc] });
       expect(useCharactersStore().characters[0]!.type).toBe('nsc');
+    });
+
+    it('migrates legacy stress arrays into stressTracks when applying imports', () => {
+      const { applyImport } = useImportExport();
+      applyImport({
+        ...validV10,
+        characters: [
+          {
+            ...minimalCharacter,
+            stressTracks: undefined,
+            stressPhysical: [{ value: 1, checked: false }],
+            stressMental: [],
+          },
+        ],
+      });
+      expect(useCharactersStore().characters[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
     });
   });
 
@@ -335,6 +347,28 @@ describe('useImportExport', () => {
       const text = await capturedBlob!.text();
       const parsed = JSON.parse(text);
       expect(parsed.characters[0].name).toBe('Aragorn');
+    });
+
+    it('exports stressTracks as the canonical character stress shape', async () => {
+      useCharactersStore().addCharacter({
+        ...minimalCharacter,
+        stressTracks: [{ label: 'Armor', boxes: [{ value: 1, checked: false }] }],
+      });
+
+      let capturedBlob: Blob | undefined;
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        capturedBlob = blob;
+        return 'blob:fake-url';
+      });
+
+      const { exportJSON } = useImportExport();
+      exportJSON();
+
+      const text = await capturedBlob!.text();
+      const parsed = JSON.parse(text);
+      expect(parsed.characters[0].stressTracks[0].label).toBe('Armor');
+      expect(parsed.characters[0].stressPhysical).toBeUndefined();
+      expect(parsed.characters[0].stressMental).toBeUndefined();
     });
 
     it('exported JSON has formatVersion 1.0', async () => {
@@ -416,6 +450,19 @@ describe('useImportExport', () => {
       await exportToClipboard();
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.characters[0].name).toBe('Bilbo');
+    });
+
+    it('writes stressTracks instead of legacy stress arrays to the clipboard export', async () => {
+      useCharactersStore().addCharacter({
+        ...minimalCharacter,
+        stressTracks: [{ label: 'Armor', boxes: [{ value: 1, checked: false }] }],
+      });
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.characters[0].stressTracks[0].label).toBe('Armor');
+      expect(parsed.characters[0].stressPhysical).toBeUndefined();
+      expect(parsed.characters[0].stressMental).toBeUndefined();
     });
 
     it('written JSON contains campaigns from the store', async () => {

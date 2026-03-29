@@ -102,10 +102,12 @@
         "extras",
         "refresh",
         "fatePoints",
-        "stressPhysical",
-        "stressMental",
         "consequences",
         "notes"
+      ],
+      "anyOf": [
+        { "required": ["stressTracks"] },
+        { "required": ["stressPhysical", "stressMental"] }
       ],
       "additionalProperties": false,
       "properties": {
@@ -134,6 +136,10 @@
         "extras": { "type": "string" },
         "refresh": { "type": "integer", "minimum": 1 },
         "fatePoints": { "type": "integer", "minimum": 0 },
+        "stressTracks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressTrack" }
+        },
         "stressPhysical": {
           "type": "array",
           "items": { "$ref": "#/$defs/StressBox" }
@@ -172,10 +178,12 @@
         "aspects",
         "stunts",
         "extras",
-        "stressPhysical",
-        "stressMental",
         "redDice",
         "blueDice"
+      ],
+      "anyOf": [
+        { "required": ["stressTracks"] },
+        { "required": ["stressPhysical", "stressMental"] }
       ],
       "additionalProperties": false,
       "properties": {
@@ -197,6 +205,10 @@
           "items": { "$ref": "#/$defs/Stunt" }
         },
         "extras": { "type": "string" },
+        "stressTracks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressTrack" }
+        },
         "stressPhysical": {
           "type": "array",
           "items": { "$ref": "#/$defs/StressBox" }
@@ -299,6 +311,18 @@
       "properties": {
         "value": { "type": "integer", "minimum": 1 },
         "checked": { "type": "boolean" }
+      }
+    },
+    "StressTrack": {
+      "type": "object",
+      "required": ["label", "boxes"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "boxes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StressBox" }
+        }
       }
     },
     "Consequence": {

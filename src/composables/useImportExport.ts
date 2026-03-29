@@ -4,6 +4,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
+import { normalizeCharacterStress, normalizeItemStress } from '../utils/stressTracks';
 
 const FORMAT_VERSION: AppDataVersion = '1.0';
 const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0'];
@@ -73,8 +74,8 @@ export function useImportExport() {
       formatVersion: FORMAT_VERSION,
       exportDate: new Date().toISOString(),
       campaigns: campaignsStore.campaigns,
-      characters: charactersStore.characters,
-      items: itemsStore.items,
+      characters: charactersStore.characters.map(normalizeCharacterStress),
+      items: itemsStore.items.map(normalizeItemStress),
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
       skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),
@@ -116,8 +117,8 @@ export function useImportExport() {
       formatVersion: FORMAT_VERSION,
       exportDate: new Date().toISOString(),
       campaigns: campaignsStore.campaigns,
-      characters: charactersStore.characters,
-      items: itemsStore.items,
+      characters: charactersStore.characters.map(normalizeCharacterStress),
+      items: itemsStore.items.map(normalizeItemStress),
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
       skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),

@@ -103,6 +103,11 @@ export interface StressBox {
   checked: boolean;
 }
 
+export interface StressTrack {
+  label: string;
+  boxes: StressBox[];
+}
+
 export interface Consequence {
   severity: ConsequenceSeverity; // 2=Leicht, 4=Mittel, 6=Schwer, 8=Extrem
   label: ConsequenceLabel;
@@ -128,8 +133,11 @@ export interface Character {
   extras: string;
   refresh: number;
   fatePoints: number;
-  stressPhysical: StressBox[];
-  stressMental: StressBox[];
+  stressTracks?: StressTrack[];
+  /** @deprecated use stressTracks instead */
+  stressPhysical?: StressBox[];
+  /** @deprecated use stressTracks instead */
+  stressMental?: StressBox[];
   consequences: Consequence[];
   notes: string;
   gmNotes?: string;
@@ -155,8 +163,11 @@ export interface Item {
   aspects: string[];
   stunts: Stunt[];
   extras: string;
-  stressPhysical: StressBox[];
-  stressMental: StressBox[];
+  stressTracks?: StressTrack[];
+  /** @deprecated use stressTracks instead */
+  stressPhysical?: StressBox[];
+  /** @deprecated use stressTracks instead */
+  stressMental?: StressBox[];
   gmNotes?: string;
   hidden?: boolean;
   color?: string;

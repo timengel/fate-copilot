@@ -93,6 +93,12 @@ describe('useCharactersStore', () => {
     expect(store.characters).toHaveLength(0);
   });
 
+  it('normalizes legacy stress arrays into stressTracks', () => {
+    const store = useCharactersStore();
+    store.addCharacter(makeChar({ stressPhysical: [{ value: 1, checked: false }], stressMental: [] }));
+    expect(store.characters[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
+  });
+
   it('reset clears all characters', () => {
     const store = useCharactersStore();
     store.addCharacter(makeChar({ id: 'c1' }));

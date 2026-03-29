@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
-import type { Character, ConsequenceLabel, ConsequenceSeverity, Stunt } from '../../types';
+import type { Character, ConsequenceLabel, ConsequenceSeverity, StressTrack as StressTrackModel, Stunt } from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -17,6 +17,7 @@ import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
 import { useMarkdown } from '../../composables/useMarkdown';
+import { normalizeCharacterStress } from '../../utils/stressTracks';
 
 const { renderMarkdown } = useMarkdown();
 
@@ -57,14 +58,14 @@ const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Character>(deepClone(props.character));
-const savedSnapshot = ref(deepClone(props.character));
+const form = reactive<Character>(normalizeCharacterStress(deepClone(props.character)));
+const savedSnapshot = ref(normalizeCharacterStress(deepClone(props.character)));
 
 watch(
   () => props.character,
   (character) => {
-    Object.assign(form, deepClone(character));
-    savedSnapshot.value = deepClone(character);
+    Object.assign(form, normalizeCharacterStress(deepClone(character)));
+    savedSnapshot.value = normalizeCharacterStress(deepClone(character));
   },
   { deep: true },
 );
@@ -74,10 +75,13 @@ const isDirty = computed(
   () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
 );
 
-const data = computed(() => (isEditing.value ? form : props.character));
+const data = computed(() => (isEditing.value ? form : normalizeCharacterStress(props.character)));
 const visibleConsequences = computed(() => data.value.consequences.filter((con) => con.value.trim() !== ''));
 const hasVisibleStress = computed(
-  () => isEditing.value || (sectionsEnabled('stress') && (data.value.stressPhysical.length > 0 || data.value.stressMental.length > 0)),
+  () =>
+    isEditing.value ||
+    (sectionsEnabled('stress') &&
+      (data.value.stressTracks ?? []).some((track) => track.boxes.length > 0)),
 );
 const hasVisibleConsequences = computed(
   () => isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
@@ -94,6 +98,11 @@ const diceSectionClasses = computed(() => ({
 const modifiersSectionClasses = computed(() => ({
   'span-full': hasVisibleModifiers.value && !hasVisibleDice.value,
 }));
+const visibleStressTracks = computed(() =>
+  (data.value.stressTracks ?? [])
+    .map((track, index) => ({ track, index }))
+    .filter(({ track }) => isEditing.value || track.boxes.length > 0),
+);
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
   return props.sections?.[section] !== false;
@@ -158,19 +167,40 @@ function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: Consequence
 }
 
 // Stress management
-function addStressBox(track: 'physical' | 'mental') {
-  const arr = track === 'physical' ? form.stressPhysical : form.stressMental;
-  const nextValue = arr.length > 0 ? arr[arr.length - 1]!.value + 1 : 1;
-  arr.push({ value: nextValue, checked: false });
+function addStressTrack() {
+  const nextIndex = (form.stressTracks?.length ?? 0) + 1;
+  if (!form.stressTracks) form.stressTracks = [];
+  form.stressTracks.push({ label: `Neuer Stress ${nextIndex}`, boxes: [] });
 }
 
-function removeStressBox(track: 'physical' | 'mental') {
-  const arr = track === 'physical' ? form.stressPhysical : form.stressMental;
-  if (arr.length > 0) arr.pop();
+function removeStressTrack(index: number) {
+  form.stressTracks?.splice(index, 1);
+}
+
+function updateStressTrackLabel(index: number, label: string) {
+  const track = form.stressTracks?.[index];
+  if (track) track.label = label;
+}
+
+function updateStressTrackBoxes(index: number, boxes: StressTrackModel['boxes']) {
+  const track = form.stressTracks?.[index];
+  if (track) track.boxes = boxes;
+}
+
+function addStressBox(index: number) {
+  const track = form.stressTracks?.[index];
+  if (!track) return;
+  const nextValue = track.boxes.length > 0 ? track.boxes[track.boxes.length - 1]!.value + 1 : 1;
+  track.boxes.push({ value: nextValue, checked: false });
+}
+
+function removeStressBox(index: number) {
+  const track = form.stressTracks?.[index];
+  if (track && track.boxes.length > 0) track.boxes.pop();
 }
 
 function save() {
-  const saved = deepClone(form);
+  const saved = normalizeCharacterStress(deepClone(form));
   emit('save', saved);
   savedSnapshot.value = saved;
 }
@@ -392,7 +422,7 @@ defineExpose({ save });
             </div>
             <FateButton icon="close" variant="danger" size="S" @click="removeStunt(i)" name="close"></FateButton>
           </div>
-          <FateButton variant="add" @click="addStunt">+ Stunt hinzufügen</FateButton>
+          <FateButton variant="add" class="stunt-add-btn" @click="addStunt">+ Stunt hinzufügen</FateButton>
         </div>
         <div v-else class="stunts-list">
           <div v-for="(stunt, i) in data.stunts" :key="i" class="stunt-item">
@@ -415,76 +445,67 @@ defineExpose({ save });
         >
           <div class="sheet-section-header">STRESS</div>
           <div class="stress-content">
-          <template v-if="isEditing">
-            <div class="stress-track-row">
-              <div class="stress-track-wrap">
-                <StressTrack
-                  label="KÖRPERLICHER STRESS (KRAFT)"
-                  :boxes="form.stressPhysical"
-                  @update="form.stressPhysical = $event"
-                />
-              </div>
-              <div class="stress-track-controls">
-                <FateButton
-                  class="stress-ctrl-btn"
-                  variant="counter"
-                  size="S"
-                  icon="minus"
-                  :disabled="form.stressPhysical.length === 0"
-                  @click="removeStressBox('physical')"
-                />
-                <FateButton
-                  class="stress-ctrl-btn"
-                  variant="counter"
-                  size="S"
-                  icon="plus"
-                  :disabled="form.stressPhysical.length >= 6"
-                  @click="addStressBox('physical')"
-                />
-              </div>
-            </div>
-            <div class="stress-track-row">
-              <div class="stress-track-wrap">
-                <StressTrack
-                  label="GEISTIGER STRESS (WILLE)"
-                  :boxes="form.stressMental"
-                  @update="form.stressMental = $event"
-                />
-              </div>
-              <div class="stress-track-controls">
-                <FateButton
-                  class="stress-ctrl-btn"
-                  variant="counter"
-                  size="S"
-                  icon="minus"
-                  :disabled="form.stressMental.length === 0"
-                  @click="removeStressBox('mental')"
-                />
-                <FateButton
-                  class="stress-ctrl-btn"
-                  variant="counter"
-                  size="S"
-                  icon="plus"
-                  :disabled="form.stressMental.length >= 6"
-                  @click="addStressBox('mental')"
-                />
+            <div v-if="isEditing" class="stress-track-list">
+              <div
+                v-for="(track, i) in form.stressTracks ?? []"
+                :key="i"
+                class="stress-track-row"
+              >
+                <div class="stress-track-wrap">
+                  <StressTrack
+                    :label="track.label"
+                    :boxes="track.boxes"
+                    :editableLabel="true"
+                    @update="updateStressTrackBoxes(i, $event)"
+                    @update:label="updateStressTrackLabel(i, $event)"
+                  />
+                </div>
+                <div class="stress-track-controls">
+                  <FateButton
+                    class="stress-ctrl-btn"
+                    variant="counter"
+                    size="S"
+                    icon="minus"
+                    :disabled="track.boxes.length === 0"
+                    @click="removeStressBox(i)"
+                  />
+                  <FateButton
+                    class="stress-ctrl-btn"
+                    variant="counter"
+                    size="S"
+                    icon="plus"
+                    :disabled="track.boxes.length >= 6"
+                    @click="addStressBox(i)"
+                  />
+                  <FateButton
+                    class="stress-ctrl-btn"
+                    variant="danger"
+                    size="S"
+                    icon="close"
+                    @click="removeStressTrack(i)"
+                  />
+                </div>
               </div>
             </div>
-          </template>
-          <template v-else>
-            <StressTrack
-              v-if="data.stressPhysical.length > 0"
-              label="KÖRPERLICHER STRESS (KRAFT)"
-              :boxes="data.stressPhysical"
-              @update="(boxes) => { form.stressPhysical = boxes; save(); }"
-            />
-            <StressTrack
-              v-if="data.stressMental.length > 0"
-              label="GEISTIGER STRESS (WILLE)"
-              :boxes="data.stressMental"
-              @update="(boxes) => { form.stressMental = boxes; save(); }"
-            />
-          </template>
+            <FateButton v-if="isEditing" variant="add" size="S" class="btn-flavor stress-add-btn" @click="addStressTrack"
+              >+ Stress-Track hinzufügen</FateButton
+            >
+            <template v-else>
+              <StressTrack
+                v-for="{ track, index } in visibleStressTracks"
+                :key="`${track.label}-${index}`"
+                :label="track.label"
+                :boxes="track.boxes"
+                @update="
+                  (boxes) => {
+                    const nextTracks = [...(data.stressTracks ?? [])];
+                    nextTracks[index] = { ...nextTracks[index]!, boxes };
+                    form.stressTracks = nextTracks;
+                    save();
+                  }
+                "
+              />
+            </template>
           </div>
         </div>
 
@@ -875,6 +896,10 @@ defineExpose({ save });
   gap: 0.85rem;
 }
 
+.stunt-add-btn {
+  align-self: flex-start;
+}
+
 /* View mode stunt display */
 .stunt-item {
   font-size: 0.8rem;
@@ -977,6 +1002,12 @@ defineExpose({ save });
 }
 
 /* Edit mode stress controls */
+.stress-track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .stress-track-row {
   display: flex;
   align-items: flex-end;
@@ -986,8 +1017,8 @@ defineExpose({ save });
 
 .stress-track-wrap {
   flex: 1;
-  min-width: 0;
-  overflow: hidden;
+  min-width: 215px;
+  overflow: visible;
 }
 
 .stress-track-controls {
@@ -1018,6 +1049,19 @@ defineExpose({ save });
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
+}
+
+.btn-flavor {
+  background: var(--fate-blue) !important;
+  color: white !important;
+}
+
+.btn-flavor:hover {
+  background: var(--fate-blue-dark) !important;
+}
+
+.stress-add-btn {
+  align-self: flex-start;
 }
 
 /* GM notes section */

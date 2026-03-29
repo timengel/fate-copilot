@@ -17,17 +17,17 @@ describe('createDefaultCharacter', () => {
   });
 
   it('returns 4 physical stress boxes with values 1–4, all unchecked', () => {
-    const { stressPhysical } = createDefaultCharacter();
-    expect(stressPhysical).toHaveLength(4);
-    expect(stressPhysical.map((b) => b.value)).toEqual([1, 2, 3, 4]);
-    expect(stressPhysical.every((b) => !b.checked)).toBe(true);
+    const physicalTrack = createDefaultCharacter().stressTracks?.[0];
+    expect(physicalTrack?.boxes).toHaveLength(4);
+    expect(physicalTrack?.boxes.map((b) => b.value)).toEqual([1, 2, 3, 4]);
+    expect(physicalTrack?.boxes.every((b) => !b.checked)).toBe(true);
   });
 
   it('returns 4 mental stress boxes with values 1–4, all unchecked', () => {
-    const { stressMental } = createDefaultCharacter();
-    expect(stressMental).toHaveLength(4);
-    expect(stressMental.map((b) => b.value)).toEqual([1, 2, 3, 4]);
-    expect(stressMental.every((b) => !b.checked)).toBe(true);
+    const mentalTrack = createDefaultCharacter().stressTracks?.[1];
+    expect(mentalTrack?.boxes).toHaveLength(4);
+    expect(mentalTrack?.boxes.map((b) => b.value)).toEqual([1, 2, 3, 4]);
+    expect(mentalTrack?.boxes.every((b) => !b.checked)).toBe(true);
   });
 
   it('returns 4 consequence slots with severities 2/4/6/8', () => {
@@ -68,17 +68,17 @@ describe('createDefaultCharacter (NSC)', () => {
   });
 
   it('returns 2 physical stress boxes with values [1, 2], all unchecked', () => {
-    const { stressPhysical } = createDefaultCharacter('nsc');
-    expect(stressPhysical).toHaveLength(2);
-    expect(stressPhysical.map((b) => b.value)).toEqual([1, 2]);
-    expect(stressPhysical.every((b) => !b.checked)).toBe(true);
+    const physicalTrack = createDefaultCharacter('nsc').stressTracks?.[0];
+    expect(physicalTrack?.boxes).toHaveLength(2);
+    expect(physicalTrack?.boxes.map((b) => b.value)).toEqual([1, 2]);
+    expect(physicalTrack?.boxes.every((b) => !b.checked)).toBe(true);
   });
 
   it('returns 1 mental stress box with value [1], unchecked', () => {
-    const { stressMental } = createDefaultCharacter('nsc');
-    expect(stressMental).toHaveLength(1);
-    expect(stressMental[0]!.value).toBe(1);
-    expect(stressMental[0]!.checked).toBe(false);
+    const mentalTrack = createDefaultCharacter('nsc').stressTracks?.[1];
+    expect(mentalTrack?.boxes).toHaveLength(1);
+    expect(mentalTrack?.boxes[0]!.value).toBe(1);
+    expect(mentalTrack?.boxes[0]!.checked).toBe(false);
   });
 
   it('returns exactly 1 consequence slot with severity 2 and label mild', () => {
@@ -96,15 +96,15 @@ describe('createDefaultCharacter (SC, explicit)', () => {
   });
 
   it('returns 4 physical stress boxes with values [1,2,3,4]', () => {
-    const { stressPhysical } = createDefaultCharacter('sc');
-    expect(stressPhysical).toHaveLength(4);
-    expect(stressPhysical.map((b) => b.value)).toEqual([1, 2, 3, 4]);
+    const physicalTrack = createDefaultCharacter('sc').stressTracks?.[0];
+    expect(physicalTrack?.boxes).toHaveLength(4);
+    expect(physicalTrack?.boxes.map((b) => b.value)).toEqual([1, 2, 3, 4]);
   });
 
   it('returns 4 mental stress boxes with values [1,2,3,4]', () => {
-    const { stressMental } = createDefaultCharacter('sc');
-    expect(stressMental).toHaveLength(4);
-    expect(stressMental.map((b) => b.value)).toEqual([1, 2, 3, 4]);
+    const mentalTrack = createDefaultCharacter('sc').stressTracks?.[1];
+    expect(mentalTrack?.boxes).toHaveLength(4);
+    expect(mentalTrack?.boxes.map((b) => b.value)).toEqual([1, 2, 3, 4]);
   });
 
   it('returns 4 consequence slots with severities [2,4,6,8]', () => {
@@ -134,6 +134,10 @@ describe('createDefaultItem', () => {
     expect(item.modifiers).toHaveLength(2);
     expect(item.modifiers![0]!.value).toBe(0);
     expect(item.modifiers![1]!.value).toBe(0);
+  });
+
+  it('returns no stress tracks by default', () => {
+    expect(createDefaultItem().stressTracks).toEqual([]);
   });
 });
 

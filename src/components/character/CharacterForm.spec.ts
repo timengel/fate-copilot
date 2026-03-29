@@ -88,68 +88,65 @@ describe('CharacterSheet (edit mode)', () => {
 
   it('adds a physical stress box when + is clicked', async () => {
     const onSave = vi.fn();
-    const char = { ...createDefaultCharacter(), stressPhysical: [{ value: 1, checked: false }] };
+    const char = {
+      ...createDefaultCharacter(),
+      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
+    };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]!); // physical +
+    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.stressPhysical).toHaveLength(2);
-    expect(saved.stressPhysical[1]!.value).toBe(2);
+    expect(saved.stressTracks?.[0]?.boxes).toHaveLength(2);
+    expect(saved.stressTracks?.[0]?.boxes[1]!.value).toBe(2);
   });
 
   it('new stress box gets value = last value + 1', async () => {
     const onSave = vi.fn();
     const char = {
       ...createDefaultCharacter(),
-      stressPhysical: [
-        { value: 3, checked: false },
-        { value: 5, checked: false },
-      ],
+      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 3, checked: false }, { value: 5, checked: false }] }],
     };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]!); // physical +
+    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.stressPhysical[2]!.value).toBe(6);
+    expect(saved.stressTracks?.[0]?.boxes[2]!.value).toBe(6);
   });
 
   it('adds stress box with value 1 when track is empty', async () => {
     const onSave = vi.fn();
-    const char = { ...createDefaultCharacter(), stressPhysical: [] };
+    const char = { ...createDefaultCharacter(), stressTracks: [{ label: 'Körperlich', boxes: [] }] };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[1]!); // physical +
+    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.stressPhysical).toHaveLength(1);
-    expect(saved.stressPhysical[0]!.value).toBe(1);
+    expect(saved.stressTracks?.[0]?.boxes).toHaveLength(1);
+    expect(saved.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
   });
 
   it('removes the last physical stress box when − is clicked', async () => {
     const onSave = vi.fn();
     const char = {
       ...createDefaultCharacter(),
-      stressPhysical: [
-        { value: 1, checked: false },
-        { value: 2, checked: false },
-      ],
+      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }, { value: 2, checked: false }] }],
     };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    await fireEvent.click(btns[0]!); // physical −
+    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    await fireEvent.click(btns[0]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.stressPhysical).toHaveLength(1);
-    expect(saved.stressPhysical[0]!.value).toBe(1);
+    expect(saved.stressTracks?.[0]?.boxes).toHaveLength(1);
+    expect(saved.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
   });
 
   it('− stress button is disabled when track is empty', () => {
-    const char = { ...createDefaultCharacter(), stressPhysical: [] };
+    const char = { ...createDefaultCharacter(), stressTracks: [{ label: 'Körperlich', boxes: [] }] };
     const { container } = renderForm(char);
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
-    expect(btns[0]!.disabled).toBe(true); // physical −
+    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    expect(btns[0]!.disabled).toBe(true);
   });
 
   // ─── Konsequenz-Slot-Verwaltung (NSC) ─────────────────────────
@@ -248,7 +245,7 @@ describe('CharacterSheet (edit mode)', () => {
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
     expect(saved).not.toBe(char);
-    expect(saved.stressPhysical).not.toBe(char.stressPhysical);
+    expect(saved.stressTracks).not.toBe(char.stressTracks);
     expect(saved.consequences).not.toBe(char.consequences);
   });
 });
@@ -282,7 +279,7 @@ describe('CharacterSheet (view mode)', () => {
   it('lets the stress section span the full row when consequences are hidden', () => {
     const char: Character = {
       ...createDefaultCharacter(),
-      stressPhysical: [{ value: 1, checked: false }],
+      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
       consequences: [
         { severity: 2, label: 'mild', value: '' },
         { severity: 4, label: 'moderate', value: '' },
@@ -291,6 +288,41 @@ describe('CharacterSheet (view mode)', () => {
     const { container } = renderView(char);
     expect(container.querySelector('.stress-section')?.classList.contains('span-full')).toBe(true);
     expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+  });
+
+  it('adds, renames, and removes stress tracks in edit mode', async () => {
+    const onSave = vi.fn();
+    const { container } = renderForm(createDefaultCharacter(), { onSave });
+
+    await fireEvent.click(screen.getByText('+ Stress-Track hinzufügen'));
+
+    const labelInputs = container.querySelectorAll<HTMLInputElement>('.stress-label-input');
+    await fireEvent.update(labelInputs[labelInputs.length - 1]!, 'Armor');
+
+    const lastRowButtons = container.querySelectorAll('.stress-track-row')[labelInputs.length - 1]!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+    await fireEvent.click(lastRowButtons[1]!);
+    await fireEvent.click(screen.getByText('Speichern'));
+
+    const saved: Character = onSave.mock.calls[0]![0];
+    const lastTrack = saved.stressTracks?.[saved.stressTracks.length - 1];
+    expect(lastTrack?.label).toBe('Armor');
+    expect(lastTrack?.boxes[0]!.value).toBe(1);
+  });
+
+  it('removes a stress track in edit mode', async () => {
+    const onSave = vi.fn();
+    const char = {
+      ...createDefaultCharacter(),
+      stressTracks: [{ label: 'Armor', boxes: [{ value: 1, checked: false }] }],
+    };
+    const { container } = renderForm(char, { onSave });
+
+    const rowButtons = container.querySelector('.stress-track-row')!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+    await fireEvent.click(rowButtons[2]!);
+    await fireEvent.click(screen.getByText('Speichern'));
+
+    const saved: Character = onSave.mock.calls[0]![0];
+    expect(saved.stressTracks).toEqual([]);
   });
 });
 

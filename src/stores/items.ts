@@ -1,30 +1,34 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Item } from '../types';
+import { normalizeItemStress } from '../utils/stressTracks';
 
 function migrateItem(item: Item): Item {
-  if (item.pureDamage !== undefined || item.deflection !== undefined) {
-    item.modifiers = [
-      { label: 'Purer Schaden', value: item.pureDamage ?? 0 },
-      { label: 'Deflektion', value: item.deflection ?? 0 },
+  const migrated = normalizeItemStress(item);
+
+  if (migrated.pureDamage !== undefined || migrated.deflection !== undefined) {
+    migrated.modifiers = [
+      { label: 'Purer Schaden', value: migrated.pureDamage ?? 0 },
+      { label: 'Deflektion', value: migrated.deflection ?? 0 },
     ];
-    delete item.pureDamage;
-    delete item.deflection;
+    delete migrated.pureDamage;
+    delete migrated.deflection;
   }
-  return item;
+
+  return migrated;
 }
 
 export const useItemsStore = defineStore('items', () => {
   const items = ref<Item[]>([]);
 
   function addItem(item: Item) {
-    items.value.push(item);
+    items.value.push(migrateItem(item));
   }
 
   function updateItem(updated: Item) {
     const index = items.value.findIndex((i) => i.id === updated.id);
     if (index !== -1) {
-      items.value[index] = updated;
+      items.value[index] = migrateItem(updated);
     }
   }
 
@@ -37,7 +41,7 @@ export const useItemsStore = defineStore('items', () => {
   }
 
   function replaceAll(incoming: Item[]) {
-    items.value = incoming;
+    items.value = incoming.map(migrateItem);
   }
 
   function reset() {

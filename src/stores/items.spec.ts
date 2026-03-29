@@ -75,6 +75,12 @@ describe('useItemsStore', () => {
     expect(store.items[0]!.id).toBe('new1');
   });
 
+  it('normalizes legacy stress arrays into stressTracks', () => {
+    const store = useItemsStore();
+    store.addItem(makeItem({ stressPhysical: [{ value: 1, checked: false }], stressMental: [] }));
+    expect(store.items[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
+  });
+
   it('reset clears all items', () => {
     const store = useItemsStore();
     store.addItem(makeItem({ id: 'i1' }));

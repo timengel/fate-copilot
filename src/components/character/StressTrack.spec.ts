@@ -15,6 +15,13 @@ describe('StressTrack', () => {
     expect(screen.getByText('Körperlich')).toBeTruthy();
   });
 
+  it('renders an editable label input in edit mode', () => {
+    const { container } = render(StressTrack, {
+      props: { boxes, label: 'Körperlich', editableLabel: true },
+    });
+    expect(container.querySelector<HTMLInputElement>('.stress-label-input')?.value).toBe('Körperlich');
+  });
+
   it('renders the correct number of checkboxes', () => {
     const { container } = render(StressTrack, { props: { boxes, label: 'Test', readonly: false } });
     expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(3);
@@ -58,5 +65,14 @@ describe('StressTrack', () => {
     expect(updated[1]!.checked).toBe(true); // unchanged
     expect(updated[2]!.checked).toBe(false); // unchanged
     expect(updated.map((b) => b.value)).toEqual([1, 2, 3]); // values preserved
+  });
+
+  it('emits label updates independently from box updates', async () => {
+    const onUpdateLabel = vi.fn();
+    const { container } = render(StressTrack, {
+      props: { boxes, label: 'Test', editableLabel: true, 'onUpdate:label': onUpdateLabel },
+    });
+    await fireEvent.update(container.querySelector('.stress-label-input')!, 'Neuer Stress');
+    expect(onUpdateLabel).toHaveBeenCalledWith('Neuer Stress');
   });
 });

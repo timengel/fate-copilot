@@ -1,4 +1,5 @@
 import type { Character, Item } from '../types';
+import { normalizeCharacterStress, normalizeItemStress } from '../utils/stressTracks';
 
 export function useSingleImportExport() {
   async function copyToClipboard(entity: Character | Item): Promise<void> {
@@ -20,7 +21,7 @@ export function useSingleImportExport() {
       throw new Error('Das Feld "name" fehlt oder ist leer.');
     }
     const type = obj.type === 'nsc' ? 'nsc' : 'sc';
-    return { ...obj, id: crypto.randomUUID(), type } as Character;
+    return normalizeCharacterStress({ ...obj, id: crypto.randomUUID(), type } as Character);
   }
 
   function parseItem(json: string): Item {
@@ -37,7 +38,7 @@ export function useSingleImportExport() {
     if (typeof obj.name !== 'string' || !obj.name.trim()) {
       throw new Error('Das Feld "name" fehlt oder ist leer.');
     }
-    return { ...obj, id: crypto.randomUUID(), type: 'item' } as Item;
+    return normalizeItemStress({ ...obj, id: crypto.randomUUID(), type: 'item' } as Item);
   }
 
   return { copyToClipboard, parseCharacter, parseItem };

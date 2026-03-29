@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useSingleImportExport } from './useSingleImportExport';
 import type { Character, Item } from '../types';
+import { PHYSICAL_STRESS_LABEL } from '../utils/stressTracks';
 
 const minimalCharacter: Character = {
   id: 'c1',
@@ -15,8 +16,7 @@ const minimalCharacter: Character = {
   extras: '',
   refresh: 3,
   fatePoints: 3,
-  stressPhysical: [],
-  stressMental: [],
+  stressTracks: [],
   consequences: [],
   notes: '',
 };
@@ -29,8 +29,7 @@ const minimalItem: Item = {
   aspects: [],
   stunts: [],
   extras: '',
-  stressPhysical: [],
-  stressMental: [],
+  stressTracks: [],
   redDice: 0,
   blueDice: 0,
 };
@@ -151,6 +150,20 @@ describe('useSingleImportExport', () => {
       const result = parseCharacter(JSON.stringify({ ...minimalCharacter, highConcept: 'Held' }));
       expect(result.highConcept).toBe('Held');
     });
+
+    it('migrates legacy stress arrays into stressTracks', () => {
+      const { parseCharacter } = useSingleImportExport();
+      const result = parseCharacter(
+        JSON.stringify({
+          ...minimalCharacter,
+          stressTracks: undefined,
+          stressPhysical: [{ value: 1, checked: false }],
+          stressMental: [],
+        }),
+      );
+      expect(result.stressTracks?.[0]?.label).toBe(PHYSICAL_STRESS_LABEL);
+      expect(result.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
+    });
   });
 
   describe('parseItem', () => {
@@ -203,6 +216,20 @@ describe('useSingleImportExport', () => {
       const { parseItem } = useSingleImportExport();
       const result = parseItem(JSON.stringify({ ...minimalItem, description: 'Ein Schwert' }));
       expect(result.description).toBe('Ein Schwert');
+    });
+
+    it('migrates legacy stress arrays into stressTracks', () => {
+      const { parseItem } = useSingleImportExport();
+      const result = parseItem(
+        JSON.stringify({
+          ...minimalItem,
+          stressTracks: undefined,
+          stressPhysical: [{ value: 1, checked: false }],
+          stressMental: [],
+        }),
+      );
+      expect(result.stressTracks?.[0]?.label).toBe(PHYSICAL_STRESS_LABEL);
+      expect(result.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
     });
   });
 });

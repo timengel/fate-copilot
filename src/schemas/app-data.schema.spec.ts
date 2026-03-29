@@ -34,8 +34,7 @@ const minimalCharacter: Character = {
   extras: '',
   refresh: 3,
   fatePoints: 3,
-  stressPhysical: [],
-  stressMental: [],
+  stressTracks: [],
   consequences: [],
   notes: '',
 };
@@ -51,11 +50,19 @@ const fullCharacter: Character = {
   ],
   stunts: [{ name: 'Schneller Schlag', description: '+2 auf Kämpfen im ersten Zug' }],
   extras: 'Magischer Stab',
-  stressPhysical: [
-    { value: 1, checked: false },
-    { value: 2, checked: true },
+  stressTracks: [
+    {
+      label: 'KÖRPERLICHER STRESS (KRAFT)',
+      boxes: [
+        { value: 1, checked: false },
+        { value: 2, checked: true },
+      ],
+    },
+    {
+      label: 'GEISTIGER STRESS (WILLE)',
+      boxes: [{ value: 1, checked: false }],
+    },
   ],
-  stressMental: [{ value: 1, checked: false }],
   consequences: [{ severity: 2, label: 'mild', value: 'Verstauchter Knöchel' }],
   notes: 'Interne Notiz',
   gmNotes: 'GM-Only Notiz',
@@ -100,6 +107,22 @@ describe('app-data JSON Schema', () => {
 
     it('accepts a fully populated character (all optional fields)', () => {
       expect(isValid({ ...minimalV10, characters: [fullCharacter] })).toBe(true);
+    });
+
+    it('accepts legacy character stress arrays for backwards compatibility', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          characters: [
+            {
+              ...minimalCharacter,
+              stressTracks: undefined,
+              stressPhysical: [],
+              stressMental: [],
+            },
+          ],
+        }),
+      ).toBe(true);
     });
 
     it('accepts a campaign with milestones', () => {
@@ -305,8 +328,7 @@ describe('app-data JSON Schema', () => {
       aspects: [],
       stunts: [],
       extras: '',
-      stressPhysical: [],
-      stressMental: [],
+      stressTracks: [],
       redDice: 0,
       blueDice: 0,
     };

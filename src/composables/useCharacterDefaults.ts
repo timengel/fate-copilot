@@ -1,4 +1,5 @@
 import type { Campaign, Character, CharacterType, Consequence, Item } from '../types';
+import { MENTAL_STRESS_LABEL, PHYSICAL_STRESS_LABEL } from '../utils/stressTracks';
 
 function generateId(): string {
   return crypto.randomUUID();
@@ -28,27 +29,35 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     extras: '',
     refresh: 3,
     fatePoints: 3,
-    stressPhysical:
-      type === 'nsc'
-        ? [
-            { value: 1, checked: false },
-            { value: 2, checked: false },
-          ]
-        : [
-            { value: 1, checked: false },
-            { value: 2, checked: false },
-            { value: 3, checked: false },
-            { value: 4, checked: false },
-          ],
-    stressMental:
-      type === 'nsc'
-        ? [{ value: 1, checked: false }]
-        : [
-            { value: 1, checked: false },
-            { value: 2, checked: false },
-            { value: 3, checked: false },
-            { value: 4, checked: false },
-          ],
+    stressTracks: [
+      {
+        label: PHYSICAL_STRESS_LABEL,
+        boxes:
+          type === 'nsc'
+            ? [
+                { value: 1, checked: false },
+                { value: 2, checked: false },
+              ]
+            : [
+                { value: 1, checked: false },
+                { value: 2, checked: false },
+                { value: 3, checked: false },
+                { value: 4, checked: false },
+              ],
+      },
+      {
+        label: MENTAL_STRESS_LABEL,
+        boxes:
+          type === 'nsc'
+            ? [{ value: 1, checked: false }]
+            : [
+                { value: 1, checked: false },
+                { value: 2, checked: false },
+                { value: 3, checked: false },
+                { value: 4, checked: false },
+              ],
+      },
+    ],
     consequences,
     notes: '',
     color: 'pfau',
@@ -72,8 +81,7 @@ export function createDefaultItem(): Item {
     aspects: [''],
     stunts: [],
     extras: '',
-    stressPhysical: [],
-    stressMental: [],
+    stressTracks: [],
     color: 'pfau',
     avatar: '',
     redDice: 0,

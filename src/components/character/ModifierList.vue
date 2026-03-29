@@ -36,16 +36,19 @@ function removeModifier(index: number) {
 <template>
   <div class="modifier-list">
     <div v-for="(modifier, i) in modifiers" v-show="editMode || modifier.value !== 0" :key="i" class="modifier-row">
-      <div class="modifier-label-row">
-        <span v-if="!gmMode" class="modifier-label-text">{{ modifier.label }}</span>
-        <input
-          v-else
-          class="modifier-label-input"
-          :value="modifier.label"
-          @input="updateLabel(i, $event)"
-        />
+      <div class="modifier-label-wrap">
+        <div class="modifier-label-row" :class="{ 'modifier-label-row--editable': editMode }">
+          <span v-if="!editMode" class="modifier-label-text">{{ modifier.label }}</span>
+          <input
+            v-else
+            class="modifier-label-input"
+            :value="modifier.label"
+            @input="updateLabel(i, $event)"
+          />
+        </div>
         <FateButton
-          v-if="gmMode"
+          v-if="editMode"
+          class="modifier-remove-btn"
           variant="danger"
           size="S"
           icon="close"
@@ -63,7 +66,7 @@ function removeModifier(index: number) {
       />
     </div>
 
-    <div v-if="gmMode" class="modifier-add-row">
+    <div v-if="editMode" class="modifier-add-row">
       <FateButton variant="secondary" size="S" class="btn-add" @click="addModifier">
         + Modifikator
       </FateButton>
@@ -82,38 +85,76 @@ function removeModifier(index: number) {
 }
 
 .modifier-label-row {
+  --editable-label-bg: color-mix(in srgb, var(--fate-blue-light) 90%, var(--fate-white) 10%);
+  --editable-label-active-bg: color-mix(in srgb, var(--fate-white) 82%, var(--fate-blue-light) 18%);
+  --editable-label-border: color-mix(in srgb, var(--fate-blue) 40%, transparent);
+  --editable-label-border-active: color-mix(in srgb, var(--fate-blue) 72%, var(--fate-white) 28%);
+  --editable-label-shadow:
+    0 2px 5px color-mix(in srgb, var(--fate-blue) 12%, transparent),
+    0 5px 10px color-mix(in srgb, var(--fate-blue) 8%, transparent);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.modifier-label-text {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--fate-blue);
+  background: var(--fate-blue-light);
+  padding: 2px 4px;
+}
+
+.modifier-label-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.modifier-label-row--editable {
+  border: 1px dashed var(--editable-label-border);
+  border-radius: 4px;
+  padding: 3px 6px;
+  flex: 1;
+  min-height: 100%;
+  background: var(--editable-label-bg);
+}
+
+.modifier-label-row--editable:focus-within {
+  border-color: var(--editable-label-border-active);
+  background: var(--editable-label-active-bg);
+  box-shadow: var(--editable-label-shadow);
+}
+
+.modifier-label-row:not(.modifier-label-row--editable) {
+  flex: 1;
+}
+
+.modifier-label-text {
   flex: 1;
 }
 
 .modifier-label-input {
   flex: 1;
+  align-self: stretch;
+  height: 100%;
   border: none;
-  border-bottom: 1px solid var(--fate-blue);
-  padding: 2px 4px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
   font-family: inherit;
-  color: var(--fate-blue);
+  color: inherit;
   background: transparent;
   outline: none;
 }
 
-.modifier-label-input:focus {
-  border-bottom-color: var(--fate-blue-dark);
+.modifier-remove-btn {
+  align-self: stretch;
+}
+
+.modifier-remove-btn :deep(.fate-btn) {
+  height: 100%;
 }
 
 .modifier-add-row {
@@ -136,9 +177,33 @@ function removeModifier(index: number) {
   background: var(--fate-white);
 }
 
+:global([data-theme="dark"] .modifier-label-row) {
+  --editable-label-bg: color-mix(in srgb, var(--fate-blue) 28%, var(--fate-white) 72%);
+  --editable-label-active-bg: color-mix(in srgb, var(--fate-white) 86%, var(--fate-blue) 14%);
+  --editable-label-border: color-mix(in srgb, var(--fate-blue) 52%, var(--fate-white) 48%);
+  --editable-label-border-active: color-mix(in srgb, var(--fate-blue) 68%, var(--fate-white) 32%);
+  --editable-label-shadow:
+    0 2px 6px color-mix(in srgb, var(--fate-white) 14%, transparent),
+    0 6px 12px color-mix(in srgb, var(--fate-white) 8%, transparent);
+  background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
+  color: white;
+}
+
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme="light"]) .modifier-row) {
     background: var(--fate-white);
+  }
+
+  :global(:root:not([data-theme="light"]) .modifier-label-row) {
+    --editable-label-bg: color-mix(in srgb, var(--fate-blue) 28%, var(--fate-white) 72%);
+    --editable-label-active-bg: color-mix(in srgb, var(--fate-white) 86%, var(--fate-blue) 14%);
+    --editable-label-border: color-mix(in srgb, var(--fate-blue) 52%, var(--fate-white) 48%);
+    --editable-label-border-active: color-mix(in srgb, var(--fate-blue) 68%, var(--fate-white) 32%);
+    --editable-label-shadow:
+      0 2px 6px color-mix(in srgb, var(--fate-white) 14%, transparent),
+      0 6px 12px color-mix(in srgb, var(--fate-white) 8%, transparent);
+    background: color-mix(in srgb, var(--fate-blue) 30%, var(--fate-white) 70%);
+    color: white;
   }
 }
 </style>
