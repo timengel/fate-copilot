@@ -69,4 +69,14 @@ const emit = defineEmits<{
   color: var(--fate-blue-dark);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
 }
+
+:global([data-theme="dark"] .fate-tab-selector__option:not(.fate-tab-selector__option--active)) {
+  color: color-mix(in srgb, var(--fate-text-light) 68%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]) .fate-tab-selector__option:not(.fate-tab-selector__option--active)) {
+    color: color-mix(in srgb, var(--fate-text-light) 68%, transparent);
+  }
+}
 </style>

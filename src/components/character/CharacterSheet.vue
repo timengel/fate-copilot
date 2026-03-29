@@ -119,8 +119,8 @@ function sectionsEnabled(section: 'stress' | 'consequences') {
 function getItemSummary(item: Item) {
   const parts: string[] = [];
 
-  if (item.redDice) parts.push(`${item.redDice}R`);
-  if (item.blueDice) parts.push(`${item.blueDice}B`);
+  if (item.redDice) parts.push(`${item.redDice} 🟥`);
+  if (item.blueDice) parts.push(`${item.blueDice} 🟦`);
 
   for (const modifier of item.modifiers ?? []) {
     if (modifier.value !== 0) {
@@ -463,43 +463,6 @@ defineExpose({ save });
         </div>
       </section>
 
-      <section
-        v-if="!isEditing && assignedItems.length > 0"
-        class="sheet-section assigned-items-section span-full"
-      >
-        <div class="sheet-section-header">GEGENSTÄNDE</div>
-        <div class="assigned-items-grid">
-          <button
-            v-for="item in assignedItems"
-            :key="item.id"
-            type="button"
-            class="assigned-item-card"
-            @click="openAssignedItem(item.id)"
-          >
-            <div class="assigned-item-card__header">
-              <FateAvatar
-                :value="item.avatar"
-                size="S"
-                :background="getColorVars(item.color)['--fate-blue']"
-              />
-              <div class="assigned-item-card__meta">
-                <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
-                <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
-              </div>
-            </div>
-            <div v-if="getItemSummary(item).length > 0" class="assigned-item-card__stats">
-              <span
-                v-for="stat in getItemSummary(item)"
-                :key="stat"
-                class="assigned-item-card__pill"
-              >
-                {{ stat }}
-              </span>
-            </div>
-          </button>
-        </div>
-      </section>
-
       <!-- STRESS + KONSEQUENZEN -->
       <div
         v-if="hasVisibleStress || hasVisibleConsequences"
@@ -666,6 +629,43 @@ defineExpose({ save });
           placeholder="GM Notizen..."
         />
         <div v-else class="text-area-display gm-notes-display markdown-content" v-html="renderMarkdown(data.gmNotes)" />
+      </section>
+
+      <section
+        v-if="!isEditing && assignedItems.length > 0"
+        class="sheet-section assigned-items-section span-full"
+      >
+        <div class="sheet-section-header">GEGENSTÄNDE</div>
+        <div class="assigned-items-grid">
+          <button
+            v-for="item in assignedItems"
+            :key="item.id"
+            type="button"
+            class="assigned-item-card"
+            @click="openAssignedItem(item.id)"
+          >
+            <div class="assigned-item-card__header">
+              <FateAvatar
+                :value="item.avatar"
+                size="S"
+                :background="getColorVars(item.color)['--fate-blue']"
+              />
+              <div class="assigned-item-card__meta">
+                <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
+                <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
+              </div>
+            </div>
+            <div v-if="getItemSummary(item).length > 0" class="assigned-item-card__stats">
+              <span
+                v-for="stat in getItemSummary(item)"
+                :key="stat"
+                class="assigned-item-card__pill"
+              >
+                {{ stat }}
+              </span>
+            </div>
+          </button>
+        </div>
       </section>
 
       <!-- FORM ACTIONS (edit mode only) -->
@@ -973,7 +973,7 @@ defineExpose({ save });
 
 .assigned-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
   padding: 0.75rem;
 }
@@ -1035,13 +1035,30 @@ defineExpose({ save });
 }
 
 .assigned-item-card__pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.18rem 0.42rem;
+  min-height: 1.5rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--fate-blue-light) 75%, var(--fate-white));
   color: var(--fate-blue-dark);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+@container character-card (width < 900px) {
+  .assigned-items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container character-card (width < 560px) {
+  .assigned-items-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* View mode stunt display */
