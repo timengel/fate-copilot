@@ -1,6 +1,6 @@
 {
   "formatVersion": "1.0",
-  "exportDate": "2026-03-22T11:45:02.455Z",
+  "exportDate": "2026-03-29T13:03:00.114Z",
   "campaigns": [
     {
       "id": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
@@ -13,66 +13,10 @@
           "id": "a6dec6f2-a0b2-4cd4-aa60-43dbb488f35a",
           "type": "small",
           "description": "Pläne eines Genestealer Kults auf der Minenwelt \"Lucin's Atem\" vereitelt"
-        },
-        {
-          "id": "db4fda1f-76c5-4e3a-818d-8c2bc9984ae2",
-          "type": "significant",
-          "description": "Inquisitorin Lyra Voss als ambivalente Verbündete gewonnen – zu welchem Preis?"
-        },
-        {
-          "id": "2bf0c1c7-8074-4a42-8813-bcd8d0608595",
-          "type": "major",
-          "description": "Das häretische Artefaktnetzwerk auf Varaktus Prime aufgedeckt und zerstört"
-        },
-        {
-          "id": "1dc3105e-c3e6-4b81-80fc-c91cafbd7fed",
-          "type": "small",
-          "description": "Kontakt zu Techmarin Bruder Orix hergestellt und Zugang zu Mechanicus-Archiven erhalten"
         }
       ],
       "color": "pfau",
       "avatar": "🚀"
-    },
-    {
-      "id": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "name": "Lucin's Atem",
-      "description": "Die erste Mission der Crew führte sie auf die Minenwelt Lucin's Atem, wo ein Genestealer-Kult die Produktion sabotierte und sich auf eine planetare Infektion vorbereitete.",
-      "status": "completed",
-      "notes": "Abgeschlossene Kampagne. Ravi entdeckte hier seine Psionik-Begabung. Gorgon erbeutete biologisches Kultistenmaterial für seine Forschung. Kein Charakter ist gestorben – dieses Mal.",
-      "milestones": [
-        {
-          "id": "b1c2d3e4-f5a6-7b8c-9d0e-f1a2b3c4d5e6",
-          "type": "small",
-          "description": "Sicherer Abstieg in den alten Minenschacht 7 trotz Sabotage der Aufzüge"
-        },
-        {
-          "id": "c2d3e4f5-a6b7-8c9d-0e1f-a2b3c4d5e6f7",
-          "type": "small",
-          "description": "Bergarbeiter-Vorarbeiter Tern Malkus als Informant gewonnen und erstes Kultisten-Netz aufgedeckt"
-        },
-        {
-          "id": "d3e4f5a6-b7c8-9d0e-1f2a-b3c4d5e6f7a8",
-          "type": "significant",
-          "description": "Schwarm-Brüter-Kammer unter dem Hauptschacht zerstört – Gorgon erlitt dabei eine schwere Konsequenz"
-        },
-        {
-          "id": "e4f5a6b7-c8d9-0e1f-2a3b-c4d5e6f7a8b9",
-          "type": "major",
-          "description": "Kultist Magen 'Der Blinde' Ferris gefangen genommen und Beweise an den Planeten-Gouverneur übergeben"
-        }
-      ],
-      "color": "salbei",
-      "avatar": "⛏️"
-    },
-    {
-      "id": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
-      "name": "Das Erbe der Ravensburger",
-      "description": "Ravi Ole Ravensburger ist der letzte Überlebende seines Hauses. Irgendwo in den alten Archiven der Adeptus Terra schlummert das Erbe seiner Familie – und das Geheimnis ihres Untergangs.",
-      "status": "inactive",
-      "notes": "Kampagne auf Eis gelegt. Warten auf Ravens Entscheidung, ob er das Erbe wirklich antreten will.",
-      "milestones": [],
-      "color": "weintraube",
-      "avatar": "📚"
     }
   ],
   "characters": [
@@ -85,8 +29,7 @@
       "trouble": "Mein eigener Stab hat mich verraten",
       "aspects": [
         "Xenos-Artefaktjäger",
-        "Kybernetisch augmentiertes Spezialauge",
-        ""
+        "Kybernetisch augmentiertes Spezialauge"
       ],
       "skills": [
         {
@@ -127,34 +70,6 @@
       "extras": "- Tigerzahnkette",
       "refresh": 3,
       "fatePoints": 3,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
       "consequences": [
         {
           "severity": 2,
@@ -179,7 +94,43 @@
       ],
       "notes": "",
       "color": "basilikum",
-      "avatar": "🏴‍☠️"
+      "avatar": "🏴‍☠️",
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "GEISTIGER STRESS (WILLE)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "1eb86a6c-1066-4d4a-9310-2b18a2d1af76",
@@ -190,8 +141,7 @@
       "trouble": "Besessen von der perfekten Biomaschine",
       "aspects": [
         "\"Du willst mir nichts Gutes\" - außer Uwe",
-        "Mechanische Extremitäten",
-        ""
+        "Mechanische Extremitäten"
       ],
       "skills": [
         {
@@ -200,10 +150,6 @@
         },
         {
           "skill": "Kämpfen",
-          "level": 3
-        },
-        {
-          "skill": "Wissen",
           "level": 3
         },
         {
@@ -248,38 +194,6 @@
       "extras": "- Phiole mit Tigerblut",
       "refresh": 3,
       "fatePoints": 3,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        },
-        {
-          "value": 4,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
       "consequences": [
         {
           "severity": 2,
@@ -304,7 +218,47 @@
       ],
       "notes": "",
       "color": "tomate",
-      "avatar": "🤖"
+      "avatar": "🤖",
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            },
+            {
+              "value": 4,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "GEISTIGER STRESS (WILLE)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175",
@@ -315,14 +269,9 @@
       "trouble": "Socially awkward",
       "aspects": [
         "Raffinierter Rätsellöser",
-        "\"Zeig mir die Welt, Uwe!\"",
-        ""
+        "\"Zeig mir die Welt, Uwe!\""
       ],
       "skills": [
-        {
-          "skill": "Wissen",
-          "level": 4
-        },
         {
           "skill": "Nachforschung",
           "level": 3
@@ -361,26 +310,6 @@
       "extras": "",
       "refresh": 3,
       "fatePoints": 3,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
       "consequences": [
         {
           "severity": 2,
@@ -405,192 +334,103 @@
       ],
       "notes": "",
       "color": "weintraube",
-      "avatar": "🫅🏻"
+      "avatar": "🫅🏻",
+      "archived": false,
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "GEISTIGER STRESS (WILLE)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "c5ab1879-b8d5-4dc7-8ad4-143c8a7e5731",
-      "type": "sc",
-      "archived": true,
-      "name": "Master Mustermann",
-      "description": "",
-      "highConcept": "Bababa bibibi",
-      "trouble": "Lulululu",
+      "id": "903c579c-f489-4f6c-b94e-199c35e3ed35",
+      "type": "nsc",
+      "name": "Orden Hyort",
+      "description": "Navigator der Emperor's Bounty, vom Psycharus Wurm korrumpiert und zum Warp-Anker des Geisterschiffs geworden.",
+      "highConcept": "Vom Psycharus Wurm verdorbener Navigator von Haus Benetek",
+      "trouble": "Mein geöffnetes drittes Auge trinkt unaufhörlich aus dem Warp",
       "aspects": [
-        "",
-        "",
-        ""
+        "Herr der Warp-Puppen",
+        "Ich brauche ein Schiff, um meinem Gefängnis zu entkommen"
       ],
       "skills": [
         {
-          "skill": "Athletik",
-          "level": 3
-        },
-        {
-          "skill": "Charisma",
+          "skill": "Wahrnehmung",
           "level": 2
         },
         {
-          "skill": "Handwerk",
-          "level": 1
-        }
-      ],
-      "stunts": [],
-      "extras": "",
-      "refresh": 3,
-      "fatePoints": 3,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
+          "skill": "Kämpfen",
+          "level": 2
         },
         {
-          "value": 2,
-          "checked": false
+          "skill": "Täuschung",
+          "level": 2
         },
-        {
-          "value": 3,
-          "checked": false
-        },
-        {
-          "value": 4,
-          "checked": false
-        },
-        {
-          "value": 5,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
-      "consequences": [
-        {
-          "severity": 2,
-          "label": "mild",
-          "value": "Matschbirne"
-        },
-        {
-          "severity": 4,
-          "label": "moderate",
-          "value": "Todeskater"
-        },
-        {
-          "severity": 6,
-          "label": "severe",
-          "value": ""
-        },
-        {
-          "severity": 8,
-          "label": "extreme",
-          "value": ""
-        }
-      ],
-      "notes": "",
-      "color": "pfau",
-      "avatar": ""
-    },
-    {
-      "id": "67281cff-7b07-4588-95f5-cec387eed21e",
-      "type": "nsc",
-      "name": "Inquisitorin Lyra Voss",
-      "description": "Agentin der Ordo Xenos, entsandt um den Genestealer-Kult auf Lucin's Atem zu untersuchen. Arbeitet widerwillig mit der Crew zusammen – solange ihre Ziele übereinstimmen.",
-      "highConcept": "Fanatische Inquisitorin der Ordo Xenos auf der Jagd nach Häresie",
-      "trouble": "Das Ziel heiligt immer die Mittel",
-      "aspects": [
-        "Eiserne Autorität des Imperators",
-        "Netzwerk von Informanten und Spitzeln",
-        ""
-      ],
-      "skills": [
         {
           "skill": "Wille",
           "level": 4
+        },
+        {
+          "skill": "Psionik",
+          "level": 3
         },
         {
           "skill": "Provozieren",
           "level": 3
         },
         {
-          "skill": "Nachforschung",
-          "level": 3
-        },
-        {
-          "skill": "Empathie",
-          "level": 2
-        },
-        {
-          "skill": "Kämpfen",
-          "level": 2
-        },
-        {
-          "skill": "Wahrnehmung",
-          "level": 2
+          "skill": "Athletik",
+          "level": 1
         },
         {
           "skill": "Schießen",
           "level": 1
         },
         {
-          "skill": "Charisma",
-          "level": 1
-        },
-        {
-          "skill": "Täuschung",
+          "skill": "Kraft",
           "level": 1
         }
       ],
       "stunts": [
         {
-          "name": "Verhörmeisterin",
-          "description": "+2 auf Provozieren in Verhör-Situationen oder wenn das Gegenüber unter Druck steht"
+          "name": "Warp-Puppen Welle",
+          "description": "Einmal pro Szene: Kann mit Wille statt anzugreifen den Situationsaspekt \"Warp-Puppen überall\" erschaffen und erhält 2 freie Einsätze."
         },
         {
-          "name": "Zeuge des Imperiums",
-          "description": "Einmal pro Szene: +2 auf Wille gegen Warp-Effekte, Einschüchterung oder Chaos-Einfluss"
+          "name": "Warpgeladene Fäuste",
+          "description": "Wenn sein Psi-Schild gebrochen ist, verursacht Orden bei Kämpfen-Angriffen +2 gegen Ziele, die bereits einen mentalen Aspekt oder eine mentale Konsequenz tragen."
+        },
+        {
+          "name": "Psionische Betäubung",
+          "description": "Statt normal anzugreifen→ Vorteil erschaffen: Psionischer Betäubungsstoß gegen ein Ziel in derselben oder einer benachbarten Zone. Erfolg: Ziel ist für 1 Runde \"Betäubt\" (außer Gefecht) und danach 1 Runde \"Benommen\". "
         }
       ],
-      "extras": "- Rosette der Heiligen Inquisition (öffnet Türen und Münder)\n- Bolt Pistole (Extraschaden: +1 Stress bei Treffern)",
+      "extras": "- Psycharus Wurm: Xeno-Parasit, Quelle von Ordens Warpkräften und Korrumpierung\n- Psi-Schild des Kapitänsthron: Solange aktive: Schadensdeflektion: 5, Rüstungsrating: 3\n- Verfluchte Navigatorenrobe: Rüstungsrating: 1",
       "refresh": 1,
-      "fatePoints": 1,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        },
-        {
-          "value": 4,
-          "checked": false
-        }
-      ],
+      "fatePoints": 3,
       "consequences": [
         {
           "severity": 2,
@@ -601,151 +441,155 @@
           "severity": 4,
           "label": "moderate",
           "value": ""
-        },
-        {
-          "severity": 6,
-          "label": "severe",
-          "value": ""
-        },
-        {
-          "severity": 8,
-          "label": "extreme",
-          "value": ""
         }
       ],
-      "notes": "GM-Notiz: Voss weiß mehr über die Krone der Konsequenzen als sie zugibt. Sie lässt die Crew vorerst gewähren.",
-      "color": "flamingo",
-      "avatar": "👁️"
+      "notes": "Endgegner aus Forsaken Bounty. Beginnt den Kampf auf dem Kapitänsthron, erschafft zuerst Vorteile wie \"Warp-Puppen überall\" oder \"Die Luft wird abgesaugt\" und geht erst in den Nahkampf, wenn sein Schild oder der Thron kompromittiert wurde. Wenn die Bindung zwischen Wurm, drittem Auge und Thron gebrochen wird, verliert er stark an Macht.",
+      "color": "rose",
+      "avatar": "👁️",
+      "blueDice": 4,
+      "redDice": 0,
+      "modifiers": [
+        {
+          "label": "Purer Schaden",
+          "value": 0
+        },
+        {
+          "label": "Deflektion",
+          "value": 5
+        }
+      ],
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "GEISTIGER STRESS (WILLE)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            },
+            {
+              "value": 4,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "e2c9b047-3f8d-4a6e-b1c5-9d7f2a4e8b6d",
+      "id": "78ce6875-691d-479b-ae65-d13630d43306",
       "type": "nsc",
-      "archived": true,
-      "name": "Magen \"Der Blinde\" Ferris",
-      "description": "Schläfer-Agent des Genestealer-Kults auf Lucin's Atem. Jahrelang als loyaler Bergarbeiter getarnt. Wurde von der Crew gefangen genommen und an die Gouverneurs-Behörden übergeben.",
-      "highConcept": "Fanatischer Genestealer-Kultist und Schläfer auf Lucin's Atem",
-      "trouble": "Der Patriarch ruft mich zurück in den Schwarm",
+      "name": "Warp-Puppen",
+      "description": "Von Orden Hyort und dem Psycharus Wurm gelenkte Leichen der Emperor's Bounty. Einzeln stumpf und langsam, in der Masse aber tödlich.",
+      "highConcept": "Vom Psycharus Wurm gelenkte Zombies",
+      "trouble": "Langsam, stumpf und nur durch fremden Willen in Bewegung",
       "aspects": [
-        "Tarnung als loyaler Bergarbeiter",
-        "Verborgene Xenos-Mutation (Tentakelarm)",
-        ""
+        "Unsterbliche Wiedergänger"
       ],
       "skills": [
         {
-          "skill": "Heimlichkeit",
-          "level": 3
+          "skill": "Kämpfen",
+          "level": 1
         },
+        {
+          "skill": "Athletik",
+          "level": 1
+        }
+      ],
+      "stunts": [
+        {
+          "name": "Mob",
+          "description": "Diese Einheit ist als Fate-Core-Mob gedacht: Mehrere Warp-Puppen können als Gruppe zusammengefasst werden. Jede zusätzliche Puppe mit Kämpfen +1 erhöht den Angriffswert des Mobs um +1."
+        },
+        {
+          "name": "Stehen wieder auf",
+          "description": "Wird eine Warp-Puppe ausgeschaltet, ist sie nicht zwingend endgültig vernichtet. Wenn sie nicht verbrannt, zerfetzt, ins Vakuum gerissen oder vollständig zerlegt wurde, kann sie in 3 Runden später wieder aufstehen."
+        },
+        {
+          "name": "arst",
+          "description": "arst"
+        }
+      ],
+      "extras": "- Als Mob: Jeder netto Shift Schaden schaltet in der Regel eine Warp-Puppe aus",
+      "refresh": 0,
+      "fatePoints": 0,
+      "consequences": [],
+      "notes": "Als namenloser NPC/Mob verwenden. Einzelne Warp-Puppen sind schwach; der eigentliche Druck entsteht durch Teamwork im Mob. Beispiel: 3 Puppen greifen mit Kämpfen +3 an, 5 Puppen mit +5. Jede ausgeschaltete Puppe senkt den Mob-Wert entsprechend. Ideal für Szenen mit Enge, Luftmangel und stetigem Nachrücken weiterer Leiber.",
+      "color": "gray",
+      "avatar": "🧟",
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "Neuer Stress 2",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c3fe567a-ae8e-49a5-8e73-aeff96215366",
+      "type": "nsc",
+      "name": "Sergeant Halix Vorn",
+      "description": "Abgebrühter imperialer Sergeant, verlässlicher Frontsoldat und taktischer Anführer.",
+      "highConcept": "Erfahrener imperialer Sergeant mit eiserner Disziplin",
+      "trouble": "Verliert schnell die Geduld bei Ungehorsam und Chaos",
+      "aspects": [
+        "Narben eines Dutzend Feuergefechte"
+      ],
+      "skills": [
         {
           "skill": "Kämpfen",
-          "level": 3
-        },
-        {
-          "skill": "Täuschung",
-          "level": 2
-        },
-        {
-          "skill": "Kraft",
-          "level": 2
+          "level": 1
         },
         {
           "skill": "Athletik",
           "level": 1
         },
         {
+          "skill": "Provozieren",
+          "level": 1
+        },
+        {
           "skill": "Wille",
-          "level": 1
-        },
-        {
-          "skill": "Wahrnehmung",
-          "level": 1
-        }
-      ],
-      "stunts": [
-        {
-          "name": "Schwarmgeist",
-          "description": "+2 auf Wille-Proben wenn andere Kultisten in der Szene anwesend sind"
-        },
-        {
-          "name": "Klettergreifer",
-          "description": "Verborgene Mutationen: +2 auf Athletik beim Klettern und in engen, dunklen Räumen"
-        }
-      ],
-      "extras": "- Mutierter Tentakelarm (versteckt, zählt als Waffe: +1 Stress bei Kämpfen-Angriffen)",
-      "refresh": 1,
-      "fatePoints": 0,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": true
-        },
-        {
-          "value": 2,
-          "checked": true
-        },
-        {
-          "value": 3,
-          "checked": true
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "consequences": [
-        {
-          "severity": 2,
-          "label": "mild",
-          "value": "Gebrochen und überwältigt"
-        },
-        {
-          "severity": 4,
-          "label": "moderate",
-          "value": ""
-        },
-        {
-          "severity": 6,
-          "label": "severe",
-          "value": ""
-        },
-        {
-          "severity": 8,
-          "label": "extreme",
-          "value": ""
-        }
-      ],
-      "notes": "Antagonist der Lucin's Atem-Kampagne. Besiegt und archiviert.",
-      "color": "salbei",
-      "avatar": "👽"
-    },
-    {
-      "id": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b",
-      "type": "nsc",
-      "name": "Techmarin Bruder Orix",
-      "description": "Neugieriger und unorthodox offener Techmarin des Adeptus Mechanicus. Ein alter Bekannter von Gorgon Zola, dem er einen Gefallen schuldet – immer zur ungünstigsten Zeit.",
-      "highConcept": "Neugieriger Techmarin und Vertrauter des Magos Zola",
-      "trouble": "Schuldet dem Magos einen Gefallen – immer zur falschen Zeit",
-      "aspects": [
-        "Mechanicus-Kontakte in drei Sektoren",
-        "Faszination für verbotene und vergessene Technologien",
-        ""
-      ],
-      "skills": [
-        {
-          "skill": "Handwerk",
-          "level": 4
-        },
-        {
-          "skill": "Wissen",
-          "level": 3
-        },
-        {
-          "skill": "Nachforschung",
           "level": 2
         },
         {
@@ -753,55 +597,19 @@
           "level": 2
         },
         {
-          "skill": "Wille",
-          "level": 2
-        },
-        {
-          "skill": "Empathie",
-          "level": 1
-        },
-        {
-          "skill": "Ressourcen",
-          "level": 1
+          "skill": "Schießen",
+          "level": 3
         }
       ],
       "stunts": [
         {
-          "name": "Notfallreparatur",
-          "description": "+2 auf Handwerk bei Feldreparaturen unter Zeitdruck oder in gefährlicher Umgebung"
-        },
-        {
-          "name": "Archiv des Omnissiah",
-          "description": "Kann Wissen statt Nachforschung verwenden, wenn es um technische Daten, Maschinenpläne oder Archiv-Recherche geht"
+          "name": "Gebrüllter Befehl",
+          "description": "Einmal pro Szene kann Halix mit Provozieren den Situationsaspekt \"In Stellung!\" mit +1 freiem Einsatz erschaffen, wenn Verbündete ihn hören können."
         }
       ],
-      "extras": "- Mechadendrit-Werkzeugarm (gibt +1 auf alle Handwerk-Proben)\n- Zugang zu lokalen Mechanicus-Archiven",
+      "extras": "- Lasergewehr\n- Flak-Rüstung\n- Feldstecher und Vox-Perle",
       "refresh": 1,
-      "fatePoints": 0,
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
+      "fatePoints": 2,
       "consequences": [
         {
           "severity": 2,
@@ -812,21 +620,39 @@
           "severity": 4,
           "label": "moderate",
           "value": ""
-        },
-        {
-          "severity": 6,
-          "label": "severe",
-          "value": ""
-        },
-        {
-          "severity": 8,
-          "label": "extreme",
-          "value": ""
         }
       ],
-      "notes": "",
-      "color": "heidelbeere",
-      "avatar": "⚙️"
+      "notes": "Mittelstarker NSC-Unterstützer. Gut als Feuerunterstützung, Absicherung von Rückzügen und zum Halten von Positionen. Kein Red/Blue-Dice-Einsatz.",
+      "color": "basilikum",
+      "avatar": "🪖",
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        },
+        {
+          "label": "GEISTIGER STRESS (WILLE)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        }
+      ]
     }
   ],
   "items": [
@@ -841,183 +667,279 @@
       ],
       "stunts": [],
       "extras": "Nutzung lässt den Schleier zw. Realität und Warp schwächer werden. Pro Nutzung → 1 Stress. Wenn 3 Stress → Nutzer muss Wille 5 verteidigen, alle im Umkreis Wille 3. Krone glüht danach kurzzeitig extrem heiß.",
-      "stressPhysical": [],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
       "color": "gray",
       "avatar": "👑",
       "redDice": 0,
       "blueDice": 0,
       "hidden": false,
-      "archived": false
+      "archived": false,
+      "consequences": [],
+      "modifiers": [],
+      "stressTracks": [
+        {
+          "label": "Warp Schleier",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "c595b363-42f2-4a5c-911c-d14b1263ed31",
+      "id": "a6b9d485-1156-47a8-8ce8-967cfddefa79",
       "type": "item",
-      "name": "Plasmawerfer",
-      "description": "Plasmawerfer des Adeptus Mechanicus. Instabil.",
+      "archived": false,
+      "name": "Profit Faktor",
+      "description": "Gerade: 3 (+0). Maß für Einfluss und Reichtum eines Freihändlers.",
       "aspects": [
-        "Überhitzungsgefahr bei jedem Schuss",
-        "Vernichtende Plasmawolke"
+        ""
       ],
-      "stunts": [
+      "stunts": [],
+      "extras": "",
+      "color": "banane",
+      "avatar": "💰",
+      "redDice": 0,
+      "blueDice": 0,
+      "gmNotes": "# Preise\n- 1–2 PF: teure Kleinigkeit / einmaliger Gefallen / kleine Reparatur\n- 3–5 PF: große Reparatur / deutliches Upgrade-Modul / großer Deal\n- 6–10 PF: dynastieprägend innerhalb eines Arcs (genau die Größenordnung von Forsaken Bounty +10 Endeavour-Reward  ￼)\n- 11–20 PF: selten, „Strategieentscheid“ / mehrere Systeme / großes Projekt\n\n# Skala für Ressourcen Proben \nPF frei (ungebunden)\n- 0–9 → +0\n- 10–19 → +1\n- 20–29 → +2\n- 30–39 → +3\n- 40–49 → +4\n- 50–59 → +5\n- 60–69 → +6\n- 70–79 → +7\n- 80+ → +8",
+      "hidden": true,
+      "modifiers": [
         {
-          "name": "Sperrfeuer",
-          "description": "Kann einmal pro Szene alle Charaktere in der Zone angreifen. Malus -1. Danach muss nachgeladen werden."
+          "label": "Profit Faktor",
+          "value": 0
         }
       ],
-      "extras": "- Munitionsvorrat von 4 pro Szene (Phys. Stress).\n- Nachladen: Probe 1 auf Schießen → Fail: 2 Stress Phys. Schaden",
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        },
-        {
-          "value": 4,
-          "checked": false
-        }
+      "stressTracks": []
+    },
+    {
+      "id": "1b111160-cc85-4005-b65b-f5bfe51bb1cc",
+      "type": "item",
+      "name": "Guncutter",
+      "description": "Kleines bewaffnetes und gepanzertes Shuttle der Crew, mit dem sie das Trümmerfeld des Battlegrounds durchqueren, um die Emperor's Bounty zu erreichen.",
+      "aspects": [
+        "Kleines, wendiges Landungsboot mit leichter Bewaffnung"
       ],
-      "stressMental": [],
-      "color": "pfau",
-      "avatar": "🔫",
-      "redDice": 2,
+      "stunts": [],
+      "extras": "- Crew: 1-2 Piloten, 1-2 Schützen, 1 Ingenieur\n- Crewquartiere für 6 Personen\n- Frachtraum für ca. 30 Personen oder entsprechende Fracht\n- 6 Void-Suits an Bord\n- Zu klein, um viele verborgene Ordnance-Fallen auszulösen\n- Bewaffnet und gepanzert für In-System-Flüge, Landungen und kurze Gefechte\n- Battleground-Sonderregel: Für den Anflug zur Emperor's Bounty ist meist eine Fahren/Pilotieren-Probe nötig; bei Fehlschlag erleidet der Guncutter 1 physischen Stress durch Trümmer oder alte Ordnance. Wenn zuvor ein Korridor freigeschossen wurde, wird die Probe erleichtert.",
+      "color": "stahl",
+      "avatar": "🛩️",
+      "redDice": 0,
       "blueDice": 0,
       "hidden": false,
-      "archived": false
+      "archived": false,
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        },
+        {
+          "severity": 4,
+          "label": "moderate",
+          "value": ""
+        },
+        {
+          "severity": 6,
+          "label": "severe",
+          "value": ""
+        }
+      ],
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            },
+            {
+              "value": 3,
+              "checked": false
+            },
+            {
+              "value": 4,
+              "checked": false
+            },
+            {
+              "value": 5,
+              "checked": false
+            },
+            {
+              "value": 6,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "b4e7f219-8c3a-4d6b-a5f1-2e9c7d4b8a6f",
+      "id": "9129a7b3-4a5a-4b18-9fd0-603e5078905a",
       "type": "item",
-      "name": "Häretisches Dataslate",
-      "description": "Ein verschlüsseltes Dataslate mit Aufzeichnungen über verbotene Xenos-Technologie, Warp-Phänomene und Genestealer-Kult-Rituale. Hochgradig häretisch – Besitz allein reicht für eine Inquisitions-Befragung.",
+      "name": "Void Suit",
+      "description": "Schwerer imperialer Vakuumanzug mit eigenem Lebenserhaltungssystem. Hält die Crew im luftleeren Raum am Leben, ist aber sperrig, laut und für Kampf oder filigrane Arbeiten eine echte Belastung.",
       "aspects": [
-        "Verbotenes Xenos- und Warp-Wissen",
-        "Begehrliches Ziel für die Inquisition"
+        "Versiegelter Vakuumanzug mit eigener Luftversorgung",
+        "Sperrig und schwer"
       ],
       "stunts": [
         {
-          "name": "Verbotenes Wissen",
-          "description": "Bei Wissen-Proben zu Xenos, Warp oder Kult-Ritualen: +2. Aber es wird ein Situationsaspekt \"Spuren von Häresie\" erzeugt, den Gegner frei einsetzen können."
+          "name": "Lebenserhaltung",
+          "description": "Solange der Void Suit intakt ist, ignoriert der Träger die normalen Effekte von Luftmangel, Dekompression und harter Vakuum-Exposition in der Szene."
         }
       ],
-      "extras": "Jede Nutzung hinterlässt digitale Spuren → 1 Mentalstress (Paranoia). Kann mit Handwerk 3 teilweise bereinigt werden. Inquisitorin Voss weiß von seiner Existenz.",
-      "stressPhysical": [],
-      "stressMental": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "color": "heidelbeere",
-      "avatar": "📜",
+      "extras": "Der Void Suit ist ein Fluch und Segen zugleich: Er erlaubt Außenbordeinsätze, Boarding unter Vakuumbedingungen und das Überleben in belüfteten Sektionen mit Atmosphärenverlust. Gleichzeitig erschwert er grobmotorisch-dynamische und feinmotorische Handlungen. \n\nAuf passende Proben wie Kämpfen, Diebeskünste, Handwerk o. Ä.: -2 oder ein erschwerender Situationsaspekt wie \"Unhandlich im Void Suit\". \n\nWird der Anzug beschädigt oder aufgerissen, ist der Schutz weg, bis er versiegelt oder repariert wurde.",
+      "color": "lavendel",
+      "avatar": "🧑‍🚀",
       "redDice": 0,
       "blueDice": 1,
       "hidden": false,
-      "archived": false
+      "archived": false,
+      "consequences": [
+        {
+          "severity": 2,
+          "label": "mild",
+          "value": ""
+        }
+      ],
+      "stressTracks": [
+        {
+          "label": "KÖRPERLICHER STRESS (KRAFT)",
+          "boxes": [
+            {
+              "value": 1,
+              "checked": false
+            },
+            {
+              "value": 2,
+              "checked": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "d6a3c851-2f7e-4b9d-c8a4-7f5e1b3d9c2a",
+      "id": "999790cb-f35a-47c7-83b9-19b1a1afdd96",
       "type": "item",
-      "name": "Tarnkleid des Assassinen",
-      "description": "Ein hochtechnologisches Tarnkleid aus Arachni-Rigg-Fasern, standardmäßig bei Officio-Assassinorum-Agenten. Unbekannter Herkunft – Rovan \"hat es einfach gefunden\".",
+      "name": "Void Breather des Kapitäns",
+      "description": "Eine prunkvolle, vergoldete Atemmaske aus der persönlichen Notfallausrüstung von Kapitän Janrak Spargan. Hinter der goldenen Front verbergen sich uralte Filter, Druckdichtungen und ein kleiner Reserve-Sauerstofftank. Die Maske wirkt würdevoll und unheimlich zugleich – ein Relikt aus dem Wrack der Emperor’s Bounty.",
       "aspects": [
-        "Nano-Tarnmembran aus Militärbeständen",
-        "Wer hat das hier vergessen?"
+        "Prunkvolle Atemmaske eines toten Kapitäns"
       ],
-      "stunts": [
-        {
-          "name": "Unsichtbarer Angriff",
-          "description": "Wenn aus dem Verborgenen heraus angegriffen wird: +2 auf Schießen oder Kämpfen für den ersten Angriff der Szene"
-        },
-        {
-          "name": "Tarnfeld aktiv",
-          "description": "Einmal pro Szene: Eine Heimlichkeit-Probe entfällt komplett (automatischer Erfolg mit einem Stunt-Einsatz)"
-        }
-      ],
-      "extras": "Hält 2 physischen Stress als \"Tarnschaden\" bevor es sichtbar wird. Reparatur erfordert Handwerk 2 oder Materialien.",
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        }
-      ],
-      "stressMental": [],
-      "color": "lavendel",
-      "avatar": "🕶️",
+      "stunts": [],
+      "extras": "**Wenn getragen:** 1 Deflektion und 2 blaue Würfel gegen luftbasierte Umgebungsgefahren oder Angriffe (z.B. Vakuum oder giftiger Rauch).",
       "redDice": 0,
-      "blueDice": 0,
-      "hidden": false,
-      "archived": true
+      "blueDice": 2,
+      "color": "mandarine",
+      "avatar": "🤿",
+      "hidden": true,
+      "modifiers": [
+        {
+          "label": "Purer Schaden",
+          "value": 0
+        },
+        {
+          "label": "Deflektion",
+          "value": 2
+        }
+      ],
+      "stressTracks": []
     },
     {
-      "id": "e9f2b473-6d1c-4a8e-b5f3-9c7a2d4e6b8f",
+      "id": "edb9db72-ccb0-47b1-8479-9275ff9222a9",
       "type": "item",
-      "name": "Wächterdrohne MK.VII",
-      "description": "Eine autonome Mechanicus-Wächterdrohne, umprogrammiert und modifiziert von Gorgon Zola. Schützt ihren designierten Benutzer und ist mit einem Lascutter bewaffnet. Manchmal etwas zu enthusiastisch.",
+      "name": "Verstärkter Armaplast Brustpanzer",
+      "description": "Ein schwerer, vergilbter Brustpanzer aus Armaplast mit verstärkter Front, Nieten und grob ersetzten Segmenten. Alt, oft geflickt und für enge Schiffskorridore gemacht, um Schrapnelle, Splitter und harte Treffer abzufangen. Innen sind nur noch Reste eines abgekratzten Dienstsiegels und verblasste Markierungen eines längst toten Waffenmanns zu sehen.",
       "aspects": [
-        "Autonomes Schutzsystem mit eigener Agenda",
-        "Lascutter: Nützlich für Türen und Feinde"
+        "Schwer und alt aber beständig (wie Cadia 😉)."
       ],
+      "stunts": [],
+      "extras": "",
+      "redDice": 0,
+      "blueDice": 1,
+      "color": "basilikum",
+      "avatar": "🛡️",
+      "hidden": true,
+      "modifiers": [],
+      "stressTracks": []
+    },
+    {
+      "id": "8818c297-dce9-4a5e-bfde-b80c3d919e06",
+      "type": "item",
+      "name": "Diagnostor Servo-Schädel",
+      "description": "Ein antiker Servo-Schädel mit Medicae-Optiken, Injektorarmen und heiser knisternden Diagnoselitaneien. Er gehörte einst dem Leit-Chiurgen der Emperor’s Bounty und wurde für Offiziere und Schwerverwundete eingesetzt, nicht für die gewöhnliche Besatzung. Sein Messinggehäuse ist verbeult, einige Sonden wurden grob ersetzt, doch seine medizinischen Routinen arbeiten noch immer erschreckend präzise.",
+      "aspects": [
+        "Fliegender Servo-Schädel zur Medicae Unterstützung"
+      ],
+      "stunts": [],
+      "extras": "**+2 🟦 bei medizinischer Erstversorgung, Diagnose oder Stabilisierung körperlicher Verletzungen.** Der Schädel schwebt selbstständig in unmittelbarer Nähe des Nutzers.",
+      "redDice": 0,
+      "blueDice": 2,
+      "color": "lachs",
+      "avatar": "⛑️",
+      "hidden": true,
+      "modifiers": [
+        {
+          "label": "Purer Schaden",
+          "value": 0
+        },
+        {
+          "label": "Deflektion",
+          "value": 0
+        }
+      ],
+      "stressTracks": []
+    },
+    {
+      "id": "4feb4596-da08-40c3-9a60-f23546d63d63",
+      "type": "item",
+      "name": "Plasma Pistole",
+      "description": "Eine seltene Plasma-Pistole aus dem Altbestand der Emperor’s Bounty, vermutlich einst die Seitenwaffe eines Waffenoffiziers oder Brückenveteranen. Das gedrungene Gehäuse aus geschwärztem Metall ist mit Warnrunen, Hitzerissen und alten Wartungssiegeln übersät. Jeder Schuss lässt die Kühlrippen glühen und die Pistole kreischend Dampf abblasen – brutal wirksam, aber gefährlich instabil.",
+      "aspects": [],
       "stunts": [
         {
-          "name": "Schutzmodus",
-          "description": "Einmal pro Konflikt kann die Drohne einen Treffer für den Besitzer abfangen und absorbiert damit eine milde Konsequenz"
-        },
-        {
-          "name": "Laserscanner",
-          "description": "+2 auf Wahrnehmung-Proben zum Aufspüren verborgener Feinde, Fallen oder versteckter Mechanismen"
+          "name": "Aufgeladener Schuss",
+          "description": "+2 🟥 aber erzeugt +3 Hitze"
         }
       ],
-      "extras": "Erfordert Handwerk 2 für Wartung nach jedem Konflikt. Bei 3 Phys. Stress → ausgeschaltet, Reparatur mit Handwerk 3 nötig. Lascutter: +1 Stress bei Kämpfen-Angriffen.",
-      "stressPhysical": [
-        {
-          "value": 1,
-          "checked": false
-        },
-        {
-          "value": 2,
-          "checked": false
-        },
-        {
-          "value": 3,
-          "checked": false
-        }
-      ],
-      "stressMental": [],
-      "color": "banane",
-      "avatar": "🛰️",
+      "extras": " # Hitze\nJeder normale Schuss erzeugt +1 Hitze.\n\n## Kühlung\n\nDie Pistole kann in dieser Runde nicht eingesetzt werden. Hitze wird auf 0 resettet.\n\n## Hitze-Explosion\n\nFalls Hitze-Stress nicht untergebracht werden kann: Die Pistole überhitzt und explodiert in der nächsten Runde. Jeder Charakter in der Nähe erleidet 3 Stress phys. Schaden.",
       "redDice": 1,
       "blueDice": 0,
-      "hidden": false,
-      "archived": false
+      "color": "pfau",
+      "avatar": "🔫",
+      "hidden": true,
+      "modifiers": [
+        {
+          "label": "Purer Schaden",
+          "value": 0
+        },
+        {
+          "label": "Deflektion",
+          "value": 0
+        }
+      ],
+      "stressTracks": [
+        {
+          "label": "Hitze",
+          "boxes": [
+            {},
+            {},
+            {}
+          ]
+        }
+      ]
     }
   ],
   "campaignCharacterAssignments": [
@@ -1035,35 +957,15 @@
     },
     {
       "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
-      "characterId": "67281cff-7b07-4588-95f5-cec387eed21e"
+      "characterId": "903c579c-f489-4f6c-b94e-199c35e3ed35"
     },
     {
       "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
-      "characterId": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b"
+      "characterId": "78ce6875-691d-479b-ae65-d13630d43306"
     },
     {
-      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "characterId": "9c801b83-8da0-4ffe-8332-a07306538162"
-    },
-    {
-      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "characterId": "1eb86a6c-1066-4d4a-9310-2b18a2d1af76"
-    },
-    {
-      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "characterId": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175"
-    },
-    {
-      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "characterId": "e2c9b047-3f8d-4a6e-b1c5-9d7f2a4e8b6d"
-    },
-    {
-      "campaignId": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
-      "characterId": "aeb2ede5-e858-4c9c-a3a9-bda833c6f175"
-    },
-    {
-      "campaignId": "7d2e4a56-9b1c-4f8e-b3d7-11a5c9e2f046",
-      "characterId": "a8b5c312-7e4f-4d9a-c2b6-5f1e3d7a9c8b"
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "characterId": "c3fe567a-ae8e-49a5-8e73-aeff96215366"
     }
   ],
   "campaignItemAssignments": [
@@ -1073,40 +975,433 @@
     },
     {
       "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
-      "itemId": "c595b363-42f2-4a5c-911c-d14b1263ed31"
-    },
-    {
-      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
-      "itemId": "b4e7f219-8c3a-4d6b-a5f1-2e9c7d4b8a6f"
-    },
-    {
-      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
       "itemId": "d6a3c851-2f7e-4b9d-c8a4-7f5e1b3d9c2a"
     },
     {
-      "campaignId": "3a7c9f11-5e23-4b8d-a12f-88c7e6d4b291",
-      "itemId": "e9f2b473-6d1c-4a8e-b5f3-9c7a2d4e6b8f"
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "9129a7b3-4a5a-4b18-9fd0-603e5078905a"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "a6b9d485-1156-47a8-8ce8-967cfddefa79"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "1b111160-cc85-4005-b65b-f5bfe51bb1cc"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "999790cb-f35a-47c7-83b9-19b1a1afdd96"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "4feb4596-da08-40c3-9a60-f23546d63d63"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "edb9db72-ccb0-47b1-8479-9275ff9222a9"
+    },
+    {
+      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
+      "itemId": "8818c297-dce9-4a5e-bfde-b80c3d919e06"
     }
   ],
   "skills": [
-    "Athletik",
-    "Charisma",
-    "Diebeskünste",
-    "Empathie",
-    "Fahren",
-    "Handwerk",
-    "Heimlichkeit",
-    "Kämpfen",
-    "Kontakte",
-    "Kraft",
-    "Nachforschung",
-    "Provozieren",
-    "Ressourcen",
-    "Schießen",
-    "Täuschung",
-    "Wahrnehmung",
-    "Wille",
-    "Wissen",
-    "Psionik"
+    {
+      "name": "Athletik",
+      "description": "Körperliche Fitness, Körperbeherrschung und Bewegungsfähigkeit. Wichtig für alles, was mit dem eigenen Körper in Bewegung zu tun hat.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Hindernisse durch Springen, Laufen, Klettern, Schwimmen überwinden; Zonen wechseln."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Taktische Vorteile durch Akrobatik oder Positionierung."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Universelle Verteidigung in körperlichen Konflikten gegen Nah- und Fernkampfangriffe."
+        }
+      ]
+    },
+    {
+      "name": "Charisma",
+      "description": "Positive Beziehungen aufbauen, Wohlwollen erzeugen, Vertrauen wecken und andere dazu bringen, einen zu mögen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Jemanden überreden, etwas zu tun, oder seine Zuneigung gewinnen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Positive emotionale Zustände erzeugen wie „Aufgemuntert\" oder „Gesprächsbereit\"."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Ruf und Atmosphäre schützen, wenn andere versuchen, sie zu untergraben."
+        }
+      ]
+    },
+    {
+      "name": "Diebeskünste",
+      "description": "Einbruch, Schlösser, Fallen, Taschendiebstahl, Schmuggelverstecke, Spuren verwischen, Sicherungen physisch umgehen, Infiltration und Beute sichern. Kein Hacking (→ Software)!",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Schlösser knacken, Fallen umgehen, Taschen leeren, Schmuggelgut verstecken, Spuren beseitigen, physische Sicherungen überwinden."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Sicherheitslücken vor Ort finden, Verstecke vorbereiten, Fluchtrouten markieren, einen Ort für den Einbruch auskundschaften."
+        }
+      ]
+    },
+    {
+      "name": "Empathie",
+      "description": "Emotionale Zustände und Verhaltensänderungen anderer erkennen – wie Wahrnehmung, aber für Gefühle statt physische Details.",
+      "actions": [
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Emotionalen Zustand einschätzen, Charakteraspekte (besonders von NSC) aufdecken."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Täuschung aufdecken; gegen soziale Vorteile verteidigen; bei mentalen Konsequenzen helfen."
+        }
+      ]
+    },
+    {
+      "name": "Fahren",
+      "description": "Fahrzeuge und schnelle Fortbewegungsmittel steuern. Je nach Setting auch Reiten, Fliegen oder Pilotieren.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Fahrzeug durch schwieriges Gelände navigieren, Rennen und Verfolgungsjagden."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Optimale Routen finden, taktische Positionsvorteile erarbeiten."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Fahrzeugschäden abwehren, Positionierungsversuche des Gegners kontern."
+        }
+      ]
+    },
+    {
+      "name": "Handwerk",
+      "description": "Umgang mit Maschinen und mechanischen Systemen. Je nach Setting auch Mechanik, Reparieren oder Technik.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Maschinen bauen, zerstören oder reparieren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte über Maschineneigenschaften, schnelle Sabotage oder mechanische Manipulation."
+        }
+      ]
+    },
+    {
+      "name": "Heimlichkeit",
+      "description": "Ungesehen und ungehört bewegen. Funktioniert gut in Kombination mit Diebeskünsten.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "An Wachen vorbeischleichen, Verfolgern entkommen, keine Spuren hinterlassen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „gut versteckt\" oder „unbekannter Standort\" erzeugen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Entdeckung durch Wahrnehmung verhindern; Spuren vor Nachforschung verschleiern."
+        }
+      ]
+    },
+    {
+      "name": "Kämpfen",
+      "description": "Nahkampfaktionen – unbewaffnet oder mit Waffe, innerhalb einer Zone. Für Fernkampf wird Schießen verwendet.",
+      "actions": [
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Betäubende Schläge, schmutzige Tricks, Entwaffnung, Kampfstil analysieren."
+        },
+        {
+          "name": "Angreifen",
+          "examples": "Direkte Nahkampfangriffe gegen Ziele in derselben Zone."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Gegen Kämpfen-Angriffe und Vorteils-Erschaffungsversuche verteidigen."
+        }
+      ]
+    },
+    {
+      "name": "Kontakte",
+      "description": "Verbindungen zu Menschen und die Fähigkeit, neue Beziehungen zu knüpfen. Umfasst alle Kommunikationswege in der Spielwelt.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Bestimmte Personen durch Straßennetzwerke, Informanten oder Datenbanken aufspüren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Den richtigen Kontakt finden, öffentliche Meinung beeinflussen, Gerüchte streuen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Soziale Vorteile abwehren; verhindern, dass man durch Täuschung oder Nachforschung gefunden wird."
+        }
+      ]
+    },
+    {
+      "name": "Kraft",
+      "description": "Rohe körperliche Stärke und Ausdauer. Pendant zu Athletik: unterscheidet „stark\" von „wendig\". Hohe Kraft gewährt zusätzliche Stressfelder.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Physische Hindernisse durch rohe Kraft überwinden: Türen eintreten, Barrieren entfernen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Griffe, Ringen und körperliche Kontrolle im Nahkampf (z.B. „Schwitzkasten\")."
+        }
+      ]
+    },
+    {
+      "name": "Nachforschung",
+      "description": "Informationen durch konzentrierte Suche und sorgfältige Prüfung aufdecken. Aktiver als die passive Wahrnehmung.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Tatortuntersuchung, gezielte Suche, relevante Quellen finden."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Umfangreiche Details aufdecken: Überwachen, Akten durchsuchen, falsche Identitäten prüfen."
+        }
+      ]
+    },
+    {
+      "name": "Provozieren",
+      "description": "Andere in Wut versetzen und negative Emotionen wecken (Angst, Scham, Rage). Wirkt nicht gegen gefühllose Wesen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Ziele durch Einschüchterung zu emotionsgesteuerten Handlungen zwingen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Emotionale Zustände erschaffen: „Wütend\", „Erschrocken\", „Zögerlich\"."
+        },
+        {
+          "name": "Angreifen",
+          "examples": "Mentale Angriffe, die psychischen Schaden verursachen."
+        }
+      ]
+    },
+    {
+      "name": "Ressourcen",
+      "description": "Reichtum und die Fähigkeit, ihn einzusetzen. Kann je nach Setting Land, Gold oder Kreditwürdigkeit repräsentieren.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Situationen mit Geld lösen: bestechen, Luxusgüter kaufen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Beziehungen durch Bestechung verbessern, Aspekte für besessene oder schnell beschaffte Gegenstände."
+        }
+      ]
+    },
+    {
+      "name": "Schießen",
+      "description": "Fernkampfwaffen einsetzen. Pendant zu Kämpfen für Distanzkämpfe – bis zu 2 Zonen Reichweite.",
+      "actions": [
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Taktische Manöver: Trickschüsse, Sperrfeuer, Entwaffnen auf Distanz."
+        },
+        {
+          "name": "Angreifen",
+          "examples": "Physische Angriffe gegen Ziele in bis zu 2 Zonen Entfernung."
+        }
+      ]
+    },
+    {
+      "name": "Täuschung",
+      "description": "Andere anlügen, in die Irre führen und durch Falschinformationen Ziele erreichen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Bluffs glaubwürdig machen, Lügen durchsetzen, Informationen durch Falschaussagen extrahieren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Ablenkungen, falsche Identitäten, irreführende Eindrücke erzeugen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Nachforschung abwehren; wahre Motive vor Empathie verbergen."
+        }
+      ]
+    },
+    {
+      "name": "Wahrnehmung",
+      "description": "Allgemeine Aufmerksamkeit und spontane Detailwahrnehmung. Schneller als Nachforschung, aber weniger tiefgreifend.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Dinge im Umfeld bemerken, undeutliche Geräusche hören, versteckte Gegenstände entdecken."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte aus Beobachtungen: Fluchtwege, Schwachstellen, Auffälligkeiten in der Menge."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Gegen Heimlichkeit; Hinterhalte verhindern; bemerken, wenn man beobachtet wird."
+        }
+      ]
+    },
+    {
+      "name": "Wille",
+      "description": "Mentale Ausdauer und Belastbarkeit. Mentales Pendant zu Kraft. Hoher Wille gewährt zusätzliche mentale Stressfelder.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Mentale Hindernisse überwinden: Rätsel, intellektuelle Aufgaben, bei denen Ausdauer zählt."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte für erhöhte Konzentration oder intensive Fokussierung."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Primäre Verteidigung gegen mentale Angriffe und emotionale Manipulation."
+        }
+      ]
+    },
+    {
+      "name": "Ingenieurskunst",
+      "description": "Bedienung, Diagnose, Wartung, Reparatur, Umbau und technische Improvisation an Maschinen, Geräten, Fahrzeugen und Schiffssystemen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Maschinen reparieren, Aggregate neu starten, Schotts manuell überbrücken, Schiffssysteme stabilisieren, technische Defekte beheben."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Notdürftig geflickt\", „Umgeleitete Energie\" oder „Improvisierte Umgehungsschaltung\" erzeugen."
+        }
+      ]
+    },
+    {
+      "name": "Software",
+      "description": "Daten, Cogitatoren, Sicherheitsprotokolle, Systemzugriff, Programmierung, digitale Sabotage und Hacking. Auch zum Kapern von Türen, Geschützen oder Servitoren über digitale Schnittstellen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "In Datenbanken eindringen, Zugriff erzwingen, digitale Schlösser öffnen, Geschütztürme freischalten, Servitoren umprogrammieren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Adminzugang\", „Backdoor installiert\", „Logfiles manipuliert\" oder „Feindliche Auspex geblendet\" erzeugen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Eigene Daten sichern, Intrusion Detection umgehen, Gegenhacks und digitale Rückverfolgung abwehren."
+        }
+      ]
+    },
+    {
+      "name": "Fliegen",
+      "description": "Pilotieren von Luft- und Raumfahrzeugen, inklusive Starts, Landungen, Ausweichmanöver und Kontrolle in Gefecht oder Hazard-Zonen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Shuttles, Jäger oder Guncutter durch Gefahren, Trümmerfelder, Atmosphäre oder Dockingmanöver steuern."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Im toten Winkel\", „Perfekter Anflug\" oder „Abfangkurs berechnet\" erzeugen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Gegen Kollisionen, Abdrängen, schwierige Fluglagen oder Angriffe auf das eigene Fluggerät verteidigen."
+        }
+      ]
+    },
+    {
+      "name": "Kultur",
+      "description": "Wissen über Gesellschaften, Bräuche, Religion, Geschichte, Politik, Kunst, Sprache, Etikette und geisteswissenschaftliches oder alltagsnahes Kulturwissen.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Probleme durch Kulturwissen lösen. Etikettefehler vermeiden, religiöse Riten korrekt deuten, Hofprotokoll verstehen, fremde Bräuche erkennen und navigieren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Kennt ihre Sitten\", „Man versteht sich\" oder „Weiß, was hier als Beleidigung gilt\" erzeugen."
+        }
+      ]
+    },
+    {
+      "name": "Wissenschaft",
+      "description": "Wissen über Physik, Biologie, Chemie, Astronomie, Xenologie, Forschung, Analyse und wissenschaftliche Methodik in Natur- und Sozialwissenschaften.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Probleme durch Fachwissen lösen. Proben analysieren, toxische Stoffe bestimmen, astronomische Daten deuten."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Chemische Schwachstelle\", „Biologische Anomalie\" oder „Saubere Datenlage\" erzeugen."
+        }
+      ]
+    },
+    {
+      "name": "Psionik",
+      "description": "Warpkräfte wie Telepathie, Telekinese, Biomantie, Divination, Pyromantie und mentale Beeinflussung. Jede Nutzung birgt Warprisiko.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Mit Warpkräften Hindernisse beseitigen, Gedanken lesen, Visionen empfangen, Objekte bewegen, Körperfunktionen manipulieren."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Immaterielle Vorahnung\", „Telekinetisch fixiert\" oder „Geist berührt\" erzeugen."
+        },
+        {
+          "name": "Angreifen",
+          "examples": "Psionische Angriffe, mentale Überlastung, Warpfeuer oder telekinetische Schläge."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Gegen psionische Wahrnehmung, mentale Infiltration oder fremde Warpmanipulation abschirmen."
+        }
+      ]
+    },
+    {
+      "name": "Medicae",
+      "description": "Erste Hilfe, Diagnose, Wundversorgung, Langzeitbehandlung, Chirurgie, Chem-Einsatz, medizinische Analyse und das Anbringen oder Versorgen von Bionik.",
+      "actions": [
+        {
+          "name": "Überwinden",
+          "examples": "Blutungen stillen, Verwundete stabilisieren, Gifte behandeln, Krankheiten erkennen, eine Operation durchführen oder Bionik sicher anschließen."
+        },
+        {
+          "name": "Vorteil erschaffen",
+          "examples": "Aspekte wie „Stabilisiert\", „Sauber verbunden\", „Unter Stims\" oder „Schwachstelle erkannt\" erzeugen."
+        },
+        {
+          "name": "Verteidigen",
+          "examples": "Gegen Verschlimmerung von Verletzungen, Schock, Erschöpfung, Vergiftung oder medizinische Fehlbehandlung absichern."
+        }
+      ]
+    }
   ]
 }
