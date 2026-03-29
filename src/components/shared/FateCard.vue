@@ -21,7 +21,7 @@ const props = withDefaults(
     badgeLabel: undefined,
     badgeVariant: 'default',
     clickable: false,
-    maxTitleLines: 3,
+    maxTitleLines: 2,
     maxBodyLines: 3,
   },
 );
@@ -148,8 +148,8 @@ function isRenderableNode(node: VNode): boolean {
   min-width: 0;
   flex: 1;
   display: -webkit-box;
-  -webkit-line-clamp: var(--fate-card-title-lines, 3);
-  line-clamp: var(--fate-card-title-lines, 3);
+  -webkit-line-clamp: var(--fate-card-title-lines, 2);
+  line-clamp: var(--fate-card-title-lines, 2);
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin-top: 0.1rem;
