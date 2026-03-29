@@ -273,6 +273,8 @@ export type TagColor =
   | 'lavendel'
   | 'weintraube'
   | 'tomate'
+  | 'erdbeere'
+  | 'lachs'
   | 'koralle'
   | 'flamingo'
   | 'mandarine'
@@ -281,13 +283,18 @@ export type TagColor =
   | 'limette'
   | 'salbei'
   | 'basilikum'
+  | 'hellgrau'
+  | 'schiefer'
   | 'gray'
+  | 'haselnuss'
   | 'zimt'
   | 'türkis'
   | 'rose';
 
 export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'tomate', label: 'Tomate', primary: '#D50000', dark: '#B71C1C', light: '#FDECEA' },
+  { id: 'erdbeere', label: 'Erdbeere', primary: '#E53935', dark: '#C62828', light: '#FDEBEB' },
+  { id: 'lachs', label: 'Lachs', primary: '#F28B82', dark: '#D96C63', light: '#FFF1EF' },
   { id: 'koralle', label: 'Koralle', primary: '#FF7043', dark: '#E64A19', light: '#FBE9E7' },
   { id: 'mandarine', label: 'Mandarine', primary: '#E67A17', dark: '#BF6010', light: '#FEF3E2' },
   { id: 'bernstein', label: 'Bernstein', primary: '#FFB300', dark: '#FF8F00', light: '#FFF8E1' },
@@ -308,8 +315,11 @@ export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'weintraube', label: 'Weintraube', primary: '#8E24AA', dark: '#6A1B7A', light: '#F3E5F5' },
   { id: 'flamingo', label: 'Flamingo', primary: '#F06292', dark: '#E91E63', light: '#FCE4EC' },
   { id: 'rose', label: 'Rose', primary: '#C2185B', dark: '#880E4F', light: '#FCE4EC' },
-  { id: 'gray', label: 'Graphit', primary: '#607D8B', dark: '#455A64', light: '#ECEFF1' },
-  { id: 'zimt', label: 'Zimt', primary: '#795548', dark: '#4E342E', light: '#EFEBE9' },
+  { id: 'hellgrau', label: 'Hellgrau', primary: '#9EADB5', dark: '#7F919A', light: '#EEF2F4' },
+  { id: 'schiefer', label: 'Schiefer', primary: '#78909C', dark: '#546E7A', light: '#E8EEF1' },
+  { id: 'gray', label: 'Graphit', primary: '#546E7A', dark: '#37474F', light: '#E3E9EC' },
+  { id: 'haselnuss', label: 'Haselnuss', primary: '#8D6E63', dark: '#6D4C41', light: '#EFEBE9' },
+  { id: 'zimt', label: 'Zimt', primary: '#6D4C41', dark: '#3E2723', light: '#ECE3DF' },
 ];
 
 export const SKILL_LEVEL_LABELS: Record<number, string> = {
