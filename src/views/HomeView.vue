@@ -10,6 +10,7 @@ import FateButton from '../components/shared/FateButton.vue';
 import FateIcon from '../components/shared/FateIcon.vue';
 import FatePlusLogo from '../components/shared/FatePlusLogo.vue';
 import FateTag from '../components/shared/FateTag.vue';
+import { CHARACTER_COLORS } from '../types';
 
 const router = useRouter();
 const charactersStore = useCharactersStore();
@@ -60,6 +61,10 @@ const recentChars = computed(() => {
 
 function getCharCampaign(charId: string): string | null {
   return campaignsStore.getCampaignsForCharacter(charId)[0]?.name ?? null;
+}
+
+function getCharacterDotColor(colorId?: string): string {
+  return CHARACTER_COLORS.find((color) => color.id === colorId)?.primary ?? 'var(--fate-blue)';
 }
 </script>
 
@@ -171,7 +176,7 @@ function getCharCampaign(charId: string): string | null {
             >
               <div
                 class="char-color-dot"
-                :style="{ background: char.color || 'var(--fate-blue)' }"
+                :style="{ backgroundColor: getCharacterDotColor(char.color) }"
               ></div>
               <div class="item-main">
                 <div class="item-name-row">
