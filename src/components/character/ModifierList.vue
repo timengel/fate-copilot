@@ -20,7 +20,8 @@ function updateValue(index: number, value: number) {
 
 function updateLabel(index: number, e: Event) {
   if (!(e.target instanceof HTMLInputElement)) return;
-  const updated = props.modifiers.map((m, i) => (i === index ? { ...m, label: e.target.value } : m));
+  const target = e.target;
+  const updated = props.modifiers.map((m, i) => (i === index ? { ...m, label: target.value } : m));
   emit('update:modifiers', updated);
 }
 

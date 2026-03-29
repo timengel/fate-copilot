@@ -125,10 +125,6 @@ const characters = computed(() => {
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
-const editingCharacter = computed(() =>
-  editingCharacterId.value ? charactersStore.getById(editingCharacterId.value) : undefined,
-);
-
 const editingCharacterCampaignIds = computed(() => {
   if (!editingCharacterId.value) return new Set<string>();
 
