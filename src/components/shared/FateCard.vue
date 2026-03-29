@@ -168,9 +168,7 @@ function isRenderableNode(node: VNode): boolean {
 }
 
 .fate-card__meta {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0 0.25rem;
+  display: block;
   padding: 0.25rem 0.9rem;
   font-size: 0.8rem;
   color: var(--fate-text-light);
