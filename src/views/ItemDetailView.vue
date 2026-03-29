@@ -17,6 +17,7 @@ import { useToastStore } from '../stores/toast';
 import { useGMModeStore } from '../stores/gmMode';
 import { useSingleImportExport } from '../composables/useSingleImportExport';
 import { getColorVars } from '../composables/useColorVars';
+import { getCharacterPrimaryPreview } from '../utils/characterPreview';
 
 const props = defineProps<{
   isNew?: boolean;
@@ -65,7 +66,7 @@ const itemCharacters = computed(() =>
         .map((character) => ({
           id: character.id,
           name: character.name || 'Unbenannt',
-          subtitle: character.highConcept,
+          subtitle: getCharacterPrimaryPreview(character),
           avatar: character.avatar,
           color: getColorVars(character.color)['--fate-blue'],
         }))

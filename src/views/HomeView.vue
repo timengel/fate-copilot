@@ -5,6 +5,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
 import { useImportExport } from '../composables/useImportExport';
+import { getCharacterPrimaryPreview } from '../utils/characterPreview';
 import { useToastStore } from '../stores/toast';
 import FateButton from '../components/shared/FateButton.vue';
 import FateIcon from '../components/shared/FateIcon.vue';
@@ -186,7 +187,7 @@ function getCharacterDotColor(colorId?: string): string {
                     :label="char.type === 'nsc' ? 'NSC' : 'SC'"
                   />
                 </div>
-                <span v-if="char.highConcept" class="item-desc">{{ char.highConcept }}</span>
+                <span v-if="getCharacterPrimaryPreview(char)" class="item-desc">{{ getCharacterPrimaryPreview(char) }}</span>
                 <span v-if="getCharCampaign(char.id)" class="char-campaign">
                   {{ getCharCampaign(char.id) }}
                 </span>

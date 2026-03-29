@@ -99,6 +99,21 @@ describe('useCharactersStore', () => {
     expect(store.characters[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
   });
 
+  it('clears highConcept and trouble for NSC characters during migration', () => {
+    const store = useCharactersStore();
+    store.addCharacter(
+      makeChar({
+        type: 'nsc',
+        highConcept: 'Altkonzept',
+        trouble: 'Altes Dilemma',
+        aspects: ['Erster Aspekt', 'Zweiter Aspekt'],
+      }),
+    );
+
+    expect(store.characters[0]!.highConcept).toBe('');
+    expect(store.characters[0]!.trouble).toBe('');
+  });
+
   it('reset clears all characters', () => {
     const store = useCharactersStore();
     store.addCharacter(makeChar({ id: 'c1' }));

@@ -9,9 +9,10 @@ import type { Character } from '../types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockPush = vi.fn();
+let mockRouteQuery: Record<string, string> = {};
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
-  useRoute: () => ({ query: {} }),
+  useRoute: () => ({ query: mockRouteQuery }),
 }));
 
 function makeCharacter(overrides: Partial<Character> = {}): Character {
@@ -39,6 +40,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 describe('CharactersView – card interactions', () => {
   beforeEach(() => {
     mockPush.mockClear();
+    mockRouteQuery = {};
   });
 
   function setup() {
@@ -355,6 +357,43 @@ describe('CharactersView – card interactions', () => {
 
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(view.getByText('Frei')).toBeTruthy();
+  });
+
+  it('shows the first two normal aspects for NSC cards instead of legacy highConcept and trouble', () => {
+    mockRouteQuery = { tab: 'nsc' };
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const store = useCharactersStore();
+    const gmStore = useGMModeStore();
+    gmStore.isGMMode = true;
+
+    store.addCharacter(
+      makeCharacter({
+        id: 'nsc-1',
+        type: 'nsc',
+        name: 'Wache',
+        highConcept: 'Altes Konzept',
+        trouble: 'Altes Dilemma',
+        aspects: ['Misstrauisch', 'Unter Druck'],
+      }),
+    );
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    expect(view.getByText('Misstrauisch')).toBeTruthy();
+    expect(view.getByText('Unter Druck')).toBeTruthy();
+    expect(view.queryByText('Altes Konzept')).toBeNull();
+    expect(view.queryByText('Altes Dilemma')).toBeNull();
   });
 
   it('resets all local filters to their defaults without changing the tab', async () => {

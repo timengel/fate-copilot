@@ -16,6 +16,7 @@ import { CAMPAIGN_STATUS_LABEL, DropdownVariant } from '../types';
 import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { createDefaultCampaign } from '../composables/useCharacterDefaults';
+import { getCharacterPrimaryPreview } from '../utils/characterPreview';
 
 const props = defineProps<{
   isNew?: boolean;
@@ -255,8 +256,8 @@ function navigateToAssignment(path: string) {
                     />
                     <div class="assignment-info">
                       <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
-                      <span v-if="char.highConcept" class="assignment-concept">{{
-                        char.highConcept
+                    <span v-if="getCharacterPrimaryPreview(char)" class="assignment-concept">{{
+                        getCharacterPrimaryPreview(char)
                       }}</span>
                     </div>
                   </button>
@@ -288,8 +289,8 @@ function navigateToAssignment(path: string) {
                       />
                       <div class="assignment-info">
                         <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
-                        <span v-if="char.highConcept" class="assignment-concept">{{
-                          char.highConcept
+                        <span v-if="getCharacterPrimaryPreview(char)" class="assignment-concept">{{
+                          getCharacterPrimaryPreview(char)
                         }}</span>
                       </div>
                     </button>

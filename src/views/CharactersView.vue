@@ -17,6 +17,7 @@ import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import PasteImportDialog from '../components/shared/PasteImportDialog.vue';
 import { useSingleImportExport } from '../composables/useSingleImportExport';
+import { getCharacterPrimaryPreview, getCharacterSearchText, getCharacterSecondaryPreview } from '../utils/characterPreview';
 
 const router = useRouter();
 const route = useRoute();
@@ -93,8 +94,7 @@ const filtered = computed(() => {
     return (
       type === activeTab.value &&
       matchesCampaignFilter(c.id) &&
-      (c.name.toLowerCase().includes(search.value.toLowerCase()) ||
-        c.highConcept.toLowerCase().includes(search.value.toLowerCase()))
+      getCharacterSearchText(c).includes(search.value.toLowerCase())
     );
   });
   if (sortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
@@ -251,9 +251,9 @@ function toggleArchived(character: Character) {
         clickable
         @click="router.push(`/characters/${char.id}`)"
       >
-        {{ char.highConcept || '—' }}
+        {{ getCharacterPrimaryPreview(char) || '—' }}
         <template #meta>
-          <span v-if="char.trouble" class="card-trouble"><em>{{ char.trouble }}</em></span>
+          <span v-if="getCharacterSecondaryPreview(char)" class="card-trouble"><em>{{ getCharacterSecondaryPreview(char) }}</em></span>
         </template>
         <template #actions>
           <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(char)" />
@@ -310,22 +310,20 @@ function toggleArchived(character: Character) {
 }
 
 .card-trouble {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 :deep(.fate-card__meta) .card-trouble {
   font-size: 0.8rem;
   color: var(--fate-text-light);
   flex: 1 1 100%;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .characters-input-row {

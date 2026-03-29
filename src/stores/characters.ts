@@ -7,6 +7,11 @@ import { useCharacterItemsStore } from './characterItems';
 function migrateCharacter(char: Character): Character {
   const migrated = normalizeCharacterStress(char);
 
+  if (migrated.type === 'nsc') {
+    migrated.highConcept = '';
+    migrated.trouble = '';
+  }
+
   if (migrated.pureDamage !== undefined || migrated.deflection !== undefined) {
     migrated.modifiers = [
       { label: 'Purer Schaden', value: migrated.pureDamage ?? 0 },
