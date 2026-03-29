@@ -199,9 +199,16 @@ export interface AppData {
   skills?: string[]; // optional für Rückwärtskompatibilität mit v1.0
 }
 
+export enum SkillAction {
+  Overcome = 'Überwinden',
+  CreateAdvantage = 'Vorteil erschaffen',
+  Attack = 'Angreifen',
+  Defend = 'Verteidigen',
+}
+
 export interface SkillInfo {
   description: string;
-  actions: { name: string; note?: string }[];
+  actions: { name: SkillAction; note?: string }[];
 }
 
 export interface CharacterColor {
@@ -228,19 +235,26 @@ export type TagColor =
   | 'lavendel'
   | 'weintraube'
   | 'tomate'
+  | 'koralle'
   | 'flamingo'
   | 'mandarine'
+  | 'bernstein'
   | 'banane'
+  | 'limette'
   | 'salbei'
   | 'basilikum'
   | 'gray'
+  | 'zimt'
   | 'türkis'
   | 'rose';
 
 export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'tomate', label: 'Tomate', primary: '#D50000', dark: '#B71C1C', light: '#FDECEA' },
+  { id: 'koralle', label: 'Koralle', primary: '#FF7043', dark: '#E64A19', light: '#FBE9E7' },
   { id: 'mandarine', label: 'Mandarine', primary: '#E67A17', dark: '#BF6010', light: '#FEF3E2' },
+  { id: 'bernstein', label: 'Bernstein', primary: '#FFB300', dark: '#FF8F00', light: '#FFF8E1' },
   { id: 'banane', label: 'Banane', primary: '#C9A84C', dark: '#A07830', light: '#FEF9E3' },
+  { id: 'limette', label: 'Limette', primary: '#7CB342', dark: '#558B2F', light: '#F1F8E9' },
   { id: 'salbei', label: 'Salbei', primary: '#57A05C', dark: '#3D7A41', light: '#EAF5EA' },
   { id: 'basilikum', label: 'Basilikum', primary: '#0B8043', dark: '#076030', light: '#E6F4EC' },
   { id: 'türkis', label: 'Türkis', primary: '#00ACC1', dark: '#00838F', light: '#E0F7FA' },
@@ -257,6 +271,7 @@ export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'flamingo', label: 'Flamingo', primary: '#F06292', dark: '#E91E63', light: '#FCE4EC' },
   { id: 'rose', label: 'Rose', primary: '#C2185B', dark: '#880E4F', light: '#FCE4EC' },
   { id: 'gray', label: 'Graphit', primary: '#607D8B', dark: '#455A64', light: '#ECEFF1' },
+  { id: 'zimt', label: 'Zimt', primary: '#795548', dark: '#4E342E', light: '#EFEBE9' },
 ];
 
 export const SKILL_LEVEL_LABELS: Record<number, string> = {
