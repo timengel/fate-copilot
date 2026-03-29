@@ -210,6 +210,11 @@ export interface CampaignItemAssignment {
   itemId: string;
 }
 
+export interface CharacterItemAssignment {
+  characterId: string;
+  itemId: string;
+}
+
 export interface AppData {
   formatVersion: AppDataVersion;
   exportDate: string;
@@ -218,6 +223,7 @@ export interface AppData {
   items?: Item[]; // optional für Rückwärtskompatibilität
   campaignCharacterAssignments: CampaignCharacterAssignment[];
   campaignItemAssignments?: CampaignItemAssignment[]; // optional für Rückwärtskompatibilität
+  characterItemAssignments?: CharacterItemAssignment[]; // optional für Rückwärtskompatibilität
   skills?: AppSkill[] | string[]; // optional für Rückwärtskompatibilität mit v1.0
 }
 

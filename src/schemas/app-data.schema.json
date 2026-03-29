@@ -44,6 +44,10 @@
       "type": "array",
       "items": { "$ref": "#/$defs/CampaignItemAssignment" }
     },
+    "characterItemAssignments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CharacterItemAssignment" }
+    },
     "skills": {
       "type": "array",
       "items": {
@@ -366,6 +370,15 @@
       "additionalProperties": false,
       "properties": {
         "campaignId": { "type": "string" },
+        "itemId": { "type": "string" }
+      }
+    },
+    "CharacterItemAssignment": {
+      "type": "object",
+      "required": ["characterId", "itemId"],
+      "additionalProperties": false,
+      "properties": {
+        "characterId": { "type": "string" },
         "itemId": { "type": "string" }
       }
     }

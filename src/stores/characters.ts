@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Character } from '../types';
 import { normalizeCharacterStress } from '../utils/stressTracks';
+import { useCharacterItemsStore } from './characterItems';
 
 function migrateCharacter(char: Character): Character {
   const migrated = normalizeCharacterStress(char);
@@ -34,6 +35,7 @@ export const useCharactersStore = defineStore('characters', () => {
 
   function deleteCharacter(id: string) {
     characters.value = characters.value.filter((c) => c.id !== id);
+    useCharacterItemsStore().unassignAllForCharacter(id);
   }
 
   function getById(id: string): Character | undefined {

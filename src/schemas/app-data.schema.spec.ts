@@ -153,6 +153,14 @@ describe('app-data JSON Schema', () => {
       expect(isValid(data)).toBe(true);
     });
 
+    it('accepts character-item assignments', () => {
+      const data: AppData = {
+        ...minimalV10,
+        characterItemAssignments: [{ characterId: 'char-1', itemId: 'item-1' }],
+      };
+      expect(isValid(data)).toBe(true);
+    });
+
     it('accepts legacy string-based skills for backwards compatibility', () => {
       expect(isValid({ ...minimalV10, skills: ['Athletik', 'Kämpfen'] })).toBe(true);
     });

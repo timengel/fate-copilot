@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
-import type { Character, ConsequenceLabel, ConsequenceSeverity, StressTrack as StressTrackModel, Stunt } from '../../types';
+import { useRouter } from 'vue-router';
+import type { Character, ConsequenceLabel, ConsequenceSeverity, Item, StressTrack as StressTrackModel, Stunt } from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
+import { useCharacterItemsStore } from '../../stores/characterItems';
 import ColorPicker from '../shared/ColorPicker.vue';
 import AspectFields from './AspectFields.vue';
 import SkillPyramid from './SkillPyramid.vue';
@@ -16,6 +18,7 @@ import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
+import { getColorVars } from '../../composables/useColorVars';
 import { useMarkdown } from '../../composables/useMarkdown';
 import { normalizeCharacterStress } from '../../utils/stressTracks';
 
@@ -57,6 +60,8 @@ const props = defineProps<{
 const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
+const characterItemsStore = useCharacterItemsStore();
+const router = useRouter();
 
 const form = reactive<Character>(normalizeCharacterStress(deepClone(props.character)));
 const savedSnapshot = ref(normalizeCharacterStress(deepClone(props.character)));
@@ -103,9 +108,31 @@ const visibleStressTracks = computed(() =>
     .map((track, index) => ({ track, index }))
     .filter(({ track }) => isEditing.value || track.boxes.length > 0),
 );
+const assignedItems = computed(() =>
+  characterItemsStore.getItemsForCharacter(data.value.id).filter((item) => gmModeStore.isGMMode || !item.hidden),
+);
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
   return props.sections?.[section] !== false;
+}
+
+function getItemSummary(item: Item) {
+  const parts: string[] = [];
+
+  if (item.redDice) parts.push(`${item.redDice}R`);
+  if (item.blueDice) parts.push(`${item.blueDice}B`);
+
+  for (const modifier of item.modifiers ?? []) {
+    if (modifier.value !== 0) {
+      parts.push(`${modifier.value > 0 ? '+' : ''}${modifier.value} ${modifier.label}`);
+    }
+  }
+
+  return parts;
+}
+
+function openAssignedItem(itemId: string) {
+  router.push(`/items/${itemId}`);
 }
 
 const isNscHidden = computed(
@@ -433,6 +460,43 @@ defineExpose({ save });
             <span v-if="stunt.description">: {{ stunt.description }}</span>
           </div>
           <div v-if="data.stunts.length === 0" class="empty-text"></div>
+        </div>
+      </section>
+
+      <section
+        v-if="!isEditing && assignedItems.length > 0"
+        class="sheet-section assigned-items-section span-full"
+      >
+        <div class="sheet-section-header">GEGENSTÄNDE</div>
+        <div class="assigned-items-grid">
+          <button
+            v-for="item in assignedItems"
+            :key="item.id"
+            type="button"
+            class="assigned-item-card"
+            @click="openAssignedItem(item.id)"
+          >
+            <div class="assigned-item-card__header">
+              <FateAvatar
+                :value="item.avatar"
+                size="S"
+                :background="getColorVars(item.color)['--fate-blue']"
+              />
+              <div class="assigned-item-card__meta">
+                <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
+                <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
+              </div>
+            </div>
+            <div v-if="getItemSummary(item).length > 0" class="assigned-item-card__stats">
+              <span
+                v-for="stat in getItemSummary(item)"
+                :key="stat"
+                class="assigned-item-card__pill"
+              >
+                {{ stat }}
+              </span>
+            </div>
+          </button>
         </div>
       </section>
 
@@ -901,6 +965,83 @@ defineExpose({ save });
 
 .stunt-add-btn {
   align-self: flex-start;
+}
+
+.assigned-items-section {
+  border-top: 1px solid var(--fate-border);
+}
+
+.assigned-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.assigned-item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 62%, var(--fate-border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--fate-white) 88%, var(--fate-blue-light) 12%);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.assigned-item-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--fate-blue) 24%, var(--fate-border));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.assigned-item-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.assigned-item-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.assigned-item-card__meta strong {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.assigned-item-card__description {
+  display: -webkit-box;
+  color: var(--fate-text-light);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.assigned-item-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.assigned-item-card__pill {
+  padding: 0.18rem 0.42rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fate-blue-light) 75%, var(--fate-white));
+  color: var(--fate-blue-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 /* View mode stunt display */

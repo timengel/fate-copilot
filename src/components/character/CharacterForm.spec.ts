@@ -1,10 +1,24 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
+import { useGMModeStore } from '../../stores/gmMode';
+import { useItemsStore } from '../../stores/items';
+import { useCharacterItemsStore } from '../../stores/characterItems';
 import CharacterSheet from './CharacterSheet.vue';
-import { createDefaultCharacter } from '../../composables/useCharacterDefaults';
+import { createDefaultCharacter, createDefaultItem } from '../../composables/useCharacterDefaults';
 import { useSkillsStore } from '../../stores/skills';
 import type { Character, Consequence } from '../../types';
+
+const mockPush = vi.fn();
+
+vi.mock('vue-router', async () => {
+  const actual = await vi.importActual<typeof import('vue-router')>('vue-router');
+
+  return {
+    ...actual,
+    useRouter: () => ({ push: mockPush }),
+  };
+});
 
 function renderForm(character?: Character, extraProps: Record<string, unknown> = {}) {
   const pinia = createPinia();
@@ -18,9 +32,10 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   });
 }
 
-function renderView(character?: Character, extraProps: Record<string, unknown> = {}) {
+function renderView(character?: Character, extraProps: Record<string, unknown> = {}, isGMMode = false) {
   const pinia = createPinia();
   setActivePinia(pinia);
+  useGMModeStore().isGMMode = isGMMode;
   return render(CharacterSheet, {
     props: { character: character ?? createDefaultCharacter(), mode: 'view', ...extraProps },
     global: {
@@ -33,6 +48,7 @@ function renderView(character?: Character, extraProps: Record<string, unknown> =
 describe('CharacterSheet (edit mode)', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    mockPush.mockReset();
   });
 
   it('calls onCancel when the cancel button is clicked', async () => {
@@ -323,6 +339,80 @@ describe('CharacterSheet (view mode)', () => {
 
     const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.stressTracks).toEqual([]);
+  });
+
+  it('renders assigned items in a new section and opens the item detail on click', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
+    const item = {
+      ...createDefaultItem(),
+      id: 'item-1',
+      name: 'Runenklinge',
+      description: 'Leicht und scharf',
+      redDice: 2,
+    };
+
+    useItemsStore().addItem(item);
+    useCharacterItemsStore().assignItem(character.id, item.id);
+
+    render(CharacterSheet, {
+      props: { character, mode: 'view' },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    expect(screen.getByText('GEGENSTÄNDE')).toBeTruthy();
+    expect(screen.getByText('Runenklinge')).toBeTruthy();
+    expect(screen.getByText('Leicht und scharf')).toBeTruthy();
+
+    await fireEvent.click(screen.getByText('Runenklinge'));
+    expect(mockPush).toHaveBeenCalledWith('/items/item-1');
+  });
+
+  it('hides assigned hidden items for non-GM users and shows them for GMs', () => {
+    let pinia = createPinia();
+    setActivePinia(pinia);
+
+    const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
+    const hiddenItem = {
+      ...createDefaultItem(),
+      id: 'item-1',
+      name: 'Geheime Klinge',
+      hidden: true,
+    };
+
+    useItemsStore().addItem(hiddenItem);
+    useCharacterItemsStore().assignItem(character.id, hiddenItem.id);
+
+    const hiddenView = render(CharacterSheet, {
+      props: { character, mode: 'view' },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+    expect(screen.queryByText('GEGENSTÄNDE')).toBeNull();
+    expect(screen.queryByText('Geheime Klinge')).toBeNull();
+    hiddenView.unmount();
+
+    pinia = createPinia();
+    setActivePinia(pinia);
+    useItemsStore().addItem(hiddenItem);
+    useCharacterItemsStore().assignItem(character.id, hiddenItem.id);
+    useGMModeStore().isGMMode = true;
+    render(CharacterSheet, {
+      props: { character, mode: 'view' },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+    expect(screen.getByText('GEGENSTÄNDE')).toBeTruthy();
+    expect(screen.getByText('Geheime Klinge')).toBeTruthy();
   });
 });
 

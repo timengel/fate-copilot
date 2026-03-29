@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Item } from '../types';
 import { normalizeItemStress } from '../utils/stressTracks';
+import { useCharacterItemsStore } from './characterItems';
 
 function migrateItem(item: Item): Item {
   const migrated = normalizeItemStress(item);
@@ -34,6 +35,7 @@ export const useItemsStore = defineStore('items', () => {
 
   function deleteItem(id: string) {
     items.value = items.value.filter((i) => i.id !== id);
+    useCharacterItemsStore().unassignAllForItem(id);
   }
 
   function getById(id: string): Item | undefined {

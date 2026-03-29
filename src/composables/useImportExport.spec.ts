@@ -4,8 +4,9 @@ import { useImportExport } from './useImportExport';
 import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
+import { useCharacterItemsStore } from '../stores/characterItems';
 import { SkillAction } from '../types';
-import type { AppData, Character, Campaign, CampaignCharacterAssignment } from '../types';
+import type { AppData, Character, Campaign, CampaignCharacterAssignment, CharacterItemAssignment } from '../types';
 
 const validV10: AppData = {
   formatVersion: '1.0',
@@ -238,6 +239,22 @@ describe('useImportExport', () => {
       expect(useCampaignsStore().assignments).toEqual([assignment]);
     });
 
+    it('applies character-item assignments to the store', () => {
+      const { applyImport } = useImportExport();
+      const assignment: CharacterItemAssignment = { characterId: 'c1', itemId: 'item-1' };
+      applyImport({ ...validV10, characterItemAssignments: [assignment] });
+      expect(useCharacterItemsStore().assignments).toEqual([assignment]);
+    });
+
+    it('defaults missing character-item assignments to an empty list on import', () => {
+      const { applyImport } = useImportExport();
+      useCharacterItemsStore().assignItem('old-char', 'old-item');
+
+      applyImport(validV10);
+
+      expect(useCharacterItemsStore().assignments).toEqual([]);
+    });
+
     it('clears previous store data before applying new import', () => {
       const { applyImport } = useImportExport();
       const existingChar: Character = {
@@ -413,6 +430,23 @@ describe('useImportExport', () => {
         },
       ]);
     });
+
+    it('exports character-item assignments', async () => {
+      useCharacterItemsStore().assignItem('char-1', 'item-1');
+
+      let capturedBlob: Blob | undefined;
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        capturedBlob = blob;
+        return 'blob:fake-url';
+      });
+
+      const { exportJSON } = useImportExport();
+      exportJSON();
+
+      const text = await capturedBlob!.text();
+      const parsed = JSON.parse(text);
+      expect(parsed.characterItemAssignments).toEqual([{ characterId: 'char-1', itemId: 'item-1' }]);
+    });
   });
 
   describe('exportToClipboard', () => {
@@ -516,6 +550,7 @@ describe('useImportExport', () => {
       expect(parsed).toHaveProperty('campaigns');
       expect(parsed).toHaveProperty('characters');
       expect(parsed).toHaveProperty('campaignCharacterAssignments');
+      expect(parsed).toHaveProperty('characterItemAssignments');
     });
 
     it('writes structured skills to the clipboard export', async () => {

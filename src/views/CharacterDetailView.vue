@@ -3,13 +3,17 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
+import { useItemsStore } from '../stores/items';
+import { useCharacterItemsStore } from '../stores/characterItems';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCampaignSection from '../components/shared/FateCampaignSection.vue';
+import FateEntityAssignmentSection from '../components/shared/FateEntityAssignmentSection.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import type { Character, CharacterType } from '../types';
 import { createDefaultCharacter } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
+import { getColorVars } from '../composables/useColorVars';
 import { useToastStore } from '../stores/toast';
 import { useGMModeStore } from '../stores/gmMode';
 import { useSingleImportExport } from '../composables/useSingleImportExport';
@@ -23,6 +27,8 @@ const route = useRoute();
 const router = useRouter();
 const charactersStore = useCharactersStore();
 const campaignsStore = useCampaignsStore();
+const itemsStore = useItemsStore();
+const characterItemsStore = useCharacterItemsStore();
 const gmModeStore = useGMModeStore();
 
 const id = computed(() => {
@@ -62,6 +68,35 @@ const characterCampaigns = computed(() =>
 
 const availableCampaigns = computed(() =>
   campaignsStore.campaigns.filter((c) => !characterCampaigns.value.some((cc) => cc.id === c.id)),
+);
+const characterCampaignIds = computed(() => new Set(characterCampaigns.value.map((campaign) => campaign.id)));
+const characterItems = computed(() =>
+  character.value
+    ? characterItemsStore
+        .getItemsForCharacter(character.value.id)
+        .filter((item) => gmModeStore.isGMMode || !item.hidden)
+        .map((item) => ({
+          id: item.id,
+          name: item.name || 'Unbenannt',
+          subtitle: item.description,
+          avatar: item.avatar,
+          color: getColorVars(item.color)['--fate-blue'],
+        }))
+    : [],
+);
+const availableItems = computed(() =>
+  itemsStore.items
+    .filter((item) => {
+      if (!(gmModeStore.isGMMode || !item.hidden)) return false;
+      if (characterItems.value.some((assigned) => assigned.id === item.id)) return false;
+      if (characterCampaignIds.value.size === 0) return false;
+
+      return campaignsStore
+        .getCampaignsForItem(item.id)
+        .some((campaign) => characterCampaignIds.value.has(campaign.id));
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+    .map((item) => ({ value: item.id, label: item.name || 'Unbenannt' })),
 );
 
 function handleSave(updated: Character) {
@@ -176,6 +211,18 @@ function queryCharacterType(): CharacterType {
           @assign="(id) => campaignsStore.assignCharacter(id, character!.id)"
           @unassign="(id) => campaignsStore.unassignCharacter(id, character!.id)"
           @navigate="(id) => router.push(`/campaigns/${id}`)"
+        />
+
+        <FateEntityAssignmentSection
+          :title="'GEGENSTÄNDE'"
+          :empty-text="'Noch keine Gegenstände zugeordnet.'"
+          :add-placeholder="'Gegenstand hinzufügen...'"
+          :assigned-entities="characterItems"
+          :available-options="availableItems"
+          :editable="true"
+          @assign="(id) => characterItemsStore.assignItem(character!.id, id)"
+          @unassign="(id) => characterItemsStore.unassignItem(character!.id, id)"
+          @navigate="(id) => router.push(`/items/${id}`)"
         />
       </template>
     </template>

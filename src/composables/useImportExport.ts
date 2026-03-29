@@ -4,6 +4,7 @@ import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
+import { useCharacterItemsStore } from '../stores/characterItems';
 import { normalizeCharacterStress, normalizeItemStress } from '../utils/stressTracks';
 
 const FORMAT_VERSION: AppDataVersion = '1.0';
@@ -69,6 +70,7 @@ export function useImportExport() {
     const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
+    const characterItemsStore = useCharacterItemsStore();
 
     const data: AppData = {
       formatVersion: FORMAT_VERSION,
@@ -78,6 +80,7 @@ export function useImportExport() {
       items: itemsStore.items.map(normalizeItemStress),
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
+      characterItemAssignments: characterItemsStore.assignments,
       skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),
     };
 
@@ -112,6 +115,7 @@ export function useImportExport() {
     const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
+    const characterItemsStore = useCharacterItemsStore();
 
     const data: AppData = {
       formatVersion: FORMAT_VERSION,
@@ -121,6 +125,7 @@ export function useImportExport() {
       items: itemsStore.items.map(normalizeItemStress),
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
+      characterItemAssignments: characterItemsStore.assignments,
       skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),
     };
 
@@ -156,6 +161,7 @@ export function useImportExport() {
     const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
+    const characterItemsStore = useCharacterItemsStore();
 
     itemsStore.replaceAll(data.items ?? []);
     charactersStore.replaceAll(data.characters);
@@ -164,6 +170,7 @@ export function useImportExport() {
       data.campaignCharacterAssignments,
       data.campaignItemAssignments ?? [],
     );
+    characterItemsStore.replaceAll(data.characterItemAssignments ?? []);
     const importedSkills = parseImportedSkills(data.skills);
     skillsStore.replaceAllWithInfo(importedSkills.names, importedSkills.info);
   }
