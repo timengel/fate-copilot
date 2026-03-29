@@ -109,6 +109,11 @@ export interface Consequence {
   value: string;
 }
 
+export interface Modifier {
+  label: string;
+  value: number;
+}
+
 export interface Character {
   id: string;
   type?: CharacterType;
@@ -134,7 +139,10 @@ export interface Character {
   avatar?: string;
   redDice?: number;
   blueDice?: number;
+  modifiers?: Modifier[];
+  /** @deprecated use modifiers instead */
   pureDamage?: number;
+  /** @deprecated use modifiers instead */
   deflection?: number;
 }
 
@@ -155,7 +163,10 @@ export interface Item {
   avatar?: string;
   redDice: number;
   blueDice: number;
+  modifiers?: Modifier[];
+  /** @deprecated use modifiers instead */
   pureDamage?: number;
+  /** @deprecated use modifiers instead */
   deflection?: number;
   consequences?: Consequence[];
 }
@@ -196,7 +207,7 @@ export interface AppData {
   items?: Item[]; // optional für Rückwärtskompatibilität
   campaignCharacterAssignments: CampaignCharacterAssignment[];
   campaignItemAssignments?: CampaignItemAssignment[]; // optional für Rückwärtskompatibilität
-  skills?: string[]; // optional für Rückwärtskompatibilität mit v1.0
+  skills?: AppSkill[] | string[]; // optional für Rückwärtskompatibilität mit v1.0
 }
 
 export enum SkillAction {
@@ -206,9 +217,25 @@ export enum SkillAction {
   Defend = 'Verteidigen',
 }
 
+export interface SkillActionInfo {
+  name: SkillAction;
+  examples?: string;
+}
+
 export interface SkillInfo {
   description: string;
-  actions: { name: SkillAction; note?: string }[];
+  actions: SkillActionInfo[];
+}
+
+export interface AppSkillAction {
+  name: SkillAction;
+  examples: string;
+}
+
+export interface AppSkill {
+  name: string;
+  description: string;
+  actions: AppSkillAction[];
 }
 
 export interface CharacterColor {

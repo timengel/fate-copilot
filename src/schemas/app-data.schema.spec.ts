@@ -4,6 +4,7 @@ import addFormats from 'ajv-formats';
 import { setActivePinia, createPinia } from 'pinia';
 import { useCharactersStore } from '../stores/characters';
 import { useImportExport } from '../composables/useImportExport';
+import { SkillAction } from '../types';
 import type { AppData, Character } from '../types';
 import schema from './app-data.schema.json';
 
@@ -70,7 +71,18 @@ const minimalV10: AppData = {
   campaigns: [],
   characters: [],
   campaignCharacterAssignments: [],
-  skills: ['Athletik', 'Kämpfen'],
+  skills: [
+    {
+      name: 'Athletik',
+      description: 'Beweglichkeit und Ausdauer',
+      actions: [{ name: SkillAction.Overcome, examples: 'Klettern, sprinten, springen' }],
+    },
+    {
+      name: 'Kämpfen',
+      description: 'Nahkampffähigkeit',
+      actions: [{ name: SkillAction.Attack, examples: 'Schlagen, fechten, ringen' }],
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -116,6 +128,10 @@ describe('app-data JSON Schema', () => {
         campaignCharacterAssignments: [{ campaignId: 'camp-1', characterId: 'char-1' }],
       };
       expect(isValid(data)).toBe(true);
+    });
+
+    it('accepts legacy string-based skills for backwards compatibility', () => {
+      expect(isValid({ ...minimalV10, skills: ['Athletik', 'Kämpfen'] })).toBe(true);
     });
 
     it('accepts all valid ConsequenceSeverity values (2, 4, 6, 8)', () => {
@@ -172,19 +188,34 @@ describe('app-data JSON Schema', () => {
     it('rejects additional unknown top-level properties', () => {
       expect(isValid({ ...minimalV10, unknownField: true })).toBe(false);
     });
+
+    it('rejects structured skills with missing required fields', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          skills: [{ name: 'Athletik', actions: [] }],
+        }),
+      ).toBe(false);
+    });
   });
 
   describe('Character dice fields', () => {
     it('accepts a character with redDice and blueDice', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 2, blueDice: 3 }] })).toBe(true);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 2, blueDice: 3 }] }),
+      ).toBe(true);
     });
 
     it('accepts redDice=0 and blueDice=0', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 0 }] })).toBe(true);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 0 }] }),
+      ).toBe(true);
     });
 
     it('accepts redDice=4 and blueDice=4 (max)', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 4, blueDice: 4 }] })).toBe(true);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 4, blueDice: 4 }] }),
+      ).toBe(true);
     });
 
     it('accepts a character without redDice/blueDice (backwards compat)', () => {
@@ -192,23 +223,36 @@ describe('app-data JSON Schema', () => {
     });
 
     it('rejects redDice > 4', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 5, blueDice: 0 }] })).toBe(false);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 5, blueDice: 0 }] }),
+      ).toBe(false);
     });
 
     it('rejects blueDice > 4', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 5 }] })).toBe(false);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: 5 }] }),
+      ).toBe(false);
     });
 
     it('rejects redDice < 0', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: -1, blueDice: 0 }] })).toBe(false);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: -1, blueDice: 0 }] }),
+      ).toBe(false);
     });
 
     it('rejects blueDice < 0', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: -1 }] })).toBe(false);
+      expect(
+        isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 0, blueDice: -1 }] }),
+      ).toBe(false);
     });
 
     it('rejects non-integer redDice', () => {
-      expect(isValid({ ...minimalV10, characters: [{ ...minimalCharacter, redDice: 1.5, blueDice: 0 }] })).toBe(false);
+      expect(
+        isValid({
+          ...minimalV10,
+          characters: [{ ...minimalCharacter, redDice: 1.5, blueDice: 0 }],
+        }),
+      ).toBe(false);
     });
   });
 
@@ -252,7 +296,7 @@ describe('app-data JSON Schema', () => {
     });
   });
 
-  describe('Item pureDamage and deflection fields', () => {
+  describe('Item modifiers field', () => {
     const minimalItem = {
       id: 'item-1',
       type: 'item',
@@ -267,40 +311,68 @@ describe('app-data JSON Schema', () => {
       blueDice: 0,
     };
 
-    it('accepts an item without pureDamage/deflection (backwards compat)', () => {
+    it('accepts an item without modifiers (backwards compat)', () => {
       expect(isValid({ ...minimalV10, items: [minimalItem] })).toBe(true);
     });
 
-    it('accepts an item with pureDamage=0 and deflection=0', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 0, deflection: 0 }] })).toBe(true);
+    it('accepts an item with a modifiers array', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'Purer Schaden', value: 0 }] }],
+        }),
+      ).toBe(true);
     });
 
-    it('accepts an item with pureDamage=8 and deflection=8 (max)', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 8, deflection: 8 }] })).toBe(true);
+    it('accepts a modifier with value at max (8)', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'X', value: 8 }] }],
+        }),
+      ).toBe(true);
     });
 
-    it('accepts an item with pureDamage=-8 and deflection=-8 (min)', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -8, deflection: -8 }] })).toBe(true);
+    it('accepts a modifier with value at min (-8)', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'X', value: -8 }] }],
+        }),
+      ).toBe(true);
     });
 
-    it('rejects pureDamage > 8', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 9 }] })).toBe(false);
+    it('rejects a modifier value > 8', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'X', value: 9 }] }],
+        }),
+      ).toBe(false);
     });
 
-    it('rejects deflection > 8', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: 9 }] })).toBe(false);
+    it('rejects a modifier value < -8', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'X', value: -9 }] }],
+        }),
+      ).toBe(false);
     });
 
-    it('rejects pureDamage < -8', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: -9 }] })).toBe(false);
+    it('rejects a non-integer modifier value', () => {
+      expect(
+        isValid({
+          ...minimalV10,
+          items: [{ ...minimalItem, modifiers: [{ label: 'X', value: 1.5 }] }],
+        }),
+      ).toBe(false);
     });
 
-    it('rejects deflection < -8', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, deflection: -9 }] })).toBe(false);
-    });
-
-    it('rejects non-integer pureDamage', () => {
-      expect(isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 1.5 }] })).toBe(false);
+    it('accepts legacy pureDamage/deflection fields for backwards compat', () => {
+      expect(
+        isValid({ ...minimalV10, items: [{ ...minimalItem, pureDamage: 2, deflection: 1 }] }),
+      ).toBe(true);
     });
   });
 

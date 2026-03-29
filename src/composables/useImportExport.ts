@@ -1,4 +1,4 @@
-import type { AppData, AppDataVersion } from '../types';
+import type { AppData, AppDataVersion, AppSkill, SkillInfo } from '../types';
 import { SKILL_LIST } from '../types';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
@@ -7,6 +7,60 @@ import { useSkillsStore } from '../stores/skills';
 
 const FORMAT_VERSION: AppDataVersion = '1.0';
 const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0'];
+
+function isAppSkill(value: unknown): value is AppSkill {
+  return (
+    typeof value === 'object' && value !== null && typeof (value as AppSkill).name === 'string'
+  );
+}
+
+function getActionExamples(action: { examples?: string; note?: string }): string {
+  return action.examples ?? action.note ?? '';
+}
+
+function buildAppSkills(skills: string[], skillInfo: Record<string, SkillInfo>): AppSkill[] {
+  return skills.map((name) => ({
+    name,
+    description: skillInfo[name]?.description ?? '',
+    actions: (skillInfo[name]?.actions ?? []).map((action) => ({
+      name: action.name,
+      examples: getActionExamples(action),
+    })),
+  }));
+}
+
+function parseImportedSkills(skills: AppData['skills']): {
+  names: string[];
+  info: Record<string, SkillInfo>;
+} {
+  if (!skills) {
+    return { names: [...SKILL_LIST], info: {} };
+  }
+
+  if (skills.every((skill) => typeof skill === 'string')) {
+    return { names: [...skills], info: {} };
+  }
+
+  if (skills.every(isAppSkill)) {
+    return {
+      names: skills.map((skill) => skill.name),
+      info: Object.fromEntries(
+        skills.map((skill) => [
+          skill.name,
+          {
+            description: skill.description ?? '',
+            actions: (skill.actions ?? []).map((action) => ({
+              name: action.name,
+              examples: action.examples ?? '',
+            })),
+          },
+        ]),
+      ),
+    };
+  }
+
+  throw new Error('Ungültiges "skills"-Format.');
+}
 
 export function useImportExport() {
   function exportJSON() {
@@ -23,7 +77,7 @@ export function useImportExport() {
       items: itemsStore.items,
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
-      skills: skillsStore.skills,
+      skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),
     };
 
     const json = JSON.stringify(data, null, 2);
@@ -66,7 +120,7 @@ export function useImportExport() {
       items: itemsStore.items,
       campaignCharacterAssignments: campaignsStore.assignments,
       campaignItemAssignments: campaignsStore.itemAssignments,
-      skills: skillsStore.skills,
+      skills: buildAppSkills(skillsStore.skills, skillsStore.skillInfo),
     };
 
     await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -104,8 +158,13 @@ export function useImportExport() {
 
     itemsStore.replaceAll(data.items ?? []);
     charactersStore.replaceAll(data.characters);
-    campaignsStore.replaceAll(data.campaigns, data.campaignCharacterAssignments, data.campaignItemAssignments ?? []);
-    skillsStore.replaceAll(data.skills ?? [...SKILL_LIST]);
+    campaignsStore.replaceAll(
+      data.campaigns,
+      data.campaignCharacterAssignments,
+      data.campaignItemAssignments ?? [],
+    );
+    const importedSkills = parseImportedSkills(data.skills);
+    skillsStore.replaceAllWithInfo(importedSkills.names, importedSkills.info);
   }
 
   return { exportJSON, exportToClipboard, importJSON, importFromString, applyImport };

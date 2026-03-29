@@ -191,34 +191,29 @@ describe('ItemsView – card interactions', () => {
       });
     }
 
-    it('shows pureDamage count with ⚔️ when pureDamage > 0', () => {
-      const { getByText } = setupWithItem({ pureDamage: 2 });
-      expect(getByText('+2 ⚔️')).toBeTruthy();
+    it('shows modifier count with label when value > 0', () => {
+      const { getByText } = setupWithItem({ modifiers: [{ label: 'Purer Schaden', value: 2 }] });
+      expect(getByText('+2 Purer Schaden')).toBeTruthy();
     });
 
-    it('shows deflection count with 🛡️ when deflection > 0', () => {
-      const { getByText } = setupWithItem({ deflection: 3 });
-      expect(getByText('+3 🛡️')).toBeTruthy();
+    it('shows second modifier with label when value > 0', () => {
+      const { getByText } = setupWithItem({ modifiers: [{ label: 'Deflektion', value: 3 }] });
+      expect(getByText('+3 Deflektion')).toBeTruthy();
     });
 
-    it('shows both pureDamage and deflection when both are set', () => {
-      const { getByText } = setupWithItem({ pureDamage: 1, deflection: 2 });
-      expect(getByText('+1 ⚔️')).toBeTruthy();
-      expect(getByText('+2 🛡️')).toBeTruthy();
+    it('shows multiple modifiers when both have non-zero values', () => {
+      const { getByText } = setupWithItem({ modifiers: [{ label: 'Purer Schaden', value: 1 }, { label: 'Deflektion', value: 2 }] });
+      expect(getByText('+1 Purer Schaden')).toBeTruthy();
+      expect(getByText('+2 Deflektion')).toBeTruthy();
     });
 
-    it('shows negative pureDamage with - prefix', () => {
-      const { getByText } = setupWithItem({ pureDamage: -3 });
-      expect(getByText('-3 ⚔️')).toBeTruthy();
+    it('shows negative modifier value with - prefix', () => {
+      const { getByText } = setupWithItem({ modifiers: [{ label: 'Purer Schaden', value: -3 }] });
+      expect(getByText('-3 Purer Schaden')).toBeTruthy();
     });
 
-    it('shows negative deflection with - prefix', () => {
-      const { getByText } = setupWithItem({ deflection: -2 });
-      expect(getByText('-2 🛡️')).toBeTruthy();
-    });
-
-    it('does not show meta when all dice and pure damage values are 0', () => {
-      const { container } = setupWithItem({ redDice: 0, blueDice: 0, pureDamage: 0, deflection: 0 });
+    it('does not show meta when all dice and modifier values are 0', () => {
+      const { container } = setupWithItem({ redDice: 0, blueDice: 0, modifiers: [{ label: 'Test', value: 0 }] });
       expect(container.querySelector('.fate-card__meta')).toBeNull();
     });
   });

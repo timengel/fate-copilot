@@ -73,28 +73,28 @@ describe('ItemSheet', () => {
       expect(screen.getByText('VERSTECKT')).toBeTruthy();
     });
 
-    it('hides MODIFIERS section when both are 0', () => {
-      renderView(makeItem({ pureDamage: 0, deflection: 0 }));
+    it('hides MODIFIERS section when all modifier values are 0', () => {
+      renderView(makeItem({ modifiers: [{ label: 'Test', value: 0 }] }));
       expect(screen.queryByText('MODIFIERS')).toBeNull();
     });
 
-    it('shows MODIFIERS section when pureDamage > 0', () => {
-      renderView(makeItem({ pureDamage: 2, deflection: 0 }));
+    it('shows MODIFIERS section when a modifier value > 0', () => {
+      renderView(makeItem({ modifiers: [{ label: 'Purer Schaden', value: 2 }] }));
       expect(screen.getByText('MODIFIERS')).toBeTruthy();
     });
 
-    it('shows MODIFIERS section when deflection > 0', () => {
-      renderView(makeItem({ pureDamage: 0, deflection: 3 }));
+    it('shows MODIFIERS section when a modifier value < 0', () => {
+      renderView(makeItem({ modifiers: [{ label: 'Deflektion', value: -3 }] }));
       expect(screen.getByText('MODIFIERS')).toBeTruthy();
     });
 
     it('hides MODIFIERS section when sections.modifiers is false', () => {
-      renderView(makeItem({ pureDamage: 2, deflection: 1 }), { sections: { modifiers: false } });
+      renderView(makeItem({ modifiers: [{ label: 'Purer Schaden', value: 2 }] }), { sections: { modifiers: false } });
       expect(screen.queryByText('MODIFIERS')).toBeNull();
     });
 
     it('renders both dice sections as siblings under the same parent when both have values', () => {
-      const { container } = renderView(makeItem({ redDice: 2, pureDamage: 1 }));
+      const { container } = renderView(makeItem({ redDice: 2, modifiers: [{ label: 'Purer Schaden', value: 1 }] }));
       const redBlue = container.querySelector('.red-blue-dice-section');
       const pureDmg = container.querySelector('.modifiers-section');
       expect(redBlue).toBeTruthy();
@@ -102,8 +102,8 @@ describe('ItemSheet', () => {
       expect(redBlue!.parentElement).toBe(pureDmg!.parentElement);
     });
 
-    it('red-blue and pure-damage sections are not nested inside each other', () => {
-      const { container } = renderView(makeItem({ redDice: 1, deflection: 2 }));
+    it('red-blue and modifiers sections are not nested inside each other', () => {
+      const { container } = renderView(makeItem({ redDice: 1, modifiers: [{ label: 'Deflektion', value: 2 }] }));
       const redBlue = container.querySelector('.red-blue-dice-section');
       const pureDmg = container.querySelector('.modifiers-section');
       expect(redBlue!.contains(pureDmg)).toBe(false);
@@ -217,21 +217,20 @@ describe('ItemSheet', () => {
       expect(saved.aspects).not.toBe(item.aspects);
     });
 
-    it('updates pureDamage and deflection via the icon counters', async () => {
+    it('updates modifier values via the icon counters', async () => {
       const onSave = vi.fn();
-      const { container } = renderForm(makeItem({ pureDamage: 1, deflection: 2 }), { onSave });
+      const { container } = renderForm(makeItem({ modifiers: [{ label: 'Purer Schaden', value: 1 }, { label: 'Deflektion', value: 2 }] }), { onSave });
 
       const plusButtons = Array.from(
         container.querySelectorAll<HTMLButtonElement>('.icon-counter .icon-controls button[aria-label="Erhöhen"]'),
       );
-      // First counter is PURER SCHADEN, second is DEFLEKTION
-      await fireEvent.click(plusButtons[0]!); // pureDamage 1 → 2
-      await fireEvent.click(plusButtons[1]!); // deflection 2 → 3
+      await fireEvent.click(plusButtons[0]!); // 1 → 2
+      await fireEvent.click(plusButtons[1]!); // 2 → 3
       await fireEvent.click(screen.getByText('Speichern'));
 
       const saved = onSave.mock.calls[0]![0] as Item;
-      expect(saved.pureDamage).toBe(2);
-      expect(saved.deflection).toBe(3);
+      expect(saved.modifiers![0]!.value).toBe(2);
+      expect(saved.modifiers![1]!.value).toBe(3);
     });
 
     describe('consequences', () => {

@@ -2,6 +2,18 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Character } from '../types';
 
+function migrateCharacter(char: Character): Character {
+  if (char.pureDamage !== undefined || char.deflection !== undefined) {
+    char.modifiers = [
+      { label: 'Purer Schaden', value: char.pureDamage ?? 0 },
+      { label: 'Deflektion', value: char.deflection ?? 0 },
+    ];
+    delete char.pureDamage;
+    delete char.deflection;
+  }
+  return char;
+}
+
 export const useCharactersStore = defineStore('characters', () => {
   const characters = ref<Character[]>([]);
 
@@ -34,5 +46,10 @@ export const useCharactersStore = defineStore('characters', () => {
 
   return { characters, addCharacter, updateCharacter, deleteCharacter, getById, replaceAll, reset };
 }, {
-  persist: { key: 'fcp-characters' },
+  persist: {
+    key: 'fcp-characters',
+    afterHydrate: (ctx) => {
+      ctx.store.characters = ctx.store.characters.map(migrateCharacter);
+    },
+  },
 });

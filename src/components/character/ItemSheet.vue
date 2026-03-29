@@ -10,7 +10,7 @@ import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
 import StressTrack from './StressTrack.vue';
 import DiceTrack from './DiceTrack.vue';
-import FateIconCounter from './FateIconCounter.vue';
+import ModifierList from './ModifierList.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
 import { useMarkdown } from '../../composables/useMarkdown';
@@ -438,33 +438,18 @@ defineExpose({ save });
       </p>
     </section>
 
-    <!-- PURER SCHADEN & DEFLEKTION -->
+    <!-- MODIFIERS -->
     <section
-      v-if="show.modifiers && (isEditing || data.pureDamage || data.deflection)"
+      v-if="show.modifiers && (isEditing || data.modifiers?.some((m) => m.value !== 0))"
       class="sheet-section modifiers-section"
     >
       <div class="sheet-section-header">MODIFIERS</div>
-      <div class="dice-tracks">
-        <FateIconCounter
-          v-if="isEditing || data.pureDamage"
-          label="PURER SCHADEN"
-          :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
-          :min="-8"
-          :max="8"
-          :readonly="!isEditing"
-          @update="form.pureDamage = $event"
-        />
-        <FateIconCounter
-          v-if="isEditing || data.deflection"
-          label="DEFLEKTION"
-          color="blue"
-          :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
-          :min="-8"
-          :max="8"
-          :readonly="!isEditing"
-          @update="form.deflection = $event"
-        />
-      </div>
+      <ModifierList
+        :modifiers="isEditing ? (form.modifiers ?? []) : (data.modifiers ?? [])"
+        :editMode="isEditing"
+        :gmMode="gmModeStore.isGMMode"
+        @update:modifiers="form.modifiers = $event"
+      />
     </section>
 
     <!-- GM OPTIONS -->

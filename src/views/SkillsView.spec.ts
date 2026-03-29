@@ -5,7 +5,8 @@ import SkillsView from './SkillsView.vue';
 import { useSkillsStore } from '../stores/skills';
 import { useToastStore } from '../stores/toast';
 import { useGMModeStore } from '../stores/gmMode';
-import { SKILL_LIST } from '../types';
+import { SKILL_LIST, SkillAction } from '../types';
+import type { SkillInfo } from '../types';
 
 describe('SkillsView', () => {
   let pinia: ReturnType<typeof createPinia>;
@@ -84,6 +85,32 @@ describe('SkillsView', () => {
       expect(store.skills).toEqual(expect.arrayContaining(SKILL_LIST));
     });
 
+    it('clicking "Bestätigen" restores the Fate default actions for a modified default skill', async () => {
+      const store = useSkillsStore();
+      store.setSkillInfo('Empathie', {
+        description: 'Benutzerdefiniert',
+        actions: [
+          {
+            name: SkillAction.Overcome,
+            examples: 'Eigene Aktion',
+          },
+        ],
+      });
+
+      setup();
+      await fireEvent.click(screen.getByText('Auf Standard zurücksetzen'));
+      await fireEvent.click(screen.getByText('Bestätigen'));
+
+      expect(store.skillInfo.Empathie?.description).toContain('Emotionale Zustände');
+      expect(store.skillInfo.Empathie?.actions.map((action) => action.name)).toEqual([
+        SkillAction.CreateAdvantage,
+        SkillAction.Defend,
+      ]);
+      expect(
+        store.skillInfo.Empathie?.actions.some((action) => action.name === SkillAction.Overcome),
+      ).toBe(false);
+    });
+
     it('clicking "Bestätigen" closes the dialog', async () => {
       setup();
       await fireEvent.click(screen.getByText('Auf Standard zurücksetzen'));
@@ -143,6 +170,49 @@ describe('SkillsView', () => {
       const btn = screen.getByText('Hinzufügen').closest('button');
       expect(btn?.disabled).toBe(true);
       expect(store.skills).toHaveLength(initialCount);
+    });
+  });
+
+  describe('skill detail dialog', () => {
+    it('persists a newly added action after saving and reopening the dialog', async () => {
+      const { container } = setup();
+
+      await fireEvent.click(screen.getByText('Empathie'));
+      await fireEvent.click(screen.getByText('Bearbeiten'));
+      const addActionDropdown = screen.getAllByRole('combobox').at(-1);
+      const examplesInputs = screen.getAllByPlaceholderText('Einsatzbeispiele');
+
+      await fireEvent.update(addActionDropdown!, SkillAction.Overcome);
+      await fireEvent.update(examplesInputs.at(-1)!, 'Luegen durchschauen');
+      await fireEvent.click(screen.getByText('+'));
+      await fireEvent.click(screen.getByText('Speichern'));
+
+      expect(screen.getByText(/Luegen durchschauen/)).toBeTruthy();
+
+      const overlay = container.ownerDocument.querySelector('.skill-info-overlay');
+      await fireEvent.click(overlay!);
+      await fireEvent.click(screen.getByText('Empathie'));
+
+      expect(screen.getByText(/Luegen durchschauen/)).toBeTruthy();
+    });
+
+    it('shows legacy action notes from persisted skill info', async () => {
+      const store = useSkillsStore();
+      const legacyAction: SkillInfo['actions'][number] = {
+        name: SkillAction.Overcome,
+      };
+      Object.assign(legacyAction, { note: 'Alte Notiz aus persistiertem Zustand' });
+
+      store.skillInfo.Athletik = {
+        description: 'Bewegung und Koordination',
+        actions: [legacyAction],
+      };
+
+      setup();
+      await fireEvent.click(screen.getByText('Athletik'));
+
+      expect(screen.getByText('Bewegung und Koordination')).toBeTruthy();
+      expect(screen.getByText(/Alte Notiz aus persistiertem Zustand/)).toBeTruthy();
     });
   });
 });

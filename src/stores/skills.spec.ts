@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
-import { useSkillsStore } from './skills';
+import { DEFAULT_SKILL_INFO, DEFAULT_SKILL_NAMES, useSkillsStore } from './skills';
 import { useCharactersStore } from './characters';
-import { SKILL_LIST } from '../types';
+import { SKILL_LIST, SkillAction } from '../types';
 import type { Character } from '../types';
 
 function makeChar(overrides: Partial<Character> = {}): Character {
@@ -33,12 +33,14 @@ describe('useSkillsStore', () => {
 
   it('initializes with the default SKILL_LIST', () => {
     expect(useSkillsStore().skills).toEqual(SKILL_LIST);
+    expect(useSkillsStore().skills).toEqual(DEFAULT_SKILL_NAMES);
   });
 
   it('adds a new skill', () => {
     const store = useSkillsStore();
     store.addSkill('Mystik');
     expect(store.skills).toContain('Mystik');
+    expect(store.skillInfo.Mystik).toEqual({ description: '', actions: [] });
   });
 
   it('trims whitespace when adding a skill', () => {
@@ -105,6 +107,10 @@ describe('useSkillsStore', () => {
     const store = useSkillsStore();
     store.replaceAll(['Custom1', 'Custom2']);
     expect(store.skills).toEqual(['Custom1', 'Custom2']);
+    expect(store.skillInfo).toEqual({
+      Custom1: { description: '', actions: [] },
+      Custom2: { description: '', actions: [] },
+    });
   });
 
   it('resetToDefaults restores SKILL_LIST', () => {
@@ -112,6 +118,27 @@ describe('useSkillsStore', () => {
     store.replaceAll(['Custom']);
     store.resetToDefaults();
     expect(store.skills).toEqual(SKILL_LIST);
+  });
+
+  it('resetToDefaults restores the Fate default skill info after editing a default skill', () => {
+    const store = useSkillsStore();
+    const originalAthletik = structuredClone(DEFAULT_SKILL_INFO.Athletik);
+
+    store.setSkillInfo('Athletik', {
+      description: 'Benutzerdefiniert',
+      actions: [{ name: SkillAction.Attack, examples: 'Eigene Aktion' }],
+    });
+
+    expect(store.skillInfo.Athletik).toEqual({
+      description: 'Benutzerdefiniert',
+      actions: [{ name: SkillAction.Attack, examples: 'Eigene Aktion' }],
+    });
+
+    store.resetToDefaults();
+
+    expect(store.skillInfo.Athletik).toEqual(originalAthletik);
+    expect(store.skillInfo.Athletik?.description).toContain('Körperliche Fitness');
+    expect(store.skillInfo.Athletik?.actions[0]?.examples).toContain('Springen');
   });
 
   it('replaceAll with empty array clears all skills', () => {
@@ -125,5 +152,128 @@ describe('useSkillsStore', () => {
     const before = [...store.skills];
     store.removeSkill('DoesNotExist');
     expect(store.skills).toEqual(before);
+  });
+
+  it('replaceAll clears stale skillInfo for removed skills', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Athletik', {
+      description: 'Alt',
+      actions: [{ name: SkillAction.Attack, examples: 'Alt' }],
+    });
+
+    store.replaceAll(['Mystik']);
+
+    expect(store.skillInfo.Athletik).toBeUndefined();
+    expect(store.skillInfo.Mystik).toEqual({ description: '', actions: [] });
+  });
+});
+
+describe('setSkillInfo', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('stores description and actions for a skill', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Mystik', {
+      description: 'Magische Fähigkeiten',
+      actions: [{ name: SkillAction.Attack, examples: 'Magischer Angriff' }],
+    });
+    expect(store.skillInfo['Mystik']?.description).toBe('Magische Fähigkeiten');
+    expect(store.skillInfo['Mystik']?.actions).toHaveLength(1);
+    expect(store.skillInfo['Mystik']?.actions[0]?.name).toBe(SkillAction.Attack);
+  });
+
+  it('overwrites existing info for the same skill', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Athletik', { description: 'Alt', actions: [] });
+    store.setSkillInfo('Athletik', { description: 'Neu', actions: [] });
+    expect(store.skillInfo['Athletik']?.description).toBe('Neu');
+  });
+
+  it('stores an action without examples', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Mystik', {
+      description: '',
+      actions: [{ name: SkillAction.Defend }],
+    });
+    expect(store.skillInfo['Mystik']?.actions[0]?.examples).toBeUndefined();
+  });
+
+  it('stores an action with examples', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Mystik', {
+      description: '',
+      actions: [{ name: SkillAction.Overcome, examples: 'Nur mit Ritualzubehör' }],
+    });
+    expect(store.skillInfo['Mystik']?.actions[0]?.examples).toBe('Nur mit Ritualzubehör');
+  });
+
+  it('clones incoming skill info so external mutations do not affect the store', () => {
+    const store = useSkillsStore();
+    const info = {
+      description: 'Magische Fähigkeiten',
+      actions: [{ name: SkillAction.Attack, examples: 'Magischer Angriff' }],
+    };
+
+    store.setSkillInfo('Mystik', info);
+    info.description = 'Geändert';
+    info.actions[0]!.examples = 'Extern verändert';
+
+    expect(store.skillInfo.Mystik).toEqual({
+      description: 'Magische Fähigkeiten',
+      actions: [{ name: SkillAction.Attack, examples: 'Magischer Angriff' }],
+    });
+  });
+});
+
+describe('replaceAllWithInfo', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('replaces the skills list', () => {
+    const store = useSkillsStore();
+    store.replaceAllWithInfo(['Mystik', 'Alchemie'], {});
+    expect(store.skills).toEqual(['Mystik', 'Alchemie']);
+  });
+
+  it('replaces the skillInfo record', () => {
+    const store = useSkillsStore();
+    const info = { Mystik: { description: 'Magie', actions: [] } };
+    store.replaceAllWithInfo(['Mystik'], info);
+    expect(store.skillInfo['Mystik']?.description).toBe('Magie');
+  });
+
+  it('deep-clones incoming action arrays', () => {
+    const store = useSkillsStore();
+    const info = {
+      Mystik: {
+        description: 'Magie',
+        actions: [{ name: SkillAction.Attack, examples: 'Magischer Angriff' }],
+      },
+    };
+
+    store.replaceAllWithInfo(['Mystik'], info);
+    info.Mystik.description = 'Geändert';
+    info.Mystik.actions[0]!.examples = 'Extern verändert';
+
+    expect(store.skillInfo.Mystik).toEqual({
+      description: 'Magie',
+      actions: [{ name: SkillAction.Attack, examples: 'Magischer Angriff' }],
+    });
+  });
+
+  it('accepts an empty skillInfo object without crashing', () => {
+    const store = useSkillsStore();
+    expect(() => store.replaceAllWithInfo(['Mystik'], {})).not.toThrow();
+    expect(store.skillInfo['Mystik']).toEqual({ description: '', actions: [] });
+  });
+
+  it('clears previous skillInfo when replaced', () => {
+    const store = useSkillsStore();
+    store.setSkillInfo('Athletik', { description: 'Alt', actions: [] });
+    store.replaceAllWithInfo(['Mystik'], { Mystik: { description: 'Neu', actions: [] } });
+    expect(store.skillInfo['Athletik']).toBeUndefined();
   });
 });

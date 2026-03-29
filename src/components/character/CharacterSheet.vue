@@ -10,7 +10,7 @@ import SkillPyramid from './SkillPyramid.vue';
 import StressTrack from './StressTrack.vue';
 import ConsequenceSlots from './ConsequenceSlots.vue';
 import DiceTrack from './DiceTrack.vue';
-import FateIconCounter from './FateIconCounter.vue';
+import ModifierList from './ModifierList.vue';
 import FateButton from '../shared/FateButton.vue';
 import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
@@ -86,7 +86,7 @@ const hasVisibleDice = computed(
   () => isEditing.value || ((props.sections?.dice ?? true) && !!(data.value.redDice || data.value.blueDice)),
 );
 const hasVisibleModifiers = computed(
-  () => isEditing.value || ((props.sections?.modifiers ?? true) && !!(data.value.pureDamage || data.value.deflection)),
+  () => isEditing.value || ((props.sections?.modifiers ?? true) && !!(data.value.modifiers?.some((m) => m.value !== 0))),
 );
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
@@ -533,30 +533,15 @@ defineExpose({ save });
         </div>
       </section>
 
-      <!-- PURER SCHADEN & DEFLEKTION -->
+      <!-- MODIFIERS -->
       <section v-if="hasVisibleModifiers" class="sheet-section modifiers-section">
         <div class="sheet-section-header">MODIFIERS</div>
-        <div class="dice-tracks">
-          <FateIconCounter
-            v-if="isEditing || data.pureDamage"
-            label="PURER SCHADEN"
-            :count="isEditing ? (form.pureDamage ?? 0) : (data.pureDamage ?? 0)"
-            :min="-8"
-            :max="8"
-            :readonly="!isEditing"
-            @update="form.pureDamage = $event"
-          />
-          <FateIconCounter
-            v-if="isEditing || data.deflection"
-            label="DEFLEKTION"
-            color="blue"
-            :count="isEditing ? (form.deflection ?? 0) : (data.deflection ?? 0)"
-            :min="-8"
-            :max="8"
-            :readonly="!isEditing"
-            @update="form.deflection = $event"
-          />
-        </div>
+        <ModifierList
+          :modifiers="isEditing ? (form.modifiers ?? []) : (data.modifiers ?? [])"
+          :editMode="isEditing"
+          :gmMode="gmModeStore.isGMMode"
+          @update:modifiers="form.modifiers = $event"
+        />
       </section>
 
       <!-- GM OPTIONS -->

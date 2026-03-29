@@ -101,7 +101,7 @@ function onChange(event: Event) {
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: fit-content;
+  width: var(--dropdown-width, fit-content);
   min-width: var(--dropdown-min-width);
   max-width: var(--dropdown-max-width);
   border-radius: 4px;

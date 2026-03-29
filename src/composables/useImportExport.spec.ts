@@ -4,6 +4,7 @@ import { useImportExport } from './useImportExport';
 import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
+import { SkillAction } from '../types';
 import type { AppData, Character, Campaign, CampaignCharacterAssignment } from '../types';
 
 const validV10: AppData = {
@@ -12,7 +13,13 @@ const validV10: AppData = {
   campaigns: [],
   characters: [],
   campaignCharacterAssignments: [],
-  skills: ['Athletik'],
+  skills: [
+    {
+      name: 'Athletik',
+      description: 'Beweglichkeit und Ausdauer',
+      actions: [{ name: SkillAction.Overcome, examples: 'Klettern, springen, sprinten' }],
+    },
+  ],
 };
 
 const minimalCharacter: Character = {
@@ -93,7 +100,9 @@ describe('useImportExport', () => {
 
     it('throws on previous schema version 1.1', () => {
       const { importFromString } = useImportExport();
-      expect(() => importFromString(JSON.stringify({ ...validV10, formatVersion: '1.1' }))).toThrow();
+      expect(() =>
+        importFromString(JSON.stringify({ ...validV10, formatVersion: '1.1' })),
+      ).toThrow();
     });
 
     it('returns correct characters array', () => {
@@ -110,7 +119,9 @@ describe('useImportExport', () => {
 
     it('throws on unknown formatVersion', () => {
       const { importFromString } = useImportExport();
-      expect(() => importFromString(JSON.stringify({ ...validV10, formatVersion: '9.9' }))).toThrow();
+      expect(() =>
+        importFromString(JSON.stringify({ ...validV10, formatVersion: '9.9' })),
+      ).toThrow();
     });
 
     it('throws when campaigns array is missing', () => {
@@ -143,7 +154,9 @@ describe('useImportExport', () => {
 
     it('accepts old character data without redDice/blueDice (backwards compat)', () => {
       const { importFromString } = useImportExport();
-      const result = importFromString(JSON.stringify({ ...validV10, characters: [minimalCharacter] }));
+      const result = importFromString(
+        JSON.stringify({ ...validV10, characters: [minimalCharacter] }),
+      );
       expect(result.characters[0]!.name).toBe('Alice');
     });
   });
@@ -189,8 +202,28 @@ describe('useImportExport', () => {
 
     it('replaces skills in the store', () => {
       const { applyImport } = useImportExport();
+      applyImport({
+        ...validV10,
+        skills: [
+          {
+            name: 'CustomSkill',
+            description: 'Individuelle Fertigkeit',
+            actions: [{ name: SkillAction.Attack, examples: 'Spezialangriff' }],
+          },
+        ],
+      });
+      expect(useSkillsStore().skills).toEqual(['CustomSkill']);
+      expect(useSkillsStore().skillInfo.CustomSkill).toEqual({
+        description: 'Individuelle Fertigkeit',
+        actions: [{ name: SkillAction.Attack, examples: 'Spezialangriff' }],
+      });
+    });
+
+    it('accepts legacy string skills during import', () => {
+      const { applyImport } = useImportExport();
       applyImport({ ...validV10, skills: ['CustomSkill'] });
       expect(useSkillsStore().skills).toEqual(['CustomSkill']);
+      expect(useSkillsStore().skillInfo.CustomSkill).toEqual({ description: '', actions: [] });
     });
 
     it('falls back to SKILL_LIST when skills is undefined (v1.0)', () => {
@@ -318,6 +351,34 @@ describe('useImportExport', () => {
       const parsed = JSON.parse(text);
       expect(parsed.formatVersion).toBe('1.0');
     });
+
+    it('exports structured skills with descriptions and action examples', async () => {
+      useSkillsStore().replaceAllWithInfo(['Mystik'], {
+        Mystik: {
+          description: 'Arkane Praxis',
+          actions: [{ name: SkillAction.CreateAdvantage, examples: 'Runen analysieren' }],
+        },
+      });
+
+      let capturedBlob: Blob | undefined;
+      vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
+        capturedBlob = blob;
+        return 'blob:fake-url';
+      });
+
+      const { exportJSON } = useImportExport();
+      exportJSON();
+
+      const text = await capturedBlob!.text();
+      const parsed = JSON.parse(text);
+      expect(parsed.skills).toEqual([
+        {
+          name: 'Mystik',
+          description: 'Arkane Praxis',
+          actions: [{ name: SkillAction.CreateAdvantage, examples: 'Runen analysieren' }],
+        },
+      ]);
+    });
   });
 
   describe('exportToClipboard', () => {
@@ -359,7 +420,13 @@ describe('useImportExport', () => {
 
     it('written JSON contains campaigns from the store', async () => {
       const campaign: Campaign = {
-        id: 'camp1', name: 'Mittelerde', description: '', status: 'active', notes: '', avatar: '🗺️', milestones: [],
+        id: 'camp1',
+        name: 'Mittelerde',
+        description: '',
+        status: 'active',
+        notes: '',
+        avatar: '🗺️',
+        milestones: [],
       };
       useCampaignsStore().addCampaign(campaign);
       const { exportToClipboard } = useImportExport();
@@ -402,6 +469,27 @@ describe('useImportExport', () => {
       expect(parsed).toHaveProperty('campaigns');
       expect(parsed).toHaveProperty('characters');
       expect(parsed).toHaveProperty('campaignCharacterAssignments');
+    });
+
+    it('writes structured skills to the clipboard export', async () => {
+      useSkillsStore().replaceAllWithInfo(['Mystik'], {
+        Mystik: {
+          description: 'Arkane Praxis',
+          actions: [{ name: SkillAction.Defend, examples: 'Schutzkreis errichten' }],
+        },
+      });
+
+      const { exportToClipboard } = useImportExport();
+      await exportToClipboard();
+
+      const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
+      expect(parsed.skills).toEqual([
+        {
+          name: 'Mystik',
+          description: 'Arkane Praxis',
+          actions: [{ name: SkillAction.Defend, examples: 'Schutzkreis errichten' }],
+        },
+      ]);
     });
   });
 });

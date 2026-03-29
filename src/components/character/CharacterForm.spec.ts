@@ -348,77 +348,56 @@ describe('CharacterSheet dirty-state', () => {
   });
 });
 
-// ─── PURER SCHADEN & DEFLEKTION section ──────────────────────────────────────
+// ─── MODIFIERS section ───────────────────────────────────────────────────────
 
 describe('CharacterSheet – modifiers section', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
-  it('hides the section in view mode when pureDamage and deflection are both absent', () => {
-    const char = createDefaultCharacter();
+  it('hides the section in view mode when all modifier values are 0', () => {
+    const char = { ...createDefaultCharacter(), modifiers: [{ label: 'Test', value: 0 }] };
     renderView(char);
-    expect(screen.queryByText('PURER SCHADEN')).toBeNull();
-    expect(screen.queryByText('DEFLEKTION')).toBeNull();
+    expect(screen.queryByText('MODIFIERS')).toBeNull();
   });
 
-  it('shows the section in edit mode even when pureDamage and deflection are 0', () => {
-    const char = { ...createDefaultCharacter(), pureDamage: 0, deflection: 0 };
+  it('shows the section in edit mode even when all modifier values are 0', () => {
+    const char = {
+      ...createDefaultCharacter(),
+      modifiers: [
+        { label: 'Purer Schaden', value: 0 },
+        { label: 'Deflektion', value: 0 },
+      ],
+    };
     renderForm(char);
-    expect(screen.getByText('PURER SCHADEN')).toBeTruthy();
-    expect(screen.getByText('DEFLEKTION')).toBeTruthy();
+    expect(screen.getByText('MODIFIERS')).toBeTruthy();
   });
 
-  it('shows the section in view mode when pureDamage is set', () => {
-    const char = { ...createDefaultCharacter(), pureDamage: 3 };
+  it('shows the section in view mode when a modifier has a non-zero value', () => {
+    const char = { ...createDefaultCharacter(), modifiers: [{ label: 'Purer Schaden', value: 3 }] };
     renderView(char);
-    expect(screen.getByText('PURER SCHADEN')).toBeTruthy();
+    expect(screen.getByText('MODIFIERS')).toBeTruthy();
   });
 
-  it('shows the section in view mode when deflection is set', () => {
-    const char = { ...createDefaultCharacter(), deflection: 2 };
-    renderView(char);
-    expect(screen.getByText('DEFLEKTION')).toBeTruthy();
-  });
-
-  it('only shows deflection counter in view mode when pureDamage is absent', () => {
-    const char = { ...createDefaultCharacter(), deflection: 2 };
-    renderView(char);
-    expect(screen.queryByText('PURER SCHADEN')).toBeNull();
-    expect(screen.getByText('DEFLEKTION')).toBeTruthy();
-  });
-
-  it('counters are readonly in view mode (no buttons rendered)', () => {
-    const char = { ...createDefaultCharacter(), pureDamage: 2, deflection: 1 };
+  it('counters are readonly in view mode (no +/- buttons rendered)', () => {
+    const char = { ...createDefaultCharacter(), modifiers: [{ label: 'Purer Schaden', value: 2 }] };
     const { container } = renderView(char);
     const section = container.querySelector('.modifiers-section')!;
     expect(section.querySelectorAll('button')).toHaveLength(0);
   });
 
-  it('incrementing pureDamage counter and saving preserves the new value', async () => {
+  it('incrementing a modifier counter and saving preserves the new value', async () => {
     const onSave = vi.fn();
-    const char = { ...createDefaultCharacter(), pureDamage: 2, deflection: 0 };
+    const char = {
+      ...createDefaultCharacter(),
+      modifiers: [{ label: 'Purer Schaden', value: 2 }],
+    };
     const { container } = renderForm(char, { onSave });
     const section = container.querySelector('.modifiers-section')!;
-    const btns = section.querySelectorAll<HTMLButtonElement>('button');
-    // btns[1] = pureDamage Erhöhen (btns[0] is minus, disabled at 2 > 0 so enabled)
-    const pureDamageAdd = [...btns].find((b) => b.getAttribute('aria-label') === 'Erhöhen');
-    await fireEvent.click(pureDamageAdd!);
+    const addBtn = section.querySelector<HTMLButtonElement>('[aria-label="Erhöhen"]');
+    await fireEvent.click(addBtn!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.pureDamage).toBe(3);
-  });
-
-  it('incrementing deflection counter and saving preserves the new value', async () => {
-    const onSave = vi.fn();
-    const char = { ...createDefaultCharacter(), pureDamage: 0, deflection: 1 };
-    const { container } = renderForm(char, { onSave });
-    const section = container.querySelector('.modifiers-section')!;
-    // two counters; deflection is the second — get all Erhöhen buttons and pick the last
-    const addBtns = section.querySelectorAll<HTMLButtonElement>('[aria-label="Erhöhen"]');
-    await fireEvent.click(addBtns[addBtns.length - 1]!);
-    await fireEvent.click(screen.getByText('Speichern'));
-    const saved: Character = onSave.mock.calls[0]![0];
-    expect(saved.deflection).toBe(2);
+    expect(saved.modifiers![0]!.value).toBe(3);
   });
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useSkillsStore } from '../stores/skills';
 import { useToastStore } from '../stores/toast';
 import FateButton from '../components/shared/FateButton.vue';
@@ -7,8 +7,12 @@ import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import FateIcon from '../components/shared/FateIcon.vue';
+import FateDropdown from '../components/shared/FateDropdown.vue';
 import { useGMModeStore } from '../stores/gmMode';
-import type { SkillInfo } from '../types';
+import { SkillAction, DropdownVariant } from '../types';
+import type { AppSkill, SkillInfo } from '../types';
+
+const SKILL_ACTION_OPTIONS = Object.values(SkillAction).map((v) => ({ value: v, label: v }));
 
 const store = useSkillsStore();
 const toastStore = useToastStore();
@@ -16,6 +20,127 @@ const gmModeStore = useGMModeStore();
 const newSkillName = ref('');
 const infoSkill = ref<string | null>(null);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+
+const showImportDialog = ref(false);
+const importJson = ref('');
+const importError = ref('');
+
+interface LegacySkillInfoImport {
+  description?: string;
+  actions?: { name: SkillAction; note?: string; examples?: string }[];
+}
+
+interface LegacySkillActionLike {
+  name: SkillAction;
+  note?: string;
+  examples?: string;
+}
+
+function getActionExamples(action: LegacySkillActionLike): string {
+  return action.examples ?? action.note ?? '';
+}
+
+function isSkillObject(value: unknown): value is AppSkill {
+  return (
+    typeof value === 'object' && value !== null && typeof (value as AppSkill).name === 'string'
+  );
+}
+
+function normalizeSkillInfo(actions: LegacySkillInfoImport['actions'] = []): SkillInfo['actions'] {
+  return actions
+    .filter(
+      (action): action is NonNullable<LegacySkillInfoImport['actions']>[number] =>
+        !!action && typeof action.name === 'string',
+    )
+    .map((action) => ({
+      name: action.name,
+      examples: action.examples ?? action.note ?? '',
+    }));
+}
+
+async function handleCopy() {
+  try {
+    await navigator.clipboard.writeText(
+      JSON.stringify(
+        {
+          skills: store.skills.map((name) => ({
+            name,
+            description: store.skillInfo[name]?.description ?? '',
+            actions: (store.skillInfo[name]?.actions ?? []).map((action) => ({
+              name: action.name,
+              examples: getActionExamples(action),
+            })),
+          })),
+        },
+        null,
+        2,
+      ),
+    );
+    toastStore.show('Fertigkeiten kopiert');
+  } catch {
+    toastStore.show('Kopieren fehlgeschlagen');
+  }
+}
+
+function openImportDialog() {
+  importJson.value = '';
+  importError.value = '';
+  showImportDialog.value = true;
+}
+
+function handleImport() {
+  importError.value = '';
+  try {
+    let data: unknown;
+    try {
+      data = JSON.parse(importJson.value);
+    } catch {
+      throw new Error('Ungültiges JSON-Format.');
+    }
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      throw new Error('JSON muss ein Objekt sein.');
+    }
+    const obj = data as Record<string, unknown>;
+    if (!Array.isArray(obj.skills)) {
+      throw new Error('Das Feld "skills" muss ein Array sein.');
+    }
+
+    if (obj.skills.every((s) => typeof s === 'string')) {
+      const legacySkillInfo = (obj.skillInfo as Record<string, LegacySkillInfoImport>) ?? {};
+      const normalizedInfo = Object.fromEntries(
+        Object.entries(legacySkillInfo).map(([name, info]) => [
+          name,
+          {
+            description: info?.description ?? '',
+            actions: normalizeSkillInfo(info?.actions),
+          },
+        ]),
+      );
+
+      store.replaceAllWithInfo(obj.skills as string[], normalizedInfo);
+    } else if (obj.skills.every(isSkillObject)) {
+      const importedSkills = obj.skills as AppSkill[];
+      store.replaceAllWithInfo(
+        importedSkills.map((skill) => skill.name),
+        Object.fromEntries(
+          importedSkills.map((skill) => [
+            skill.name,
+            {
+              description: skill.description ?? '',
+              actions: normalizeSkillInfo(skill.actions),
+            },
+          ]),
+        ),
+      );
+    } else {
+      throw new Error('Das Feld "skills" muss ein Array aus Strings oder Skill-Objekten sein.');
+    }
+    toastStore.show('Fertigkeiten importiert');
+    showImportDialog.value = false;
+  } catch (e) {
+    importError.value = e instanceof Error ? e.message : 'Unbekannter Fehler.';
+  }
+}
 
 const sortedSkills = computed(() => [...store.skills].sort((a, b) => a.localeCompare(b, 'de')));
 
@@ -36,288 +161,94 @@ function resetToDefaults() {
   );
 }
 
-const SKILL_INFO: Record<string, SkillInfo> = {
-  Athletik: {
-    description:
-      'Körperliche Fitness, Körperbeherrschung und Bewegungsfähigkeit. Wichtig für alles, was mit dem eigenen Körper in Bewegung zu tun hat.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Hindernisse durch Springen, Laufen, Klettern, Schwimmen überwinden; Zonen wechseln.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Taktische Vorteile durch Akrobatik oder Positionierung.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Universelle Verteidigung in körperlichen Konflikten gegen Nah- und Fernkampfangriffe.',
-      },
-    ],
-  },
-  Charisma: {
-    description:
-      'Positive Beziehungen aufbauen, Wohlwollen erzeugen, Vertrauen wecken und andere dazu bringen, einen zu mögen.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Jemanden überreden, etwas zu tun, oder seine Zuneigung gewinnen.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Positive emotionale Zustände erzeugen wie „Aufgemuntert" oder „Gesprächsbereit".',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Ruf und Atmosphäre schützen, wenn andere versuchen, sie zu untergraben.',
-      },
-    ],
-  },
-  Diebeskünste: {
-    description:
-      'Dinge stehlen und in gesperrte Bereiche eindringen. In modernen Umgebungen auch Hacken und Sicherheitssysteme deaktivieren.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Schlösser knacken, Fallen umgehen, Taschendiebstahl, Spuren verwischen.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Orte auskundschaften, Sicherheitslücken finden, Tatortspuren auswerten.',
-      },
-    ],
-  },
-  Empathie: {
-    description:
-      'Emotionale Zustände und Verhaltensänderungen anderer erkennen – wie Wahrnehmung, aber für Gefühle statt physische Details.',
-    actions: [
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Emotionalen Zustand einschätzen, Charakteraspekte (besonders von NSC) aufdecken.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Täuschung aufdecken; gegen soziale Vorteile verteidigen; bei mentalen Konsequenzen helfen.',
-      },
-    ],
-  },
-  Fahren: {
-    description:
-      'Fahrzeuge und schnelle Fortbewegungsmittel steuern. Je nach Setting auch Reiten, Fliegen oder Pilotieren.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Fahrzeug durch schwieriges Gelände navigieren, Rennen und Verfolgungsjagden.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Optimale Routen finden, taktische Positionsvorteile erarbeiten.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Fahrzeugschäden abwehren, Positionierungsversuche des Gegners kontern.',
-      },
-    ],
-  },
-  Handwerk: {
-    description:
-      'Umgang mit Maschinen und mechanischen Systemen. Je nach Setting auch Mechanik, Reparieren oder Technik.',
-    actions: [
-      { name: 'Überwinden', note: 'Maschinen bauen, zerstören oder reparieren.' },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Aspekte über Maschineneigenschaften, schnelle Sabotage oder mechanische Manipulation.',
-      },
-    ],
-  },
-  Heimlichkeit: {
-    description:
-      'Ungesehen und ungehört bewegen. Funktioniert gut in Kombination mit Diebeskünsten.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'An Wachen vorbeischleichen, Verfolgern entkommen, keine Spuren hinterlassen.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Aspekte wie „gut versteckt" oder „unbekannter Standort" erzeugen.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Entdeckung durch Wahrnehmung verhindern; Spuren vor Nachforschung verschleiern.',
-      },
-    ],
-  },
-  Kämpfen: {
-    description:
-      'Nahkampfaktionen – unbewaffnet oder mit Waffe, innerhalb einer Zone. Für Fernkampf wird Schießen verwendet.',
-    actions: [
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Betäubende Schläge, schmutzige Tricks, Entwaffnung, Kampfstil analysieren.',
-      },
-      { name: 'Angreifen', note: 'Direkte Nahkampfangriffe gegen Ziele in derselben Zone.' },
-      {
-        name: 'Verteidigen',
-        note: 'Gegen Kämpfen-Angriffe und Vorteils-Erschaffungsversuche verteidigen.',
-      },
-    ],
-  },
-  Kontakte: {
-    description:
-      'Verbindungen zu Menschen und die Fähigkeit, neue Beziehungen zu knüpfen. Umfasst alle Kommunikationswege in der Spielwelt.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Bestimmte Personen durch Straßennetzwerke, Informanten oder Datenbanken aufspüren.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Den richtigen Kontakt finden, öffentliche Meinung beeinflussen, Gerüchte streuen.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Soziale Vorteile abwehren; verhindern, dass man durch Täuschung oder Nachforschung gefunden wird.',
-      },
-    ],
-  },
-  Kraft: {
-    description:
-      'Rohe körperliche Stärke und Ausdauer. Pendant zu Athletik: unterscheidet „stark" von „wendig". Hohe Kraft gewährt zusätzliche Stressfelder.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Physische Hindernisse durch rohe Kraft überwinden: Türen eintreten, Barrieren entfernen.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Griffe, Ringen und körperliche Kontrolle im Nahkampf (z.B. „Schwitzkasten").',
-      },
-    ],
-  },
-  Nachforschung: {
-    description:
-      'Informationen durch konzentrierte Suche und sorgfältige Prüfung aufdecken. Aktiver als die passive Wahrnehmung.',
-    actions: [
-      { name: 'Überwinden', note: 'Tatortuntersuchung, gezielte Suche, relevante Quellen finden.' },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Umfangreiche Details aufdecken: Überwachen, Akten durchsuchen, falsche Identitäten prüfen.',
-      },
-    ],
-  },
-  Provozieren: {
-    description:
-      'Andere in Wut versetzen und negative Emotionen wecken (Angst, Scham, Rage). Wirkt nicht gegen gefühllose Wesen.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Ziele durch Einschüchterung zu emotionsgesteuerten Handlungen zwingen.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Emotionale Zustände erschaffen: „Wütend", „Erschrocken", „Zögerlich".',
-      },
-      { name: 'Angreifen', note: 'Mentale Angriffe, die psychischen Schaden verursachen.' },
-    ],
-  },
-  Ressourcen: {
-    description:
-      'Reichtum und die Fähigkeit, ihn einzusetzen. Kann je nach Setting Land, Gold oder Kreditwürdigkeit repräsentieren.',
-    actions: [
-      { name: 'Überwinden', note: 'Situationen mit Geld lösen: bestechen, Luxusgüter kaufen.' },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Beziehungen durch Bestechung verbessern, Aspekte für besessene oder schnell beschaffte Gegenstände.',
-      },
-    ],
-  },
-  Schießen: {
-    description:
-      'Fernkampfwaffen einsetzen. Pendant zu Kämpfen für Distanzkämpfe – bis zu 2 Zonen Reichweite.',
-    actions: [
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Taktische Manöver: Trickschüsse, Sperrfeuer, Entwaffnen auf Distanz.',
-      },
-      { name: 'Angreifen', note: 'Physische Angriffe gegen Ziele in bis zu 2 Zonen Entfernung.' },
-    ],
-  },
-  Täuschung: {
-    description:
-      'Andere anlügen, in die Irre führen und durch Falschinformationen Ziele erreichen.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Bluffs glaubwürdig machen, Lügen durchsetzen, Informationen durch Falschaussagen extrahieren.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Ablenkungen, falsche Identitäten, irreführende Eindrücke erzeugen.',
-      },
-      { name: 'Verteidigen', note: 'Nachforschung abwehren; wahre Motive vor Empathie verbergen.' },
-    ],
-  },
-  Wahrnehmung: {
-    description:
-      'Allgemeine Aufmerksamkeit und spontane Detailwahrnehmung. Schneller als Nachforschung, aber weniger tiefgreifend.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Dinge im Umfeld bemerken, undeutliche Geräusche hören, versteckte Gegenstände entdecken.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Aspekte aus Beobachtungen: Fluchtwege, Schwachstellen, Auffälligkeiten in der Menge.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Gegen Heimlichkeit; Hinterhalte verhindern; bemerken, wenn man beobachtet wird.',
-      },
-    ],
-  },
-  Wille: {
-    description:
-      'Mentale Ausdauer und Belastbarkeit. Mentales Pendant zu Kraft. Hoher Wille gewährt zusätzliche mentale Stressfelder.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Mentale Hindernisse überwinden: Rätsel, intellektuelle Aufgaben, bei denen Ausdauer zählt.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Aspekte für erhöhte Konzentration oder intensive Fokussierung.',
-      },
-      {
-        name: 'Verteidigen',
-        note: 'Primäre Verteidigung gegen mentale Angriffe und emotionale Manipulation.',
-      },
-    ],
-  },
-  Wissen: {
-    description:
-      'Angesammeltes Wissen und formale Bildung. Je nach Setting auch Gelehrsamkeit oder Wissenschaft.',
-    actions: [
-      {
-        name: 'Überwinden',
-        note: 'Probleme durch Expertise lösen: alte Sprachen übersetzen, schwierige Fragen beantworten.',
-      },
-      {
-        name: 'Vorteil erschaffen',
-        note: 'Wie Nachforschung – Storyfakten oder verborgene Informationen aus Expertenwissen ableiten.',
-      },
-    ],
-  },
-};
+function openInfo(skill: string) {
+  infoSkill.value = skill;
+  editing.value = false;
+}
 
-const selectedInfo = computed<SkillInfo | null>(() =>
-  infoSkill.value ? (SKILL_INFO[infoSkill.value] ?? null) : null,
+function closeInfo() {
+  infoSkill.value = null;
+  editing.value = false;
+}
+
+// Edit mode
+const editing = ref(false);
+const editDescription = ref('');
+const editActions = ref<SkillInfo['actions']>([]);
+const newActionName = ref<SkillAction | ''>('');
+const newActionExamples = ref('');
+
+function openEdit() {
+  const info = store.skillInfo[infoSkill.value!] ?? { description: '', actions: [] };
+  editDescription.value = info.description;
+  editActions.value = info.actions.map((action) => ({
+    name: action.name,
+    examples: getActionExamples(action),
+  }));
+  newActionName.value = '';
+  newActionExamples.value = '';
+  editing.value = true;
+}
+
+function addAction() {
+  const name = newActionName.value;
+  if (!name) return;
+  editActions.value.push({ name, examples: newActionExamples.value.trim() || undefined });
+  newActionName.value = '';
+  newActionExamples.value = '';
+}
+
+function saveEdit() {
+  const info: SkillInfo = {
+    description: editDescription.value.trim(),
+    actions: editActions.value.map((a) => ({
+      name: a.name,
+      examples: a.examples?.trim() || undefined,
+    })),
+  };
+  store.setSkillInfo(infoSkill.value!, info);
+  editing.value = false;
+}
+
+function cancelEdit() {
+  editing.value = false;
+}
+
+const selectedInfo = computed<SkillInfo>(
+  () => store.skillInfo[infoSkill.value ?? ''] ?? { description: '', actions: [] },
 );
+
+const usedActionNames = computed(() => new Set(editActions.value.map((a) => a.name)));
+
+const availableActionOptions = computed(() =>
+  SKILL_ACTION_OPTIONS.filter((o) => !usedActionNames.value.has(o.value as SkillAction)),
+);
+
+const allActionsAdded = computed(() => editActions.value.length >= SKILL_ACTION_OPTIONS.length);
+
+function actionOptionsFor(currentName: SkillAction) {
+  return SKILL_ACTION_OPTIONS.filter(
+    (o) => o.value === currentName || !usedActionNames.value.has(o.value as SkillAction),
+  );
+}
 </script>
 
 <template>
   <div class="list-view">
-    <FateHeader title="Fertigkeiten" />
+    <FateHeader title="Fertigkeiten">
+      <div class="header-actions">
+        <FateButton
+          v-if="gmModeStore.isGMMode"
+          variant="secondary"
+          icon="paste"
+          @click="openImportDialog"
+          ><span class="btn-label">Importieren</span></FateButton
+        >
+        <FateButton variant="secondary" icon="copy" @click="handleCopy"
+          ><span class="btn-label">Kopieren</span></FateButton
+        >
+      </div>
+    </FateHeader>
 
     <p class="skills-hint">
       Diese Fertigkeiten stehen in der Skill-Pyramide als Dropdown-Optionen zur Verfügung.
@@ -328,13 +259,12 @@ const selectedInfo = computed<SkillInfo | null>(() =>
         <div
           v-for="skill in sortedSkills"
           :key="skill"
-          class="skill-manage-row"
-          :class="{ 'skill-manage-row--clickable': !!SKILL_INFO[skill] }"
-          @click="SKILL_INFO[skill] ? (infoSkill = skill) : undefined"
+          class="skill-manage-row skill-manage-row--clickable"
+          @click="openInfo(skill)"
         >
           <div class="skill-manage-label">
             <span class="skill-manage-name">{{ skill }}</span>
-            <FateIcon v-if="SKILL_INFO[skill]" name="info" :size="14" class="skill-info-icon" />
+            <FateIcon name="info" :size="14" class="skill-info-icon" />
           </div>
           <div class="skill-manage-actions">
             <FateButton
@@ -342,7 +272,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
               icon="close"
               variant="danger"
               size="S"
-              @click="store.removeSkill(skill)"
+              @click.stop="store.removeSkill(skill)"
             />
           </div>
         </div>
@@ -374,28 +304,152 @@ const selectedInfo = computed<SkillInfo | null>(() =>
     v-if="confirmDialog"
     :title="confirmDialog.title"
     :message="confirmDialog.message"
-    @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+    @confirm="
+      confirmDialog.onConfirm();
+      confirmDialog = null;
+    "
     @cancel="confirmDialog = null"
   />
 
   <!-- Info Modal -->
   <Teleport to="body">
-    <div v-if="infoSkill && selectedInfo" class="skill-info-overlay" @click.self="infoSkill = null">
+    <div v-if="infoSkill" class="skill-info-overlay" @click.self="closeInfo">
       <div class="skill-info-modal">
         <div class="skill-info-header">
           <h2>{{ infoSkill }}</h2>
-          <FateButton icon="close" variant="secondary" class="skill-info-close" @click="infoSkill = null"></FateButton
-          >
+          <div class="skill-info-header-actions">
+            <FateButton
+              v-if="gmModeStore.isGMMode && !editing"
+              icon="edit"
+              variant="secondary"
+              class="skill-edit-btn"
+              @click="openEdit"
+            >
+              <span class="edit-label-full">Bearbeiten</span>
+            </FateButton>
+            <FateButton
+              icon="close"
+              variant="secondary"
+              class="skill-info-close"
+              @click="closeInfo"
+            />
+          </div>
         </div>
-        <p class="skill-info-description">{{ selectedInfo.description }}</p>
-        <div class="skill-info-actions">
-          <h3>Aktionen</h3>
-          <ul>
-            <li v-for="action in selectedInfo.actions" :key="action.name">
-              <strong>{{ action.name }}</strong>
-              <span v-if="action.note">: {{ action.note }}</span>
-            </li>
-          </ul>
+
+        <!-- View mode -->
+        <template v-if="!editing">
+          <p v-if="selectedInfo.description" class="skill-info-description">
+            {{ selectedInfo.description }}
+          </p>
+          <p v-else class="skill-info-empty">Keine Beschreibung vorhanden.</p>
+
+          <div v-if="selectedInfo.actions.length" class="skill-info-actions">
+            <h3>Aktionen</h3>
+            <ul>
+              <li v-for="action in selectedInfo.actions" :key="action.name">
+                <strong>{{ action.name }}</strong>
+                <span v-if="getActionExamples(action)">: {{ getActionExamples(action) }}</span>
+              </li>
+            </ul>
+          </div>
+        </template>
+
+        <!-- Edit mode -->
+        <template v-else>
+          <div class="skill-edit-section">
+            <label class="skill-edit-label">Beschreibung</label>
+            <textarea
+              v-model="editDescription"
+              rows="3"
+              class="skill-edit-textarea"
+              placeholder="Beschreibung der Fertigkeit..."
+            />
+          </div>
+
+          <div class="skill-edit-section">
+            <label class="skill-edit-label">Aktionen</label>
+            <div v-for="(action, i) in editActions" :key="i" class="skill-edit-action-row">
+              <FateDropdown
+                v-model="action.name"
+                :options="actionOptionsFor(action.name)"
+                :variant="DropdownVariant.Subtle"
+                size="S"
+                style="
+                  flex: 1;
+                  --dropdown-width: 100%;
+                  --dropdown-min-width: 0;
+                  --dropdown-max-width: none;
+                "
+              />
+              <input
+                v-model="action.examples"
+                class="skill-edit-input skill-edit-input--note"
+                placeholder="Einsatzbeispiele"
+              />
+              <FateButton
+                icon="close"
+                variant="danger"
+                size="S"
+                @click="editActions.splice(i, 1)"
+              />
+            </div>
+
+            <div v-if="!allActionsAdded" class="skill-edit-action-row skill-edit-add-row">
+              <FateDropdown
+                v-model="newActionName"
+                :options="availableActionOptions"
+                placeholder="Neue Aktion..."
+                :variant="DropdownVariant.Subtle"
+                size="S"
+                style="
+                  flex: 1;
+                  --dropdown-width: 100%;
+                  --dropdown-min-width: 0;
+                  --dropdown-max-width: none;
+                "
+              />
+              <input
+                v-model="newActionExamples"
+                class="skill-edit-input skill-edit-input--note"
+                placeholder="Einsatzbeispiele"
+                @keydown.enter="addAction"
+              />
+              <FateButton variant="secondary" size="S" :disabled="!newActionName" @click="addAction"
+                >+</FateButton
+              >
+            </div>
+          </div>
+
+          <div class="skill-edit-footer">
+            <FateButton variant="secondary" @click="cancelEdit">Abbrechen</FateButton>
+            <FateButton @click="saveEdit">Speichern</FateButton>
+          </div>
+        </template>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Import Dialog -->
+  <Teleport to="body">
+    <div v-if="showImportDialog" class="dialog-overlay" @click.self="showImportDialog = false">
+      <div class="dialog-box">
+        <div class="dialog-title">Fertigkeiten importieren</div>
+        <div class="dialog-message">JSON einfügen (z. B. von einer KI generiert):</div>
+        <textarea
+          v-model="importJson"
+          class="json-input"
+          placeholder='{ "skills": [{ "name": "Athletik", "description": "", "actions": [{ "name": "Vorteil erschaffen", "examples": "..." }] }] }'
+          spellcheck="false"
+          @keydown.stop
+        />
+        <div v-if="importError" class="error-message">{{ importError }}</div>
+        <div class="dialog-actions">
+          <FateButton icon="close" variant="secondary" @click="showImportDialog = false"
+            >Abbrechen</FateButton
+          >
+          <FateButton icon="paste" :disabled="!importJson.trim()" @click="handleImport"
+            >Importieren</FateButton
+          >
         </div>
       </div>
     </div>
@@ -403,6 +457,10 @@ const selectedInfo = computed<SkillInfo | null>(() =>
 </template>
 
 <style scoped>
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
 .skills-hint {
   color: var(--fate-text-light);
   font-size: 0.875rem;
@@ -444,7 +502,6 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   background: var(--fate-blue-light);
 }
 
-
 .skill-manage-actions {
   display: flex;
   gap: 0.35rem;
@@ -466,7 +523,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   background: var(--fate-white);
   border-radius: 8px;
   padding: 1.5rem;
-  max-width: 480px;
+  max-width: 640px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
@@ -480,6 +537,7 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   margin-bottom: 0.75rem;
   border-bottom: 2px solid var(--fate-blue);
   padding-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 
 .skill-info-header h2 {
@@ -487,6 +545,14 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   font-weight: 700;
   color: var(--fate-heading);
   margin: 0;
+  flex: 1;
+}
+
+.skill-info-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
 .skill-info-close {
@@ -504,6 +570,13 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   color: var(--fate-text);
   margin: 0 0 1rem;
   line-height: 1.5;
+}
+
+.skill-info-empty {
+  font-size: 0.9rem;
+  color: var(--fate-text-light);
+  font-style: italic;
+  margin: 0 0 1rem;
 }
 
 .skill-info-actions h3 {
@@ -600,5 +673,163 @@ const selectedInfo = computed<SkillInfo | null>(() =>
   .reset-label-short {
     display: inline;
   }
+}
+
+/* Edit label responsive */
+.edit-label-full {
+  display: inline;
+}
+
+@media (max-width: 480px) {
+  .edit-label-full {
+    display: none;
+  }
+
+  .skill-edit-btn {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+/* Edit mode styles */
+.skill-edit-section {
+  margin-bottom: 1rem;
+}
+
+.skill-edit-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fate-muted);
+  margin-bottom: 0.4rem;
+}
+
+.skill-edit-textarea {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: var(--fate-white);
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.skill-edit-textarea:focus {
+  border-color: var(--fate-blue);
+}
+
+.skill-edit-action-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.skill-edit-input {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: var(--fate-white);
+  outline: none;
+  min-width: 0;
+}
+
+.skill-edit-input--note {
+  flex: 2;
+  min-width: 0;
+}
+
+.skill-edit-input:focus {
+  border-color: var(--fate-blue);
+}
+
+.skill-edit-add-row {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--fate-border);
+}
+
+.skill-edit-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--fate-border);
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--fate-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background: var(--fate-white);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 560px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dialog-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--fate-text);
+}
+
+.dialog-message {
+  font-size: 0.9rem;
+  color: var(--fate-text-light);
+}
+
+.json-input {
+  width: 100%;
+  min-height: 180px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--fate-border);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: var(--fate-text);
+  background: var(--fate-bg);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.json-input:focus {
+  border-color: var(--fate-blue);
+}
+
+.error-message {
+  font-size: 0.85rem;
+  color: var(--fate-red, #e53935);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 </style>

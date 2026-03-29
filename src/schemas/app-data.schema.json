@@ -46,7 +46,9 @@
     },
     "skills": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "anyOf": [{ "type": "string" }, { "$ref": "#/$defs/AppSkill" }]
+      },
       "description": "Benutzerdefinierte Fertigkeitenliste"
     }
   },
@@ -89,10 +91,21 @@
     "Character": {
       "type": "object",
       "required": [
-        "id", "name", "description", "highConcept", "trouble",
-        "aspects", "skills", "stunts", "extras",
-        "refresh", "fatePoints",
-        "stressPhysical", "stressMental", "consequences", "notes"
+        "id",
+        "name",
+        "description",
+        "highConcept",
+        "trouble",
+        "aspects",
+        "skills",
+        "stunts",
+        "extras",
+        "refresh",
+        "fatePoints",
+        "stressPhysical",
+        "stressMental",
+        "consequences",
+        "notes"
       ],
       "additionalProperties": false,
       "properties": {
@@ -141,6 +154,10 @@
         "avatar": { "type": "string" },
         "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
         "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "modifiers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Modifier" }
+        },
         "pureDamage": { "type": "integer", "minimum": -8, "maximum": 8 },
         "deflection": { "type": "integer", "minimum": -8, "maximum": 8 }
       }
@@ -148,10 +165,17 @@
     "Item": {
       "type": "object",
       "required": [
-        "id", "type", "name", "description",
-        "aspects", "stunts", "extras",
-        "stressPhysical", "stressMental",
-        "redDice", "blueDice"
+        "id",
+        "type",
+        "name",
+        "description",
+        "aspects",
+        "stunts",
+        "extras",
+        "stressPhysical",
+        "stressMental",
+        "redDice",
+        "blueDice"
       ],
       "additionalProperties": false,
       "properties": {
@@ -186,6 +210,10 @@
         "avatar": { "type": "string" },
         "redDice": { "type": "integer", "minimum": 0, "maximum": 4 },
         "blueDice": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "modifiers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Modifier" }
+        },
         "pureDamage": { "type": "integer", "minimum": -8, "maximum": 8 },
         "deflection": { "type": "integer", "minimum": -8, "maximum": 8 },
         "consequences": {
@@ -197,9 +225,19 @@
     "TagColor": {
       "type": "string",
       "enum": [
-        "pfau", "heidelbeere", "lavendel", "weintraube",
-        "tomate", "flamingo", "mandarine", "banane", "salbei", "basilikum",
-        "gray", "türkis", "rose"
+        "pfau",
+        "heidelbeere",
+        "lavendel",
+        "weintraube",
+        "tomate",
+        "flamingo",
+        "mandarine",
+        "banane",
+        "salbei",
+        "basilikum",
+        "gray",
+        "türkis",
+        "rose"
       ]
     },
     "SkillEntry": {
@@ -209,6 +247,40 @@
       "properties": {
         "skill": { "type": "string" },
         "level": { "type": "integer", "minimum": 1, "maximum": 8 }
+      }
+    },
+    "AppSkill": {
+      "type": "object",
+      "required": ["name", "description", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AppSkillAction" }
+        }
+      }
+    },
+    "AppSkillAction": {
+      "type": "object",
+      "required": ["name", "examples"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Überwinden", "Vorteil erschaffen", "Angreifen", "Verteidigen"]
+        },
+        "examples": { "type": "string" }
+      }
+    },
+    "Modifier": {
+      "type": "object",
+      "required": ["label", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "value": { "type": "integer", "minimum": -8, "maximum": 8 }
       }
     },
     "Stunt": {

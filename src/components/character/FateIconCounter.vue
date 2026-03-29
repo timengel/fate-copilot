@@ -10,6 +10,7 @@ withDefaults(
     iconPositive?: ButtonIcon;
     iconNegative?: ButtonIcon;
     readonly?: boolean;
+    hideLabel?: boolean;
     min?: number;
     max?: number;
     color?: 'red' | 'blue';
@@ -29,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="icon-counter" :class="color">
-    <div class="icon-label">{{ label }}</div>
+    <div v-if="!hideLabel" class="icon-label">{{ label }}</div>
     <div class="icon-row">
       <span class="icon-count">{{ count > 0 ? '+' + count : count }}</span>
       <FateIcon v-for="i in Math.abs(count)" :key="i" :name="count >= 0 ? iconPositive : iconNegative" :size="24" class="icon-item" />

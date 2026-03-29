@@ -2,6 +2,18 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Item } from '../types';
 
+function migrateItem(item: Item): Item {
+  if (item.pureDamage !== undefined || item.deflection !== undefined) {
+    item.modifiers = [
+      { label: 'Purer Schaden', value: item.pureDamage ?? 0 },
+      { label: 'Deflektion', value: item.deflection ?? 0 },
+    ];
+    delete item.pureDamage;
+    delete item.deflection;
+  }
+  return item;
+}
+
 export const useItemsStore = defineStore('items', () => {
   const items = ref<Item[]>([]);
 
@@ -34,5 +46,10 @@ export const useItemsStore = defineStore('items', () => {
 
   return { items, addItem, updateItem, deleteItem, getById, replaceAll, reset };
 }, {
-  persist: { key: 'fcp-items' },
+  persist: {
+    key: 'fcp-items',
+    afterHydrate: (ctx) => {
+      ctx.store.items = ctx.store.items.map(migrateItem);
+    },
+  },
 });

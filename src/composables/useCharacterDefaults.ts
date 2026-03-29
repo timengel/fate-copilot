@@ -55,8 +55,10 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
     avatar: '',
     redDice: 0,
     blueDice: 0,
-    pureDamage: 0,
-    deflection: 0,
+    modifiers: [
+      { label: 'Purer Schaden', value: 0 },
+      { label: 'Deflektion', value: 0 },
+    ],
   };
 }
 
@@ -76,8 +78,10 @@ export function createDefaultItem(): Item {
     avatar: '',
     redDice: 0,
     blueDice: 0,
-    pureDamage: 0,
-    deflection: 0,
+    modifiers: [
+      { label: 'Purer Schaden', value: 0 },
+      { label: 'Deflektion', value: 0 },
+    ],
     consequences: [],
   };
 }

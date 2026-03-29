@@ -129,12 +129,11 @@ describe('createDefaultItem', () => {
     expect(item.blueDice).toBe(0);
   });
 
-  it('returns pureDamage=0', () => {
-    expect(createDefaultItem().pureDamage).toBe(0);
-  });
-
-  it('returns deflection=0', () => {
-    expect(createDefaultItem().deflection).toBe(0);
+  it('returns two default modifiers with value 0', () => {
+    const item = createDefaultItem();
+    expect(item.modifiers).toHaveLength(2);
+    expect(item.modifiers![0]!.value).toBe(0);
+    expect(item.modifiers![1]!.value).toBe(0);
   });
 });
 
