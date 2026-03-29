@@ -102,6 +102,18 @@ const hasVisibleStress = computed(
 const hasVisibleConsequences = computed(
   () => isEditing.value || (show.value.consequences && visibleConsequences.value.length > 0),
 );
+const hasVisibleDice = computed(
+  () => show.value.dice && (isEditing.value || !!data.value.redDice || !!data.value.blueDice),
+);
+const hasVisibleModifiers = computed(
+  () => show.value.modifiers && (isEditing.value || !!data.value.modifiers?.some((m) => m.value !== 0)),
+);
+const diceSectionClasses = computed(() => ({
+  'span-full': hasVisibleDice.value && !hasVisibleModifiers.value,
+}));
+const modifiersSectionClasses = computed(() => ({
+  'span-full': hasVisibleModifiers.value && !hasVisibleDice.value,
+}));
 
 function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: ConsequenceLabel) {
   if (!form.consequences) form.consequences = [];
@@ -410,8 +422,9 @@ defineExpose({ save });
 
     <!-- ROTE & BLAUE WÜRFEL -->
     <section
-      v-if="show.dice && (isEditing || data.redDice || data.blueDice)"
+      v-if="hasVisibleDice"
       class="sheet-section red-blue-dice-section"
+      :class="diceSectionClasses"
     >
       <div class="sheet-section-header">ROTE &amp; BLAUE WÜRFEL</div>
       <div class="dice-tracks">
@@ -440,8 +453,9 @@ defineExpose({ save });
 
     <!-- MODIFIERS -->
     <section
-      v-if="show.modifiers && (isEditing || data.modifiers?.some((m) => m.value !== 0))"
+      v-if="hasVisibleModifiers"
       class="sheet-section modifiers-section"
+      :class="modifiersSectionClasses"
     >
       <div class="sheet-section-header">MODIFIERS</div>
       <ModifierList

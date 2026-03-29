@@ -88,6 +88,12 @@ const hasVisibleDice = computed(
 const hasVisibleModifiers = computed(
   () => isEditing.value || ((props.sections?.modifiers ?? true) && !!(data.value.modifiers?.some((m) => m.value !== 0))),
 );
+const diceSectionClasses = computed(() => ({
+  'span-full': hasVisibleDice.value && !hasVisibleModifiers.value,
+}));
+const modifiersSectionClasses = computed(() => ({
+  'span-full': hasVisibleModifiers.value && !hasVisibleDice.value,
+}));
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
   return props.sections?.[section] !== false;
@@ -511,7 +517,11 @@ defineExpose({ save });
       </div>
 
       <!-- WÜRFEL -->
-      <section v-if="hasVisibleDice" class="sheet-section dice-section">
+      <section
+        v-if="hasVisibleDice"
+        class="sheet-section dice-section"
+        :class="diceSectionClasses"
+      >
         <div class="sheet-section-header">WÜRFEL</div>
         <div class="dice-tracks">
           <DiceTrack
@@ -534,7 +544,11 @@ defineExpose({ save });
       </section>
 
       <!-- MODIFIERS -->
-      <section v-if="hasVisibleModifiers" class="sheet-section modifiers-section">
+      <section
+        v-if="hasVisibleModifiers"
+        class="sheet-section modifiers-section"
+        :class="modifiersSectionClasses"
+      >
         <div class="sheet-section-header">MODIFIERS</div>
         <ModifierList
           :modifiers="isEditing ? (form.modifiers ?? []) : (data.modifiers ?? [])"

@@ -400,4 +400,29 @@ describe('CharacterSheet – modifiers section', () => {
     const saved: Character = onSave.mock.calls[0]![0];
     expect(saved.modifiers![0]!.value).toBe(3);
   });
+
+  it('lets the dice section span the full row when modifiers are hidden', () => {
+    const char = { ...createDefaultCharacter(), redDice: 2, blueDice: 1, modifiers: [{ label: 'Test', value: 0 }] };
+    const { container } = renderView(char);
+    expect(container.querySelector('.dice-section')?.classList.contains('span-full')).toBe(true);
+    expect(container.querySelector('.modifiers-section')).toBeNull();
+  });
+
+  it('lets the modifiers section span the full row when dice are hidden', () => {
+    const char = { ...createDefaultCharacter(), modifiers: [{ label: 'Purer Schaden', value: 2 }] };
+    const { container } = renderView(char);
+    expect(container.querySelector('.dice-section')).toBeNull();
+    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(true);
+  });
+
+  it('keeps dice and modifiers split when both sections are visible', () => {
+    const char = {
+      ...createDefaultCharacter(),
+      redDice: 1,
+      modifiers: [{ label: 'Purer Schaden', value: 2 }],
+    };
+    const { container } = renderView(char);
+    expect(container.querySelector('.dice-section')?.classList.contains('span-full')).toBe(false);
+    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(false);
+  });
 });
