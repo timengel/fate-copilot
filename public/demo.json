@@ -1,6 +1,6 @@
 {
   "formatVersion": "1.0",
-  "exportDate": "2026-03-29T13:03:00.114Z",
+  "exportDate": "2026-03-29T16:21:13.704Z",
   "campaigns": [
     {
       "id": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
@@ -219,6 +219,8 @@
       "notes": "",
       "color": "tomate",
       "avatar": "🤖",
+      "pyramidMaxLevel": 5,
+      "pyramidMaxCols": 5,
       "stressTracks": [
         {
           "label": "KÖRPERLICHER STRESS (KRAFT)",
@@ -370,8 +372,8 @@
       "type": "nsc",
       "name": "Orden Hyort",
       "description": "Navigator der Emperor's Bounty, vom Psycharus Wurm korrumpiert und zum Warp-Anker des Geisterschiffs geworden.",
-      "highConcept": "Vom Psycharus Wurm verdorbener Navigator von Haus Benetek",
-      "trouble": "Mein geöffnetes drittes Auge trinkt unaufhörlich aus dem Warp",
+      "highConcept": "",
+      "trouble": "",
       "aspects": [
         "Herr der Warp-Puppen",
         "Ich brauche ein Schiff, um meinem Gefängnis zu entkommen"
@@ -500,8 +502,8 @@
       "type": "nsc",
       "name": "Warp-Puppen",
       "description": "Von Orden Hyort und dem Psycharus Wurm gelenkte Leichen der Emperor's Bounty. Einzeln stumpf und langsam, in der Masse aber tödlich.",
-      "highConcept": "Vom Psycharus Wurm gelenkte Zombies",
-      "trouble": "Langsam, stumpf und nur durch fremden Willen in Bewegung",
+      "highConcept": "",
+      "trouble": "",
       "aspects": [
         "Unsterbliche Wiedergänger"
       ],
@@ -570,9 +572,10 @@
       "type": "nsc",
       "name": "Sergeant Halix Vorn",
       "description": "Abgebrühter imperialer Sergeant, verlässlicher Frontsoldat und taktischer Anführer.",
-      "highConcept": "Erfahrener imperialer Sergeant mit eiserner Disziplin",
-      "trouble": "Verliert schnell die Geduld bei Ungehorsam und Chaos",
+      "highConcept": "",
+      "trouble": "",
       "aspects": [
+        "Stahlharter, disziplinierter Sergeant",
         "Narben eines Dutzend Feuergefechte"
       ],
       "skills": [
@@ -607,7 +610,7 @@
           "description": "Einmal pro Szene kann Halix mit Provozieren den Situationsaspekt \"In Stellung!\" mit +1 freiem Einsatz erschaffen, wenn Verbündete ihn hören können."
         }
       ],
-      "extras": "- Lasergewehr\n- Flak-Rüstung\n- Feldstecher und Vox-Perle",
+      "extras": "",
       "refresh": 1,
       "fatePoints": 2,
       "consequences": [
@@ -623,7 +626,7 @@
         }
       ],
       "notes": "Mittelstarker NSC-Unterstützer. Gut als Feuerunterstützung, Absicherung von Rückzügen und zum Halten von Positionen. Kein Red/Blue-Dice-Einsatz.",
-      "color": "basilikum",
+      "color": "salbei",
       "avatar": "🪖",
       "stressTracks": [
         {
@@ -667,7 +670,7 @@
       ],
       "stunts": [],
       "extras": "Nutzung lässt den Schleier zw. Realität und Warp schwächer werden. Pro Nutzung → 1 Stress. Wenn 3 Stress → Nutzer muss Wille 5 verteidigen, alle im Umkreis Wille 3. Krone glüht danach kurzzeitig extrem heiß.",
-      "color": "gray",
+      "color": "weintraube",
       "avatar": "👑",
       "redDice": 0,
       "blueDice": 0,
@@ -730,7 +733,7 @@
       ],
       "stunts": [],
       "extras": "- Crew: 1-2 Piloten, 1-2 Schützen, 1 Ingenieur\n- Crewquartiere für 6 Personen\n- Frachtraum für ca. 30 Personen oder entsprechende Fracht\n- 6 Void-Suits an Bord\n- Zu klein, um viele verborgene Ordnance-Fallen auszulösen\n- Bewaffnet und gepanzert für In-System-Flüge, Landungen und kurze Gefechte\n- Battleground-Sonderregel: Für den Anflug zur Emperor's Bounty ist meist eine Fahren/Pilotieren-Probe nötig; bei Fehlschlag erleidet der Guncutter 1 physischen Stress durch Trümmer oder alte Ordnance. Wenn zuvor ein Korridor freigeschossen wurde, wird die Probe erleichtert.",
-      "color": "stahl",
+      "color": "gray",
       "avatar": "🛩️",
       "redDice": 0,
       "blueDice": 0,
@@ -833,13 +836,13 @@
     {
       "id": "999790cb-f35a-47c7-83b9-19b1a1afdd96",
       "type": "item",
-      "name": "Void Breather des Kapitäns",
+      "name": "Void-Breather des Kapitäns",
       "description": "Eine prunkvolle, vergoldete Atemmaske aus der persönlichen Notfallausrüstung von Kapitän Janrak Spargan. Hinter der goldenen Front verbergen sich uralte Filter, Druckdichtungen und ein kleiner Reserve-Sauerstofftank. Die Maske wirkt würdevoll und unheimlich zugleich – ein Relikt aus dem Wrack der Emperor’s Bounty.",
       "aspects": [
         "Prunkvolle Atemmaske eines toten Kapitäns"
       ],
       "stunts": [],
-      "extras": "**Wenn getragen:** 1 Deflektion und 2 blaue Würfel gegen luftbasierte Umgebungsgefahren oder Angriffe (z.B. Vakuum oder giftiger Rauch).",
+      "extras": "**Wenn getragen:** +1 Deflektion und +2 🟦 gegen **luftbasierte Umgebungsgefahren oder Angriffe** (z.B. Vakuum oder giftiger Rauch).",
       "redDice": 0,
       "blueDice": 2,
       "color": "mandarine",
@@ -847,12 +850,8 @@
       "hidden": true,
       "modifiers": [
         {
-          "label": "Purer Schaden",
-          "value": 0
-        },
-        {
-          "label": "Deflektion",
-          "value": 2
+          "label": "Deflektion (luftbasierte Gefahren)",
+          "value": 1
         }
       ],
       "stressTracks": []
@@ -870,7 +869,7 @@
       "redDice": 0,
       "blueDice": 1,
       "color": "basilikum",
-      "avatar": "🛡️",
+      "avatar": "🎽",
       "hidden": true,
       "modifiers": [],
       "stressTracks": []
@@ -878,13 +877,13 @@
     {
       "id": "8818c297-dce9-4a5e-bfde-b80c3d919e06",
       "type": "item",
-      "name": "Diagnostor Servo-Schädel",
-      "description": "Ein antiker Servo-Schädel mit Medicae-Optiken, Injektorarmen und heiser knisternden Diagnoselitaneien. Er gehörte einst dem Leit-Chiurgen der Emperor’s Bounty und wurde für Offiziere und Schwerverwundete eingesetzt, nicht für die gewöhnliche Besatzung. Sein Messinggehäuse ist verbeult, einige Sonden wurden grob ersetzt, doch seine medizinischen Routinen arbeiten noch immer erschreckend präzise.",
+      "name": "Medicae Servo-Schädel",
+      "description": "Ein antiker Servo-Schädel mit Medicae-Optiken, Injektorarmen und heiser knisternden Diagnoselitaneien. Er gehörte einst dem Leit-Chiurgen der Emperor’s Bounty und wurde für Offiziere und VIPs eingesetzt, nicht für die gewöhnliche Besatzung. Sein Messinggehäuse ist verbeult, einige Sonden wurden grob ersetzt, doch seine medizinischen Routinen arbeiten noch immer präzise.",
       "aspects": [
         "Fliegender Servo-Schädel zur Medicae Unterstützung"
       ],
       "stunts": [],
-      "extras": "**+2 🟦 bei medizinischer Erstversorgung, Diagnose oder Stabilisierung körperlicher Verletzungen.** Der Schädel schwebt selbstständig in unmittelbarer Nähe des Nutzers.",
+      "extras": "**+2 🟦 bei Medicae Proben.** Der Schädel schwebt selbstständig in unmittelbarer Nähe des Nutzers.",
       "redDice": 0,
       "blueDice": 2,
       "color": "lachs",
@@ -999,13 +998,10 @@
     },
     {
       "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
-      "itemId": "edb9db72-ccb0-47b1-8479-9275ff9222a9"
-    },
-    {
-      "campaignId": "9b01fd23-2e92-4cf5-a3d2-23b363113c1a",
       "itemId": "8818c297-dce9-4a5e-bfde-b80c3d919e06"
     }
   ],
+  "characterItemAssignments": [],
   "skills": [
     {
       "name": "Athletik",
