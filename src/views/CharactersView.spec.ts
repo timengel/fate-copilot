@@ -45,6 +45,7 @@ describe('CharactersView – card interactions', () => {
     const pinia = createPinia();
     setActivePinia(pinia);
     const store = useCharactersStore();
+    useGMModeStore().isGMMode = false;
     const char = makeCharacter();
     store.addCharacter(char);
 
@@ -109,6 +110,16 @@ describe('CharactersView – card interactions', () => {
   it('shows a quick archive button in GM mode', () => {
     const { getByLabelText } = setupGM();
     expect(getByLabelText('Charakter archivieren')).toBeTruthy();
+  });
+
+  it('hides the character tab selector when GM mode is off', () => {
+    const { container } = setup();
+    expect(container.querySelector('.fate-tab-selector')).toBeNull();
+  });
+
+  it('shows the character tab selector when GM mode is on', () => {
+    const { container } = setupGM();
+    expect(container.querySelector('.fate-tab-selector')).toBeTruthy();
   });
 
   it('quick archive toggles the archived flag without navigation', async () => {
@@ -394,7 +405,7 @@ describe('CharactersView – card interactions', () => {
     expect(searchInput.value).toBe('');
     expect((selects[0] as HTMLSelectElement).value).toBe('active');
     expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
-    expect(view.container.querySelector('.tab-btn--active')?.textContent).toContain('SC');
+    expect(view.container.querySelector('.fate-tab-selector__option--active')?.textContent).toContain('SC');
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(resetButton.disabled).toBe(true);
   });

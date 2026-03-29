@@ -12,6 +12,7 @@ import FateHeader from '../components/shared/FateHeader.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
+import FateTabSelector from '../components/shared/FateTabSelector.vue';
 import { useToastStore } from '../stores/toast';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import PasteImportDialog from '../components/shared/PasteImportDialog.vue';
@@ -42,6 +43,14 @@ const campaignFilterOptions = computed(() => [
     .sort((a, b) => a.name.localeCompare(b.name, 'de'))
     .map((campaign) => ({ value: campaign.id, label: campaign.name || 'Unbenannte Kampagne' })),
 ]);
+const characterTabOptions = computed(() =>
+  gmModeStore.isGMMode
+    ? [
+        { value: 'sc', label: 'Spieler (SC)' },
+        { value: 'nsc', label: 'Nicht-Spieler (NSC)' },
+      ]
+    : [{ value: 'sc', label: 'Spieler (SC)' }],
+);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const { copyToClipboard } = useSingleImportExport();
 
@@ -190,23 +199,14 @@ function toggleArchived(character: Character) {
       </div>
     </FateHeader>
 
-    <div class="tab-bar">
-      <button
-        class="tab-btn"
-        :class="{ 'tab-btn--active': activeTab === 'sc' }"
-        @click="setTab('sc')"
-      >
-        <span class="tab-btn-full">Spielercharaktere (SC)</span><span class="tab-btn-short">Spieler (SC)</span>
-      </button>
-      <button
-        v-if="gmModeStore.isGMMode"
-        class="tab-btn"
-        :class="{ 'tab-btn--active': activeTab === 'nsc' }"
-        @click="setTab('nsc')"
-      >
-        <span class="tab-btn-full">Nicht-Spieler-Charaktere (NSC)</span><span class="tab-btn-short">Nicht-Spieler (NSC)</span>
-      </button>
-    </div>
+    <FateTabSelector
+      v-if="gmModeStore.isGMMode"
+      class="characters-tab-selector"
+      :model-value="activeTab"
+      :options="characterTabOptions"
+      aria-label="Charaktertyp"
+      @update:model-value="setTab($event as CharacterType)"
+    />
 
     <div class="characters-input-row">
       <input v-model="search" class="search-input" placeholder="Charakter suchen..." type="search" />
@@ -297,20 +297,7 @@ function toggleArchived(character: Character) {
   gap: 0.5rem;
 }
 
-.tab-btn-short {
-  display: none;
-}
-
 @container main (width < 768px) {
-  .tab-btn-full {
-    display: none;
-  }
-
-  .tab-btn-short {
-    display: inline;
-  }
-
-
   .header-actions .btn-label {
     display: none;
   }
@@ -417,41 +404,7 @@ function toggleArchived(character: Character) {
   background: var(--fate-white);
 }
 
-.tab-bar {
-  display: flex;
-  gap: 1.5rem;
+.characters-tab-selector {
   margin-bottom: 1rem;
-  border-bottom: 2px solid var(--fate-border);
-}
-
-.tab-btn {
-  background: transparent;
-  border: none;
-  border-bottom: none;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--fate-text-light);
-  white-space: nowrap;
-  cursor: pointer;
-  box-shadow: none;
-  transition:
-    color 0.15s,
-    border-bottom-color 0.15s;
-}
-
-.tab-btn:hover {
-  color: var(--fate-heading);
-}
-
-.tab-btn--active {
-  color: var(--fate-heading);
-  box-shadow: 0 2px 0 var(--fate-heading);
-}
-
-.tab-btn:not(.tab-btn--active) {
-  color: var(--fate-text-light);
 }
 </style>

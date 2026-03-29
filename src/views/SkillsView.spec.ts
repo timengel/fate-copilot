@@ -283,7 +283,7 @@ describe('SkillsView', () => {
       expect(screen.getByRole('button', { name: 'Ersetzen' })).toBeTruthy();
       expect(screen.getByText(/Neue Fertigkeiten werden ergänzt/)).toBeTruthy();
       expect(screen.getByRole('button', { name: 'Anhängen' }).className).toContain(
-        'import-mode-btn--active',
+        'fate-tab-selector__option--active',
       );
     });
 

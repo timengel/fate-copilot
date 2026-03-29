@@ -8,6 +8,7 @@ import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import FateIcon from '../components/shared/FateIcon.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
+import FateTabSelector from '../components/shared/FateTabSelector.vue';
 import { useGMModeStore } from '../stores/gmMode';
 import { SkillAction, DropdownVariant } from '../types';
 import type { AppSkill, SkillInfo } from '../types';
@@ -26,6 +27,10 @@ const importJson = ref('');
 const importError = ref('');
 type ImportMode = 'merge' | 'replace';
 const importMode = ref<ImportMode>('merge');
+const importModeOptions = [
+  { value: 'merge', label: 'Anhängen' },
+  { value: 'replace', label: 'Ersetzen' },
+] as const;
 
 interface LegacySkillActionLike {
   name: SkillAction;
@@ -452,24 +457,13 @@ function actionOptionsFor(currentName: SkillAction) {
       <div class="dialog-box">
         <div class="dialog-title">Fertigkeiten importieren</div>
         <div class="dialog-message">JSON einfügen (z. B. von einer KI generiert):</div>
-        <div class="import-mode-group" role="group" aria-label="Importmodus">
-          <button
-            type="button"
-            class="import-mode-btn"
-            :class="{ 'import-mode-btn--active': importMode === 'merge' }"
-            @click="importMode = 'merge'"
-          >
-            Anhängen
-          </button>
-          <button
-            type="button"
-            class="import-mode-btn"
-            :class="{ 'import-mode-btn--active': importMode === 'replace' }"
-            @click="importMode = 'replace'"
-          >
-            Ersetzen
-          </button>
-        </div>
+        <FateTabSelector
+          class="import-mode-selector"
+          :model-value="importMode"
+          :options="importModeOptions"
+          aria-label="Importmodus"
+          @update:model-value="importMode = $event as ImportMode"
+        />
         <div class="import-mode-hint">
           {{
             importMode === 'merge'
@@ -720,38 +714,8 @@ function actionOptionsFor(currentName: SkillAction) {
   display: none;
 }
 
-.import-mode-group {
-  display: inline-flex;
-  gap: 0.3rem;
-  width: fit-content;
-  max-width: 100%;
-  padding: 0.25rem;
+.import-mode-selector {
   margin: 0.75rem 0 0.5rem;
-  border-radius: 999px;
-  background: var(--fate-blue-light);
-}
-
-.import-mode-btn {
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: var(--fate-text-light);
-  border-radius: 999px;
-  padding: 0.4rem 0.8rem;
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s,
-    box-shadow 0.15s;
-}
-
-.import-mode-btn--active {
-  background: var(--fate-white);
-  color: var(--fate-blue-dark);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
 }
 
 .import-mode-hint {
