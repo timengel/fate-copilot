@@ -2,6 +2,7 @@
 import { ref, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useItemsStore } from '../stores/items';
+import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
 import type { Item, Character } from '../types';
 import { DropdownVariant } from '../types';
@@ -18,17 +19,28 @@ import { useSingleImportExport } from '../composables/useSingleImportExport';
 
 const router = useRouter();
 const store = useItemsStore();
+const campaignsStore = useCampaignsStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const search = ref('');
 const showArchivedItems = ref(false);
 const sortOrder = ref('name-asc');
+const campaignFilter = ref('all');
+const DEFAULT_SORT_ORDER = 'name-asc';
+const DEFAULT_CAMPAIGN_FILTER = 'all';
 
 const sortOptions = [
   { value: 'name-asc', label: 'Name (A–Z)' },
   { value: 'name-desc', label: 'Name (Z–A)' },
   { value: 'dice-desc', label: 'Meiste Würfel' },
 ];
+const campaignFilterOptions = computed(() => [
+  { value: 'all', label: 'Alle Kampagnen' },
+  { value: 'unassigned', label: 'Nicht zugewiesen' },
+  ...[...campaignsStore.campaigns]
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+    .map((campaign) => ({ value: campaign.id, label: campaign.name || 'Unbenannte Kampagne' })),
+]);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const { copyToClipboard } = useSingleImportExport();
 
@@ -54,7 +66,8 @@ const filtered = computed(() => {
     (item) =>
       item.name.toLowerCase().includes(search.value.toLowerCase()) &&
       (showArchivedItems.value || !item.archived) &&
-      (gmModeStore.isGMMode || !item.hidden),
+      (gmModeStore.isGMMode || !item.hidden) &&
+      matchesCampaignFilter(item.id),
   );
   if (sortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
   if (sortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'));
@@ -93,6 +106,35 @@ function setSortOrder(val: string) {
   });
 }
 
+const hasActiveFilters = computed(
+  () =>
+    search.value !== '' ||
+    showArchivedItems.value ||
+    sortOrder.value !== DEFAULT_SORT_ORDER ||
+    campaignFilter.value !== DEFAULT_CAMPAIGN_FILTER,
+);
+
+function resetFilters() {
+  search.value = '';
+  showArchivedItems.value = false;
+  sortOrder.value = DEFAULT_SORT_ORDER;
+  campaignFilter.value = DEFAULT_CAMPAIGN_FILTER;
+}
+
+function matchesCampaignFilter(itemId: string) {
+  if (campaignFilter.value === 'all') return true;
+
+  const assignedCampaignIds = campaignsStore.itemAssignments
+    .filter((assignment) => assignment.itemId === itemId)
+    .map((assignment) => assignment.campaignId);
+
+  if (campaignFilter.value === 'unassigned') {
+    return assignedCampaignIds.length === 0;
+  }
+
+  return assignedCampaignIds.includes(campaignFilter.value);
+}
+
 function toggleArchived(item: Item) {
   store.updateItem({ ...item, archived: !item.archived });
   toastStore.show(
@@ -115,9 +157,19 @@ function toggleArchived(item: Item) {
     <div class="items-input-row">
       <input v-model="search" class="search-input" placeholder="Gegenstand suchen..." type="search" />
       <div class="sort-archive-row">
+        <FateDropdown :model-value="campaignFilter" :options="campaignFilterOptions" :variant="DropdownVariant.Subtle" size="M" @update:model-value="campaignFilter = $event" />
         <FateDropdown :model-value="sortOrder" :options="sortOptions" :variant="DropdownVariant.Subtle" size="M" @update:model-value="setSortOrder" />
         <FateCheckbox class="label-full" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige archivierte Gegenstände" />
         <FateCheckbox class="label-short" :model-value="showArchivedItems" @update:model-value="setShowArchived" label="Zeige Archiv" />
+        <FateButton
+          icon="reset"
+          variant="secondary"
+          class="reset-filter-btn"
+          :disabled="!hasActiveFilters"
+          aria-label="Filter zurücksetzen"
+          title="Filter zurücksetzen"
+          @click="resetFilters"
+        />
       </div>
     </div>
 
@@ -213,6 +265,11 @@ function toggleArchived(item: Item) {
   flex-wrap: wrap;
 }
 
+.reset-filter-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .sort-archive-row {
   display: contents;
 }
@@ -221,17 +278,30 @@ function toggleArchived(item: Item) {
   display: none;
 }
 
-@container main (width < 480px) {
+@container main (width < 768px) {
+  .items-input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .search-input {
+    grid-column: 1;
+    width: 100%;
+    min-width: 100%;
+    max-width: none;
+  }
+
   .sort-archive-row {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
+    grid-column: 1;
     width: 100%;
   }
 
   .sort-archive-row :deep(.fate-dropdown) {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
     --dropdown-min-width: 0;
     --dropdown-max-width: 100%;
   }
@@ -242,15 +312,20 @@ function toggleArchived(item: Item) {
 
   .sort-archive-row :deep(.label-short) {
     display: inline-flex;
-    flex: 1;
+    grid-column: 1;
+  }
+
+  .reset-filter-btn {
+    grid-column: 2;
+    justify-self: end;
+    margin-left: 0;
   }
 }
 
 .search-input {
   flex: 1;
   width: 100%;
-  min-width: min(260px, 100%);
-  max-width: 400px;
+  min-width: min(180px, 100%);
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--fate-border);
   border-radius: 4px;

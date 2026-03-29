@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import ItemsView from './ItemsView.vue';
 import { useItemsStore } from '../stores/items';
+import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import type { Item } from '../types';
@@ -241,5 +242,170 @@ describe('ItemsView – card interactions', () => {
     await fireEvent.click(view.getByText('Zeige archivierte Gegenstände'));
 
     expect(view.getByText('Archivierter Gegenstand')).toBeTruthy();
+  });
+
+  it('shows a campaign filter dropdown with the unassigned option', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const campaignsStore = useCampaignsStore();
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const selects = view.container.querySelectorAll('select');
+    expect(selects[0]?.textContent).toContain('Alle Kampagnen');
+    expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
+    expect(selects[0]?.textContent).toContain('Alpha');
+  });
+
+  it('shows a reset filters button', () => {
+    const view = setup();
+    expect(view.getByLabelText('Filter zurücksetzen')).toBeTruthy();
+  });
+
+  it('keeps the reset filters button disabled when filters are at their defaults', () => {
+    const view = setup();
+    expect((view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('filters items by assigned campaign', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const itemsStore = useItemsStore();
+    const campaignsStore = useCampaignsStore();
+
+    itemsStore.addItem(makeItem({ id: 'item-1', name: 'Alpha-Schwert' }));
+    itemsStore.addItem(makeItem({ id: 'item-2', name: 'Beta-Schild' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignItem('camp-1', 'item-1');
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    await fireEvent.update(campaignSelect!, 'camp-1');
+
+    expect(view.getByText('Alpha-Schwert')).toBeTruthy();
+    expect(view.queryByText('Beta-Schild')).toBeNull();
+  });
+
+  it('filters items by unassigned status', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const itemsStore = useItemsStore();
+    const campaignsStore = useCampaignsStore();
+
+    itemsStore.addItem(makeItem({ id: 'item-1', name: 'Zugewiesen' }));
+    itemsStore.addItem(makeItem({ id: 'item-2', name: 'Frei' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignItem('camp-1', 'item-1');
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    await fireEvent.update(campaignSelect!, 'unassigned');
+
+    expect(view.queryByText('Zugewiesen')).toBeNull();
+    expect(view.getByText('Frei')).toBeTruthy();
+  });
+
+  it('resets all local filters to their defaults', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const itemsStore = useItemsStore();
+    const campaignsStore = useCampaignsStore();
+
+    itemsStore.addItem(makeItem({ id: 'item-1', name: 'Zugewiesen', archived: true }));
+    itemsStore.addItem(makeItem({ id: 'item-2', name: 'Frei' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignItem('camp-1', 'item-1');
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const resetButton = view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement;
+    const searchInput = view.getByPlaceholderText('Gegenstand suchen...') as HTMLInputElement;
+    const selects = view.container.querySelectorAll('select');
+
+    await fireEvent.update(searchInput, 'frei');
+    await fireEvent.update(selects[0]!, 'unassigned');
+    await fireEvent.update(selects[1]!, 'name-desc');
+    await fireEvent.click(view.getByText('Zeige archivierte Gegenstände'));
+
+    expect(resetButton.disabled).toBe(false);
+
+    await fireEvent.click(resetButton);
+
+    expect(searchInput.value).toBe('');
+    expect((selects[0] as HTMLSelectElement).value).toBe('all');
+    expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
+    expect(view.queryByText('Zugewiesen')).toBeNull();
+    expect(resetButton.disabled).toBe(true);
   });
 });

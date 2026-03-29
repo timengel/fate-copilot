@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import CharactersView from './CharactersView.vue';
 import { useCharactersStore } from '../stores/characters';
+import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import type { Character } from '../types';
@@ -176,5 +177,173 @@ describe('CharactersView – card interactions', () => {
       await fireEvent.click(copyBtn!);
       expect(mockPush).not.toHaveBeenCalled();
     });
+  });
+
+  it('shows a campaign filter dropdown with the unassigned option', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const campaignsStore = useCampaignsStore();
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const selects = view.container.querySelectorAll('select');
+    expect(selects[0]?.textContent).toContain('Alle Kampagnen');
+    expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
+    expect(selects[0]?.textContent).toContain('Alpha');
+  });
+
+  it('shows a reset filters button', () => {
+    const view = setup();
+    expect(view.getByLabelText('Filter zurücksetzen')).toBeTruthy();
+  });
+
+  it('keeps the reset filters button disabled when filters are at their defaults', () => {
+    const view = setup();
+    expect((view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('filters characters by assigned campaign', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const charactersStore = useCharactersStore();
+    const campaignsStore = useCampaignsStore();
+
+    charactersStore.addCharacter(makeCharacter({ id: 'char-1', name: 'Alpha-Held' }));
+    charactersStore.addCharacter(makeCharacter({ id: 'char-2', name: 'Beta-Held' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignCharacter('camp-1', 'char-1');
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    await fireEvent.update(campaignSelect!, 'camp-1');
+
+    expect(view.getByText('Alpha-Held')).toBeTruthy();
+    expect(view.queryByText('Beta-Held')).toBeNull();
+  });
+
+  it('filters characters by unassigned status', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const charactersStore = useCharactersStore();
+    const campaignsStore = useCampaignsStore();
+
+    charactersStore.addCharacter(makeCharacter({ id: 'char-1', name: 'Zugewiesen' }));
+    charactersStore.addCharacter(makeCharacter({ id: 'char-2', name: 'Frei' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignCharacter('camp-1', 'char-1');
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    await fireEvent.update(campaignSelect!, 'unassigned');
+
+    expect(view.queryByText('Zugewiesen')).toBeNull();
+    expect(view.getByText('Frei')).toBeTruthy();
+  });
+
+  it('resets all local filters to their defaults without changing the tab', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const charactersStore = useCharactersStore();
+    const campaignsStore = useCampaignsStore();
+    const gmStore = useGMModeStore();
+    gmStore.isGMMode = true;
+
+    charactersStore.addCharacter(makeCharacter({ id: 'char-1', name: 'Zugewiesen', type: 'sc', archived: true }));
+    charactersStore.addCharacter(makeCharacter({ id: 'char-2', name: 'Frei', type: 'sc' }));
+    campaignsStore.addCampaign({
+      id: 'camp-1',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignCharacter('camp-1', 'char-1');
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    const resetButton = view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement;
+    const searchInput = view.getByPlaceholderText('Charakter suchen...') as HTMLInputElement;
+    const selects = view.container.querySelectorAll('select');
+
+    await fireEvent.update(searchInput, 'frei');
+    await fireEvent.update(selects[0]!, 'unassigned');
+    await fireEvent.update(selects[1]!, 'name-desc');
+    await fireEvent.click(view.getByText('Zeige archivierte Charaktere'));
+
+    expect(resetButton.disabled).toBe(false);
+
+    await fireEvent.click(resetButton);
+
+    expect(searchInput.value).toBe('');
+    expect((selects[0] as HTMLSelectElement).value).toBe('all');
+    expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
+    expect(view.container.querySelector('.tab-btn--active')?.textContent).toContain('SC');
+    expect(view.queryByText('Zugewiesen')).toBeNull();
+    expect(resetButton.disabled).toBe(true);
   });
 });
