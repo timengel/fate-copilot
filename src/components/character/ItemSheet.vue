@@ -993,7 +993,8 @@ defineExpose({ save });
   border-bottom: 1px solid var(--fate-light-border);
 }
 
-.aspect-row:last-child {
+.aspect-row:last-child,
+.aspect-row:has(+ .aspect-add-row) {
   border-bottom: none;
 }
 

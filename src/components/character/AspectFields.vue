@@ -108,6 +108,11 @@ function removeAspect(index: number) {
   border-bottom: 1px solid var(--fate-light-border);
 }
 
+.aspect-row:last-child,
+.aspect-row:has(+ .aspect-add-row) {
+  border-bottom: none;
+}
+
 .aspect-label {
   font-size: 0.7rem;
   color: var(--fate-blue);

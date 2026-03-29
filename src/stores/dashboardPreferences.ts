@@ -4,7 +4,7 @@ import { ref } from 'vue';
 export const useDashboardPreferencesStore = defineStore(
   'dashboardPreferences',
   () => {
-    const selectedCampaignId = ref<string | null>(null);
+    const selectedCampaignFilter = ref('active');
     const showSC = ref(true);
     const showNSC = ref(true);
     const showArchivedCharacters = ref(false);
@@ -26,7 +26,7 @@ export const useDashboardPreferencesStore = defineStore(
     });
 
     function reset() {
-      selectedCampaignId.value = null;
+      selectedCampaignFilter.value = 'active';
       showSC.value = true;
       showNSC.value = true;
       showArchivedCharacters.value = false;
@@ -49,7 +49,7 @@ export const useDashboardPreferencesStore = defineStore(
     }
 
     return {
-      selectedCampaignId,
+      selectedCampaignFilter,
       showSC,
       showNSC,
       showArchivedCharacters,

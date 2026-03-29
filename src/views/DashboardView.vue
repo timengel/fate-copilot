@@ -22,7 +22,7 @@ const itemsStore = useItemsStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const {
-  selectedCampaignId,
+  selectedCampaignFilter,
   showSC,
   showNSC,
   showArchivedCharacters,
@@ -60,39 +60,40 @@ const editingItemId = ref<string | null>(null);
 const characterFormRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
 const itemFormRef = ref<InstanceType<typeof ItemSheet>[]>([]);
 
-const allCampaigns = computed(() =>
-  gmModeStore.isGMMode
-    ? campaignsStore.campaigns
-    : campaignsStore.campaigns.filter((c) => c.status === 'active'),
-);
-
 const campaignOptions = computed(() =>
-  allCampaigns.value.map((campaign) => ({
-    value: campaign.id,
-    label: campaign.name,
-  })),
+  [
+    { value: 'active', label: 'Aktive Kampagnen' },
+    { value: 'all', label: 'Alle Kampagnen' },
+    { value: 'unassigned', label: 'Nicht zugewiesen' },
+    ...[...campaignsStore.campaigns]
+      .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+      .map((campaign) => ({
+        value: campaign.id,
+        label: campaign.name || 'Unbenannte Kampagne',
+      })),
+  ],
 );
 
-const selectedCampaignIdDropdown = computed({
-  get: () => selectedCampaignId.value ?? '',
+const selectedCampaignFilterDropdown = computed({
+  get: () => selectedCampaignFilter.value,
   set: (value: string) => {
-    selectedCampaignId.value = value || null;
+    selectedCampaignFilter.value = value || 'active';
   },
 });
 
 watchEffect(() => {
-  const visible = allCampaigns.value;
-  if (!selectedCampaignId.value || !visible.find((c) => c.id === selectedCampaignId.value)) {
-    selectedCampaignId.value = visible[0]?.id ?? null;
+  const visible = campaignOptions.value;
+  if (!visible.find((option) => option.value === selectedCampaignFilter.value)) {
+    selectedCampaignFilter.value = 'active';
   }
 });
 
 const allCharactersInCampaign = computed(() =>
-  selectedCampaignId.value ? campaignsStore.getCharactersForCampaign(selectedCampaignId.value) : [],
+  charactersStore.characters.filter((character) => matchesCharacterCampaignFilter(character.id)),
 );
 
 const allItemsInCampaign = computed(() =>
-  selectedCampaignId.value ? campaignsStore.getItemsForCampaign(selectedCampaignId.value) : [],
+  itemsStore.items.filter((item) => matchesItemCampaignFilter(item.id)),
 );
 
 const items = computed(() => {
@@ -168,6 +169,58 @@ function setShowNSC(val: boolean) { withViewTransition(() => { showNSC.value = v
 function setShowArchivedCharacters(val: boolean) { withViewTransition(() => { showArchivedCharacters.value = val; }); }
 function setShowArchivedItems(val: boolean) { withViewTransition(() => { showArchivedItems.value = val; }); }
 
+function matchesCharacterCampaignFilter(characterId: string) {
+  if (selectedCampaignFilter.value === 'all') return true;
+
+  const assignedCampaignIds = campaignsStore.assignments
+    .filter((assignment) => assignment.characterId === characterId)
+    .map((assignment) => assignment.campaignId);
+
+  if (selectedCampaignFilter.value === 'active') {
+    const activeCampaignIds = campaignsStore.campaigns
+      .filter((campaign) => campaign.status === 'active')
+      .map((campaign) => campaign.id);
+
+    if (activeCampaignIds.length === 0) {
+      return true;
+    }
+
+    return assignedCampaignIds.some((campaignId) => activeCampaignIds.includes(campaignId));
+  }
+
+  if (selectedCampaignFilter.value === 'unassigned') {
+    return assignedCampaignIds.length === 0;
+  }
+
+  return assignedCampaignIds.includes(selectedCampaignFilter.value);
+}
+
+function matchesItemCampaignFilter(itemId: string) {
+  if (selectedCampaignFilter.value === 'all') return true;
+
+  const assignedCampaignIds = campaignsStore.itemAssignments
+    .filter((assignment) => assignment.itemId === itemId)
+    .map((assignment) => assignment.campaignId);
+
+  if (selectedCampaignFilter.value === 'active') {
+    const activeCampaignIds = campaignsStore.campaigns
+      .filter((campaign) => campaign.status === 'active')
+      .map((campaign) => campaign.id);
+
+    if (activeCampaignIds.length === 0) {
+      return true;
+    }
+
+    return assignedCampaignIds.some((campaignId) => activeCampaignIds.includes(campaignId));
+  }
+
+  if (selectedCampaignFilter.value === 'unassigned') {
+    return assignedCampaignIds.length === 0;
+  }
+
+  return assignedCampaignIds.includes(selectedCampaignFilter.value);
+}
+
 function expandAllSections() {
   filtersOpen.value = true;
   filterSections.value.kampagne = true;
@@ -236,14 +289,14 @@ onUnmounted(() => {
       <div v-show="!sidebarCollapsed" class="sidebar-content">
         <div class="sidebar-group">
           <div class="sidebar-group-label">Kampagne</div>
-          <div v-if="allCampaigns.length === 0" class="campaign-select-empty">
+          <div v-if="campaignsStore.campaigns.length === 0" class="campaign-select-empty">
             Keine Kampagnen.
           </div>
           <FateDropdown
             v-else
-            v-model="selectedCampaignIdDropdown"
+            v-model="selectedCampaignFilterDropdown"
             class="campaign-dropdown"
-            placeholder="Wählen…"
+            placeholder="Filter wählen…"
             :options="campaignOptions"
             :variant="DropdownVariant.Subtle"
             size="S"
@@ -318,8 +371,8 @@ onUnmounted(() => {
             <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.kampagne }" />
           </button>
           <div v-if="filterSections.kampagne" class="filters-section-body">
-            <div v-if="allCampaigns.length === 0" class="campaign-select-empty">Keine Kampagnen.</div>
-            <FateDropdown v-else v-model="selectedCampaignIdDropdown" class="campaign-dropdown" placeholder="Wählen…" :options="campaignOptions" :variant="DropdownVariant.Subtle" size="S" />
+            <div v-if="campaignsStore.campaigns.length === 0" class="campaign-select-empty">Keine Kampagnen.</div>
+            <FateDropdown v-else v-model="selectedCampaignFilterDropdown" class="campaign-dropdown" placeholder="Filter wählen…" :options="campaignOptions" :variant="DropdownVariant.Subtle" size="S" />
           </div>
         </div>
 
@@ -384,9 +437,9 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="!selectedCampaignId" class="dashboard-empty">Keine Kampagne ausgewählt.</div>
+    <div v-if="campaignsStore.campaigns.length === 0" class="dashboard-empty">Keine Kampagnen vorhanden.</div>
     <div v-else-if="allCharactersInCampaign.length === 0 && allItemsInCampaign.length === 0" class="dashboard-empty">
-      Keine Charaktere oder Items in dieser Kampagne.
+      Keine Charaktere oder Items für diesen Filter.
     </div>
     <div v-else-if="characters.length === 0 && items.length === 0" class="dashboard-empty">
       Alle Charaktere und Items sind ausgeblendet.

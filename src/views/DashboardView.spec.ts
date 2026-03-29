@@ -6,7 +6,9 @@ import { useCampaignsStore } from '../stores/campaigns';
 import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
+import { useCharactersStore } from '../stores/characters';
 import type { Campaign, Item } from '../types';
+import type { Character } from '../types';
 
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
   return {
@@ -33,6 +35,29 @@ function makeItem(overrides: Partial<Item> = {}): Item {
     stressPhysical: [],
     stressMental: [],
     hidden: false,
+    redDice: 0,
+    blueDice: 0,
+    ...overrides,
+  };
+}
+
+function makeCharacter(overrides: Partial<Character> = {}): Character {
+  return {
+    id: 'character-1',
+    type: 'sc',
+    archived: false,
+    name: 'Alrik',
+    highConcept: '',
+    trouble: '',
+    aspects: [],
+    skills: [],
+    stunts: [],
+    consequences: [],
+    stressPhysical: [],
+    stressMental: [],
+    notes: '',
+    gmNotes: '',
+    extras: '',
     redDice: 0,
     blueDice: 0,
     ...overrides,
@@ -270,5 +295,77 @@ describe('DashboardView archived item filter', () => {
     expect(updateSpy).toHaveBeenCalledOnce();
     expect(updateSpy.mock.calls[0]?.[0].name).toBe('Neues Schwert');
     expect(toastStore.message).toBe('Gegenstand gespeichert');
+  });
+});
+
+describe('DashboardView campaign filter', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('defaults the campaign dropdown to active campaigns', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    campaignsStore.addCampaign(makeCampaign({ id: 'campaign-1', name: 'Aktiv' }));
+
+    const view = render(DashboardView, {
+      global: { plugins: [pinia], stubs: filterStubs },
+    });
+    const dropdown = [...view.container.querySelectorAll<HTMLSelectElement>('select')]
+      .find((select) => [...select.options].some((option) => option.value === 'active'));
+
+    expect(dropdown).toBeTruthy();
+    expect(dropdown?.value).toBe('active');
+  });
+
+  it('shows only entries assigned to active campaigns by default', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    const charactersStore = useCharactersStore();
+
+    const activeCampaign = makeCampaign({ id: 'campaign-active', name: 'Aktiv', status: 'active' });
+    const inactiveCampaign = makeCampaign({ id: 'campaign-inactive', name: 'Inaktiv', status: 'inactive' });
+    const activeCharacter = makeCharacter({ id: 'character-active', name: 'Aktive Figur' });
+    const inactiveCharacter = makeCharacter({ id: 'character-inactive', name: 'Inaktive Figur' });
+
+    campaignsStore.addCampaign(activeCampaign);
+    campaignsStore.addCampaign(inactiveCampaign);
+    charactersStore.addCharacter(activeCharacter);
+    charactersStore.addCharacter(inactiveCharacter);
+    campaignsStore.assignCharacter(activeCampaign.id, activeCharacter.id);
+    campaignsStore.assignCharacter(inactiveCampaign.id, inactiveCharacter.id);
+
+    const view = render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateButton: { template: '<button><slot /></button>' },
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
+          FateRadioButtonGroup: { template: '<div />' },
+          CharacterSheet: {
+            props: ['character'],
+            template: '<div>{{ character.name }}</div>',
+          },
+          ItemSheet: { template: '<div />' },
+        },
+      },
+    });
+
+    expect(view.getByText('Aktive Figur')).toBeTruthy();
+    expect(view.queryByText('Inaktive Figur')).toBeNull();
   });
 });

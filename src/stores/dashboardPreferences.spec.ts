@@ -9,7 +9,7 @@ describe('useDashboardPreferencesStore', () => {
 
   it('has correct default values', () => {
     const store = useDashboardPreferencesStore();
-    expect(store.selectedCampaignId).toBeNull();
+    expect(store.selectedCampaignFilter).toBe('active');
     expect(store.showSC).toBe(true);
     expect(store.showNSC).toBe(true);
     expect(store.showArchivedCharacters).toBe(false);
@@ -34,10 +34,10 @@ describe('useDashboardPreferencesStore', () => {
     expect(sections.modifiers).toBe(true);
   });
 
-  it('selectedCampaignId can be set', () => {
+  it('selectedCampaignFilter can be set', () => {
     const store = useDashboardPreferencesStore();
-    store.selectedCampaignId = 'camp-1';
-    expect(store.selectedCampaignId).toBe('camp-1');
+    store.selectedCampaignFilter = 'camp-1';
+    expect(store.selectedCampaignFilter).toBe('camp-1');
   });
 
   it('layout can be switched to grid', () => {
@@ -78,7 +78,7 @@ describe('useDashboardPreferencesStore', () => {
 
   it('reset restores all default values', () => {
     const store = useDashboardPreferencesStore();
-    store.selectedCampaignId = 'camp-1';
+    store.selectedCampaignFilter = 'camp-1';
     store.showSC = false;
     store.showNSC = false;
     store.showArchivedCharacters = true;
@@ -90,7 +90,7 @@ describe('useDashboardPreferencesStore', () => {
     store.visibleSections.stress = false;
     store.visibleSections.modifiers = false;
     store.reset();
-    expect(store.selectedCampaignId).toBeNull();
+    expect(store.selectedCampaignFilter).toBe('active');
     expect(store.showSC).toBe(true);
     expect(store.showNSC).toBe(true);
     expect(store.showArchivedCharacters).toBe(false);
