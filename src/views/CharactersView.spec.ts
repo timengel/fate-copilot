@@ -205,9 +205,16 @@ describe('CharactersView – card interactions', () => {
     });
 
     const selects = view.container.querySelectorAll('select');
+    expect(selects[0]?.textContent).toContain('Aktiv');
     expect(selects[0]?.textContent).toContain('Alle Kampagnen');
     expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
     expect(selects[0]?.textContent).toContain('Alpha');
+  });
+
+  it('defaults the campaign filter to Aktiv', () => {
+    const view = setup();
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    expect((campaignSelect as HTMLSelectElement).value).toBe('active');
   });
 
   it('shows a reset filters button', () => {
@@ -255,6 +262,51 @@ describe('CharactersView – card interactions', () => {
 
     expect(view.getByText('Alpha-Held')).toBeTruthy();
     expect(view.queryByText('Beta-Held')).toBeNull();
+  });
+
+  it('shows only characters assigned to active campaigns by default when active campaigns exist', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const charactersStore = useCharactersStore();
+    const campaignsStore = useCampaignsStore();
+
+    charactersStore.addCharacter(makeCharacter({ id: 'char-1', name: 'Aktiv-Zugewiesen' }));
+    charactersStore.addCharacter(makeCharacter({ id: 'char-2', name: 'Inaktiv-Zugewiesen' }));
+    charactersStore.addCharacter(makeCharacter({ id: 'char-3', name: 'Ohne Kampagne' }));
+    campaignsStore.addCampaign({
+      id: 'camp-active',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.addCampaign({
+      id: 'camp-inactive',
+      name: 'Beta',
+      description: '',
+      status: 'inactive',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignCharacter('camp-active', 'char-1');
+    campaignsStore.assignCharacter('camp-inactive', 'char-2');
+
+    const view = render(CharactersView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    expect(view.getByText('Aktiv-Zugewiesen')).toBeTruthy();
+    expect(view.queryByText('Inaktiv-Zugewiesen')).toBeNull();
+    expect(view.queryByText('Ohne Kampagne')).toBeNull();
   });
 
   it('filters characters by unassigned status', async () => {
@@ -340,7 +392,7 @@ describe('CharactersView – card interactions', () => {
     await fireEvent.click(resetButton);
 
     expect(searchInput.value).toBe('');
-    expect((selects[0] as HTMLSelectElement).value).toBe('all');
+    expect((selects[0] as HTMLSelectElement).value).toBe('active');
     expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
     expect(view.container.querySelector('.tab-btn--active')?.textContent).toContain('SC');
     expect(view.queryByText('Zugewiesen')).toBeNull();

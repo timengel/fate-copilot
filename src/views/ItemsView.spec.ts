@@ -270,9 +270,16 @@ describe('ItemsView – card interactions', () => {
     });
 
     const selects = view.container.querySelectorAll('select');
+    expect(selects[0]?.textContent).toContain('Aktiv');
     expect(selects[0]?.textContent).toContain('Alle Kampagnen');
     expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
     expect(selects[0]?.textContent).toContain('Alpha');
+  });
+
+  it('defaults the campaign filter to Aktiv', () => {
+    const view = setup();
+    const [campaignSelect] = view.container.querySelectorAll('select');
+    expect((campaignSelect as HTMLSelectElement).value).toBe('active');
   });
 
   it('shows a reset filters button', () => {
@@ -320,6 +327,51 @@ describe('ItemsView – card interactions', () => {
 
     expect(view.getByText('Alpha-Schwert')).toBeTruthy();
     expect(view.queryByText('Beta-Schild')).toBeNull();
+  });
+
+  it('shows only items assigned to active campaigns by default when active campaigns exist', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    const itemsStore = useItemsStore();
+    const campaignsStore = useCampaignsStore();
+
+    itemsStore.addItem(makeItem({ id: 'item-1', name: 'Aktiv-Zugewiesen' }));
+    itemsStore.addItem(makeItem({ id: 'item-2', name: 'Inaktiv-Zugewiesen' }));
+    itemsStore.addItem(makeItem({ id: 'item-3', name: 'Ohne Kampagne' }));
+    campaignsStore.addCampaign({
+      id: 'camp-active',
+      name: 'Alpha',
+      description: '',
+      status: 'active',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.addCampaign({
+      id: 'camp-inactive',
+      name: 'Beta',
+      description: '',
+      status: 'inactive',
+      notes: '',
+      milestones: [],
+    });
+    campaignsStore.assignItem('camp-active', 'item-1');
+    campaignsStore.assignItem('camp-inactive', 'item-2');
+
+    const view = render(ItemsView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateHeader: { template: '<div><slot /></div>' },
+          FateIcon: true,
+          ConfirmDialog: true,
+          RouterLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    expect(view.getByText('Aktiv-Zugewiesen')).toBeTruthy();
+    expect(view.queryByText('Inaktiv-Zugewiesen')).toBeNull();
+    expect(view.queryByText('Ohne Kampagne')).toBeNull();
   });
 
   it('filters items by unassigned status', async () => {
@@ -403,7 +455,7 @@ describe('ItemsView – card interactions', () => {
     await fireEvent.click(resetButton);
 
     expect(searchInput.value).toBe('');
-    expect((selects[0] as HTMLSelectElement).value).toBe('all');
+    expect((selects[0] as HTMLSelectElement).value).toBe('active');
     expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(resetButton.disabled).toBe(true);

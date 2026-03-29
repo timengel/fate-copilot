@@ -26,15 +26,16 @@ const toastStore = useToastStore();
 const search = ref('');
 const showArchivedCharacters = ref(false);
 const sortOrder = ref('name-asc');
-const campaignFilter = ref('all');
+const campaignFilter = ref('active');
 const DEFAULT_SORT_ORDER = 'name-asc';
-const DEFAULT_CAMPAIGN_FILTER = 'all';
+const DEFAULT_CAMPAIGN_FILTER = 'active';
 
 const sortOptions = [
   { value: 'name-asc', label: 'Name (A–Z)' },
   { value: 'name-desc', label: 'Name (Z–A)' },
 ];
 const campaignFilterOptions = computed(() => [
+  { value: 'active', label: 'Aktive Kampagnen' },
   { value: 'all', label: 'Alle Kampagnen' },
   { value: 'unassigned', label: 'Nicht zugewiesen' },
   ...[...campaignsStore.campaigns]
@@ -150,6 +151,18 @@ function matchesCampaignFilter(characterId: string) {
   const assignedCampaignIds = campaignsStore.assignments
     .filter((assignment) => assignment.characterId === characterId)
     .map((assignment) => assignment.campaignId);
+
+  if (campaignFilter.value === 'active') {
+    const activeCampaignIds = campaignsStore.campaigns
+      .filter((campaign) => campaign.status === 'active')
+      .map((campaign) => campaign.id);
+
+    if (activeCampaignIds.length === 0) {
+      return true;
+    }
+
+    return assignedCampaignIds.some((campaignId) => activeCampaignIds.includes(campaignId));
+  }
 
   if (campaignFilter.value === 'unassigned') {
     return assignedCampaignIds.length === 0;
