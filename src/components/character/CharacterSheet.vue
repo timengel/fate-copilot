@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Character, ConsequenceLabel, ConsequenceSeverity, Item, StressTrack as StressTrackModel, Stunt } from '../../types';
+import type {
+  Character,
+  ConsequenceLabel,
+  ConsequenceSeverity,
+  Item,
+  StressTrack as StressTrackModel,
+  Stunt,
+} from '../../types';
 import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
@@ -94,7 +101,9 @@ const formIsDirty = computed(
 const isDirty = computed(() => formIsDirty.value || !!props.externalDirty);
 
 const data = computed(() => (isEditing.value ? form : normalizeCharacterStress(props.character)));
-const visibleConsequences = computed(() => data.value.consequences.filter((con) => con.value.trim() !== ''));
+const visibleConsequences = computed(() =>
+  data.value.consequences.filter((con) => con.value.trim() !== ''),
+);
 const hasVisibleStress = computed(
   () =>
     isEditing.value ||
@@ -102,13 +111,18 @@ const hasVisibleStress = computed(
       (data.value.stressTracks ?? []).some((track) => track.boxes.length > 0)),
 );
 const hasVisibleConsequences = computed(
-  () => isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
+  () =>
+    isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
 );
 const hasVisibleDice = computed(
-  () => isEditing.value || ((props.sections?.dice ?? true) && !!(data.value.redDice || data.value.blueDice)),
+  () =>
+    isEditing.value ||
+    ((props.sections?.dice ?? true) && !!(data.value.redDice || data.value.blueDice)),
 );
 const hasVisibleModifiers = computed(
-  () => isEditing.value || ((props.sections?.modifiers ?? true) && !!(data.value.modifiers?.some((m) => m.value !== 0))),
+  () =>
+    isEditing.value ||
+    ((props.sections?.modifiers ?? true) && !!data.value.modifiers?.some((m) => m.value !== 0)),
 );
 const diceSectionClasses = computed(() => ({
   'span-full': hasVisibleDice.value && !hasVisibleModifiers.value,
@@ -122,19 +136,17 @@ const visibleStressTracks = computed(() =>
     .filter(({ track }) => isEditing.value || track.boxes.length > 0),
 );
 const assignedItems = computed(() =>
-  (props.assignedItems ?? characterItemsStore.getItemsForCharacter(data.value.id))
-    .filter((item) => gmModeStore.isGMMode || !item.hidden),
+  (props.assignedItems ?? characterItemsStore.getItemsForCharacter(data.value.id)).filter(
+    (item) => gmModeStore.isGMMode || !item.hidden,
+  ),
 );
-const canManageAssignedItems = computed(
-  () => isEditing.value && gmModeStore.isGMMode && !props.isNew,
-);
+const canManageAssignedItems = computed(() => isEditing.value && !props.isNew);
 const shouldShowAssignedItemsSection = computed(
   () =>
-    (props.sections?.items ?? true) && (
-      (!isEditing.value && assignedItems.value.length > 0) ||
+    (props.sections?.items ?? true) &&
+    ((!isEditing.value && assignedItems.value.length > 0) ||
       (canManageAssignedItems.value &&
-        (assignedItems.value.length > 0 || (props.availableItemOptions?.length ?? 0) > 0))
-    ),
+        (assignedItems.value.length > 0 || (props.availableItemOptions?.length ?? 0) > 0))),
 );
 const canOpenAssignedItems = computed(
   () => !isEditing.value && !props.disableAssignedItemNavigation,
@@ -273,7 +285,7 @@ function save() {
   savedSnapshot.value = saved;
 }
 
-defineExpose({ save });
+defineExpose({ save, isDirty });
 </script>
 
 <template>
@@ -306,10 +318,7 @@ defineExpose({ save });
       </div>
 
       <!-- ALLGEMEINES -->
-      <section
-        v-if="isEditing || sections?.general !== false"
-        class="sheet-section general"
-      >
+      <section v-if="isEditing || sections?.general !== false" class="sheet-section general">
         <div class="sheet-section-header">ALLGEMEINES</div>
         <div class="general-grid">
           <div class="general-left">
@@ -344,27 +353,39 @@ defineExpose({ save });
           </div>
           <div class="general-right">
             <div
-              v-if="isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
+              v-if="
+                isEditing &&
+                (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)
+              "
               class="field-stats-edit"
             >
               <div v-if="sections?.generalFatePoints !== false" class="field-stat">
                 <label class="field-label">Fate-Punkte</label>
                 <FateCounter v-model="form.fatePoints" />
               </div>
-              <div v-if="sections?.generalRefresh !== false && form.type !== 'nsc'" class="field-stat">
+              <div
+                v-if="sections?.generalRefresh !== false && form.type !== 'nsc'"
+                class="field-stat"
+              >
                 <label class="field-label">Erholungsrate</label>
                 <FateCounter v-model="form.refresh" :min="1" :max="10" />
               </div>
             </div>
             <div
-              v-if="!isEditing && (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)"
+              v-if="
+                !isEditing &&
+                (sections?.generalRefresh !== false || sections?.generalFatePoints !== false)
+              "
               class="field-stats-view"
             >
               <div v-if="sections?.generalFatePoints !== false" class="field-stat">
                 <span class="field-label">Fate-Punkte</span>
                 <span class="field-value fate-points">{{ data.fatePoints }}</span>
               </div>
-              <div v-if="sections?.generalRefresh !== false && data.type !== 'nsc'" class="field-stat">
+              <div
+                v-if="sections?.generalRefresh !== false && data.type !== 'nsc'"
+                class="field-stat"
+              >
                 <span class="field-label">Erholungsrate</span>
                 <span class="field-value refresh-value">{{ data.refresh }}</span>
               </div>
@@ -433,11 +454,13 @@ defineExpose({ save });
       <section
         v-if="isEditing || (sections?.extras !== false && data.extras?.trim())"
         class="sheet-section extras"
-        :class="{ 'span-full': !isEditing && (sections?.stunts === false || data.stunts.length === 0) }"
+        :class="{
+          'span-full': !isEditing && (sections?.stunts === false || data.stunts.length === 0),
+        }"
       >
         <div
           class="sheet-section-header"
-          :class="{ 'section-header-toggle': isEditing && (form.type === 'nsc') }"
+          :class="{ 'section-header-toggle': isEditing && form.type === 'nsc' }"
           @click="isEditing && form.type === 'nsc' && (showExtras = !showExtras)"
         >
           EXTRAS
@@ -452,7 +475,11 @@ defineExpose({ save });
             placeholder="Extras beschreiben..."
           />
         </div>
-        <div v-else class="text-area-display markdown-content" v-html="renderMarkdown(data.extras)" />
+        <div
+          v-else
+          class="text-area-display markdown-content"
+          v-html="renderMarkdown(data.extras)"
+        />
       </section>
 
       <!-- STUNTS -->
@@ -488,9 +515,17 @@ defineExpose({ save });
                 @input="onStuntDescInput(i, $event)"
               />
             </div>
-            <FateButton icon="close" variant="danger" size="S" @click="removeStunt(i)" name="close"></FateButton>
+            <FateButton
+              icon="close"
+              variant="danger"
+              size="S"
+              @click="removeStunt(i)"
+              name="close"
+            ></FateButton>
           </div>
-          <FateButton variant="add" class="stunt-add-btn" @click="addStunt">+ Stunt hinzufügen</FateButton>
+          <FateButton variant="add" class="stunt-add-btn" @click="addStunt"
+            >+ Stunt hinzufügen</FateButton
+          >
         </div>
         <div v-else class="stunts-list">
           <div v-for="(stunt, i) in data.stunts" :key="i" class="stunt-item">
@@ -502,10 +537,7 @@ defineExpose({ save });
       </section>
 
       <!-- STRESS + KONSEQUENZEN -->
-      <div
-        v-if="hasVisibleStress || hasVisibleConsequences"
-        class="sheet-stress-row"
-      >
+      <div v-if="hasVisibleStress || hasVisibleConsequences" class="sheet-stress-row">
         <div
           v-if="hasVisibleStress"
           class="stress-section"
@@ -514,11 +546,7 @@ defineExpose({ save });
           <div class="sheet-section-header">STRESS</div>
           <div class="stress-content">
             <div v-if="isEditing" class="stress-track-list">
-              <div
-                v-for="(track, i) in form.stressTracks ?? []"
-                :key="i"
-                class="stress-track-row"
-              >
+              <div v-for="(track, i) in form.stressTracks ?? []" :key="i" class="stress-track-row">
                 <div class="stress-track-wrap">
                   <StressTrack
                     :label="track.label"
@@ -555,7 +583,12 @@ defineExpose({ save });
                 </div>
               </div>
             </div>
-            <FateButton v-if="isEditing" variant="add" size="S" class="btn-flavor stress-add-btn" @click="addStressTrack"
+            <FateButton
+              v-if="isEditing"
+              variant="add"
+              size="S"
+              class="btn-flavor stress-add-btn"
+              @click="addStressTrack"
               >+ Stress-Track hinzufügen</FateButton
             >
             <template v-else>
@@ -594,7 +627,8 @@ defineExpose({ save });
                 icon="add"
                 class="consequence-config-btn"
                 @click="addConsequenceSlot(ct.severity, ct.labelKey)"
-              >{{ ct.label }} ({{ ct.severity }})</FateButton>
+                >{{ ct.label }} ({{ ct.severity }})</FateButton
+              >
             </div>
             <ConsequenceSlots
               :consequences="form.consequences"
@@ -606,11 +640,7 @@ defineExpose({ save });
       </div>
 
       <!-- WÜRFEL -->
-      <section
-        v-if="hasVisibleDice"
-        class="sheet-section dice-section"
-        :class="diceSectionClasses"
-      >
+      <section v-if="hasVisibleDice" class="sheet-section dice-section" :class="diceSectionClasses">
         <div class="sheet-section-header">WÜRFEL</div>
         <div class="dice-tracks">
           <DiceTrack
@@ -652,7 +682,10 @@ defineExpose({ save });
         class="sheet-section assigned-items-section span-full"
       >
         <div class="sheet-section-header">GEGENSTÄNDE</div>
-        <div v-if="canManageAssignedItems && (availableItemOptions?.length ?? 0) > 0" class="assigned-items-assign-row">
+        <div
+          v-if="canManageAssignedItems && (availableItemOptions?.length ?? 0) > 0"
+          class="assigned-items-assign-row"
+        >
           <FateDropdown
             :options="availableItemOptions"
             placeholder="Gegenstand hinzufügen..."
@@ -680,14 +713,15 @@ defineExpose({ save });
                   :background="getColorVars(item.color)['--fate-blue']"
                 />
                 <div class="assigned-item-card__meta">
-                  <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
-                  <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
+                  <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{
+                    item.name || 'Unbenannt'
+                  }}</strong>
+                  <span v-if="item.description" class="assigned-item-card__description">{{
+                    item.description
+                  }}</span>
                 </div>
               </div>
-              <div
-                v-if="canManageAssignedItems"
-                class="assigned-item-card__remove-wrap"
-              >
+              <div v-if="canManageAssignedItems" class="assigned-item-card__remove-wrap">
                 <button
                   type="button"
                   class="assigned-item-card__remove"
@@ -729,13 +763,21 @@ defineExpose({ save });
           v-model="form.gmNotes"
           placeholder="GM Notizen..."
         />
-        <div v-else class="text-area-display gm-notes-display markdown-content" v-html="renderMarkdown(data.gmNotes)" />
+        <div
+          v-else
+          class="text-area-display gm-notes-display markdown-content"
+          v-html="renderMarkdown(data.gmNotes)"
+        />
       </section>
 
       <!-- FORM ACTIONS (edit mode only) -->
       <div v-if="isEditing && !hideActions" class="form-actions">
-        <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
-        <FateButton icon="check" :disabled="!isDirty" @click="save"><span class="btn-label">Speichern</span></FateButton>
+        <FateButton variant="secondary" icon="close" @click="emit('cancel')"
+          ><span class="btn-label">Abbrechen</span></FateButton
+        >
+        <FateButton icon="check" :disabled="!isDirty" @click="save"
+          ><span class="btn-label">Speichern</span></FateButton
+        >
       </div>
     </template>
   </div>
@@ -987,16 +1029,33 @@ defineExpose({ save });
   white-space: normal;
 }
 
-.markdown-content :deep(p) { margin: 0 0 0.5em; }
-.markdown-content :deep(p:last-child) { margin-bottom: 0; }
+.markdown-content :deep(p) {
+  margin: 0 0 0.5em;
+}
+.markdown-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
 .markdown-content :deep(ul),
-.markdown-content :deep(ol) { margin: 0.25em 0 0.5em 1.25em; padding: 0; }
-.markdown-content :deep(li) { margin-bottom: 0.15em; }
-.markdown-content :deep(strong) { font-weight: 600; }
-.markdown-content :deep(em) { font-style: italic; }
+.markdown-content :deep(ol) {
+  margin: 0.25em 0 0.5em 1.25em;
+  padding: 0;
+}
+.markdown-content :deep(li) {
+  margin-bottom: 0.15em;
+}
+.markdown-content :deep(strong) {
+  font-weight: 600;
+}
+.markdown-content :deep(em) {
+  font-style: italic;
+}
 .markdown-content :deep(h1),
 .markdown-content :deep(h2),
-.markdown-content :deep(h3) { margin: 0.5em 0 0.25em; font-size: 1em; font-weight: 700; }
+.markdown-content :deep(h3) {
+  margin: 0.5em 0 0.25em;
+  font-size: 1em;
+  font-weight: 700;
+}
 .markdown-content :deep(code) {
   font-family: monospace;
   background: rgba(0, 0, 0, 0.1);
@@ -1335,7 +1394,6 @@ defineExpose({ save });
   overflow: hidden;
 }
 
-
 /* Würfel section */
 .dice-tracks {
   display: flex;
@@ -1538,40 +1596,40 @@ defineExpose({ save });
   }
 }
 
-:global([data-theme="dark"] .character-sheet),
-:global([data-theme="dark"] .sheet-stress-row),
-:global([data-theme="dark"] .consequence-row-flex),
-:global([data-theme="dark"] .gm-notes-section),
-:global([data-theme="dark"] .form-actions),
-:global([data-theme="dark"] .sheet-section),
-:global([data-theme="dark"] .text-area-display),
-:global([data-theme="dark"] .field-value) {
+:global([data-theme='dark'] .character-sheet),
+:global([data-theme='dark'] .sheet-stress-row),
+:global([data-theme='dark'] .consequence-row-flex),
+:global([data-theme='dark'] .gm-notes-section),
+:global([data-theme='dark'] .form-actions),
+:global([data-theme='dark'] .sheet-section),
+:global([data-theme='dark'] .text-area-display),
+:global([data-theme='dark'] .field-value) {
   background: var(--fate-white);
 }
 
-:global([data-theme="dark"] .field-input),
-:global([data-theme="dark"] .text-area-input),
-:global([data-theme="dark"] .stunt-name-input),
-:global([data-theme="dark"] .stunt-desc-textarea) {
+:global([data-theme='dark'] .field-input),
+:global([data-theme='dark'] .text-area-input),
+:global([data-theme='dark'] .stunt-name-input),
+:global([data-theme='dark'] .stunt-desc-textarea) {
   background: var(--fate-bg);
 }
 
 @media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme="light"]) .character-sheet),
-  :global(:root:not([data-theme="light"]) .sheet-stress-row),
-  :global(:root:not([data-theme="light"]) .consequence-row-flex),
-  :global(:root:not([data-theme="light"]) .gm-notes-section),
-  :global(:root:not([data-theme="light"]) .form-actions),
-  :global(:root:not([data-theme="light"]) .sheet-section),
-  :global(:root:not([data-theme="light"]) .text-area-display),
-  :global(:root:not([data-theme="light"]) .field-value) {
+  :global(:root:not([data-theme='light']) .character-sheet),
+  :global(:root:not([data-theme='light']) .sheet-stress-row),
+  :global(:root:not([data-theme='light']) .consequence-row-flex),
+  :global(:root:not([data-theme='light']) .gm-notes-section),
+  :global(:root:not([data-theme='light']) .form-actions),
+  :global(:root:not([data-theme='light']) .sheet-section),
+  :global(:root:not([data-theme='light']) .text-area-display),
+  :global(:root:not([data-theme='light']) .field-value) {
     background: var(--fate-white);
   }
 
-  :global(:root:not([data-theme="light"]) .field-input),
-  :global(:root:not([data-theme="light"]) .text-area-input),
-  :global(:root:not([data-theme="light"]) .stunt-name-input),
-  :global(:root:not([data-theme="light"]) .stunt-desc-textarea) {
+  :global(:root:not([data-theme='light']) .field-input),
+  :global(:root:not([data-theme='light']) .text-area-input),
+  :global(:root:not([data-theme='light']) .stunt-name-input),
+  :global(:root:not([data-theme='light']) .stunt-desc-textarea) {
     background: var(--fate-bg);
   }
 }

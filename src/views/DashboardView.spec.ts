@@ -1,6 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { computed, defineComponent, h } from 'vue';
 import DashboardView from './DashboardView.vue';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useItemsStore } from '../stores/items';
@@ -145,7 +146,9 @@ describe('DashboardView inline filter collapsing', () => {
     const { container } = setupFilters();
     await fireEvent.click(container.querySelector('.filters-toggle')!);
     await fireEvent.click(container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!);
-    expect(container.querySelector<HTMLElement>('.filters-expand-all')!.title).toBe('Alle zuklappen');
+    expect(container.querySelector<HTMLElement>('.filters-expand-all')!.title).toBe(
+      'Alle zuklappen',
+    );
   });
 
   it('collapse-all button collapses all sections', async () => {
@@ -191,7 +194,8 @@ describe('DashboardView character sheet item navigation', () => {
           FateRadioButtonGroup: { template: '<div />' },
           CharacterSheet: {
             props: ['disableAssignedItemNavigation'],
-            template: '<div class="character-sheet-stub">{{ disableAssignedItemNavigation ? "disabled" : "enabled" }}</div>',
+            template:
+              '<div class="character-sheet-stub">{{ disableAssignedItemNavigation ? "disabled" : "enabled" }}</div>',
           },
           ItemSheet: { template: '<div />' },
         },
@@ -266,7 +270,9 @@ describe('DashboardView character sheet item navigation', () => {
     await fireEvent.click(view.container.querySelector('.unassign')!);
     expect(view.container.querySelector('.assigned')?.textContent).toBe('');
     expect(view.container.querySelector('.dirty')?.textContent).toBe('dirty');
-    expect(characterItemsStore.getItemsForCharacter(character.id).map((entry) => entry.name)).toEqual(['Schwert']);
+    expect(
+      characterItemsStore.getItemsForCharacter(character.id).map((entry) => entry.name),
+    ).toEqual(['Schwert']);
 
     await fireEvent.click(view.container.querySelector('.save')!);
     expect(characterItemsStore.getItemsForCharacter(character.id)).toHaveLength(0);
@@ -416,6 +422,179 @@ describe('DashboardView archived item filter', () => {
   });
 });
 
+describe('DashboardView character edit switching', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  function setupCharacterSwitching(options: { dirtyCharacterIds?: string[] } = {}) {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    const charactersStore = useCharactersStore();
+
+    const campaign = makeCampaign();
+    const firstCharacter = makeCharacter({ id: 'character-1', name: 'Alrik' });
+    const secondCharacter = makeCharacter({ id: 'character-2', name: 'Bea' });
+
+    campaignsStore.addCampaign(campaign);
+    charactersStore.addCharacter(firstCharacter);
+    charactersStore.addCharacter(secondCharacter);
+    campaignsStore.assignCharacter(campaign.id, firstCharacter.id);
+    campaignsStore.assignCharacter(campaign.id, secondCharacter.id);
+
+    const dirtyIds = new Set(options.dirtyCharacterIds ?? []);
+
+    const CharacterSheetStub = defineComponent({
+      props: ['character', 'mode'],
+      emits: ['save', 'cancel', 'assign-item', 'unassign-item'],
+      setup(props, { emit, slots, expose }) {
+        const isDirty = computed(
+          () => props.mode === 'edit' && dirtyIds.has((props.character as Character).id),
+        );
+
+        function save() {
+          emit('save', {
+            ...(props.character as Character),
+            name: `${(props.character as Character).name} gespeichert`,
+          });
+        }
+
+        expose({ save, isDirty });
+
+        return () =>
+          h('div', { class: 'character-sheet-switch-stub' }, [
+            h('span', { class: 'character-name' }, (props.character as Character).name),
+            props.mode === 'edit'
+              ? h(
+                  'span',
+                  { class: 'editing-indicator' },
+                  `editing-${(props.character as Character).id}`,
+                )
+              : null,
+            props.mode === 'edit'
+              ? slots['edit-bar-actions']?.({ isDirty: isDirty.value })
+              : slots['name-bar-actions']?.(),
+          ]);
+      },
+    });
+
+    const view = render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
+          FateRadioButtonGroup: { template: '<div />' },
+          CharacterSheet: CharacterSheetStub,
+          ItemSheet: { template: '<div />' },
+        },
+      },
+    });
+
+    return { view, charactersStore };
+  }
+
+  it('disables the inline character save button until there are changes', async () => {
+    const { view } = setupCharacterSwitching();
+    const editButtons = view
+      .getAllByText('Bearbeiten')
+      .map((element) => element.closest('button'))
+      .filter((button): button is HTMLButtonElement => !!button);
+
+    await fireEvent.click(editButtons[0]!);
+
+    const saveButton = view.getByText('Speichern').closest('button') as HTMLButtonElement;
+    expect(saveButton.disabled).toBe(true);
+  });
+
+  it('prompts before switching away from a dirty character edit session', async () => {
+    const { view } = setupCharacterSwitching({ dirtyCharacterIds: ['character-1'] });
+    const editButtons = view
+      .getAllByText('Bearbeiten')
+      .map((element) => element.closest('button'))
+      .filter((button): button is HTMLButtonElement => !!button);
+
+    await fireEvent.click(editButtons[0]!);
+    expect(view.getByText('editing-character-1')).toBeTruthy();
+
+    await fireEvent.click(editButtons[1]!);
+
+    expect(view.getByText('Ungespeicherte Aenderungen')).toBeTruthy();
+    expect(view.getByText(/Du bearbeitest gerade „Alrik“\./)).toBeTruthy();
+    expect(view.getByText(/bevor „Bea“ geoeffnet wird\?/)).toBeTruthy();
+    expect(view.getByText('editing-character-1')).toBeTruthy();
+  });
+
+  it('saves the current character before switching when the user chooses Speichern', async () => {
+    const { view, charactersStore } = setupCharacterSwitching({
+      dirtyCharacterIds: ['character-1'],
+    });
+    const editButtons = view
+      .getAllByText('Bearbeiten')
+      .map((element) => element.closest('button'))
+      .filter((button): button is HTMLButtonElement => !!button);
+
+    await fireEvent.click(editButtons[0]!);
+    await fireEvent.click(editButtons[1]!);
+    await fireEvent.click(
+      view.container.querySelector('.dialog-overlay .fate-btn--primary') as HTMLButtonElement,
+    );
+
+    expect(charactersStore.getById('character-1')?.name).toBe('Alrik gespeichert');
+    expect(view.getByText('editing-character-2')).toBeTruthy();
+  });
+
+  it('discards the current character changes before switching when the user chooses Verwerfen', async () => {
+    const { view, charactersStore } = setupCharacterSwitching({
+      dirtyCharacterIds: ['character-1'],
+    });
+    const editButtons = view
+      .getAllByText('Bearbeiten')
+      .map((element) => element.closest('button'))
+      .filter((button): button is HTMLButtonElement => !!button);
+
+    await fireEvent.click(editButtons[0]!);
+    await fireEvent.click(editButtons[1]!);
+    await fireEvent.click(
+      view.container.querySelector(
+        '.dialog-overlay .fate-btn--danger-outline',
+      ) as HTMLButtonElement,
+    );
+
+    expect(charactersStore.getById('character-1')?.name).toBe('Alrik');
+    expect(view.getByText('editing-character-2')).toBeTruthy();
+  });
+
+  it('keeps the current character in edit mode when the user cancels the switch', async () => {
+    const { view } = setupCharacterSwitching({ dirtyCharacterIds: ['character-1'] });
+    const editButtons = view
+      .getAllByText('Bearbeiten')
+      .map((element) => element.closest('button'))
+      .filter((button): button is HTMLButtonElement => !!button);
+
+    await fireEvent.click(editButtons[0]!);
+    await fireEvent.click(editButtons[1]!);
+    await fireEvent.click(
+      view.container.querySelector('.dialog-overlay .fate-btn--secondary') as HTMLButtonElement,
+    );
+
+    expect(view.queryByText('Ungespeicherte Aenderungen')).toBeNull();
+    expect(view.getByText('editing-character-1')).toBeTruthy();
+    expect(view.queryByText('editing-character-2')).toBeNull();
+  });
+});
+
 describe('DashboardView campaign filter', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -431,8 +610,9 @@ describe('DashboardView campaign filter', () => {
     const view = render(DashboardView, {
       global: { plugins: [pinia], stubs: filterStubs },
     });
-    const dropdown = [...view.container.querySelectorAll<HTMLSelectElement>('select')]
-      .find((select) => [...select.options].some((option) => option.value === 'active'));
+    const dropdown = [...view.container.querySelectorAll<HTMLSelectElement>('select')].find(
+      (select) => [...select.options].some((option) => option.value === 'active'),
+    );
 
     expect(dropdown).toBeTruthy();
     expect(dropdown?.value).toBe('active');
@@ -446,7 +626,11 @@ describe('DashboardView campaign filter', () => {
     const charactersStore = useCharactersStore();
 
     const activeCampaign = makeCampaign({ id: 'campaign-active', name: 'Aktiv', status: 'active' });
-    const inactiveCampaign = makeCampaign({ id: 'campaign-inactive', name: 'Inaktiv', status: 'inactive' });
+    const inactiveCampaign = makeCampaign({
+      id: 'campaign-inactive',
+      name: 'Inaktiv',
+      status: 'inactive',
+    });
     const activeCharacter = makeCharacter({ id: 'character-active', name: 'Aktive Figur' });
     const inactiveCharacter = makeCharacter({ id: 'character-inactive', name: 'Inaktive Figur' });
 

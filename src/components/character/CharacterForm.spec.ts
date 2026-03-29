@@ -24,7 +24,12 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   const pinia = createPinia();
   setActivePinia(pinia);
   return render(CharacterSheet, {
-    props: { character: character ?? createDefaultCharacter(), mode: 'edit', isNew: true, ...extraProps },
+    props: {
+      character: character ?? createDefaultCharacter(),
+      mode: 'edit',
+      isNew: true,
+      ...extraProps,
+    },
     global: {
       plugins: [pinia],
       stubs: { SkillPyramid: true },
@@ -32,7 +37,11 @@ function renderForm(character?: Character, extraProps: Record<string, unknown> =
   });
 }
 
-function renderView(character?: Character, extraProps: Record<string, unknown> = {}, isGMMode = false) {
+function renderView(
+  character?: Character,
+  extraProps: Record<string, unknown> = {},
+  isGMMode = false,
+) {
   const pinia = createPinia();
   setActivePinia(pinia);
   useGMModeStore().isGMMode = isGMMode;
@@ -109,7 +118,9 @@ describe('CharacterSheet (edit mode)', () => {
       stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
     };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    const btns = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn',
+    );
     await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
@@ -121,10 +132,20 @@ describe('CharacterSheet (edit mode)', () => {
     const onSave = vi.fn();
     const char = {
       ...createDefaultCharacter(),
-      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 3, checked: false }, { value: 5, checked: false }] }],
+      stressTracks: [
+        {
+          label: 'Körperlich',
+          boxes: [
+            { value: 3, checked: false },
+            { value: 5, checked: false },
+          ],
+        },
+      ],
     };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    const btns = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn',
+    );
     await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
@@ -133,9 +154,14 @@ describe('CharacterSheet (edit mode)', () => {
 
   it('adds stress box with value 1 when track is empty', async () => {
     const onSave = vi.fn();
-    const char = { ...createDefaultCharacter(), stressTracks: [{ label: 'Körperlich', boxes: [] }] };
+    const char = {
+      ...createDefaultCharacter(),
+      stressTracks: [{ label: 'Körperlich', boxes: [] }],
+    };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    const btns = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn',
+    );
     await fireEvent.click(btns[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
@@ -147,10 +173,20 @@ describe('CharacterSheet (edit mode)', () => {
     const onSave = vi.fn();
     const char = {
       ...createDefaultCharacter(),
-      stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }, { value: 2, checked: false }] }],
+      stressTracks: [
+        {
+          label: 'Körperlich',
+          boxes: [
+            { value: 1, checked: false },
+            { value: 2, checked: false },
+          ],
+        },
+      ],
     };
     const { container } = renderForm(char, { onSave });
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    const btns = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn',
+    );
     await fireEvent.click(btns[0]!);
     await fireEvent.click(screen.getByText('Speichern'));
     const saved: Character = onSave.mock.calls[0]![0];
@@ -159,9 +195,14 @@ describe('CharacterSheet (edit mode)', () => {
   });
 
   it('− stress button is disabled when track is empty', () => {
-    const char = { ...createDefaultCharacter(), stressTracks: [{ label: 'Körperlich', boxes: [] }] };
+    const char = {
+      ...createDefaultCharacter(),
+      stressTracks: [{ label: 'Körperlich', boxes: [] }],
+    };
     const { container } = renderForm(char);
-    const btns = container.querySelectorAll<HTMLButtonElement>('.stress-track-row .stress-ctrl-btn');
+    const btns = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn',
+    );
     expect(btns[0]!.disabled).toBe(true);
   });
 
@@ -320,7 +361,9 @@ describe('CharacterSheet (view mode)', () => {
     const labelInputs = container.querySelectorAll<HTMLInputElement>('.stress-label-input');
     await fireEvent.update(labelInputs[labelInputs.length - 1]!, 'Armor');
 
-    const lastRowButtons = container.querySelectorAll('.stress-track-row')[labelInputs.length - 1]!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+    const lastRowButtons = container
+      .querySelectorAll('.stress-track-row')
+      [labelInputs.length - 1]!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
     await fireEvent.click(lastRowButtons[1]!);
     await fireEvent.click(screen.getByText('Speichern'));
 
@@ -338,7 +381,9 @@ describe('CharacterSheet (view mode)', () => {
     };
     const { container } = renderForm(char, { onSave });
 
-    const rowButtons = container.querySelector('.stress-track-row')!.querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
+    const rowButtons = container
+      .querySelector('.stress-track-row')!
+      .querySelectorAll<HTMLButtonElement>('.stress-ctrl-btn');
     await fireEvent.click(rowButtons[2]!);
     await fireEvent.click(screen.getByText('Speichern'));
 
@@ -472,10 +517,10 @@ describe('CharacterSheet (view mode)', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('shows item assignment controls inside the items section in GM edit mode', () => {
+  it('shows item assignment controls inside the items section in non-GM edit mode', () => {
     const pinia = createPinia();
     setActivePinia(pinia);
-    useGMModeStore().isGMMode = true;
+    useGMModeStore().isGMMode = false;
 
     render(CharacterSheet, {
       props: {
@@ -494,10 +539,10 @@ describe('CharacterSheet (view mode)', () => {
     expect(screen.getByRole('combobox')).toBeTruthy();
   });
 
-  it('emits assign-item from the in-sheet dropdown in GM edit mode', async () => {
+  it('emits assign-item from the in-sheet dropdown in non-GM edit mode', async () => {
     const pinia = createPinia();
     setActivePinia(pinia);
-    useGMModeStore().isGMMode = true;
+    useGMModeStore().isGMMode = false;
     const onAssignItem = vi.fn();
 
     render(CharacterSheet, {
@@ -518,10 +563,10 @@ describe('CharacterSheet (view mode)', () => {
     expect(onAssignItem).toHaveBeenCalledWith('item-1');
   });
 
-  it('shows an unassign button on assigned item cards in GM edit mode and does not navigate on unassign', async () => {
+  it('shows an unassign button on assigned item cards in non-GM edit mode and does not navigate on unassign', async () => {
     const pinia = createPinia();
     setActivePinia(pinia);
-    useGMModeStore().isGMMode = true;
+    useGMModeStore().isGMMode = false;
     const onUnassignItem = vi.fn();
     const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
     const item = { ...createDefaultItem(), id: 'item-1', name: 'Runenklinge' };
@@ -547,17 +592,18 @@ describe('CharacterSheet (view mode)', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('does not show item assignment controls for non-GM edit mode', () => {
+  it('does not show hidden items in assignment controls for non-GM edit mode', () => {
     const pinia = createPinia();
     setActivePinia(pinia);
     useGMModeStore().isGMMode = false;
 
-    const { container } = render(CharacterSheet, {
+    render(CharacterSheet, {
       props: {
         character: { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' },
         mode: 'edit',
         isNew: false,
-        availableItemOptions: [{ value: 'item-1', label: 'Runenklinge' }],
+        availableItemOptions: [],
+        assignedItems: [{ ...createDefaultItem(), id: 'item-2', name: 'Versteckt', hidden: true }],
       },
       global: {
         plugins: [pinia],
@@ -566,7 +612,7 @@ describe('CharacterSheet (view mode)', () => {
     });
 
     expect(screen.queryByRole('combobox')).toBeNull();
-    expect(container.querySelector('.assigned-item-card__remove')).toBeNull();
+    expect(screen.queryByText('Versteckt')).toBeNull();
   });
 });
 
@@ -684,7 +730,12 @@ describe('CharacterSheet – modifiers section', () => {
   });
 
   it('lets the dice section span the full row when modifiers are hidden', () => {
-    const char = { ...createDefaultCharacter(), redDice: 2, blueDice: 1, modifiers: [{ label: 'Test', value: 0 }] };
+    const char = {
+      ...createDefaultCharacter(),
+      redDice: 2,
+      blueDice: 1,
+      modifiers: [{ label: 'Test', value: 0 }],
+    };
     const { container } = renderView(char);
     expect(container.querySelector('.dice-section')?.classList.contains('span-full')).toBe(true);
     expect(container.querySelector('.modifiers-section')).toBeNull();
@@ -694,7 +745,9 @@ describe('CharacterSheet – modifiers section', () => {
     const char = { ...createDefaultCharacter(), modifiers: [{ label: 'Purer Schaden', value: 2 }] };
     const { container } = renderView(char);
     expect(container.querySelector('.dice-section')).toBeNull();
-    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(true);
+    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(
+      true,
+    );
   });
 
   it('keeps dice and modifiers split when both sections are visible', () => {
@@ -705,6 +758,8 @@ describe('CharacterSheet – modifiers section', () => {
     };
     const { container } = renderView(char);
     expect(container.querySelector('.dice-section')?.classList.contains('span-full')).toBe(false);
-    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(false);
+    expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(
+      false,
+    );
   });
 });

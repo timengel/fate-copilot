@@ -63,20 +63,23 @@ const editingCharacterItemIds = ref<string[]>([]);
 const initialEditingCharacterItemIds = ref<string[]>([]);
 const characterFormRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
 const itemFormRef = ref<InstanceType<typeof ItemSheet>[]>([]);
+const pendingCharacterEditId = ref<string | null>(null);
+const switchCharacterDialog = ref<{
+  currentCharacterId: string;
+  nextCharacterId: string;
+} | null>(null);
 
-const campaignOptions = computed(() =>
-  [
-    { value: 'active', label: 'Aktive Kampagnen' },
-    { value: 'all', label: 'Alle Kampagnen' },
-    { value: 'unassigned', label: 'Nicht zugewiesen' },
-    ...[...campaignsStore.campaigns]
-      .sort((a, b) => a.name.localeCompare(b.name, 'de'))
-      .map((campaign) => ({
-        value: campaign.id,
-        label: campaign.name || 'Unbenannte Kampagne',
-      })),
-  ],
-);
+const campaignOptions = computed(() => [
+  { value: 'active', label: 'Aktive Kampagnen' },
+  { value: 'all', label: 'Alle Kampagnen' },
+  { value: 'unassigned', label: 'Nicht zugewiesen' },
+  ...[...campaignsStore.campaigns]
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+    .map((campaign) => ({
+      value: campaign.id,
+      label: campaign.name || 'Unbenannte Kampagne',
+    })),
+]);
 
 const selectedCampaignFilterDropdown = computed({
   get: () => selectedCampaignFilter.value,
@@ -107,8 +110,13 @@ const items = computed(() => {
     if (item.archived && !showArchivedItems.value) return false;
     return true;
   });
-  if (itemSortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
-  if (itemSortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'));
+  if (itemSortOrder.value === 'name-desc')
+    return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
+  if (itemSortOrder.value === 'dice-desc')
+    return [...result].sort(
+      (a, b) =>
+        b.redDice + b.blueDice - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'),
+    );
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
@@ -121,7 +129,8 @@ const characters = computed(() => {
     if (type === 'nsc' && !showNSC.value) return false;
     return true;
   });
-  if (charSortOrder.value === 'name-desc') return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
+  if (charSortOrder.value === 'name-desc')
+    return [...result].sort((a, b) => b.name.localeCompare(a.name, 'de'));
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
@@ -129,7 +138,9 @@ const editingCharacterCampaignIds = computed(() => {
   if (!editingCharacterId.value) return new Set<string>();
 
   return new Set(
-    campaignsStore.getCampaignsForCharacter(editingCharacterId.value).map((campaign) => campaign.id),
+    campaignsStore
+      .getCampaignsForCharacter(editingCharacterId.value)
+      .map((campaign) => campaign.id),
   );
 });
 
@@ -181,6 +192,12 @@ function handleSave(updated: Character) {
   editingCharacterId.value = null;
   syncEditingCharacterItems(null);
   toastStore.show('Charakter gespeichert');
+
+  if (pendingCharacterEditId.value) {
+    const nextCharacterId = pendingCharacterEditId.value;
+    pendingCharacterEditId.value = null;
+    startCharacterEditing(nextCharacterId);
+  }
 }
 
 function handleItemSave(updated: Item) {
@@ -203,8 +220,65 @@ function startCharacterEditing(characterId: string) {
 }
 
 function cancelCharacterEditing() {
+  pendingCharacterEditId.value = null;
+  switchCharacterDialog.value = null;
   syncEditingCharacterItems(null);
   editingCharacterId.value = null;
+}
+
+function getCharacterName(characterId: string) {
+  return charactersStore.getById(characterId)?.name || 'Unbenannt';
+}
+
+function getActiveCharacterForm() {
+  return characterFormRef.value?.[0] ?? null;
+}
+
+function isActiveCharacterDirty() {
+  return getActiveCharacterForm()?.isDirty ?? hasEditingCharacterItemChanges.value;
+}
+
+function requestCharacterEdit(characterId: string) {
+  if (editingCharacterId.value === characterId) return;
+
+  if (!editingCharacterId.value) {
+    startCharacterEditing(characterId);
+    return;
+  }
+
+  if (!isActiveCharacterDirty()) {
+    cancelCharacterEditing();
+    startCharacterEditing(characterId);
+    return;
+  }
+
+  switchCharacterDialog.value = {
+    currentCharacterId: editingCharacterId.value,
+    nextCharacterId: characterId,
+  };
+}
+
+function cancelCharacterSwitch() {
+  pendingCharacterEditId.value = null;
+  switchCharacterDialog.value = null;
+}
+
+function discardCharacterSwitchChanges() {
+  const nextCharacterId = switchCharacterDialog.value?.nextCharacterId;
+  cancelCharacterEditing();
+
+  if (nextCharacterId) {
+    startCharacterEditing(nextCharacterId);
+  }
+}
+
+function saveCharacterSwitchChanges() {
+  const nextCharacterId = switchCharacterDialog.value?.nextCharacterId;
+  if (!nextCharacterId) return;
+
+  pendingCharacterEditId.value = nextCharacterId;
+  switchCharacterDialog.value = null;
+  saveCharacterEditing();
 }
 
 function handleDashboardAssignItem(itemId: string) {
@@ -213,7 +287,9 @@ function handleDashboardAssignItem(itemId: string) {
 }
 
 function handleDashboardUnassignItem(itemId: string) {
-  editingCharacterItemIds.value = editingCharacterItemIds.value.filter((assignedItemId) => assignedItemId !== itemId);
+  editingCharacterItemIds.value = editingCharacterItemIds.value.filter(
+    (assignedItemId) => assignedItemId !== itemId,
+  );
 }
 
 watch(sidebarCollapsed, (val) => {
@@ -221,28 +297,64 @@ watch(sidebarCollapsed, (val) => {
   sessionStorage.setItem('sidebarCollapsed', String(val));
 });
 
-watch(layout, (val) => {
-  document.body.classList.toggle('dashboard-grid-active', val === 'grid');
-}, { immediate: true });
+watch(
+  layout,
+  (val) => {
+    document.body.classList.toggle('dashboard-grid-active', val === 'grid');
+  },
+  { immediate: true },
+);
 
 function withViewTransition(fn: () => void) {
-  if (!document.startViewTransition) { fn(); return; }
-  document.startViewTransition(async () => { fn(); await nextTick(); });
+  if (!document.startViewTransition) {
+    fn();
+    return;
+  }
+  document.startViewTransition(async () => {
+    fn();
+    await nextTick();
+  });
 }
 
 function setLayout(val: string) {
   if (val !== 'list' && val !== 'grid') return;
-  withViewTransition(() => { layout.value = val; });
+  withViewTransition(() => {
+    layout.value = val;
+  });
 }
 
 const anyExpanded = computed(() => Object.values(filterSections.value).some(Boolean));
 
-function setCharSortOrder(val: string) { withViewTransition(() => { charSortOrder.value = val; }); }
-function setItemSortOrder(val: string) { withViewTransition(() => { itemSortOrder.value = val; }); }
-function setShowSC(val: boolean) { withViewTransition(() => { showSC.value = val; }); }
-function setShowNSC(val: boolean) { withViewTransition(() => { showNSC.value = val; }); }
-function setShowArchivedCharacters(val: boolean) { withViewTransition(() => { showArchivedCharacters.value = val; }); }
-function setShowArchivedItems(val: boolean) { withViewTransition(() => { showArchivedItems.value = val; }); }
+function setCharSortOrder(val: string) {
+  withViewTransition(() => {
+    charSortOrder.value = val;
+  });
+}
+function setItemSortOrder(val: string) {
+  withViewTransition(() => {
+    itemSortOrder.value = val;
+  });
+}
+function setShowSC(val: boolean) {
+  withViewTransition(() => {
+    showSC.value = val;
+  });
+}
+function setShowNSC(val: boolean) {
+  withViewTransition(() => {
+    showNSC.value = val;
+  });
+}
+function setShowArchivedCharacters(val: boolean) {
+  withViewTransition(() => {
+    showArchivedCharacters.value = val;
+  });
+}
+function setShowArchivedItems(val: boolean) {
+  withViewTransition(() => {
+    showArchivedItems.value = val;
+  });
+}
 
 function matchesCharacterCampaignFilter(characterId: string) {
   if (selectedCampaignFilter.value === 'all') return true;
@@ -313,7 +425,6 @@ function collapseAllSections() {
   filterSections.value.layout = false;
 }
 
-
 onMounted(() => {
   // sidebar-no-transition disables the CSS transition on mount so the initial
   // padding-left jump is not animated. Double rAF ensures at least one frame
@@ -345,10 +456,7 @@ onUnmounted(() => {
       title="Sidebar öffnen"
       @click="sidebarCollapsed = false"
     />
-    <aside
-      class="dashboard-sidebar"
-      :class="{ collapsed: sidebarCollapsed }"
-    >
+    <aside class="dashboard-sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-header">
         <h3 class="sidebar-title" v-show="!sidebarCollapsed">Filter</h3>
         <FateButton
@@ -380,17 +488,44 @@ onUnmounted(() => {
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Charaktere</div>
-          <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
+          <FateDropdown
+            :model-value="charSortOrder"
+            :options="charSortOptions"
+            :variant="DropdownVariant.Subtle"
+            class="campaign-dropdown"
+            size="S"
+            @update:model-value="setCharSortOrder"
+          />
           <FateCheckbox :model-value="showSC" label="Zeige SC" @update:model-value="setShowSC" />
-          <FateCheckbox v-if="gmModeStore.isGMMode" :model-value="showNSC" label="Zeige NSC" @update:model-value="setShowNSC" />
-          <FateCheckbox :model-value="showArchivedCharacters" label="Archiviert" @update:model-value="setShowArchivedCharacters" />
+          <FateCheckbox
+            v-if="gmModeStore.isGMMode"
+            :model-value="showNSC"
+            label="Zeige NSC"
+            @update:model-value="setShowNSC"
+          />
+          <FateCheckbox
+            :model-value="showArchivedCharacters"
+            label="Archiviert"
+            @update:model-value="setShowArchivedCharacters"
+          />
         </div>
 
         <div class="sidebar-group">
           <div class="sidebar-group-label">Items</div>
-          <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
+          <FateDropdown
+            :model-value="itemSortOrder"
+            :options="itemSortOptions"
+            :variant="DropdownVariant.Subtle"
+            class="campaign-dropdown"
+            size="S"
+            @update:model-value="setItemSortOrder"
+          />
           <FateCheckbox v-model="showItems" label="Zeige Items" />
-          <FateCheckbox :model-value="showArchivedItems" label="Archiviert" @update:model-value="setShowArchivedItems" />
+          <FateCheckbox
+            :model-value="showArchivedItems"
+            label="Archiviert"
+            @update:model-value="setShowArchivedItems"
+          />
         </div>
 
         <div class="sidebar-group">
@@ -402,7 +537,11 @@ onUnmounted(() => {
           <FateCheckbox v-model="visibleSections.stunts" label="Stunts" />
           <FateCheckbox v-model="visibleSections.stress" label="Stress" />
           <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
-          <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
+          <FateCheckbox
+            v-if="gmModeStore.isGMMode"
+            v-model="visibleSections.gmNotes"
+            label="GM-Notizen"
+          />
           <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
           <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
           <FateCheckbox v-model="visibleSections.items" label="Gegenstände" />
@@ -418,7 +557,10 @@ onUnmounted(() => {
           <FateRadioButtonGroup
             :model-value="layout"
             @update:model-value="setLayout"
-            :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
+            :options="[
+              { value: 'list', label: 'Liste' },
+              { value: 'grid', label: 'Zwei Spalten' },
+            ]"
           />
         </div>
       </div>
@@ -429,58 +571,137 @@ onUnmounted(() => {
       <div class="filters-toggle-row">
         <button class="filters-toggle" @click="filtersOpen = !filtersOpen">
           <span>Filter</span>
-          <FateIcon name="chevron-right" :size="16" class="filters-toggle-icon" :class="{ open: filtersOpen }" />
+          <FateIcon
+            name="chevron-right"
+            :size="16"
+            class="filters-toggle-icon"
+            :class="{ open: filtersOpen }"
+          />
         </button>
         <button
           class="filters-expand-all"
           :title="anyExpanded ? 'Alle zuklappen' : 'Alle aufklappen'"
           @click="anyExpanded ? collapseAllSections() : expandAllSections()"
         >
-          <FateIcon name="chevrons-down" :size="16" class="filters-toggle-icon" :class="{ open: anyExpanded }" />
+          <FateIcon
+            name="chevrons-down"
+            :size="16"
+            class="filters-toggle-icon"
+            :class="{ open: anyExpanded }"
+          />
         </button>
       </div>
 
       <div v-if="filtersOpen" class="filters-body">
         <div class="filters-section">
-          <button class="filters-section-toggle" @click="filterSections.kampagne = !filterSections.kampagne">
+          <button
+            class="filters-section-toggle"
+            @click="filterSections.kampagne = !filterSections.kampagne"
+          >
             <span>Kampagne</span>
-            <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.kampagne }" />
+            <FateIcon
+              name="chevron-right"
+              :size="14"
+              class="filters-toggle-icon"
+              :class="{ open: filterSections.kampagne }"
+            />
           </button>
           <div v-if="filterSections.kampagne" class="filters-section-body">
-            <div v-if="campaignsStore.campaigns.length === 0" class="campaign-select-empty">Keine Kampagnen.</div>
-            <FateDropdown v-else v-model="selectedCampaignFilterDropdown" class="campaign-dropdown" placeholder="Filter wählen…" :options="campaignOptions" :variant="DropdownVariant.Subtle" size="S" />
+            <div v-if="campaignsStore.campaigns.length === 0" class="campaign-select-empty">
+              Keine Kampagnen.
+            </div>
+            <FateDropdown
+              v-else
+              v-model="selectedCampaignFilterDropdown"
+              class="campaign-dropdown"
+              placeholder="Filter wählen…"
+              :options="campaignOptions"
+              :variant="DropdownVariant.Subtle"
+              size="S"
+            />
           </div>
         </div>
 
         <div class="filters-section">
-          <button class="filters-section-toggle" @click="filterSections.charaktere = !filterSections.charaktere">
+          <button
+            class="filters-section-toggle"
+            @click="filterSections.charaktere = !filterSections.charaktere"
+          >
             <span>Charaktere</span>
-            <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.charaktere }" />
+            <FateIcon
+              name="chevron-right"
+              :size="14"
+              class="filters-toggle-icon"
+              :class="{ open: filterSections.charaktere }"
+            />
           </button>
           <div v-if="filterSections.charaktere" class="filters-section-body">
-            <FateDropdown :model-value="charSortOrder" :options="charSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setCharSortOrder" />
+            <FateDropdown
+              :model-value="charSortOrder"
+              :options="charSortOptions"
+              :variant="DropdownVariant.Subtle"
+              class="campaign-dropdown"
+              size="S"
+              @update:model-value="setCharSortOrder"
+            />
             <FateCheckbox :model-value="showSC" label="SC" @update:model-value="setShowSC" />
-            <FateCheckbox v-if="gmModeStore.isGMMode" :model-value="showNSC" label="NSC" @update:model-value="setShowNSC" />
-            <FateCheckbox :model-value="showArchivedCharacters" label="Archiviert" @update:model-value="setShowArchivedCharacters" />
+            <FateCheckbox
+              v-if="gmModeStore.isGMMode"
+              :model-value="showNSC"
+              label="NSC"
+              @update:model-value="setShowNSC"
+            />
+            <FateCheckbox
+              :model-value="showArchivedCharacters"
+              label="Archiviert"
+              @update:model-value="setShowArchivedCharacters"
+            />
           </div>
         </div>
 
         <div class="filters-section">
-          <button class="filters-section-toggle" @click="filterSections.items = !filterSections.items">
+          <button
+            class="filters-section-toggle"
+            @click="filterSections.items = !filterSections.items"
+          >
             <span>Items</span>
-            <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.items }" />
+            <FateIcon
+              name="chevron-right"
+              :size="14"
+              class="filters-toggle-icon"
+              :class="{ open: filterSections.items }"
+            />
           </button>
           <div v-if="filterSections.items" class="filters-section-body">
-            <FateDropdown :model-value="itemSortOrder" :options="itemSortOptions" :variant="DropdownVariant.Subtle" class="campaign-dropdown" size="S" @update:model-value="setItemSortOrder" />
+            <FateDropdown
+              :model-value="itemSortOrder"
+              :options="itemSortOptions"
+              :variant="DropdownVariant.Subtle"
+              class="campaign-dropdown"
+              size="S"
+              @update:model-value="setItemSortOrder"
+            />
             <FateCheckbox v-model="showItems" label="Zeige Items" />
-            <FateCheckbox :model-value="showArchivedItems" label="Archiviert" @update:model-value="setShowArchivedItems" />
+            <FateCheckbox
+              :model-value="showArchivedItems"
+              label="Archiviert"
+              @update:model-value="setShowArchivedItems"
+            />
           </div>
         </div>
 
         <div class="filters-section">
-          <button class="filters-section-toggle" @click="filterSections.sektionen = !filterSections.sektionen">
+          <button
+            class="filters-section-toggle"
+            @click="filterSections.sektionen = !filterSections.sektionen"
+          >
             <span>Sektionen</span>
-            <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.sektionen }" />
+            <FateIcon
+              name="chevron-right"
+              :size="14"
+              class="filters-toggle-icon"
+              :class="{ open: filterSections.sektionen }"
+            />
           </button>
           <div v-if="filterSections.sektionen" class="filters-section-body">
             <FateCheckbox v-model="visibleSections.general" label="Allgemeines" />
@@ -490,7 +711,11 @@ onUnmounted(() => {
             <FateCheckbox v-model="visibleSections.stunts" label="Stunts" />
             <FateCheckbox v-model="visibleSections.stress" label="Stress" />
             <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
-            <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
+            <FateCheckbox
+              v-if="gmModeStore.isGMMode"
+              v-model="visibleSections.gmNotes"
+              label="GM-Notizen"
+            />
             <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
             <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
             <FateCheckbox v-model="visibleSections.items" label="Gegenstände" />
@@ -499,23 +724,39 @@ onUnmounted(() => {
         </div>
 
         <div class="filters-section">
-          <button class="filters-section-toggle" @click="filterSections.layout = !filterSections.layout">
+          <button
+            class="filters-section-toggle"
+            @click="filterSections.layout = !filterSections.layout"
+          >
             <span>Layout</span>
-            <FateIcon name="chevron-right" :size="14" class="filters-toggle-icon" :class="{ open: filterSections.layout }" />
+            <FateIcon
+              name="chevron-right"
+              :size="14"
+              class="filters-toggle-icon"
+              :class="{ open: filterSections.layout }"
+            />
           </button>
           <div v-if="filterSections.layout" class="filters-section-body">
             <FateRadioButtonGroup
               :model-value="layout"
               @update:model-value="setLayout"
-              :options="[{ value: 'list', label: 'Liste' }, { value: 'grid', label: 'Zwei Spalten' }]"
+              :options="[
+                { value: 'list', label: 'Liste' },
+                { value: 'grid', label: 'Zwei Spalten' },
+              ]"
             />
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="campaignsStore.campaigns.length === 0" class="dashboard-empty">Keine Kampagnen vorhanden.</div>
-    <div v-else-if="allCharactersInCampaign.length === 0 && allItemsInCampaign.length === 0" class="dashboard-empty">
+    <div v-if="campaignsStore.campaigns.length === 0" class="dashboard-empty">
+      Keine Kampagnen vorhanden.
+    </div>
+    <div
+      v-else-if="allCharactersInCampaign.length === 0 && allItemsInCampaign.length === 0"
+      class="dashboard-empty"
+    >
       Keine Charaktere oder Items für diesen Filter.
     </div>
     <div v-else-if="characters.length === 0 && items.length === 0" class="dashboard-empty">
@@ -527,7 +768,12 @@ onUnmounted(() => {
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
-      <div v-for="character in characters" :key="character.id" :style="`view-transition-name: char-${character.id}`" class="dashboard-entry">
+      <div
+        v-for="character in characters"
+        :key="character.id"
+        :style="`view-transition-name: char-${character.id}`"
+        class="dashboard-entry"
+      >
         <CharacterSheet
           v-if="editingCharacterId === character.id"
           ref="characterFormRef"
@@ -544,18 +790,39 @@ onUnmounted(() => {
           @assign-item="handleDashboardAssignItem"
           @unassign-item="handleDashboardUnassignItem"
         >
-          <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="M" @click="cancelCharacterEditing"
+          <template #edit-bar-actions="{ isDirty }">
+            <FateButton
+              icon="close"
+              variant="outline"
+              size="M"
+              class="dashboard-inline-edit-action"
+              @click="cancelCharacterEditing"
               ><span class="btn-label">Abbrechen</span></FateButton
             >
-            <FateButton icon="check" variant="outline" size="M" @click="saveCharacterEditing"
-              ><span class="btn-label">Speichern</span></FateButton
+            <FateButton
+              icon="check"
+              variant="outline"
+              size="M"
+              class="dashboard-inline-edit-action"
+              :disabled="!isDirty"
+              @click="saveCharacterEditing"
+            >
+              <span class="btn-label">Speichern</span></FateButton
             >
           </template>
         </CharacterSheet>
-        <CharacterSheet v-else :character="character" :sections="visibleSections" :disableAssignedItemNavigation="true">
+        <CharacterSheet
+          v-else
+          :character="character"
+          :sections="visibleSections"
+          :disableAssignedItemNavigation="true"
+        >
           <template v-if="showEditButton" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="M" @click="startCharacterEditing(character.id)"
+            <FateButton
+              icon="edit"
+              variant="outline"
+              size="M"
+              @click="requestCharacterEdit(character.id)"
               ><span class="btn-label">Bearbeiten</span></FateButton
             >
           </template>
@@ -563,10 +830,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div
-      v-if="characters.length > 0 && items.length > 0"
-      class="dashboard-section-divider"
-    >
+    <div v-if="characters.length > 0 && items.length > 0" class="dashboard-section-divider">
       <span class="dashboard-section-divider__label">Items</span>
     </div>
 
@@ -575,7 +839,12 @@ onUnmounted(() => {
       class="dashboard-stack"
       :class="{ 'dashboard-stack--grid': layout === 'grid' }"
     >
-      <div v-for="item in items" :key="item.id" :style="`view-transition-name: item-${item.id}`" class="dashboard-entry">
+      <div
+        v-for="item in items"
+        :key="item.id"
+        :style="`view-transition-name: item-${item.id}`"
+        class="dashboard-entry"
+      >
         <ItemSheet
           v-if="editingItemId === item.id"
           ref="itemFormRef"
@@ -587,10 +856,20 @@ onUnmounted(() => {
           @cancel="editingItemId = null"
         >
           <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="M" @click="editingItemId = null"
+            <FateButton
+              icon="close"
+              variant="outline"
+              size="M"
+              class="dashboard-inline-edit-action"
+              @click="editingItemId = null"
               ><span class="btn-label">Abbrechen</span></FateButton
             >
-            <FateButton icon="check" variant="outline" size="M" @click="saveItemEditing"
+            <FateButton
+              icon="check"
+              variant="outline"
+              size="M"
+              class="dashboard-inline-edit-action"
+              @click="saveItemEditing"
               ><span class="btn-label">Speichern</span></FateButton
             >
           </template>
@@ -602,6 +881,29 @@ onUnmounted(() => {
             >
           </template>
         </ItemSheet>
+      </div>
+    </div>
+
+    <div v-if="switchCharacterDialog" class="dialog-overlay" @click.self="cancelCharacterSwitch">
+      <div class="dialog-box dialog-box--switch-character">
+        <div class="dialog-title">Ungespeicherte Aenderungen</div>
+        <div class="dialog-message">
+          Du bearbeitest gerade „{{ getCharacterName(switchCharacterDialog.currentCharacterId) }}“.
+          Was soll mit den Aenderungen passieren, bevor „{{
+            getCharacterName(switchCharacterDialog.nextCharacterId)
+          }}“ geoeffnet wird?
+        </div>
+        <div class="dialog-actions dialog-actions--stack-mobile">
+          <FateButton icon="close" variant="secondary" @click="cancelCharacterSwitch">
+            Abbrechen
+          </FateButton>
+          <FateButton icon="delete" variant="danger-outline" @click="discardCharacterSwitchChanges">
+            Verwerfen
+          </FateButton>
+          <FateButton icon="check" variant="primary" @click="saveCharacterSwitchChanges">
+            Speichern
+          </FateButton>
+        </div>
       </div>
     </div>
   </div>
@@ -743,8 +1045,6 @@ onUnmounted(() => {
   flex-shrink: 0;
   color: var(--fate-text-light);
 }
-
-
 
 .dashboard-sidebar.collapsed .sidebar-toggle {
   width: 100%;
@@ -955,6 +1255,69 @@ onUnmounted(() => {
   color: var(--fate-text-light);
   padding: 3rem;
   font-size: 0.9rem;
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--fate-overlay);
+  z-index: 1000;
+}
+
+.dialog-box {
+  width: min(100%, 30rem);
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: var(--fate-white);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-title {
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--fate-text);
+}
+
+.dialog-message {
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--fate-text);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@container character-card (width < 480px) {
+  :deep(.dashboard-inline-edit-action .btn-label) {
+    display: none;
+  }
+
+  :deep(.dashboard-inline-edit-action.fate-btn) {
+    padding: 0;
+    width: var(--btn-size, 32px);
+    justify-content: center;
+  }
+}
+
+@container main (width < 480px) {
+  .dialog-actions--stack-mobile {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .dialog-actions--stack-mobile :deep(.fate-btn) {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 900px) {
