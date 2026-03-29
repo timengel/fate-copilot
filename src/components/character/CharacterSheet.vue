@@ -1509,6 +1509,11 @@ defineExpose({ save, isDirty });
     width: auto;
     min-width: 0;
   }
+
+  .character-name-bar :deep(.fate-btn) {
+    --btn-size: 40px;
+    min-height: var(--btn-size);
+  }
 }
 
 @container character-card (width <= 325px) {
@@ -1574,6 +1579,11 @@ defineExpose({ save, isDirty });
   .general-grid .field-label {
     width: auto;
     min-width: 0;
+  }
+
+  .character-name-bar :deep(.fate-btn) {
+    --btn-size: 40px;
+    min-height: var(--btn-size);
   }
 }
 
