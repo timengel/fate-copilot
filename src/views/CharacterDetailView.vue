@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharactersStore } from '../stores/characters';
 import { useCampaignsStore } from '../stores/campaigns';
@@ -8,12 +8,10 @@ import { useCharacterItemsStore } from '../stores/characterItems';
 import CharacterSheet from '../components/character/CharacterSheet.vue';
 import FateButton from '../components/shared/FateButton.vue';
 import FateCampaignSection from '../components/shared/FateCampaignSection.vue';
-import FateEntityAssignmentSection from '../components/shared/FateEntityAssignmentSection.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
-import type { Character, CharacterType } from '../types';
+import type { Character, CharacterType, Item } from '../types';
 import { createDefaultCharacter } from '../composables/useCharacterDefaults';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
-import { getColorVars } from '../composables/useColorVars';
 import { useToastStore } from '../stores/toast';
 import { useGMModeStore } from '../stores/gmMode';
 import { useSingleImportExport } from '../composables/useSingleImportExport';
@@ -70,25 +68,52 @@ const availableCampaigns = computed(() =>
   campaignsStore.campaigns.filter((c) => !characterCampaigns.value.some((cc) => cc.id === c.id)),
 );
 const characterCampaignIds = computed(() => new Set(characterCampaigns.value.map((campaign) => campaign.id)));
-const characterItems = computed(() =>
-  character.value
-    ? characterItemsStore
-        .getItemsForCharacter(character.value.id)
-        .filter((item) => gmModeStore.isGMMode || !item.hidden)
-        .map((item) => ({
-          id: item.id,
-          name: item.name || 'Unbenannt',
-          subtitle: item.description,
-          avatar: item.avatar,
-          color: getColorVars(item.color)['--fate-blue'],
-        }))
-    : [],
+const persistedAssignedItemIds = computed(() =>
+  character.value ? characterItemsStore.getItemsForCharacter(character.value.id).map((item) => item.id) : [],
 );
+const editingAssignedItemIds = ref<string[]>([]);
+const initialAssignedItemIds = ref<string[]>([]);
+const activeAssignedItemIds = computed(() => (isEditing.value ? editingAssignedItemIds.value : persistedAssignedItemIds.value));
+const assignedItems = computed<Item[]>(() =>
+  activeAssignedItemIds.value
+    .map((itemId) => itemsStore.getById(itemId))
+    .filter((item): item is Item => !!item),
+);
+const hasItemAssignmentChanges = computed(() => {
+  const initial = [...initialAssignedItemIds.value].sort();
+  const current = [...editingAssignedItemIds.value].sort();
+
+  if (initial.length !== current.length) return true;
+
+  return initial.some((itemId, index) => itemId !== current[index]);
+});
+
+function syncEditingAssignedItems() {
+  const ids = [...persistedAssignedItemIds.value];
+  initialAssignedItemIds.value = ids;
+  editingAssignedItemIds.value = ids;
+}
+
+watch(
+  [() => isEditing.value, () => character.value?.id, persistedAssignedItemIds],
+  ([editing, characterId]) => {
+    if (!editing) return;
+    if (!characterId) {
+      initialAssignedItemIds.value = [];
+      editingAssignedItemIds.value = [];
+      return;
+    }
+
+    syncEditingAssignedItems();
+  },
+  { immediate: true },
+);
+
 const availableItems = computed(() =>
   itemsStore.items
     .filter((item) => {
       if (!(gmModeStore.isGMMode || !item.hidden)) return false;
-      if (characterItems.value.some((assigned) => assigned.id === item.id)) return false;
+      if (activeAssignedItemIds.value.includes(item.id)) return false;
       if (characterCampaignIds.value.size === 0) return false;
 
       return campaignsStore
@@ -105,6 +130,7 @@ function handleSave(updated: Character) {
     router.replace(`/characters/${updated.id}`);
   } else {
     charactersStore.updateCharacter(updated);
+    characterItemsStore.setItemsForCharacter(updated.id, editingAssignedItemIds.value);
     isEditing.value = false;
     if (props.editMode) router.replace(`/characters/${updated.id}`);
   }
@@ -112,6 +138,7 @@ function handleSave(updated: Character) {
 }
 
 function handleCancel() {
+  syncEditingAssignedItems();
   if (props.isNew) {
     router.push(backPath.value);
   } else {
@@ -121,7 +148,19 @@ function handleCancel() {
 }
 
 function toggleEdit() {
+  if (!isEditing.value) {
+    syncEditingAssignedItems();
+  }
   isEditing.value = !isEditing.value;
+}
+
+function handleAssignItem(itemId: string) {
+  if (!itemId || editingAssignedItemIds.value.includes(itemId)) return;
+  editingAssignedItemIds.value = [...editingAssignedItemIds.value, itemId];
+}
+
+function handleUnassignItem(itemId: string) {
+  editingAssignedItemIds.value = editingAssignedItemIds.value.filter((assignedItemId) => assignedItemId !== itemId);
 }
 
 function toggleArchived() {
@@ -178,8 +217,13 @@ function queryCharacterType(): CharacterType {
         :key="character.id"
         :character="character"
         :hideActions="true"
+        :assigned-items="assignedItems"
+        :available-item-options="availableItems"
+        :external-dirty="hasItemAssignmentChanges"
         @save="handleSave"
         @cancel="handleCancel"
+        @assign-item="handleAssignItem"
+        @unassign-item="handleUnassignItem"
       >
         <template #edit-bar-actions="{ isDirty }">
           <FateButton icon="close" variant="outline" size="M" @click="handleCancel"><span class="btn-label">Abbrechen</span></FateButton>
@@ -211,18 +255,6 @@ function queryCharacterType(): CharacterType {
           @assign="(id) => campaignsStore.assignCharacter(id, character!.id)"
           @unassign="(id) => campaignsStore.unassignCharacter(id, character!.id)"
           @navigate="(id) => router.push(`/campaigns/${id}`)"
-        />
-
-        <FateEntityAssignmentSection
-          :title="'GEGENSTÄNDE'"
-          :empty-text="'Noch keine Gegenstände zugeordnet.'"
-          :add-placeholder="'Gegenstand hinzufügen...'"
-          :assigned-entities="characterItems"
-          :available-options="availableItems"
-          :editable="true"
-          @assign="(id) => characterItemsStore.assignItem(character!.id, id)"
-          @unassign="(id) => characterItemsStore.unassignItem(character!.id, id)"
-          @navigate="(id) => router.push(`/items/${id}`)"
         />
       </template>
     </template>

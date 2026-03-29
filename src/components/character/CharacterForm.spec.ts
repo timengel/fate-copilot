@@ -267,6 +267,11 @@ describe('CharacterSheet (edit mode)', () => {
 });
 
 describe('CharacterSheet (view mode)', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    mockPush.mockReset();
+  });
+
   it('hides empty consequence rows', () => {
     const char: Character = {
       ...createDefaultCharacter(),
@@ -414,6 +419,155 @@ describe('CharacterSheet (view mode)', () => {
     expect(screen.getByText('GEGENSTÄNDE')).toBeTruthy();
     expect(screen.getByText('Geheime Klinge')).toBeTruthy();
   });
+
+  it('hides the assigned items section when sections.items is false', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
+    const item = { ...createDefaultItem(), id: 'item-1', name: 'Runenklinge' };
+
+    useItemsStore().addItem(item);
+    useCharacterItemsStore().assignItem(character.id, item.id);
+
+    render(CharacterSheet, {
+      props: {
+        character,
+        mode: 'view',
+        sections: { items: false },
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    expect(screen.queryByText('GEGENSTÄNDE')).toBeNull();
+    expect(screen.queryByText('Runenklinge')).toBeNull();
+  });
+
+  it('does not navigate from assigned item cards when navigation is disabled', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
+    const item = { ...createDefaultItem(), id: 'item-1', name: 'Runenklinge' };
+
+    useItemsStore().addItem(item);
+    useCharacterItemsStore().assignItem(character.id, item.id);
+
+    render(CharacterSheet, {
+      props: {
+        character,
+        mode: 'view',
+        disableAssignedItemNavigation: true,
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    await fireEvent.click(screen.getByText('Runenklinge'));
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('shows item assignment controls inside the items section in GM edit mode', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = true;
+
+    render(CharacterSheet, {
+      props: {
+        character: { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' },
+        mode: 'edit',
+        isNew: false,
+        availableItemOptions: [{ value: 'item-1', label: 'Runenklinge' }],
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    expect(screen.getByText('GEGENSTÄNDE')).toBeTruthy();
+    expect(screen.getByRole('combobox')).toBeTruthy();
+  });
+
+  it('emits assign-item from the in-sheet dropdown in GM edit mode', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = true;
+    const onAssignItem = vi.fn();
+
+    render(CharacterSheet, {
+      props: {
+        character: { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' },
+        mode: 'edit',
+        isNew: false,
+        availableItemOptions: [{ value: 'item-1', label: 'Runenklinge' }],
+        onAssignItem,
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    await fireEvent.update(screen.getByRole('combobox'), 'item-1');
+    expect(onAssignItem).toHaveBeenCalledWith('item-1');
+  });
+
+  it('shows an unassign button on assigned item cards in GM edit mode and does not navigate on unassign', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = true;
+    const onUnassignItem = vi.fn();
+    const character = { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' };
+    const item = { ...createDefaultItem(), id: 'item-1', name: 'Runenklinge' };
+
+    useItemsStore().addItem(item);
+    useCharacterItemsStore().assignItem(character.id, item.id);
+
+    const { container } = render(CharacterSheet, {
+      props: {
+        character,
+        mode: 'edit',
+        isNew: false,
+        onUnassignItem,
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    await fireEvent.click(container.querySelector('.assigned-item-card__remove')!);
+    expect(onUnassignItem).toHaveBeenCalledWith('item-1');
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('does not show item assignment controls for non-GM edit mode', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = false;
+
+    const { container } = render(CharacterSheet, {
+      props: {
+        character: { ...createDefaultCharacter(), id: 'char-1', name: 'Heldin' },
+        mode: 'edit',
+        isNew: false,
+        availableItemOptions: [{ value: 'item-1', label: 'Runenklinge' }],
+      },
+      global: {
+        plugins: [pinia],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(container.querySelector('.assigned-item-card__remove')).toBeNull();
+  });
 });
 
 // ─── Dirty-state: save/cancel button visibility ───────────────────────────
@@ -456,6 +610,12 @@ describe('CharacterSheet dirty-state', () => {
     });
     expect(getByText('Speichern')).toBeTruthy();
     expect(getByText('Abbrechen')).toBeTruthy();
+  });
+
+  it('enables save when external dirty state is set', () => {
+    const char = { ...createDefaultCharacter(), name: 'Existing Hero' };
+    const { getByText } = renderExisting(char, { externalDirty: true });
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('disables save again after saving', async () => {

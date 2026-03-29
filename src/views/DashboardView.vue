@@ -14,11 +14,13 @@ import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
 import { useItemsStore } from '../stores/items';
+import { useCharacterItemsStore } from '../stores/characterItems';
 import { DropdownVariant, type Character, type Item } from '../types';
 
 const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const itemsStore = useItemsStore();
+const characterItemsStore = useCharacterItemsStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
 const {
@@ -57,6 +59,8 @@ const itemSortOptions = [
 ];
 const editingCharacterId = ref<string | null>(null);
 const editingItemId = ref<string | null>(null);
+const editingCharacterItemIds = ref<string[]>([]);
+const initialEditingCharacterItemIds = ref<string[]>([]);
 const characterFormRef = ref<InstanceType<typeof CharacterSheet>[]>([]);
 const itemFormRef = ref<InstanceType<typeof ItemSheet>[]>([]);
 
@@ -121,9 +125,65 @@ const characters = computed(() => {
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
 
+const editingCharacter = computed(() =>
+  editingCharacterId.value ? charactersStore.getById(editingCharacterId.value) : undefined,
+);
+
+const editingCharacterCampaignIds = computed(() => {
+  if (!editingCharacterId.value) return new Set<string>();
+
+  return new Set(
+    campaignsStore.getCampaignsForCharacter(editingCharacterId.value).map((campaign) => campaign.id),
+  );
+});
+
+const editingAssignedItems = computed(() =>
+  editingCharacterItemIds.value
+    .map((itemId) => itemsStore.getById(itemId))
+    .filter((item): item is Item => !!item),
+);
+
+const availableDashboardCharacterItems = computed(() =>
+  itemsStore.items
+    .filter((item) => {
+      if (!(gmModeStore.isGMMode || !item.hidden)) return false;
+      if (editingCharacterItemIds.value.includes(item.id)) return false;
+      if (editingCharacterCampaignIds.value.size === 0) return false;
+
+      return campaignsStore
+        .getCampaignsForItem(item.id)
+        .some((campaign) => editingCharacterCampaignIds.value.has(campaign.id));
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+    .map((item) => ({ value: item.id, label: item.name || 'Unbenannt' })),
+);
+
+const hasEditingCharacterItemChanges = computed(() => {
+  const initial = [...initialEditingCharacterItemIds.value].sort();
+  const current = [...editingCharacterItemIds.value].sort();
+
+  if (initial.length !== current.length) return true;
+
+  return initial.some((itemId, index) => itemId !== current[index]);
+});
+
+function syncEditingCharacterItems(characterId: string | null) {
+  if (!characterId) {
+    initialEditingCharacterItemIds.value = [];
+    editingCharacterItemIds.value = [];
+    return;
+  }
+
+  const itemIds = characterItemsStore.getItemsForCharacter(characterId).map((item) => item.id);
+  initialEditingCharacterItemIds.value = [...itemIds];
+  editingCharacterItemIds.value = [...itemIds];
+}
+
 function handleSave(updated: Character) {
   charactersStore.updateCharacter(updated);
+  characterItemsStore.setItemsForCharacter(updated.id, editingCharacterItemIds.value);
   editingCharacterId.value = null;
+  syncEditingCharacterItems(null);
   toastStore.show('Charakter gespeichert');
 }
 
@@ -139,6 +199,25 @@ function saveCharacterEditing() {
 
 function saveItemEditing() {
   itemFormRef.value?.[0]?.save();
+}
+
+function startCharacterEditing(characterId: string) {
+  syncEditingCharacterItems(characterId);
+  editingCharacterId.value = characterId;
+}
+
+function cancelCharacterEditing() {
+  syncEditingCharacterItems(null);
+  editingCharacterId.value = null;
+}
+
+function handleDashboardAssignItem(itemId: string) {
+  if (!itemId || editingCharacterItemIds.value.includes(itemId)) return;
+  editingCharacterItemIds.value = [...editingCharacterItemIds.value, itemId];
+}
+
+function handleDashboardUnassignItem(itemId: string) {
+  editingCharacterItemIds.value = editingCharacterItemIds.value.filter((assignedItemId) => assignedItemId !== itemId);
 }
 
 watch(sidebarCollapsed, (val) => {
@@ -330,6 +409,7 @@ onUnmounted(() => {
           <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
           <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
           <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
+          <FateCheckbox v-model="visibleSections.items" label="Gegenstände" />
         </div>
 
         <div class="sidebar-group">
@@ -416,7 +496,8 @@ onUnmounted(() => {
             <FateCheckbox v-model="visibleSections.consequences" label="Konsequenzen" />
             <FateCheckbox v-if="gmModeStore.isGMMode" v-model="visibleSections.gmNotes" label="GM-Notizen" />
             <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
-          <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
+            <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
+            <FateCheckbox v-model="visibleSections.items" label="Gegenstände" />
             <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
           </div>
         </div>
@@ -457,11 +538,18 @@ onUnmounted(() => {
           mode="edit"
           :character="character"
           :hideActions="true"
+          :sections="visibleSections"
+          :disableAssignedItemNavigation="true"
+          :assigned-items="editingAssignedItems"
+          :available-item-options="availableDashboardCharacterItems"
+          :external-dirty="hasEditingCharacterItemChanges"
           @save="handleSave"
-          @cancel="editingCharacterId = null"
+          @cancel="cancelCharacterEditing"
+          @assign-item="handleDashboardAssignItem"
+          @unassign-item="handleDashboardUnassignItem"
         >
           <template #edit-bar-actions>
-            <FateButton icon="close" variant="outline" size="M" @click="editingCharacterId = null"
+            <FateButton icon="close" variant="outline" size="M" @click="cancelCharacterEditing"
               ><span class="btn-label">Abbrechen</span></FateButton
             >
             <FateButton icon="check" variant="outline" size="M" @click="saveCharacterEditing"
@@ -469,9 +557,9 @@ onUnmounted(() => {
             >
           </template>
         </CharacterSheet>
-        <CharacterSheet v-else :character="character" :sections="visibleSections">
+        <CharacterSheet v-else :character="character" :sections="visibleSections" :disableAssignedItemNavigation="true">
           <template v-if="showEditButton" #name-bar-actions>
-            <FateButton icon="edit" variant="outline" size="M" @click="editingCharacterId = character.id"
+            <FateButton icon="edit" variant="outline" size="M" @click="startCharacterEditing(character.id)"
               ><span class="btn-label">Bearbeiten</span></FateButton
             >
           </template>

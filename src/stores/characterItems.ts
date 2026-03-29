@@ -31,6 +31,15 @@ export const useCharacterItemsStore = defineStore('characterItems', () => {
     assignments.value = assignments.value.filter((assignment) => assignment.itemId !== itemId);
   }
 
+  function setItemsForCharacter(characterId: string, itemIds: string[]) {
+    const uniqueItemIds = [...new Set(itemIds)];
+    const otherAssignments = assignments.value.filter((assignment) => assignment.characterId !== characterId);
+    assignments.value = [
+      ...otherAssignments,
+      ...uniqueItemIds.map((itemId) => ({ characterId, itemId })),
+    ];
+  }
+
   function getItemsForCharacter(characterId: string) {
     const itemsStore = useItemsStore();
     const itemIds = assignments.value
@@ -63,6 +72,7 @@ export const useCharacterItemsStore = defineStore('characterItems', () => {
     unassignItem,
     unassignAllForCharacter,
     unassignAllForItem,
+    setItemsForCharacter,
     getItemsForCharacter,
     getCharactersForItem,
     replaceAll,

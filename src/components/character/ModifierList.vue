@@ -31,11 +31,21 @@ function addModifier() {
 function removeModifier(index: number) {
   emit('update:modifiers', props.modifiers.filter((_, i) => i !== index));
 }
+
+function isVisibleModifier(modifier: Modifier) {
+  return props.editMode || modifier.value !== 0;
+}
 </script>
 
 <template>
   <div class="modifier-list">
-    <div v-for="(modifier, i) in modifiers" v-show="editMode || modifier.value !== 0" :key="i" class="modifier-row">
+    <div
+      v-for="(modifier, i) in modifiers"
+      v-show="isVisibleModifier(modifier)"
+      :key="i"
+      class="modifier-row"
+      :class="{ 'modifier-row--last-visible': i === modifiers.map((entry) => isVisibleModifier(entry)).lastIndexOf(true) }"
+    >
       <div class="modifier-label-wrap">
         <div class="modifier-label-row" :class="{ 'modifier-label-row--editable': editMode }">
           <span v-if="!editMode" class="modifier-label-text">{{ modifier.label }}</span>
@@ -82,6 +92,10 @@ function removeModifier(index: number) {
 .modifier-row {
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--fate-light-border);
+}
+
+.modifier-row--last-visible {
+  border-bottom: none;
 }
 
 .modifier-label-row {

@@ -32,6 +32,7 @@ describe('useDashboardPreferencesStore', () => {
     expect(sections.gmNotes).toBe(true);
     expect(sections.dice).toBe(true);
     expect(sections.modifiers).toBe(true);
+    expect(sections.items).toBe(true);
   });
 
   it('selectedCampaignFilter can be set', () => {
@@ -66,8 +67,10 @@ describe('useDashboardPreferencesStore', () => {
     const store = useDashboardPreferencesStore();
     store.visibleSections.skills = false;
     store.visibleSections.stress = false;
+    store.visibleSections.items = false;
     expect(store.visibleSections.skills).toBe(false);
     expect(store.visibleSections.stress).toBe(false);
+    expect(store.visibleSections.items).toBe(false);
     expect(store.visibleSections.aspects).toBe(true);
   });
 
@@ -89,6 +92,7 @@ describe('useDashboardPreferencesStore', () => {
     store.visibleSections.skills = false;
     store.visibleSections.stress = false;
     store.visibleSections.modifiers = false;
+    store.visibleSections.items = false;
     store.reset();
     expect(store.selectedCampaignFilter).toBe('active');
     expect(store.showSC).toBe(true);
@@ -101,5 +105,6 @@ describe('useDashboardPreferencesStore', () => {
     expect(store.visibleSections.skills).toBe(true);
     expect(store.visibleSections.stress).toBe(true);
     expect(store.visibleSections.modifiers).toBe(true);
+    expect(store.visibleSections.items).toBe(true);
   });
 });

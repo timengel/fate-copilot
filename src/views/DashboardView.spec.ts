@@ -7,6 +7,7 @@ import { useItemsStore } from '../stores/items';
 import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import { useCharactersStore } from '../stores/characters';
+import { useCharacterItemsStore } from '../stores/characterItems';
 import type { Campaign, Item } from '../types';
 import type { Character } from '../types';
 
@@ -152,6 +153,123 @@ describe('DashboardView inline filter collapsing', () => {
     await fireEvent.click(container.querySelector('.filters-expand-all')!); // expand all
     await fireEvent.click(container.querySelector('.filters-expand-all')!); // collapse all
     expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+  });
+});
+
+describe('DashboardView character sheet item navigation', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('disables assigned item navigation on dashboard character sheets', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    const charactersStore = useCharactersStore();
+
+    campaignsStore.addCampaign(makeCampaign());
+    charactersStore.addCharacter(makeCharacter({ id: 'character-1', name: 'Alrik' }));
+    campaignsStore.assignCharacter('campaign-1', 'character-1');
+
+    const view = render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateButton: { template: '<button><slot /></button>' },
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
+          FateRadioButtonGroup: { template: '<div />' },
+          CharacterSheet: {
+            props: ['disableAssignedItemNavigation'],
+            template: '<div class="character-sheet-stub">{{ disableAssignedItemNavigation ? "disabled" : "enabled" }}</div>',
+          },
+          ItemSheet: { template: '<div />' },
+        },
+      },
+    });
+
+    expect(view.getByText('disabled')).toBeTruthy();
+  });
+
+  it('stages dashboard character item unassignments until save', async () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+
+    const campaignsStore = useCampaignsStore();
+    const charactersStore = useCharactersStore();
+    const itemsStore = useItemsStore();
+    const characterItemsStore = useCharacterItemsStore();
+    const gmModeStore = useGMModeStore();
+
+    gmModeStore.isGMMode = true;
+
+    const campaign = makeCampaign();
+    const character = makeCharacter({ id: 'character-1', name: 'Alrik' });
+    const item = makeItem({ id: 'item-1', name: 'Schwert' });
+
+    campaignsStore.addCampaign(campaign);
+    charactersStore.addCharacter(character);
+    itemsStore.addItem(item);
+    campaignsStore.assignCharacter(campaign.id, character.id);
+    campaignsStore.assignItem(campaign.id, item.id);
+    characterItemsStore.assignItem(character.id, item.id);
+
+    const view = render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          FateButton: { template: '<button><slot /></button>' },
+          FateDropdown: {
+            props: ['modelValue', 'options', 'placeholder'],
+            template: `
+              <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                <option value="">{{ placeholder }}</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            `,
+          },
+          FateRadioButtonGroup: { template: '<div />' },
+          CharacterSheet: {
+            props: ['character', 'mode', 'assignedItems', 'externalDirty'],
+            emits: ['save', 'cancel', 'assign-item', 'unassign-item'],
+            template: `
+              <div>
+                <span class="character-name">{{ character.name }}</span>
+                <slot v-if="mode !== 'edit'" name="name-bar-actions" />
+                <span class="assigned">{{ (assignedItems || []).map((entry) => entry.name).join(',') }}</span>
+                <span class="dirty">{{ externalDirty ? 'dirty' : 'clean' }}</span>
+                <button v-if="mode === 'edit'" class="save" @click="$emit('save', character)">save-now</button>
+                <button v-if="mode === 'edit'" class="unassign" @click="$emit('unassign-item', 'item-1')">unassign</button>
+              </div>
+            `,
+          },
+          ItemSheet: { template: '<div />' },
+        },
+      },
+    });
+
+    await fireEvent.click(view.container.querySelector('.dashboard-entry button')!);
+    expect(view.container.querySelector('.assigned')?.textContent).toContain('Schwert');
+
+    await fireEvent.click(view.container.querySelector('.unassign')!);
+    expect(view.container.querySelector('.assigned')?.textContent).toBe('');
+    expect(view.container.querySelector('.dirty')?.textContent).toBe('dirty');
+    expect(characterItemsStore.getItemsForCharacter(character.id).map((entry) => entry.name)).toEqual(['Schwert']);
+
+    await fireEvent.click(view.container.querySelector('.save')!);
+    expect(characterItemsStore.getItemsForCharacter(character.id)).toHaveLength(0);
   });
 });
 

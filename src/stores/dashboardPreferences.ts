@@ -23,6 +23,7 @@ export const useDashboardPreferencesStore = defineStore(
       gmNotes: true,
       dice: true,
       modifiers: true,
+      items: true,
     });
 
     function reset() {
@@ -45,6 +46,7 @@ export const useDashboardPreferencesStore = defineStore(
         gmNotes: true,
         dice: true,
         modifiers: true,
+        items: true,
       };
     }
 

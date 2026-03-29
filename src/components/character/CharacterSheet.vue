@@ -18,6 +18,8 @@ import FateCounter from '../shared/FateCounter.vue';
 import FateAvatar from '../shared/FateAvatar.vue';
 import AvatarPicker from '../shared/AvatarPicker.vue';
 import FateCheckbox from '../shared/FateCheckbox.vue';
+import FateDropdown from '../shared/FateDropdown.vue';
+import FateIcon from '../shared/FateIcon.vue';
 import { getColorVars } from '../../composables/useColorVars';
 import { useMarkdown } from '../../composables/useMarkdown';
 import { normalizeCharacterStress } from '../../utils/stressTracks';
@@ -41,6 +43,10 @@ const props = defineProps<{
   mode?: 'view' | 'edit';
   isNew?: boolean;
   hideActions?: boolean;
+  disableAssignedItemNavigation?: boolean;
+  assignedItems?: Item[];
+  availableItemOptions?: { value: string; label: string }[];
+  externalDirty?: boolean;
   sections?: {
     general?: boolean;
     generalRefresh?: boolean;
@@ -54,10 +60,16 @@ const props = defineProps<{
     gmNotes?: boolean;
     dice?: boolean;
     modifiers?: boolean;
+    items?: boolean;
   };
 }>();
 
-const emit = defineEmits<{ save: [character: Character]; cancel: [] }>();
+const emit = defineEmits<{
+  save: [character: Character];
+  cancel: [];
+  'assign-item': [itemId: string];
+  'unassign-item': [itemId: string];
+}>();
 
 const gmModeStore = useGMModeStore();
 const characterItemsStore = useCharacterItemsStore();
@@ -76,9 +88,10 @@ watch(
 );
 
 const isEditing = computed(() => props.mode === 'edit');
-const isDirty = computed(
+const formIsDirty = computed(
   () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
 );
+const isDirty = computed(() => formIsDirty.value || !!props.externalDirty);
 
 const data = computed(() => (isEditing.value ? form : normalizeCharacterStress(props.character)));
 const visibleConsequences = computed(() => data.value.consequences.filter((con) => con.value.trim() !== ''));
@@ -109,7 +122,22 @@ const visibleStressTracks = computed(() =>
     .filter(({ track }) => isEditing.value || track.boxes.length > 0),
 );
 const assignedItems = computed(() =>
-  characterItemsStore.getItemsForCharacter(data.value.id).filter((item) => gmModeStore.isGMMode || !item.hidden),
+  (props.assignedItems ?? characterItemsStore.getItemsForCharacter(data.value.id))
+    .filter((item) => gmModeStore.isGMMode || !item.hidden),
+);
+const canManageAssignedItems = computed(
+  () => isEditing.value && gmModeStore.isGMMode && !props.isNew,
+);
+const shouldShowAssignedItemsSection = computed(
+  () =>
+    (props.sections?.items ?? true) && (
+      (!isEditing.value && assignedItems.value.length > 0) ||
+      (canManageAssignedItems.value &&
+        (assignedItems.value.length > 0 || (props.availableItemOptions?.length ?? 0) > 0))
+    ),
+);
+const canOpenAssignedItems = computed(
+  () => !isEditing.value && !props.disableAssignedItemNavigation,
 );
 
 function sectionsEnabled(section: 'stress' | 'consequences') {
@@ -133,6 +161,16 @@ function getItemSummary(item: Item) {
 
 function openAssignedItem(itemId: string) {
   router.push(`/items/${itemId}`);
+}
+
+function assignItem(itemId: string) {
+  if (!itemId) return;
+  emit('assign-item', itemId);
+}
+
+function unassignItem(itemId: string, event: Event) {
+  event.stopPropagation();
+  emit('unassign-item', itemId);
 }
 
 const isNscHidden = computed(
@@ -609,6 +647,69 @@ defineExpose({ save });
         />
       </section>
 
+      <section
+        v-if="shouldShowAssignedItemsSection"
+        class="sheet-section assigned-items-section span-full"
+      >
+        <div class="sheet-section-header">GEGENSTÄNDE</div>
+        <div v-if="canManageAssignedItems && (availableItemOptions?.length ?? 0) > 0" class="assigned-items-assign-row">
+          <FateDropdown
+            :options="availableItemOptions"
+            placeholder="Gegenstand hinzufügen..."
+            size="S"
+            @update:model-value="assignItem"
+          />
+        </div>
+        <div class="assigned-items-grid">
+          <div
+            v-for="item in assignedItems"
+            :key="item.id"
+            class="assigned-item-card"
+            :class="{ 'assigned-item-card--clickable': canOpenAssignedItems }"
+            :role="canOpenAssignedItems ? 'button' : undefined"
+            :tabindex="canOpenAssignedItems ? 0 : undefined"
+            @click="canOpenAssignedItems && openAssignedItem(item.id)"
+            @keydown.enter.prevent="canOpenAssignedItems && openAssignedItem(item.id)"
+            @keydown.space.prevent="canOpenAssignedItems && openAssignedItem(item.id)"
+          >
+            <div class="assigned-item-card__header">
+              <div class="assigned-item-card__title-wrap">
+                <FateAvatar
+                  :value="item.avatar"
+                  size="S"
+                  :background="getColorVars(item.color)['--fate-blue']"
+                />
+                <div class="assigned-item-card__meta">
+                  <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
+                  <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
+                </div>
+              </div>
+              <div
+                v-if="canManageAssignedItems"
+                class="assigned-item-card__remove-wrap"
+              >
+                <button
+                  type="button"
+                  class="assigned-item-card__remove"
+                  @click.stop="unassignItem(item.id, $event)"
+                >
+                  <FateIcon name="close" :size="14" />
+                </button>
+              </div>
+            </div>
+            <div v-if="getItemSummary(item).length > 0" class="assigned-item-card__stats">
+              <span
+                v-for="stat in getItemSummary(item)"
+                :key="stat"
+                class="assigned-item-card__pill"
+              >
+                <span class="assigned-item-card__pill-text">{{ stat }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- GM OPTIONS -->
       <section
         v-if="gmModeStore.isGMMode && sections?.gmNotes !== false && (isEditing || data.gmNotes)"
@@ -629,43 +730,6 @@ defineExpose({ save });
           placeholder="GM Notizen..."
         />
         <div v-else class="text-area-display gm-notes-display markdown-content" v-html="renderMarkdown(data.gmNotes)" />
-      </section>
-
-      <section
-        v-if="!isEditing && assignedItems.length > 0"
-        class="sheet-section assigned-items-section span-full"
-      >
-        <div class="sheet-section-header">GEGENSTÄNDE</div>
-        <div class="assigned-items-grid">
-          <button
-            v-for="item in assignedItems"
-            :key="item.id"
-            type="button"
-            class="assigned-item-card"
-            @click="openAssignedItem(item.id)"
-          >
-            <div class="assigned-item-card__header">
-              <FateAvatar
-                :value="item.avatar"
-                size="S"
-                :background="getColorVars(item.color)['--fate-blue']"
-              />
-              <div class="assigned-item-card__meta">
-                <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
-                <span v-if="item.description" class="assigned-item-card__description">{{ item.description }}</span>
-              </div>
-            </div>
-            <div v-if="getItemSummary(item).length > 0" class="assigned-item-card__stats">
-              <span
-                v-for="stat in getItemSummary(item)"
-                :key="stat"
-                class="assigned-item-card__pill"
-              >
-                {{ stat }}
-              </span>
-            </div>
-          </button>
-        </div>
       </section>
 
       <!-- FORM ACTIONS (edit mode only) -->
@@ -971,6 +1035,16 @@ defineExpose({ save });
   border-top: 1px solid var(--fate-border);
 }
 
+.assigned-items-assign-row {
+  padding: 0.75rem 0.75rem 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.assigned-items-assign-row :deep(.fate-dropdown) {
+  --dropdown-max-width: min(100%, 20rem);
+}
+
 .assigned-items-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -979,22 +1053,27 @@ defineExpose({ save });
 }
 
 .assigned-item-card {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  width: 100%;
   padding: 0.75rem;
   border: 1px solid color-mix(in srgb, var(--fate-blue-light) 62%, var(--fate-border));
   border-radius: 8px;
   background: color-mix(in srgb, var(--fate-white) 88%, var(--fate-blue-light) 12%);
   text-align: left;
-  cursor: pointer;
   transition:
     transform 0.12s ease,
     border-color 0.12s ease,
     box-shadow 0.12s ease;
 }
 
-.assigned-item-card:hover {
+.assigned-item-card--clickable {
+  cursor: pointer;
+}
+
+.assigned-item-card--clickable:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--fate-blue) 24%, var(--fate-border));
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -1003,7 +1082,16 @@ defineExpose({ save });
 .assigned-item-card__header {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 0.55rem;
+}
+
+.assigned-item-card__title-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .assigned-item-card__meta {
@@ -1034,12 +1122,36 @@ defineExpose({ save });
   gap: 0.35rem;
 }
 
+.assigned-item-card__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: none;
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--fate-red) 85%, black 15%);
+  color: white;
+  cursor: pointer;
+}
+
+.assigned-item-card__remove-wrap {
+  flex-shrink: 0;
+}
+
+.assigned-item-card__remove:hover {
+  background: color-mix(in srgb, var(--fate-red) 92%, black 8%);
+}
+
 .assigned-item-card__pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.18rem 0.42rem;
   min-height: 1.5rem;
+  min-width: 0;
+  max-width: 100%;
   border-radius: 999px;
   background: color-mix(in srgb, var(--fate-blue-light) 75%, var(--fate-white));
   color: var(--fate-blue-dark);
@@ -1049,13 +1161,33 @@ defineExpose({ save });
   line-height: 1;
 }
 
-@container character-card (width < 900px) {
+.assigned-item-card__pill-text {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@container character-card (width < 768px) {
   .assigned-items-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@container character-card (width < 560px) {
+@container main (width < 768px) {
+  .assigned-items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container character-card (width < 480px) {
+  .assigned-items-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container main (width < 480px) {
   .assigned-items-grid {
     grid-template-columns: 1fr;
   }
