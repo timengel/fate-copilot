@@ -6,9 +6,14 @@ import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
 import { useCharacterItemsStore } from '../stores/characterItems';
 import { normalizeCharacterStress, normalizeItemStress } from '../utils/stressTracks';
+import {
+  CURRENT_APP_DATA_VERSION,
+  SUPPORTED_APP_DATA_VERSIONS,
+  migrateAppDataToCurrent,
+} from '../utils/appDataMigration';
 
-const FORMAT_VERSION: AppDataVersion = '1.0';
-const SUPPORTED_VERSIONS: AppDataVersion[] = ['1.0'];
+const FORMAT_VERSION: AppDataVersion = CURRENT_APP_DATA_VERSION;
+const SUPPORTED_VERSIONS: AppDataVersion[] = SUPPORTED_APP_DATA_VERSIONS;
 
 function isAppSkill(value: unknown): value is AppSkill {
   return (
@@ -135,7 +140,7 @@ export function useImportExport() {
   function importFromString(jsonString: string): AppData {
     const raw = JSON.parse(jsonString);
     validateImportData(raw);
-    return raw as AppData;
+    return migrateAppDataToCurrent(raw as AppData);
   }
 
   function importJSON(file: File): Promise<AppData> {
@@ -145,7 +150,7 @@ export function useImportExport() {
         try {
           const raw = JSON.parse(e.target?.result as string);
           if (validateImportData(raw)) {
-            resolve(raw);
+            resolve(migrateAppDataToCurrent(raw as AppData));
           }
         } catch (err) {
           reject(err instanceof Error ? err : new Error('Ungültige JSON-Datei'));
@@ -157,21 +162,22 @@ export function useImportExport() {
   }
 
   function applyImport(data: AppData) {
+    const migratedData = migrateAppDataToCurrent(data);
     const charactersStore = useCharactersStore();
     const itemsStore = useItemsStore();
     const campaignsStore = useCampaignsStore();
     const skillsStore = useSkillsStore();
     const characterItemsStore = useCharacterItemsStore();
 
-    itemsStore.replaceAll(data.items ?? []);
-    charactersStore.replaceAll(data.characters);
+    itemsStore.replaceAll(migratedData.items ?? []);
+    charactersStore.replaceAll(migratedData.characters);
     campaignsStore.replaceAll(
-      data.campaigns,
-      data.campaignCharacterAssignments,
-      data.campaignItemAssignments ?? [],
+      migratedData.campaigns,
+      migratedData.campaignCharacterAssignments,
+      migratedData.campaignItemAssignments ?? [],
     );
-    characterItemsStore.replaceAll(data.characterItemAssignments ?? []);
-    const importedSkills = parseImportedSkills(data.skills);
+    characterItemsStore.replaceAll(migratedData.characterItemAssignments ?? []);
+    const importedSkills = parseImportedSkills(migratedData.skills);
     skillsStore.replaceAllWithInfo(importedSkills.names, importedSkills.info);
   }
 

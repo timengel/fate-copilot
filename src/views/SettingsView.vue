@@ -142,7 +142,7 @@ function clearAllData() {
   background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 8px;
-  padding: 1.25rem 1.5rem 0.5rem;
+  padding: 1.25rem 1.5rem 1.25rem;
 }
 
 .settings-section h2 {

@@ -1199,7 +1199,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  width: min(100%, 72rem);
+  width: 100%;
   margin: 0 0 1.5rem;
   color: var(--fate-text-light);
   justify-self: stretch;

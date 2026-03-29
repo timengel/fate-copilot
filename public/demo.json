@@ -1,5 +1,5 @@
 {
-  "formatVersion": "1.0",
+  "formatVersion": "1.1",
   "exportDate": "2026-03-29T16:21:13.704Z",
   "campaigns": [
     {
@@ -27,10 +27,7 @@
       "description": "Unterwelt-Freihändler und Informationsmakler",
       "highConcept": "Eiskalter Unterwelt-Freihändler mit weit verbreitetem Netzwerk",
       "trouble": "Mein eigener Stab hat mich verraten",
-      "aspects": [
-        "Xenos-Artefaktjäger",
-        "Kybernetisch augmentiertes Spezialauge"
-      ],
+      "aspects": ["Xenos-Artefaktjäger", "Kybernetisch augmentiertes Spezialauge"],
       "skills": [
         {
           "skill": "Nachforschung",
@@ -139,10 +136,7 @@
       "description": "Ein bionisch augmentierter Magos, besessen davon die perfekte Biomaschine zu werden.",
       "highConcept": "Bionisch augmentierter Magos Biologis des Adeptus Mechanicus",
       "trouble": "Besessen von der perfekten Biomaschine",
-      "aspects": [
-        "\"Du willst mir nichts Gutes\" - außer Uwe",
-        "Mechanische Extremitäten"
-      ],
+      "aspects": ["\"Du willst mir nichts Gutes\" - außer Uwe", "Mechanische Extremitäten"],
       "skills": [
         {
           "skill": "Kraft",
@@ -269,10 +263,7 @@
       "description": "",
       "highConcept": "Der letze Überlebende der Ravensburger",
       "trouble": "Socially awkward",
-      "aspects": [
-        "Raffinierter Rätsellöser",
-        "\"Zeig mir die Welt, Uwe!\""
-      ],
+      "aspects": ["Raffinierter Rätsellöser", "\"Zeig mir die Welt, Uwe!\""],
       "skills": [
         {
           "skill": "Nachforschung",
@@ -504,9 +495,7 @@
       "description": "Von Orden Hyort und dem Psycharus Wurm gelenkte Leichen der Emperor's Bounty. Einzeln stumpf und langsam, in der Masse aber tödlich.",
       "highConcept": "",
       "trouble": "",
-      "aspects": [
-        "Unsterbliche Wiedergänger"
-      ],
+      "aspects": ["Unsterbliche Wiedergänger"],
       "skills": [
         {
           "skill": "Kämpfen",
@@ -574,10 +563,7 @@
       "description": "Abgebrühter imperialer Sergeant, verlässlicher Frontsoldat und taktischer Anführer.",
       "highConcept": "",
       "trouble": "",
-      "aspects": [
-        "Stahlharter, disziplinierter Sergeant",
-        "Narben eines Dutzend Feuergefechte"
-      ],
+      "aspects": ["Stahlharter, disziplinierter Sergeant", "Narben eines Dutzend Feuergefechte"],
       "skills": [
         {
           "skill": "Kämpfen",
@@ -664,10 +650,7 @@
       "type": "item",
       "name": "Krone der Konsequenzen",
       "description": "Mächtiger Gegenstand mit Resonanz im Warp. Fängt Konsequenzen ab und fügt sie per Zufall einer Person in der Nähe zu. Höchst häretisch.",
-      "aspects": [
-        "Starke Warp-Resonanz",
-        "Befleckt vom Chaos"
-      ],
+      "aspects": ["Starke Warp-Resonanz", "Befleckt vom Chaos"],
       "stunts": [],
       "extras": "Nutzung lässt den Schleier zw. Realität und Warp schwächer werden. Pro Nutzung → 1 Stress. Wenn 3 Stress → Nutzer muss Wille 5 verteidigen, alle im Umkreis Wille 3. Krone glüht danach kurzzeitig extrem heiß.",
       "color": "weintraube",
@@ -704,9 +687,7 @@
       "archived": false,
       "name": "Profit Faktor",
       "description": "Gerade: 3 (+0). Maß für Einfluss und Reichtum eines Freihändlers.",
-      "aspects": [
-        ""
-      ],
+      "aspects": [""],
       "stunts": [],
       "extras": "",
       "color": "banane",
@@ -728,9 +709,7 @@
       "type": "item",
       "name": "Guncutter",
       "description": "Kleines bewaffnetes und gepanzertes Shuttle der Crew, mit dem sie das Trümmerfeld des Battlegrounds durchqueren, um die Emperor's Bounty zu erreichen.",
-      "aspects": [
-        "Kleines, wendiges Landungsboot mit leichter Bewaffnung"
-      ],
+      "aspects": ["Kleines, wendiges Landungsboot mit leichter Bewaffnung"],
       "stunts": [],
       "extras": "- Crew: 1-2 Piloten, 1-2 Schützen, 1 Ingenieur\n- Crewquartiere für 6 Personen\n- Frachtraum für ca. 30 Personen oder entsprechende Fracht\n- 6 Void-Suits an Bord\n- Zu klein, um viele verborgene Ordnance-Fallen auszulösen\n- Bewaffnet und gepanzert für In-System-Flüge, Landungen und kurze Gefechte\n- Battleground-Sonderregel: Für den Anflug zur Emperor's Bounty ist meist eine Fahren/Pilotieren-Probe nötig; bei Fehlschlag erleidet der Guncutter 1 physischen Stress durch Trümmer oder alte Ordnance. Wenn zuvor ein Korridor freigeschossen wurde, wird die Probe erleichtert.",
       "color": "gray",
@@ -793,10 +772,7 @@
       "type": "item",
       "name": "Void Suit",
       "description": "Schwerer imperialer Vakuumanzug mit eigenem Lebenserhaltungssystem. Hält die Crew im luftleeren Raum am Leben, ist aber sperrig, laut und für Kampf oder filigrane Arbeiten eine echte Belastung.",
-      "aspects": [
-        "Versiegelter Vakuumanzug mit eigener Luftversorgung",
-        "Sperrig und schwer"
-      ],
+      "aspects": ["Versiegelter Vakuumanzug mit eigener Luftversorgung", "Sperrig und schwer"],
       "stunts": [
         {
           "name": "Lebenserhaltung",
@@ -838,9 +814,7 @@
       "type": "item",
       "name": "Void-Breather des Kapitäns",
       "description": "Eine prunkvolle, vergoldete Atemmaske aus der persönlichen Notfallausrüstung von Kapitän Janrak Spargan. Hinter der goldenen Front verbergen sich uralte Filter, Druckdichtungen und ein kleiner Reserve-Sauerstofftank. Die Maske wirkt würdevoll und unheimlich zugleich – ein Relikt aus dem Wrack der Emperor’s Bounty.",
-      "aspects": [
-        "Prunkvolle Atemmaske eines toten Kapitäns"
-      ],
+      "aspects": ["Prunkvolle Atemmaske eines toten Kapitäns"],
       "stunts": [],
       "extras": "**Wenn getragen:** +1 Deflektion und +2 🟦 gegen **luftbasierte Umgebungsgefahren oder Angriffe** (z.B. Vakuum oder giftiger Rauch).",
       "redDice": 0,
@@ -861,9 +835,7 @@
       "type": "item",
       "name": "Verstärkter Armaplast Brustpanzer",
       "description": "Ein schwerer, vergilbter Brustpanzer aus Armaplast mit verstärkter Front, Nieten und grob ersetzten Segmenten. Alt, oft geflickt und für enge Schiffskorridore gemacht, um Schrapnelle, Splitter und harte Treffer abzufangen. Innen sind nur noch Reste eines abgekratzten Dienstsiegels und verblasste Markierungen eines längst toten Waffenmanns zu sehen.",
-      "aspects": [
-        "Schwer und alt aber beständig (wie Cadia 😉)."
-      ],
+      "aspects": ["Schwer und alt aber beständig (wie Cadia 😉)."],
       "stunts": [],
       "extras": "",
       "redDice": 0,
@@ -879,9 +851,7 @@
       "type": "item",
       "name": "Medicae Servo-Schädel",
       "description": "Ein antiker Servo-Schädel mit Medicae-Optiken, Injektorarmen und heiser knisternden Diagnoselitaneien. Er gehörte einst dem Leit-Chiurgen der Emperor’s Bounty und wurde für Offiziere und VIPs eingesetzt, nicht für die gewöhnliche Besatzung. Sein Messinggehäuse ist verbeult, einige Sonden wurden grob ersetzt, doch seine medizinischen Routinen arbeiten noch immer präzise.",
-      "aspects": [
-        "Fliegender Servo-Schädel zur Medicae Unterstützung"
-      ],
+      "aspects": ["Fliegender Servo-Schädel zur Medicae Unterstützung"],
       "stunts": [],
       "extras": "**+2 🟦 bei Medicae Proben.** Der Schädel schwebt selbstständig in unmittelbarer Nähe des Nutzers.",
       "redDice": 0,
@@ -932,11 +902,7 @@
       "stressTracks": [
         {
           "label": "Hitze",
-          "boxes": [
-            {},
-            {},
-            {}
-          ]
+          "boxes": [{}, {}, {}]
         }
       ]
     }

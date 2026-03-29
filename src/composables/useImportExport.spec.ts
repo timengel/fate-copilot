@@ -6,10 +6,16 @@ import { useCampaignsStore } from '../stores/campaigns';
 import { useSkillsStore } from '../stores/skills';
 import { useCharacterItemsStore } from '../stores/characterItems';
 import { SkillAction } from '../types';
-import type { AppData, Character, Campaign, CampaignCharacterAssignment, CharacterItemAssignment } from '../types';
+import type {
+  AppData,
+  Character,
+  Campaign,
+  CampaignCharacterAssignment,
+  CharacterItemAssignment,
+} from '../types';
 
-const validV10: AppData = {
-  formatVersion: '1.0',
+const validV11: AppData = {
+  formatVersion: '1.1',
   exportDate: '2024-01-01T00:00:00.000Z',
   campaigns: [],
   characters: [],
@@ -40,6 +46,19 @@ const minimalCharacter: Character = {
   notes: '',
 };
 
+const legacyV10: AppData = {
+  ...validV11,
+  formatVersion: '1.0',
+  characters: [
+    {
+      ...minimalCharacter,
+      stressTracks: undefined,
+      stressPhysical: [{ value: 1, checked: false }],
+      stressMental: [],
+    },
+  ],
+};
+
 function makeFile(data: unknown): File {
   return new File([JSON.stringify(data)], 'test.json', { type: 'application/json' });
 }
@@ -50,15 +69,17 @@ describe('useImportExport', () => {
   });
 
   describe('importJSON', () => {
-    it('resolves with valid v1.0 data', async () => {
+    it('resolves with valid v1.1 data', async () => {
       const { importJSON } = useImportExport();
-      const result = await importJSON(makeFile(validV10));
-      expect(result.formatVersion).toBe('1.0');
+      const result = await importJSON(makeFile(validV11));
+      expect(result.formatVersion).toBe('1.1');
     });
 
-    it('rejects previous schema version 1.1', async () => {
+    it('accepts legacy v1.0 data and migrates it to 1.1', async () => {
       const { importJSON } = useImportExport();
-      await expect(importJSON(makeFile({ ...validV10, formatVersion: '1.1' }))).rejects.toThrow();
+      const result = await importJSON(makeFile(legacyV10));
+      expect(result.formatVersion).toBe('1.1');
+      expect(result.characters[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
     });
 
     it('rejects on invalid JSON string', async () => {
@@ -69,45 +90,45 @@ describe('useImportExport', () => {
 
     it('rejects on unknown formatVersion', async () => {
       const { importJSON } = useImportExport();
-      await expect(importJSON(makeFile({ ...validV10, formatVersion: '9.9' }))).rejects.toThrow();
+      await expect(importJSON(makeFile({ ...validV11, formatVersion: '9.9' }))).rejects.toThrow();
     });
 
     it('rejects when campaigns array is missing', async () => {
       const { importJSON } = useImportExport();
-      const { campaigns: _c, ...noCampaigns } = validV10;
+      const { campaigns: _c, ...noCampaigns } = validV11;
       await expect(importJSON(makeFile(noCampaigns))).rejects.toThrow();
     });
 
     it('rejects when characters array is missing', async () => {
       const { importJSON } = useImportExport();
-      const { characters: _c, ...noChars } = validV10;
+      const { characters: _c, ...noChars } = validV11;
       await expect(importJSON(makeFile(noChars))).rejects.toThrow();
     });
 
     it('rejects when campaignCharacterAssignments is missing', async () => {
       const { importJSON } = useImportExport();
-      const { campaignCharacterAssignments: _a, ...noAssignments } = validV10;
+      const { campaignCharacterAssignments: _a, ...noAssignments } = validV11;
       await expect(importJSON(makeFile(noAssignments))).rejects.toThrow();
     });
   });
 
   describe('importFromString', () => {
-    it('returns parsed AppData for valid v1.0 JSON string', () => {
+    it('returns parsed AppData for valid v1.1 JSON string', () => {
       const { importFromString } = useImportExport();
-      const result = importFromString(JSON.stringify(validV10));
-      expect(result.formatVersion).toBe('1.0');
+      const result = importFromString(JSON.stringify(validV11));
+      expect(result.formatVersion).toBe('1.1');
     });
 
-    it('throws on previous schema version 1.1', () => {
+    it('accepts legacy v1.0 JSON and migrates it to 1.1', () => {
       const { importFromString } = useImportExport();
-      expect(() =>
-        importFromString(JSON.stringify({ ...validV10, formatVersion: '1.1' })),
-      ).toThrow();
+      const result = importFromString(JSON.stringify(legacyV10));
+      expect(result.formatVersion).toBe('1.1');
+      expect(result.characters[0]!.stressTracks?.[0]?.boxes[0]!.value).toBe(1);
     });
 
     it('returns correct characters array', () => {
       const { importFromString } = useImportExport();
-      const data = { ...validV10, characters: [minimalCharacter] };
+      const data = { ...validV11, characters: [minimalCharacter] };
       const result = importFromString(JSON.stringify(data));
       expect(result.characters[0]!.name).toBe('Alice');
     });
@@ -120,25 +141,25 @@ describe('useImportExport', () => {
     it('throws on unknown formatVersion', () => {
       const { importFromString } = useImportExport();
       expect(() =>
-        importFromString(JSON.stringify({ ...validV10, formatVersion: '9.9' })),
+        importFromString(JSON.stringify({ ...validV11, formatVersion: '9.9' })),
       ).toThrow();
     });
 
     it('throws when campaigns array is missing', () => {
       const { importFromString } = useImportExport();
-      const { campaigns: _c, ...noCampaigns } = validV10;
+      const { campaigns: _c, ...noCampaigns } = validV11;
       expect(() => importFromString(JSON.stringify(noCampaigns))).toThrow();
     });
 
     it('throws when characters array is missing', () => {
       const { importFromString } = useImportExport();
-      const { characters: _c, ...noChars } = validV10;
+      const { characters: _c, ...noChars } = validV11;
       expect(() => importFromString(JSON.stringify(noChars))).toThrow();
     });
 
     it('throws when campaignCharacterAssignments is missing', () => {
       const { importFromString } = useImportExport();
-      const { campaignCharacterAssignments: _a, ...noAssignments } = validV10;
+      const { campaignCharacterAssignments: _a, ...noAssignments } = validV11;
       expect(() => importFromString(JSON.stringify(noAssignments))).toThrow();
     });
   });
@@ -147,7 +168,7 @@ describe('useImportExport', () => {
     it('preserves redDice and blueDice on import', () => {
       const { importFromString } = useImportExport();
       const charWithDice = { ...minimalCharacter, redDice: 3, blueDice: 1 };
-      const result = importFromString(JSON.stringify({ ...validV10, characters: [charWithDice] }));
+      const result = importFromString(JSON.stringify({ ...validV11, characters: [charWithDice] }));
       expect(result.characters[0]!.redDice).toBe(3);
       expect(result.characters[0]!.blueDice).toBe(1);
     });
@@ -155,7 +176,7 @@ describe('useImportExport', () => {
     it('accepts old character data without redDice/blueDice (backwards compat)', () => {
       const { importFromString } = useImportExport();
       const result = importFromString(
-        JSON.stringify({ ...validV10, characters: [minimalCharacter] }),
+        JSON.stringify({ ...validV11, characters: [minimalCharacter] }),
       );
       expect(result.characters[0]!.name).toBe('Alice');
     });
@@ -180,7 +201,7 @@ describe('useImportExport', () => {
         consequences: [],
         notes: '',
       };
-      applyImport({ ...validV10, characters: [character] });
+      applyImport({ ...validV11, characters: [character] });
       expect(useCharactersStore().characters[0]!.name).toBe('Alice');
     });
 
@@ -195,14 +216,14 @@ describe('useImportExport', () => {
         avatar: '🗺️',
         milestones: [],
       };
-      applyImport({ ...validV10, campaigns: [campaign] });
+      applyImport({ ...validV11, campaigns: [campaign] });
       expect(useCampaignsStore().campaigns[0]!.name).toBe('My Campaign');
     });
 
     it('replaces skills in the store', () => {
       const { applyImport } = useImportExport();
       applyImport({
-        ...validV10,
+        ...validV11,
         skills: [
           {
             name: 'CustomSkill',
@@ -220,14 +241,14 @@ describe('useImportExport', () => {
 
     it('accepts legacy string skills during import', () => {
       const { applyImport } = useImportExport();
-      applyImport({ ...validV10, skills: ['CustomSkill'] });
+      applyImport({ ...validV11, skills: ['CustomSkill'] });
       expect(useSkillsStore().skills).toEqual(['CustomSkill']);
       expect(useSkillsStore().skillInfo.CustomSkill).toEqual({ description: '', actions: [] });
     });
 
     it('falls back to SKILL_LIST when skills is undefined (v1.0)', () => {
       const { applyImport } = useImportExport();
-      const { skills: _s, ...data } = validV10;
+      const { skills: _s, ...data } = validV11;
       applyImport(data as AppData);
       expect(useSkillsStore().skills.length).toBeGreaterThan(0);
     });
@@ -235,14 +256,14 @@ describe('useImportExport', () => {
     it('applies campaign-character assignments to the store', () => {
       const { applyImport } = useImportExport();
       const assignment: CampaignCharacterAssignment = { campaignId: 'camp1', characterId: 'c1' };
-      applyImport({ ...validV10, campaignCharacterAssignments: [assignment] });
+      applyImport({ ...validV11, campaignCharacterAssignments: [assignment] });
       expect(useCampaignsStore().assignments).toEqual([assignment]);
     });
 
     it('applies character-item assignments to the store', () => {
       const { applyImport } = useImportExport();
       const assignment: CharacterItemAssignment = { characterId: 'c1', itemId: 'item-1' };
-      applyImport({ ...validV10, characterItemAssignments: [assignment] });
+      applyImport({ ...validV11, characterItemAssignments: [assignment] });
       expect(useCharacterItemsStore().assignments).toEqual([assignment]);
     });
 
@@ -250,7 +271,7 @@ describe('useImportExport', () => {
       const { applyImport } = useImportExport();
       useCharacterItemsStore().assignItem('old-char', 'old-item');
 
-      applyImport(validV10);
+      applyImport(validV11);
 
       expect(useCharacterItemsStore().assignments).toEqual([]);
     });
@@ -274,7 +295,7 @@ describe('useImportExport', () => {
         notes: '',
       };
       useCharactersStore().addCharacter(existingChar);
-      applyImport({ ...validV10, characters: [] });
+      applyImport({ ...validV11, characters: [] });
       expect(useCharactersStore().characters).toHaveLength(0);
     });
 
@@ -297,14 +318,14 @@ describe('useImportExport', () => {
         consequences: [],
         notes: '',
       };
-      applyImport({ ...validV10, characters: [nsc] });
+      applyImport({ ...validV11, characters: [nsc] });
       expect(useCharactersStore().characters[0]!.type).toBe('nsc');
     });
 
     it('migrates legacy stress arrays into stressTracks when applying imports', () => {
       const { applyImport } = useImportExport();
       applyImport({
-        ...validV10,
+        ...validV11,
         characters: [
           {
             ...minimalCharacter,
@@ -388,7 +409,7 @@ describe('useImportExport', () => {
       expect(parsed.characters[0].stressMental).toBeUndefined();
     });
 
-    it('exported JSON has formatVersion 1.0', async () => {
+    it('exported JSON has formatVersion 1.1', async () => {
       let capturedBlob: Blob | undefined;
       vi.spyOn(URL, 'createObjectURL').mockImplementation((blob: Blob) => {
         capturedBlob = blob;
@@ -400,7 +421,7 @@ describe('useImportExport', () => {
 
       const text = await capturedBlob!.text();
       const parsed = JSON.parse(text);
-      expect(parsed.formatVersion).toBe('1.0');
+      expect(parsed.formatVersion).toBe('1.1');
     });
 
     it('exports structured skills with descriptions and action examples', async () => {
@@ -445,7 +466,9 @@ describe('useImportExport', () => {
 
       const text = await capturedBlob!.text();
       const parsed = JSON.parse(text);
-      expect(parsed.characterItemAssignments).toEqual([{ characterId: 'char-1', itemId: 'item-1' }]);
+      expect(parsed.characterItemAssignments).toEqual([
+        { characterId: 'char-1', itemId: 'item-1' },
+      ]);
     });
   });
 
@@ -471,11 +494,11 @@ describe('useImportExport', () => {
       expect(writeText).toHaveBeenCalledOnce();
     });
 
-    it('written JSON has formatVersion 1.0', async () => {
+    it('written JSON has formatVersion 1.1', async () => {
       const { exportToClipboard } = useImportExport();
       await exportToClipboard();
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
-      expect(parsed.formatVersion).toBe('1.0');
+      expect(parsed.formatVersion).toBe('1.1');
     });
 
     it('written JSON contains characters from the store', async () => {

@@ -80,7 +80,7 @@ export type ConsequenceSeverity = 2 | 4 | 6 | 8;
 
 export type SkillLevel = number;
 
-export type AppDataVersion = '1.0';
+export type AppDataVersion = '1.0' | '1.1';
 
 export type CharacterType = 'sc' | 'nsc';
 
