@@ -328,8 +328,31 @@ export const CHARACTER_COLORS: CharacterColor[] = [
   { id: 'zimt', label: 'Zimt', primary: '#6D4C41', dark: '#3E2723', light: '#ECE3DF' },
 ];
 
-export const SKILL_LEVEL_LABELS: Record<number, string> = {
-  1: 'Durchschnittlich',
+export type CheckLadderLevel = -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type PositiveCheckLadderLevel = Exclude<CheckLadderLevel, -2 | -1 | 0>;
+
+export interface CheckLadderEntry {
+  level: CheckLadderLevel;
+  value: string;
+  label: string;
+}
+
+export const CHECK_LADDER: CheckLadderEntry[] = [
+  { level: 8, value: '+8', label: 'Legendär' },
+  { level: 7, value: '+7', label: 'Episch' },
+  { level: 6, value: '+6', label: 'Fantastisch' },
+  { level: 5, value: '+5', label: 'Hervorragend' },
+  { level: 4, value: '+4', label: 'Großartig' },
+  { level: 3, value: '+3', label: 'Gut' },
+  { level: 2, value: '+2', label: 'Ordentlich' },
+  { level: 1, value: '+1', label: 'Durchschnitt' },
+  { level: 0, value: '0', label: 'Mäßig' },
+  { level: -1, value: '-1', label: 'Armselig' },
+  { level: -2, value: '-2', label: 'Grauenhaft' },
+];
+
+export const POSITIVE_CHECK_LADDER_LABELS: Record<PositiveCheckLadderLevel, string> = {
+  1: 'Durchschnitt',
   2: 'Ordentlich',
   3: 'Gut',
   4: 'Großartig',
@@ -338,6 +361,10 @@ export const SKILL_LEVEL_LABELS: Record<number, string> = {
   7: 'Episch',
   8: 'Legendär',
 };
+
+export function getPositiveCheckLadderLabel(level: number): string {
+  return POSITIVE_CHECK_LADDER_LABELS[level as PositiveCheckLadderLevel] ?? '';
+}
 
 export const SKILL_LIST = [
   'Athletik',

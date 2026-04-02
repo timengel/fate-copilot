@@ -1,5 +1,4 @@
-import type { AppData, AppDataVersion, AppSkill, SkillInfo } from '../types';
-import { SKILL_LIST } from '../types';
+import { SKILL_LIST, type AppData, type AppDataVersion, type AppSkill, type SkillInfo } from '@fate/types';
 import { useCharactersStore } from '../stores/characters';
 import { useItemsStore } from '../stores/items';
 import { useCampaignsStore } from '../stores/campaigns';

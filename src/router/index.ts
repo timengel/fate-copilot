@@ -9,6 +9,7 @@ import ItemsView from '../views/ItemsView.vue';
 import ItemDetailView from '../views/ItemDetailView.vue';
 import SkillsView from '../views/SkillsView.vue';
 import SettingsView from '../views/SettingsView.vue';
+import CheatSheetView from '../views/CheatSheetView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,7 @@ const router = createRouter({
     { path: '/items/:id', component: ItemDetailView },
     { path: '/items/:id/edit', component: ItemDetailView, props: { editMode: true } },
     { path: '/skills', component: SkillsView },
+    { path: '/cheat-sheet', component: CheatSheetView },
     { path: '/settings', component: SettingsView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

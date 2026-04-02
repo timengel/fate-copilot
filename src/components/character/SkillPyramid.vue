@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { SkillEntry } from '../../types';
-import { SKILL_LEVEL_LABELS } from '../../types';
+import { getPositiveCheckLadderLabel, type SkillEntry } from '@fate/types';
 import { useSkillsStore } from '../../stores/skills';
 import FateButton from '../shared/FateButton.vue';
 
@@ -101,7 +100,7 @@ function removeCol() {
     <div v-for="level in visibleRows" :key="level" class="pyramid-row">
       <div class="level-label">
         <span class="level-plus">+{{ level }}</span>
-        <span class="level-name">{{ SKILL_LEVEL_LABELS[level] ?? '' }}</span>
+        <span class="level-name">{{ getPositiveCheckLadderLabel(level) }}</span>
       </div>
       <div class="level-slots">
         <div v-for="i in effectiveCols" :key="i" class="skill-slot">
@@ -281,7 +280,7 @@ function removeCol() {
 
 @container (width < 640px) {
   .level-label {
-    flex: 0 0 90px;
+    flex: 0 0 100px;
     overflow: hidden;
   }
   .pyramid-row {

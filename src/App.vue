@@ -79,6 +79,14 @@ watch(
             <RouterLink to="/characters" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/characters') }">Charaktere</RouterLink>
             <RouterLink to="/items" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/items') }">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/skills') }">Fertigkeiten</RouterLink>
+            <RouterLink
+              v-if="gmModeStore.isGMMode"
+              to="/cheat-sheet"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/cheat-sheet') }"
+            >
+              Cheat Sheet
+            </RouterLink>
             <button class="nav-link nav-theme-toggle" :aria-label="themeLabel" @click="cycleTheme">
               <span class="theme-icon-wrap">
                 <Transition name="theme-icon" mode="out-in">

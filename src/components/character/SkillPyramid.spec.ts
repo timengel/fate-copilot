@@ -3,6 +3,7 @@ import { render, fireEvent, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import SkillPyramid from './SkillPyramid.vue';
 import { useSkillsStore } from '../../stores/skills';
+import { POSITIVE_CHECK_LADDER_LABELS } from '../../types';
 import type { SkillEntry } from '../../types';
 
 function renderPyramid(skills: SkillEntry[], extraProps: Record<string, unknown> = {}) {
@@ -18,6 +19,15 @@ function renderPyramid(skills: SkillEntry[], extraProps: Record<string, unknown>
 describe('SkillPyramid', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  it('renders official german ladder labels from the shared check ladder', () => {
+    renderPyramid([], { maxLevel: 8, maxCols: 1 });
+
+    expect(screen.getByText(`+8`)).toBeTruthy();
+    expect(screen.getByText(POSITIVE_CHECK_LADDER_LABELS[8])).toBeTruthy();
+    expect(screen.getByText(POSITIVE_CHECK_LADDER_LABELS[2])).toBeTruthy();
+    expect(screen.getByText(POSITIVE_CHECK_LADDER_LABELS[1])).toBeTruthy();
   });
 
   // ─── updateSlot ────────────────────────────────────────────────

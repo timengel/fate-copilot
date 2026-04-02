@@ -1,7 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { computed, defineComponent, h } from 'vue';
+import { computed, defineComponent, h, type PropType } from 'vue';
 import DashboardView from './DashboardView.vue';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useItemsStore } from '../stores/items';
@@ -14,55 +14,58 @@ import type { Character } from '../types';
 
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
   return {
-    id: 'campaign-1',
-    name: 'Testkampagne',
-    description: '',
-    status: 'active',
-    notes: '',
-    milestones: [],
     ...overrides,
+    id: overrides.id ?? 'campaign-1',
+    name: overrides.name ?? 'Testkampagne',
+    description: overrides.description ?? '',
+    status: overrides.status ?? 'active',
+    notes: overrides.notes ?? '',
+    milestones: overrides.milestones ?? [],
   };
 }
 
 function makeItem(overrides: Partial<Item> = {}): Item {
   return {
-    id: 'item-1',
-    type: 'item',
-    archived: false,
-    name: 'Altes Schwert',
-    description: '',
-    aspects: [],
-    stunts: [],
-    extras: '',
-    stressPhysical: [],
-    stressMental: [],
-    hidden: false,
-    redDice: 0,
-    blueDice: 0,
     ...overrides,
+    id: overrides.id ?? 'item-1',
+    type: 'item',
+    archived: overrides.archived ?? false,
+    name: overrides.name ?? 'Altes Schwert',
+    description: overrides.description ?? '',
+    aspects: overrides.aspects ?? [],
+    stunts: overrides.stunts ?? [],
+    extras: overrides.extras ?? '',
+    stressPhysical: overrides.stressPhysical ?? [],
+    stressMental: overrides.stressMental ?? [],
+    hidden: overrides.hidden ?? false,
+    redDice: overrides.redDice ?? 0,
+    blueDice: overrides.blueDice ?? 0,
   };
 }
 
 function makeCharacter(overrides: Partial<Character> = {}): Character {
   return {
-    id: 'character-1',
-    type: 'sc',
-    archived: false,
-    name: 'Alrik',
-    highConcept: '',
-    trouble: '',
-    aspects: [],
-    skills: [],
-    stunts: [],
-    consequences: [],
-    stressPhysical: [],
-    stressMental: [],
-    notes: '',
-    gmNotes: '',
-    extras: '',
-    redDice: 0,
-    blueDice: 0,
     ...overrides,
+    id: overrides.id ?? 'character-1',
+    type: overrides.type ?? 'sc',
+    archived: overrides.archived ?? false,
+    name: overrides.name ?? 'Alrik',
+    description: overrides.description ?? '',
+    highConcept: overrides.highConcept ?? '',
+    trouble: overrides.trouble ?? '',
+    aspects: overrides.aspects ?? [],
+    skills: overrides.skills ?? [],
+    stunts: overrides.stunts ?? [],
+    consequences: overrides.consequences ?? [],
+    stressPhysical: overrides.stressPhysical ?? [],
+    stressMental: overrides.stressMental ?? [],
+    notes: overrides.notes ?? '',
+    gmNotes: overrides.gmNotes ?? '',
+    extras: overrides.extras ?? '',
+    refresh: overrides.refresh ?? 0,
+    fatePoints: overrides.fatePoints ?? 0,
+    redDice: overrides.redDice ?? 0,
+    blueDice: overrides.blueDice ?? 0,
   };
 }
 
@@ -100,26 +103,26 @@ describe('DashboardView inline filter collapsing', () => {
 
   it('shows the filters body when the Filter toggle is clicked', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     expect(container.querySelector('.filters-body')).toBeTruthy();
   });
 
   it('hides the filters body again when the Filter toggle is clicked twice', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     expect(container.querySelector('.filters-body')).toBeNull();
   });
 
   it('all sections are collapsed by default when filters are opened', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
   });
 
   it('clicking a section toggle expands only that section', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     const sectionToggles = container.querySelectorAll<HTMLElement>('.filters-section-toggle');
     await fireEvent.click(sectionToggles[1]!); // Karaktere section
     expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
@@ -127,7 +130,7 @@ describe('DashboardView inline filter collapsing', () => {
 
   it('clicking an expanded section toggle collapses it', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     const toggle = container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!;
     await fireEvent.click(toggle);
     expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
@@ -137,14 +140,14 @@ describe('DashboardView inline filter collapsing', () => {
 
   it('expand-all button opens the filters panel and expands all sections', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-expand-all')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!);
     expect(container.querySelector('.filters-body')).toBeTruthy();
     expect(container.querySelectorAll('.filters-section-body').length).toBe(5);
   });
 
   it('expand-all button becomes collapse-all when at least one section is expanded', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-toggle')!);
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
     await fireEvent.click(container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!);
     expect(container.querySelector<HTMLElement>('.filters-expand-all')!.title).toBe(
       'Alle zuklappen',
@@ -153,8 +156,8 @@ describe('DashboardView inline filter collapsing', () => {
 
   it('collapse-all button collapses all sections', async () => {
     const { container } = setupFilters();
-    await fireEvent.click(container.querySelector('.filters-expand-all')!); // expand all
-    await fireEvent.click(container.querySelector('.filters-expand-all')!); // collapse all
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!); // expand all
+    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!); // collapse all
     expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
   });
 });
@@ -264,24 +267,24 @@ describe('DashboardView character sheet item navigation', () => {
       },
     });
 
-    await fireEvent.click(view.container.querySelector('.dashboard-entry button')!);
+    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.dashboard-entry button')!);
     expect(view.container.querySelector('.assigned')?.textContent).toContain('Schwert');
 
-    await fireEvent.click(view.container.querySelector('.unassign')!);
+    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.unassign')!);
     expect(view.container.querySelector('.assigned')?.textContent).toBe('');
     expect(view.container.querySelector('.dirty')?.textContent).toBe('dirty');
     expect(
       characterItemsStore.getItemsForCharacter(character.id).map((entry) => entry.name),
     ).toEqual(['Schwert']);
 
-    await fireEvent.click(view.container.querySelector('.save')!);
+    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.save')!);
     expect(characterItemsStore.getItemsForCharacter(character.id)).toHaveLength(0);
   });
 });
 
 describe('DashboardView archived item filter', () => {
   function getItemArchivedFilter(container: HTMLElement) {
-    return container.querySelectorAll<HTMLElement>('.sidebar-group .fate-checkbox')[3];
+    return container.querySelectorAll<HTMLLabelElement>('.sidebar-group .fate-checkbox')[3];
   }
 
   function getItemEditButton(container: HTMLElement) {
@@ -343,7 +346,7 @@ describe('DashboardView archived item filter', () => {
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
 
-    await fireEvent.click(getItemArchivedFilter(view.container)!);
+    await fireEvent.click(getItemArchivedFilter(view.container as HTMLElement)!);
 
     expect(view.getByText('Altes Schwert')).toBeTruthy();
   });
@@ -351,24 +354,24 @@ describe('DashboardView archived item filter', () => {
   it('still hides hidden archived items for non-GM users even when the archived filter is enabled', async () => {
     const view = setup({ archived: true, hidden: true });
 
-    await fireEvent.click(getItemArchivedFilter(view.container)!);
+    await fireEvent.click(getItemArchivedFilter(view.container as HTMLElement)!);
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
   });
 
   it('shows an edit button for visible items when editing is enabled', () => {
     const view = setup({}, false, false);
-    expect(getItemEditButton(view.container)).toBeTruthy();
+    expect(getItemEditButton(view.container as HTMLElement)).toBeTruthy();
   });
 
   it('switches an item into edit mode and cancels without saving', async () => {
     const view = setup({}, false, false);
-    await fireEvent.click(getItemEditButton(view.container)!);
+    await fireEvent.click(getItemEditButton(view.container as HTMLElement)!);
     expect(view.getByText('Abbrechen')).toBeTruthy();
     expect(view.getByText('Speichern')).toBeTruthy();
 
-    await fireEvent.click(view.getByText('Abbrechen'));
-    expect(getItemEditButton(view.container)).toBeTruthy();
+    await fireEvent.click(view.getByText('Abbrechen').closest('button') as HTMLButtonElement);
+    expect(getItemEditButton(view.container as HTMLElement)).toBeTruthy();
   });
 
   it('saves an edited item inline and shows a success toast', async () => {
@@ -412,9 +415,9 @@ describe('DashboardView archived item filter', () => {
       },
     });
 
-    await fireEvent.click(getItemEditButton(view.container)!);
+    await fireEvent.click(getItemEditButton(view.container as HTMLElement)!);
     await fireEvent.update(view.getByPlaceholderText('Name des Gegenstands'), 'Neues Schwert');
-    await fireEvent.click(view.getByText('Speichern'));
+    await fireEvent.click(view.getByText('Speichern').closest('button') as HTMLButtonElement);
 
     expect(updateSpy).toHaveBeenCalledOnce();
     expect(updateSpy.mock.calls[0]?.[0].name).toBe('Neues Schwert');
@@ -447,17 +450,24 @@ describe('DashboardView character edit switching', () => {
     const dirtyIds = new Set(options.dirtyCharacterIds ?? []);
 
     const CharacterSheetStub = defineComponent({
-      props: ['character', 'mode'],
+      props: {
+        character: {
+          type: Object as PropType<Character>,
+          required: true,
+        },
+        mode: {
+          type: String as PropType<string | undefined>,
+          required: false,
+        },
+      },
       emits: ['save', 'cancel', 'assign-item', 'unassign-item'],
       setup(props, { emit, slots, expose }) {
-        const isDirty = computed(
-          () => props.mode === 'edit' && dirtyIds.has((props.character as Character).id),
-        );
+        const isDirty = computed(() => props.mode === 'edit' && dirtyIds.has(props.character.id));
 
         function save() {
           emit('save', {
-            ...(props.character as Character),
-            name: `${(props.character as Character).name} gespeichert`,
+            ...props.character,
+            name: `${props.character.name} gespeichert`,
           });
         }
 
@@ -465,13 +475,9 @@ describe('DashboardView character edit switching', () => {
 
         return () =>
           h('div', { class: 'character-sheet-switch-stub' }, [
-            h('span', { class: 'character-name' }, (props.character as Character).name),
+            h('span', { class: 'character-name' }, props.character.name),
             props.mode === 'edit'
-              ? h(
-                  'span',
-                  { class: 'editing-indicator' },
-                  `editing-${(props.character as Character).id}`,
-                )
+              ? h('span', { class: 'editing-indicator' }, `editing-${props.character.id}`)
               : null,
             props.mode === 'edit'
               ? slots['edit-bar-actions']?.({ isDirty: isDirty.value })
@@ -505,12 +511,16 @@ describe('DashboardView character edit switching', () => {
     return { view, charactersStore };
   }
 
-  it('disables the inline character save button until there are changes', async () => {
-    const { view } = setupCharacterSwitching();
-    const editButtons = view
+  function getEditButtons(view: ReturnType<typeof render>): HTMLButtonElement[] {
+    return view
       .getAllByText('Bearbeiten')
       .map((element) => element.closest('button'))
-      .filter((button): button is HTMLButtonElement => !!button);
+      .filter((button): button is HTMLButtonElement => button instanceof HTMLButtonElement);
+  }
+
+  it('disables the inline character save button until there are changes', async () => {
+    const { view } = setupCharacterSwitching();
+    const editButtons = getEditButtons(view);
 
     await fireEvent.click(editButtons[0]!);
 
@@ -520,10 +530,7 @@ describe('DashboardView character edit switching', () => {
 
   it('prompts before switching away from a dirty character edit session', async () => {
     const { view } = setupCharacterSwitching({ dirtyCharacterIds: ['character-1'] });
-    const editButtons = view
-      .getAllByText('Bearbeiten')
-      .map((element) => element.closest('button'))
-      .filter((button): button is HTMLButtonElement => !!button);
+    const editButtons = getEditButtons(view);
 
     await fireEvent.click(editButtons[0]!);
     expect(view.getByText('editing-character-1')).toBeTruthy();
@@ -540,15 +547,12 @@ describe('DashboardView character edit switching', () => {
     const { view, charactersStore } = setupCharacterSwitching({
       dirtyCharacterIds: ['character-1'],
     });
-    const editButtons = view
-      .getAllByText('Bearbeiten')
-      .map((element) => element.closest('button'))
-      .filter((button): button is HTMLButtonElement => !!button);
+    const editButtons = getEditButtons(view);
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
     await fireEvent.click(
-      view.container.querySelector('.dialog-overlay .fate-btn--primary') as HTMLButtonElement,
+      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--primary')!,
     );
 
     expect(charactersStore.getById('character-1')?.name).toBe('Alrik gespeichert');
@@ -559,17 +563,14 @@ describe('DashboardView character edit switching', () => {
     const { view, charactersStore } = setupCharacterSwitching({
       dirtyCharacterIds: ['character-1'],
     });
-    const editButtons = view
-      .getAllByText('Bearbeiten')
-      .map((element) => element.closest('button'))
-      .filter((button): button is HTMLButtonElement => !!button);
+    const editButtons = getEditButtons(view);
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
     await fireEvent.click(
-      view.container.querySelector(
+      view.container.querySelector<HTMLButtonElement>(
         '.dialog-overlay .fate-btn--danger-outline',
-      ) as HTMLButtonElement,
+      )!,
     );
 
     expect(charactersStore.getById('character-1')?.name).toBe('Alrik');
@@ -578,15 +579,12 @@ describe('DashboardView character edit switching', () => {
 
   it('keeps the current character in edit mode when the user cancels the switch', async () => {
     const { view } = setupCharacterSwitching({ dirtyCharacterIds: ['character-1'] });
-    const editButtons = view
-      .getAllByText('Bearbeiten')
-      .map((element) => element.closest('button'))
-      .filter((button): button is HTMLButtonElement => !!button);
+    const editButtons = getEditButtons(view);
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
     await fireEvent.click(
-      view.container.querySelector('.dialog-overlay .fate-btn--secondary') as HTMLButtonElement,
+      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--secondary')!,
     );
 
     expect(view.queryByText('Ungespeicherte Aenderungen')).toBeNull();
