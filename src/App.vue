@@ -108,7 +108,7 @@ watch(
                 :class="{ 'gm-active': gmModeStore.isGMMode }"
                 @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
               >
-                <FateToggle v-model="gmModeStore.isGMMode" label="GM-Modus" :variant="ToggleVariant.Ghost" @click.stop />
+                <FateToggle v-model="gmModeStore.isGMMode" label="GM" :variant="ToggleVariant.Ghost" @click.stop />
               </div>
             </div>
           </Transition>

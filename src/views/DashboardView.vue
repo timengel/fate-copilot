@@ -567,11 +567,6 @@ onUnmounted(() => {
         </div>
 
         <div class="sidebar-group">
-          <div class="sidebar-group-label">Aktionen</div>
-          <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
-        </div>
-
-        <div class="sidebar-group">
           <div class="sidebar-group-label">Layout</div>
           <FateRadioButtonGroup
             :model-value="layout"
@@ -738,7 +733,6 @@ onUnmounted(() => {
             <FateCheckbox v-model="visibleSections.dice" label="Würfel" />
             <FateCheckbox v-model="visibleSections.modifiers" label="Modifiers" />
             <FateCheckbox v-model="visibleSections.items" label="Gegenstände" />
-            <FateCheckbox v-model="showEditButton" label="Bearbeiten" />
           </div>
         </div>
 
