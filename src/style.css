@@ -42,6 +42,8 @@
   --fate-header-bg: var(--fate-blue);
   --fate-nav-active-bg: white;
   --fate-nav-active-color: var(--fate-blue);
+  --fate-scrollbar-thumb: #a4c9dc;
+  --fate-scrollbar-track: #f2f7fa;
 
   font-family: 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -58,6 +60,12 @@
 *::after {
   box-sizing: border-box;
   touch-action: manipulation;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fate-scrollbar-thumb) var(--fate-scrollbar-track);
+  scrollbar-gutter: auto;
 }
 
 html {
@@ -272,6 +280,8 @@ html[data-theme='dark'] .sheet-section-header {
   --fate-nav-active-color: white;
 
   --fate-btn-primary-bg: #0f4060;
+  --fate-scrollbar-thumb: #3f6280;
+  --fate-scrollbar-track: #1a2733;
 }
 
 /* System preference fallback — applies dark when no explicit choice is stored */
@@ -309,5 +319,7 @@ html[data-theme='dark'] .sheet-section-header {
     --fate-nav-active-color: white;
 
     --fate-btn-primary-bg: #1e5a8a;
+    --fate-scrollbar-thumb: #3f6280;
+    --fate-scrollbar-track: #1a2733;
   }
 }
