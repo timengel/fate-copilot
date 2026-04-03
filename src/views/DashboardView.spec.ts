@@ -12,6 +12,18 @@ import { useCharacterItemsStore } from '../stores/characterItems';
 import type { Campaign, Item } from '../types';
 import type { Character } from '../types';
 
+const mockRouterPush = vi.fn();
+
+vi.mock('vue-router', async () => {
+  const actual = await vi.importActual<typeof import('vue-router')>('vue-router');
+  return {
+    ...actual,
+    useRouter: () => ({
+      push: mockRouterPush,
+    }),
+  };
+});
+
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
   return {
     ...overrides,
@@ -71,6 +83,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 
 const filterStubs = {
   FateButton: { template: '<button><slot /></button>' },
+  FateIcon: { template: '<span />' },
   FateDropdown: {
     props: ['modelValue', 'options', 'placeholder'],
     template: `
@@ -85,11 +98,66 @@ const filterStubs = {
   ItemSheet: { template: '<div />' },
 };
 
+beforeEach(() => {
+  mockRouterPush.mockReset();
+});
+
 function setupFilters() {
   const pinia = createPinia();
   setActivePinia(pinia);
   return render(DashboardView, { global: { plugins: [pinia], stubs: filterStubs } });
 }
+
+describe('DashboardView floating action menu', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  function setupFab(gmMode: boolean) {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = gmMode;
+    return render(DashboardView, {
+      global: {
+        plugins: [pinia],
+        stubs: filterStubs,
+      },
+    });
+  }
+
+  it('hides the floating action menu when GM mode is off', () => {
+    const { queryByRole } = setupFab(false);
+    expect(queryByRole('button', { name: 'Schnellaktionen öffnen' })).toBeNull();
+  });
+
+  it('toggles the floating action menu when GM mode is on', async () => {
+    const { getByRole, queryByRole } = setupFab(true);
+    const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+
+    await fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(getByRole('button', { name: 'Cheat Sheet öffnen' })).toBeTruthy();
+
+    await fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+  });
+
+  it('navigates to cheat sheet from the floating action menu', async () => {
+    const { getByRole, queryByRole } = setupFab(true);
+    const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
+
+    await fireEvent.click(trigger);
+    await fireEvent.click(getByRole('button', { name: 'Cheat Sheet öffnen' }));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/cheat-sheet');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+  });
+});
 
 describe('DashboardView inline filter collapsing', () => {
   beforeEach(() => {

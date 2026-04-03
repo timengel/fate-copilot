@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
@@ -22,6 +23,7 @@ const charactersStore = useCharactersStore();
 const itemsStore = useItemsStore();
 const characterItemsStore = useCharacterItemsStore();
 const gmModeStore = useGMModeStore();
+const router = useRouter();
 const toastStore = useToastStore();
 const {
   selectedCampaignFilter,
@@ -68,6 +70,7 @@ const switchCharacterDialog = ref<{
   currentCharacterId: string;
   nextCharacterId: string;
 } | null>(null);
+const isFabOpen = ref(false);
 
 const campaignOptions = computed(() => [
   { value: 'active', label: 'Aktive Kampagnen' },
@@ -281,6 +284,15 @@ function saveCharacterSwitchChanges() {
   saveCharacterEditing();
 }
 
+function toggleFabMenu() {
+  isFabOpen.value = !isFabOpen.value;
+}
+
+function openCheatSheetFromFab() {
+  isFabOpen.value = false;
+  router.push('/cheat-sheet');
+}
+
 function handleDashboardAssignItem(itemId: string) {
   if (!itemId || editingCharacterItemIds.value.includes(itemId)) return;
   editingCharacterItemIds.value = [...editingCharacterItemIds.value, itemId];
@@ -296,6 +308,13 @@ watch(sidebarCollapsed, (val) => {
   document.body.classList.toggle('sidebar-collapsed', val);
   sessionStorage.setItem('sidebarCollapsed', String(val));
 });
+
+watch(
+  () => gmModeStore.isGMMode,
+  (isEnabled) => {
+    if (!isEnabled) isFabOpen.value = false;
+  },
+);
 
 watch(
   layout,
@@ -906,6 +925,33 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+
+    <div v-if="gmModeStore.isGMMode" class="dashboard-fab">
+      <Transition name="fab-actions">
+        <div v-if="isFabOpen" id="dashboard-fab-menu" class="dashboard-fab-menu">
+          <button
+            type="button"
+            class="dashboard-fab-action"
+            aria-label="Cheat Sheet öffnen"
+            @click="openCheatSheetFromFab"
+          >
+            Cheat Sheet
+          </button>
+        </div>
+      </Transition>
+
+      <button
+        type="button"
+        class="dashboard-fab-trigger"
+        :class="{ open: isFabOpen }"
+        :aria-expanded="isFabOpen ? 'true' : 'false'"
+        aria-controls="dashboard-fab-menu"
+        aria-label="Schnellaktionen öffnen"
+        @click="toggleFabMenu"
+      >
+        <FateIcon name="add" :size="20" class="dashboard-fab-trigger-icon" :class="{ open: isFabOpen }" />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -987,14 +1033,8 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
   padding-bottom: 1.25rem;
   padding-left: 0.5rem;
-}
-
-.sidebar-content::-webkit-scrollbar {
-  width: 8px;
 }
 
 .dashboard-sidebar.collapsed {
@@ -1296,6 +1336,109 @@ onUnmounted(() => {
   gap: 0.75rem;
 }
 
+.dashboard-fab {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  z-index: 900;
+}
+
+.dashboard-fab-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dashboard-fab-action {
+  border: 1px solid var(--fate-border);
+  border-radius: 999px;
+  background: var(--fate-white);
+  color: var(--fate-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+  cursor: pointer;
+}
+
+.dashboard-fab-action:hover {
+  background: var(--fate-blue-light);
+  color: var(--fate-heading);
+}
+
+.dashboard-fab-trigger {
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid color-mix(in srgb, var(--fate-blue) 65%, var(--fate-border));
+  border-radius: 999px;
+  background: var(--fate-blue);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.3);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.12s ease;
+}
+
+.dashboard-fab-trigger-icon {
+  transition: transform 0.16s ease;
+  transform: rotate(0deg);
+}
+
+.dashboard-fab-trigger-icon.open {
+  transform: rotate(45deg);
+}
+
+.dashboard-fab-trigger:hover {
+  background: color-mix(in srgb, var(--fate-blue) 85%, white);
+}
+
+.dashboard-fab-trigger.open {
+  background: var(--fate-blue-dark);
+  border-color: var(--fate-blue-dark);
+}
+
+.dashboard-fab-trigger:active {
+  transform: translateY(1px);
+}
+
+.dashboard-fab-trigger:focus-visible,
+.dashboard-fab-action:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fate-blue) 75%, white);
+  outline-offset: 2px;
+}
+
+.fab-actions-enter-active,
+.fab-actions-leave-active {
+  transition: all 0.16s ease;
+}
+
+.fab-actions-enter-from,
+.fab-actions-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+:global(html[data-theme='dark']) .dashboard-fab-trigger.open {
+  background: var(--fate-nav-active-bg);
+  border-color: var(--fate-nav-active-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-theme='light'])) .dashboard-fab-trigger.open {
+    background: var(--fate-nav-active-bg);
+    border-color: var(--fate-nav-active-bg);
+  }
+}
+
 @container character-card (width < 480px) {
   :deep(.dashboard-inline-edit-action .btn-label) {
     display: none;
@@ -1327,6 +1470,11 @@ onUnmounted(() => {
 
   .dashboard-filters-inline {
     display: flex;
+  }
+
+  .dashboard-fab {
+    right: 0.85rem;
+    bottom: 0.85rem;
   }
 }
 </style>
