@@ -49,10 +49,11 @@ describe('App navigation', () => {
     };
   }
 
-  it('hides the cheat sheet link when GM mode is off', async () => {
+  it('always shows the cheat sheet link regardless of GM mode', async () => {
     await setup();
 
-    expect(screen.queryByRole('link', { name: 'Cheat Sheet' })).toBeNull();
+    const link = screen.getByRole('link', { name: 'Cheat Sheet' });
+    expect(link.getAttribute('href')).toBe('/cheat-sheet');
   });
 
   it('shows the cheat sheet link in the navbar when GM mode is on', async () => {

@@ -961,8 +961,12 @@ onUnmounted(() => {
       @toggle="handleCheatSheetPopoverToggle"
     >
       <div class="cheat-sheet-popover-panel">
-        <FateButton icon="close" @click="closeCheatSheetPopover()"></FateButton>
-        <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
+        <div class="cheat-sheet-close-bar">
+          <FateButton icon="close" @click="closeCheatSheetPopover()"></FateButton>
+        </div>
+        <div class="cheat-sheet-scroll-area">
+          <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
+        </div>
       </div>
     </div>
 
@@ -1497,6 +1501,59 @@ onUnmounted(() => {
   align-items: flex-end;
 }
 
+.cheat-sheet-close-bar {
+  align-self: flex-end;
+}
+
+.cheat-sheet-scroll-area {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .cheat-sheet-popover::backdrop {
+    bottom: 56px;
+  }
+
+  .cheat-sheet-popover:popover-open {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: auto;
+    width: auto;
+    height: calc(100dvh - 56px - 1.5rem);
+    transform: none;
+    background: transparent;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cheat-sheet-popover-panel {
+    display: block;
+    max-height: none;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .cheat-sheet-close-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    align-self: unset;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.3rem 0.5rem;
+    background: transparent;
+  }
+
+  .cheat-sheet-scroll-area {
+    display: block;
+    width: 100%;
+  }
+}
+
 :global(html[data-theme='dark']) .dashboard-fab-trigger.open {
   background: var(--fate-nav-active-bg);
   border-color: var(--fate-nav-active-bg);
@@ -1545,6 +1602,12 @@ onUnmounted(() => {
   .dashboard-fab {
     right: 0.85rem;
     bottom: 0.85rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-fab {
+    bottom: calc(56px + 0.85rem);
   }
 }
 </style>

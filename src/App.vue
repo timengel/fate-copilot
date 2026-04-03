@@ -80,7 +80,6 @@ watch(
             <RouterLink to="/items" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/items') }">Gegenstände</RouterLink>
             <RouterLink to="/skills" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/skills') }">Fertigkeiten</RouterLink>
             <RouterLink
-              v-if="gmModeStore.isGMMode"
               to="/cheat-sheet"
               class="nav-link"
               :class="{ 'router-link-active': route.path.startsWith('/cheat-sheet') }"
@@ -138,6 +137,8 @@ watch(
   display: flex;
   flex-direction: column;
   height: 100%;
+  container-type: inline-size;
+  container-name: app-wrapper;
 }
 
 .app-header {
@@ -489,5 +490,38 @@ watch(
   .app-main {
     padding: 0.5rem;
   }
+}
+
+@container app-wrapper (width < 600px) {
+  .app-header {
+    order: 2;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.22);
+    z-index: 1000;
+  }
+
+  .app-scroll-area {
+    order: 1;
+    padding-bottom: 56px;
+  }
+
+  .nav-drawer {
+    top: auto;
+    bottom: 56px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-drawer.nav-open {
+    border-top: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-drawer .nav-links {
+    flex-direction: column-reverse;
+  }
+
+  .nav-drawer .nav-gm-toggle-clip {
+    order: -1;
+  }
+
 }
 </style>
