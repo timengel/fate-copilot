@@ -961,11 +961,11 @@ onUnmounted(() => {
       @toggle="handleCheatSheetPopoverToggle"
     >
       <div class="cheat-sheet-popover-panel">
-        <FateCheatSheet />
+        <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
       </div>
     </div>
 
-    <div v-if="gmModeStore.isGMMode" class="dashboard-fab">
+    <div class="dashboard-fab">
       <Transition name="fab-actions">
         <div v-if="isFabOpen" id="dashboard-fab-menu" class="dashboard-fab-menu">
           <button

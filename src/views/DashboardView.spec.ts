@@ -84,7 +84,11 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 const filterStubs = {
   FateButton: { template: '<button><slot /></button>' },
   FateIcon: { template: '<span />' },
-  FateCheatSheet: { template: '<section aria-label="Fate cheat sheet">Cheat Sheet Popover</section>' },
+  FateCheatSheet: {
+    props: ['variant'],
+    template:
+      '<section aria-label="Fate cheat sheet" :data-variant="variant">Cheat Sheet Popover</section>',
+  },
   FateDropdown: {
     props: ['modelValue', 'options', 'placeholder'],
     template: `
@@ -126,9 +130,9 @@ describe('DashboardView floating action menu', () => {
     });
   }
 
-  it('hides the floating action menu when GM mode is off', () => {
-    const { queryByRole } = setupFab(false);
-    expect(queryByRole('button', { name: 'Schnellaktionen öffnen' })).toBeNull();
+  it('shows the floating action menu when GM mode is off', () => {
+    const { getByRole } = setupFab(false);
+    expect(getByRole('button', { name: 'Schnellaktionen öffnen' })).toBeTruthy();
   });
 
   it('toggles the floating action menu when GM mode is on', async () => {
@@ -168,6 +172,13 @@ describe('DashboardView floating action menu', () => {
   it('uses Popover API auto mode for light-dismiss behavior', () => {
     const { container } = setupFab(true);
     expect(container.querySelector('.cheat-sheet-popover')?.getAttribute('popover')).toBe('auto');
+  });
+
+  it('renders the basic cheat sheet variant in non-GM mode', () => {
+    const { container } = setupFab(false);
+    expect(container.querySelector('[aria-label="Fate cheat sheet"]')?.getAttribute('data-variant')).toBe(
+      'basic',
+    );
   });
 });
 

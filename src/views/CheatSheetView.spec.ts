@@ -19,26 +19,30 @@ describe('CheatSheetView', () => {
             template: '<div><h1>{{ title }}</h1></div>',
           },
           FateCheatSheet: {
-            template: '<section aria-label="Fate cheat sheet">stubbed cheat sheet</section>',
+            props: ['variant'],
+            template:
+              '<section aria-label="Fate cheat sheet" :data-variant="variant">stubbed cheat sheet</section>',
           },
         },
       },
     });
   };
 
-  it('hides cheat sheet content when GM mode is disabled', () => {
+  it('renders basic cheat sheet when GM mode is disabled', () => {
     renderView(false);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Cheat Sheet' })).toBeTruthy();
-    expect(screen.getByText('Cheat Sheet ist nur im GM-Modus sichtbar.')).toBeTruthy();
-    expect(screen.queryByLabelText('Fate cheat sheet')).toBeNull();
+    const cheatSheet = screen.getByLabelText('Fate cheat sheet');
+    expect(cheatSheet).toBeTruthy();
+    expect(cheatSheet.getAttribute('data-variant')).toBe('basic');
   });
 
-  it('renders FateCheatSheet when GM mode is enabled', () => {
+  it('renders GM cheat sheet when GM mode is enabled', () => {
     renderView(true);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Cheat Sheet' })).toBeTruthy();
-    expect(screen.getByLabelText('Fate cheat sheet')).toBeTruthy();
-    expect(screen.queryByText('Cheat Sheet ist nur im GM-Modus sichtbar.')).toBeNull();
+    const cheatSheet = screen.getByLabelText('Fate cheat sheet');
+    expect(cheatSheet).toBeTruthy();
+    expect(cheatSheet.getAttribute('data-variant')).toBe('gm');
   });
 });

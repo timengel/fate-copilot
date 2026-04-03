@@ -2,6 +2,17 @@
 import { computed, ref } from 'vue';
 import { CHECK_LADDER } from '../../types';
 
+type CheatSheetVariant = 'basic' | 'gm';
+
+const props = withDefaults(
+  defineProps<{
+    variant?: CheatSheetVariant;
+  }>(),
+  {
+    variant: 'gm',
+  },
+);
+
 const ACTION_MATRIX = [
   {
     action: 'Überwinden',
@@ -83,7 +94,13 @@ const tokenizeHighlight = (text: string) => {
   return tokens;
 };
 
-const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
+const RULE_CARDS: {
+  area: string;
+  title?: string;
+  lines: string[];
+  gmOnly?: boolean;
+  basicOnly?: boolean;
+}[] = [
   {
     area: 'actions',
     title: '4 Aktionen',
@@ -92,6 +109,7 @@ const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
   {
     area: 'challenges',
     title: 'Challenges',
+    gmOnly: true,
     lines: [
       'Herausforderung = mehrere Überwinden-Aktionen für eine komplexe Szene.',
       'Jede Teilaufgabe nutzt eine andere Fertigkeit; Ergebnisse am Ende gemeinsam auswerten.',
@@ -100,6 +118,7 @@ const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
   {
     area: 'contests',
     title: 'Wettstreite',
+    gmOnly: true,
     lines: [
       'Wettstreit = mehrere Austausche ohne direkten Schaden bei gegensätzlichen Zielen.',
       'Pro Austausch 1 Wurf; wer zuerst 3 Siege hat, gewinnt den Wettstreit.',
@@ -108,6 +127,7 @@ const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
   {
     area: 'milestones',
     title: 'Meilensteine',
+    gmOnly: true,
     lines: [
       'Minor (meist Sitzungsende): 1 kleine Änderung, z. B. Stunt tauschen oder Aspekte umbenennen.',
       'Significant (Szenarioende): Minor + 1 Fertigkeitspunkt und schwere Konsequenzen umbenennen.',
@@ -119,8 +139,41 @@ const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
     lines: [],
   },
   {
+    area: 'aspect-types',
+    title: 'Aspektarten',
+    basicOnly: true,
+    lines: [
+      'Spielaspekte: Permanent.',
+      'Charakteraspekte: Permanent.',
+      'Situationsaspekte: Halten an bis Ende der Szene oder bis irrelevant.',
+      'Boosts: Halten an bis Ende der Szene, bis irrelevant oder bis einmal genutzt.',
+      'Konsequenzen: Halten an, bis sie erholt wurden.',
+    ],
+  },
+  {
+    area: 'concede',
+    title: 'Niederlage einräumen',
+    basicOnly: true,
+    lines: [
+      'Vor Wurf: Gegner bekommt, was er will, er siegt, Du überlebst aber.',
+      'Du bekommst 1 FP, plus 1 weiteren pro Konsequenz, die Du erlitten hattest.',
+    ],
+  },
+  {
+    area: 'consequences-basic',
+    title: 'Konsequenzen',
+    basicOnly: true,
+    lines: [
+      'Mild (+2), Moderat (+4), Schwer (+6) reduzieren die Shifts eines Treffers.',
+      'Du kannst mehrere Konsequenzen für einen Treffer nehmen, falls Slots frei sind.',
+      'Der Gegner erhält auf jede neue Konsequenz 1 freien Invoke.',
+      'Konsequenzen sind bleibende Aspekte, bis sie erholt wurden.',
+    ],
+  },
+  {
     area: 'scene-setup',
     title: 'Szenen-Setup-Checkliste',
+    gmOnly: true,
     lines: [
       'Was steht auf dem Spiel?',
       'Welche 2-3 Situationsaspekte gibt es?',
@@ -134,7 +187,19 @@ const RULE_CARDS: { area: string; title?: string; lines: string[] }[] = [
 const actionsCardTitle = computed(
   () => RULE_CARDS.find((card) => card.area === 'actions')?.title ?? '4 Aktionen',
 );
-const visibleRuleCards = computed(() => RULE_CARDS.filter((card) => card.area !== 'actions'));
+const visibleRuleCards = computed(() =>
+  RULE_CARDS.filter((card) => {
+    if (card.area === 'actions') {
+      return false;
+    }
+
+    if (props.variant === 'basic') {
+      return !card.gmOnly;
+    }
+
+    return !card.basicOnly;
+  }),
+);
 
 const CHANCES_TABLE = [
   { result: '0', chance: '23,46 %' },
@@ -168,7 +233,7 @@ const splitMilestoneLine = (line: string) => {
 </script>
 
 <template>
-  <div class="cheat-sheet-page">
+  <div class="cheat-sheet-page" :class="`cheat-sheet-page-${props.variant}`">
     <div class="sheet-content">
       <section class="cheat-grid" aria-label="Fate cheat sheet">
         <article class="cheat-card cheat-card-ladder" aria-labelledby="check-ladder-heading">
@@ -860,6 +925,30 @@ const splitMilestoneLine = (line: string) => {
 
   .rule-area-scene-setup {
     grid-area: scene-setup;
+  }
+
+  .cheat-sheet-page-basic .cheat-grid {
+    grid-template-columns: minmax(11.5rem, 13rem) repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+      'leiter aktionen aktionen aktionen'
+      'leiter aspekte aspekte x'
+      'chance y z u';
+  }
+
+  .cheat-sheet-page-basic .rule-area-aspect-types {
+    grid-area: aspekte;
+  }
+
+  .cheat-sheet-page-basic .rule-area-chances {
+    grid-area: chance;
+  }
+
+  .cheat-sheet-page-basic .rule-area-concede {
+    grid-area: z;
+  }
+
+  .cheat-sheet-page-basic .rule-area-consequences-basic {
+    grid-area: y;
   }
 }
 </style>
