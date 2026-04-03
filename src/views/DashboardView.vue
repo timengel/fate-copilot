@@ -961,6 +961,7 @@ onUnmounted(() => {
       @toggle="handleCheatSheetPopoverToggle"
     >
       <div class="cheat-sheet-popover-panel">
+        <FateButton icon="close" @click="closeCheatSheetPopover()"></FateButton>
         <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
       </div>
     </div>
@@ -1490,7 +1491,10 @@ onUnmounted(() => {
 .cheat-sheet-popover-panel {
   max-height: 92vh;
   overflow: auto;
-  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
 }
 
 :global(html[data-theme='dark']) .dashboard-fab-trigger.open {

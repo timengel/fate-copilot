@@ -93,7 +93,7 @@ function clearAllData() {
       </div>
       <div class="settings-row">
         <div class="settings-row-label">
-          <span>GM-Modus-Schalter in der Navigation anzeigen</span>
+          <span>Sichtbarkeit des GM-Modus-Toggle</span>
           <span class="settings-row-description">Zeigt den GM-Modus-Toggle in der Navigationsleiste an.</span>
         </div>
         <FateToggle v-model="gmModeStore.showGMToggle" :variant="ToggleVariant.Danger" />
