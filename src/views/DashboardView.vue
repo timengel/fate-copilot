@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
 import { useGMModeStore } from '../stores/gmMode';
@@ -14,6 +13,7 @@ import FateIcon from '../components/shared/FateIcon.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
+import FateCheatSheet from '../components/shared/FateCheatSheet.vue';
 import { useItemsStore } from '../stores/items';
 import { useCharacterItemsStore } from '../stores/characterItems';
 import { DropdownVariant, type Character, type Item } from '../types';
@@ -23,7 +23,6 @@ const charactersStore = useCharactersStore();
 const itemsStore = useItemsStore();
 const characterItemsStore = useCharacterItemsStore();
 const gmModeStore = useGMModeStore();
-const router = useRouter();
 const toastStore = useToastStore();
 const {
   selectedCampaignFilter,
@@ -71,6 +70,11 @@ const switchCharacterDialog = ref<{
   nextCharacterId: string;
 } | null>(null);
 const isFabOpen = ref(false);
+const cheatSheetPopoverRef = ref<HTMLDivElement | null>(null);
+
+function setCheatSheetScrollLock(locked: boolean) {
+  document.body.classList.toggle('dashboard-cheat-sheet-open', locked);
+}
 
 const campaignOptions = computed(() => [
   { value: 'active', label: 'Aktive Kampagnen' },
@@ -288,9 +292,32 @@ function toggleFabMenu() {
   isFabOpen.value = !isFabOpen.value;
 }
 
-function openCheatSheetFromFab() {
+function handleCheatSheetFabActionClick() {
   isFabOpen.value = false;
-  router.push('/cheat-sheet');
+}
+
+function closeCheatSheetPopover() {
+  const popoverEl = cheatSheetPopoverRef.value;
+  if (!popoverEl) return;
+  popoverEl.hidePopover();
+  setCheatSheetScrollLock(false);
+}
+
+function handleCheatSheetPopoverToggle(event: Event) {
+  const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
+  if (toggleEvent.newState === 'open') {
+    setCheatSheetScrollLock(true);
+    return;
+  }
+  if (toggleEvent.newState === 'closed') {
+    setCheatSheetScrollLock(false);
+    return;
+  }
+
+  const popoverEl = cheatSheetPopoverRef.value;
+  if (!popoverEl) return;
+  const isOpen = popoverEl.matches(':popover-open');
+  setCheatSheetScrollLock(isOpen);
 }
 
 function handleDashboardAssignItem(itemId: string) {
@@ -312,7 +339,10 @@ watch(sidebarCollapsed, (val) => {
 watch(
   () => gmModeStore.isGMMode,
   (isEnabled) => {
-    if (!isEnabled) isFabOpen.value = false;
+    if (!isEnabled) {
+      isFabOpen.value = false;
+      closeCheatSheetPopover();
+    }
   },
 );
 
@@ -460,6 +490,7 @@ onUnmounted(() => {
   document.body.classList.remove('has-dashboard-sidebar');
   document.body.classList.remove('sidebar-collapsed');
   document.body.classList.remove('dashboard-grid-active');
+  document.body.classList.remove('dashboard-cheat-sheet-open');
 });
 </script>
 
@@ -920,6 +951,20 @@ onUnmounted(() => {
       </div>
     </div>
 
+    <div
+      ref="cheatSheetPopoverRef"
+      id="dashboard-cheat-sheet-popover"
+      class="cheat-sheet-popover"
+      popover="auto"
+      role="dialog"
+      aria-label="Cheat Sheet Popover"
+      @toggle="handleCheatSheetPopoverToggle"
+    >
+      <div class="cheat-sheet-popover-panel">
+        <FateCheatSheet />
+      </div>
+    </div>
+
     <div v-if="gmModeStore.isGMMode" class="dashboard-fab">
       <Transition name="fab-actions">
         <div v-if="isFabOpen" id="dashboard-fab-menu" class="dashboard-fab-menu">
@@ -927,7 +972,9 @@ onUnmounted(() => {
             type="button"
             class="dashboard-fab-action"
             aria-label="Cheat Sheet öffnen"
-            @click="openCheatSheetFromFab"
+            popovertarget="dashboard-cheat-sheet-popover"
+            popovertargetaction="toggle"
+            @click="handleCheatSheetFabActionClick"
           >
             Cheat Sheet
           </button>
@@ -1419,6 +1466,31 @@ onUnmounted(() => {
 .fab-actions-leave-to {
   opacity: 0;
   transform: translateY(8px);
+}
+
+.cheat-sheet-popover {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.cheat-sheet-popover:popover-open {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(96vw, 1140px);
+}
+
+.cheat-sheet-popover::backdrop {
+  background: var(--fate-overlay);
+}
+
+.cheat-sheet-popover-panel {
+  max-height: 92vh;
+  overflow: auto;
+  border-radius: 14px;
 }
 
 :global(html[data-theme='dark']) .dashboard-fab-trigger.open {

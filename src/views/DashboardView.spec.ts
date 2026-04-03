@@ -84,6 +84,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 const filterStubs = {
   FateButton: { template: '<button><slot /></button>' },
   FateIcon: { template: '<span />' },
+  FateCheatSheet: { template: '<section aria-label="Fate cheat sheet">Cheat Sheet Popover</section>' },
   FateDropdown: {
     props: ['modelValue', 'options', 'placeholder'],
     template: `
@@ -146,16 +147,27 @@ describe('DashboardView floating action menu', () => {
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
   });
 
-  it('navigates to cheat sheet from the floating action menu', async () => {
-    const { getByRole, queryByRole } = setupFab(true);
+  it('uses popovertarget wiring for the cheat sheet FAB action', async () => {
+    const { container, getByRole, queryByRole } = setupFab(true);
     const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
 
     await fireEvent.click(trigger);
-    await fireEvent.click(getByRole('button', { name: 'Cheat Sheet öffnen' }));
+    const actionButton = getByRole('button', { name: 'Cheat Sheet öffnen' });
+    await fireEvent.click(actionButton);
 
-    expect(mockRouterPush).toHaveBeenCalledWith('/cheat-sheet');
+    expect(mockRouterPush).not.toHaveBeenCalled();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+    expect(actionButton.getAttribute('popovertarget')).toBe('dashboard-cheat-sheet-popover');
+    expect(actionButton.getAttribute('popovertargetaction')).toBe('toggle');
+    expect(container.querySelector('#dashboard-cheat-sheet-popover')?.getAttribute('popover')).toBe(
+      'auto',
+    );
+  });
+
+  it('uses Popover API auto mode for light-dismiss behavior', () => {
+    const { container } = setupFab(true);
+    expect(container.querySelector('.cheat-sheet-popover')?.getAttribute('popover')).toBe('auto');
   });
 });
 

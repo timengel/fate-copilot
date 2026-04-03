@@ -105,6 +105,10 @@ body.dashboard-grid-active .app-main {
   max-width: none;
 }
 
+body.dashboard-cheat-sheet-open .app-scroll-area {
+  overflow: hidden;
+}
+
 @media (min-width: 901px) {
   body.has-dashboard-sidebar .app-scroll-area {
     padding-left: 188px;

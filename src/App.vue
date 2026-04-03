@@ -243,10 +243,10 @@ watch(
 }
 
 .theme-icon-enter-active {
-  animation: theme-icon-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: theme-icon-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .theme-icon-leave-active {
-  animation: theme-icon-out 0.2s ease-in;
+  animation: theme-icon-out 0.14s ease-in;
   position: absolute;
 }
 
