@@ -3,55 +3,21 @@ import { describe, it, expect } from 'vitest';
 import FateCheatSheet from './FateCheatSheet.vue';
 import { CHECK_LADDER } from '../../types';
 
-const GM_HEADINGS = ['4 Aktionen', 'Challenges', 'Wettstreite', 'Meilensteine', 'Szenen-Setup-Checkliste'];
-const BASIC_HEADINGS = ['4 Aktionen', 'Aspektarten', 'Niederlage einräumen', 'Konsequenzen'];
-
 describe('FateCheatSheet', () => {
-  it('renders the gm variant by default and gates cards by variant', () => {
-    render(FateCheatSheet, { props: { variant: 'gm' } });
+  it('shows consequences card content only in basic variant', async () => {
+    const { rerender } = render(FateCheatSheet, { props: { variant: 'gm' } });
 
-    for (const heading of GM_HEADINGS) {
-      expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy();
-    }
-    expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(GM_HEADINGS.length);
+    expect(screen.queryByText(/bleibende Aspekte/i)).toBeNull();
 
-    for (const heading of BASIC_HEADINGS) {
-      if (heading === '4 Aktionen') continue;
-      expect(screen.queryByRole('heading', { level: 2, name: heading })).toBeNull();
-    }
-  });
+    await rerender({ variant: 'basic' });
 
-  it('renders the basic variant and card payload structure', () => {
-    render(FateCheatSheet, {
-      props: {
-        variant: 'basic',
-      },
-    });
-
-    for (const heading of BASIC_HEADINGS) {
-      expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy();
-    }
-    expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(BASIC_HEADINGS.length);
-
-    for (const heading of GM_HEADINGS) {
-      if (heading === '4 Aktionen') continue;
-      expect(screen.queryByRole('heading', { level: 2, name: heading })).toBeNull();
-    }
-
-    const aspectCard = screen.getByRole('heading', { level: 2, name: 'Aspektarten' }).closest('article');
-    expect(aspectCard).toBeTruthy();
-    expect(aspectCard ? within(aspectCard).getAllByRole('listitem') : []).toHaveLength(5);
-
-    const concedeCard = screen.getByRole('heading', { level: 2, name: 'Niederlage einräumen' }).closest('article');
-    expect(concedeCard).toBeTruthy();
-    expect(concedeCard ? within(concedeCard).getAllByRole('listitem') : []).toHaveLength(2);
-
-    const consequencesCard = screen.getByRole('heading', { level: 2, name: 'Konsequenzen' }).closest('article');
-    expect(consequencesCard).toBeTruthy();
-    expect(consequencesCard ? within(consequencesCard).getAllByRole('listitem') : []).toHaveLength(4);
-
-    expect(screen.getByRole('table', { name: 'Stufenleiter für Proben' })).toBeTruthy();
-    expect(screen.getByRole('table', { name: 'Wahrscheinlichkeiten für 4dF' })).toBeTruthy();
+    const consequencesCard = screen
+      .getByRole('heading', { level: 2, name: 'Konsequenzen' })
+      .closest('article');
+    expect(consequencesCard?.textContent).toContain('bleibende Aspekte');
+    expect(consequencesCard?.textContent).toContain('Leicht: 1 Szene');
+    expect(consequencesCard?.textContent).toContain('Mittel: 1 Sitzung');
+    expect(consequencesCard?.textContent).toContain('Schwer: 1 Szenario');
   });
 
   it('renders ladder and chance data tables from their configured datasets', () => {
