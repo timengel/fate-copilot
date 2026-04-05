@@ -86,7 +86,8 @@ function deleteItem(id: string, name: string) {
 }
 
 function setShowArchived(val: boolean) {
-  if (!document.startViewTransition) {
+  const shouldUseViewTransitions = !!document.startViewTransition;
+  if (!shouldUseViewTransitions) {
     showArchivedItems.value = val;
     return;
   }
@@ -97,7 +98,8 @@ function setShowArchived(val: boolean) {
 }
 
 function setSortOrder(val: string) {
-  if (!document.startViewTransition) {
+  const shouldUseViewTransitions = !!document.startViewTransition;
+  if (!shouldUseViewTransitions) {
     sortOrder.value = val;
     return;
   }

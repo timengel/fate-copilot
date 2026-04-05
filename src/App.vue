@@ -149,6 +149,7 @@ watch(
   position: relative;
   flex-shrink: 0;
   z-index: 100;
+  view-transition-name: app-header;
   container-type: inline-size;
   container-name: header;
 }
@@ -512,6 +513,7 @@ watch(
 
   .nav-drawer.nav-open {
     border-top: none;
+    padding-top: 0.65rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
@@ -521,6 +523,7 @@ watch(
 
   .nav-drawer .nav-gm-toggle-clip {
     order: -1;
+    margin-bottom: 0.5rem;
   }
 
 }

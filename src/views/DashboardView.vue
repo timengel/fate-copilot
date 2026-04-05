@@ -361,7 +361,8 @@ watch(
 );
 
 function withViewTransition(fn: () => void) {
-  if (!document.startViewTransition) {
+  const shouldUseViewTransitions = !!document.startViewTransition;
+  if (!shouldUseViewTransitions) {
     fn();
     return;
   }
