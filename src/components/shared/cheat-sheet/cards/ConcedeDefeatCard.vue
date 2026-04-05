@@ -5,8 +5,8 @@
     </div>
 
     <ul class="compact-list compact-list-tight">
-      <li>Vor Wurf: Gegner bekommt, was er will, er siegt, Du überlebst aber.</li>
-      <li>Du bekommst 1 FP, plus 1 weiteren pro Konsequenz, die Du erlitten hattest.</li>
+      <li><strong class="rule-strong">Vor Wurf:</strong> Gegner bekommt, was er will, er siegt, i.d.R. überlebst du aber.</li>
+      <li>Du bekommst <strong class="rule-strong">1 FP</strong>, plus <strong class="rule-strong">1 weiteren FP pro Konsequenz</strong>, die Du erlitten hattest.</li>
     </ul>
   </article>
 </template>
@@ -27,16 +27,26 @@
 }
 
 .compact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
   margin: 0;
   padding-left: 1rem;
 }
 
 .compact-list li {
+  margin: 0;
+  margin-bottom: 0.22rem;
+  padding-left: 0.24rem;
   font-size: 0.72rem;
-  line-height: 1.25;
+  line-height: 1.22;
   color: var(--fate-text-light);
 }
+
+.compact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.rule-strong {
+  font-weight: 700;
+  color: var(--fate-heading);
+}
+
 </style>

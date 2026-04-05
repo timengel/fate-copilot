@@ -1,12 +1,12 @@
 <template>
   <article>
     <div class="card-heading card-heading-compact">
-      <h2>Challenges</h2>
+      <h2>Herausforderungen</h2>
     </div>
 
     <ul class="compact-list compact-list-tight">
-      <li>Herausforderung = mehrere Überwinden-Aktionen für eine komplexe Szene.</li>
-      <li>Jede Teilaufgabe nutzt eine andere Fertigkeit; Ergebnisse am Ende gemeinsam auswerten.</li>
+      <li>Herausforderung: <strong class="rule-label">mehrere Überwinden-Aktionen</strong> für eine komplexe Szene.</li>
+      <li>Jede Teilaufgabe nutzt eine <strong class="rule-label">andere Fertigkeit</strong>; Ergebnisse am Ende gemeinsam auswerten.</li>
     </ul>
   </article>
 </template>
@@ -27,16 +27,25 @@
 }
 
 .compact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
   margin: 0;
   padding-left: 1rem;
 }
 
 .compact-list li {
+  margin: 0;
+  margin-bottom: 0.22rem;
+  padding-left: 0.24rem;
   font-size: 0.72rem;
-  line-height: 1.25;
+  line-height: 1.22;
   color: var(--fate-text-light);
+}
+
+.compact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.rule-label {
+  color: var(--fate-heading);
+  font-weight: 700;
 }
 </style>

@@ -303,6 +303,12 @@ function closeCheatSheetPopover() {
   setCheatSheetScrollLock(false);
 }
 
+function handleCheatSheetBackdropClick(event: Event) {
+  event.preventDefault();
+  event.stopPropagation();
+  closeCheatSheetPopover();
+}
+
 function handleCheatSheetPopoverToggle(event: Event) {
   const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
   if (toggleEvent.newState === 'open') {
@@ -960,9 +966,15 @@ onUnmounted(() => {
       aria-label="Cheat Sheet Popover"
       @toggle="handleCheatSheetPopoverToggle"
     >
+      <div
+        class="cheat-sheet-hit-surface"
+        aria-hidden="true"
+        @pointerdown.prevent.stop
+        @click.prevent.stop="handleCheatSheetBackdropClick"
+      ></div>
       <div class="cheat-sheet-popover-panel">
         <div class="cheat-sheet-close-bar">
-          <FateButton icon="close" @click="closeCheatSheetPopover()"></FateButton>
+          <FateButton icon="close" variant="danger" @click="closeCheatSheetPopover()"></FateButton>
         </div>
         <div class="cheat-sheet-scroll-area">
           <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
@@ -1493,12 +1505,19 @@ onUnmounted(() => {
 }
 
 .cheat-sheet-popover-panel {
+  position: relative;
+  z-index: 1;
   max-height: 92vh;
   overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-end;
+}
+
+.cheat-sheet-hit-surface {
+  position: fixed;
+  inset: 0;
 }
 
 .cheat-sheet-close-bar {
@@ -1511,6 +1530,10 @@ onUnmounted(() => {
 
 @media (max-width: 600px) {
   .cheat-sheet-popover::backdrop {
+    bottom: 56px;
+  }
+
+  .cheat-sheet-hit-surface {
     bottom: 56px;
   }
 

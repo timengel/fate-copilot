@@ -6,9 +6,9 @@
 
     <ul class="compact-list compact-list-tight">
       <li>Mild (+2), Moderat (+4), Schwer (+6) reduzieren die Shifts eines Treffers.</li>
-      <li>Du kannst mehrere Konsequenzen für einen Treffer nehmen, falls Slots frei sind.</li>
-      <li>Der Gegner erhält auf jede neue Konsequenz 1 freien Invoke.</li>
-      <li>Konsequenzen sind bleibende Aspekte, bis sie erholt wurden.</li>
+      <li>Du kannst <strong class="rule-strong">mehrere Konsequenzen</strong> für einen Treffer nehmen, falls Slots frei sind.</li>
+      <li>Konsequenzen sind <strong class="rule-strong">bleibende Aspekte</strong>, bis sie erholt wurden.</li>
+      <li>Der Gegner erhält auf jede neue Konsequenz <strong class="rule-strong">1 freien Einsatz</strong>.</li>
     </ul>
   </article>
 </template>
@@ -29,16 +29,26 @@
 }
 
 .compact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
   margin: 0;
   padding-left: 1rem;
 }
 
 .compact-list li {
+  margin: 0;
+  margin-bottom: 0.22rem;
+  padding-left: 0.24rem;
   font-size: 0.72rem;
-  line-height: 1.25;
+  line-height: 1.22;
   color: var(--fate-text-light);
 }
+
+.compact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.rule-strong {
+  font-weight: 700;
+  color: var(--fate-heading);
+}
+
 </style>

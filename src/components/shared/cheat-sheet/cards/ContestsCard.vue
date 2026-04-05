@@ -5,8 +5,8 @@
     </div>
 
     <ul class="compact-list compact-list-tight">
-      <li>Wettstreit = mehrere Austausche ohne direkten Schaden bei gegensätzlichen Zielen.</li>
-      <li>Pro Austausch 1 Wurf; wer zuerst 3 Siege hat, gewinnt den Wettstreit.</li>
+      <li>Wettstreit: <strong class="rule-label">mehrere Austausche ohne direkten Schaden</strong> bei gegensätzlichen Zielen.</li>
+      <li><strong class="rule-label">Pro Austausch 1 Wurf</strong>; wer zuerst <strong class="rule-label">3 Siege</strong> hat, gewinnt den Wettstreit.</li>
     </ul>
   </article>
 </template>
@@ -27,16 +27,25 @@
 }
 
 .compact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
   margin: 0;
   padding-left: 1rem;
 }
 
 .compact-list li {
+  margin: 0;
+  margin-bottom: 0.22rem;
+  padding-left: 0.24rem;
   font-size: 0.72rem;
-  line-height: 1.25;
+  line-height: 1.22;
   color: var(--fate-text-light);
+}
+
+.compact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.rule-label {
+  color: var(--fate-heading);
+  font-weight: 700;
 }
 </style>

@@ -32,9 +32,10 @@
 }
 
 .compact-list {
+  counter-reset: checklist-step;
   display: flex;
   flex-direction: column;
-  gap: 0.32rem;
+  gap: 0.3rem;
   margin: 0;
   padding-left: 0;
 }
@@ -43,24 +44,32 @@
   list-style: none;
   margin: 0;
   position: relative;
-  padding: 0.38rem 0.45rem 0.38rem 1.45rem;
+  padding: 0.34rem 0.42rem 0.34rem 1.55rem;
   border: 1px solid var(--fate-light-border);
   border-radius: 7px;
-  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
-  line-height: 1.28;
+  background: color-mix(in srgb, var(--fate-white) 95%, var(--fate-blue-light) 5%);
+  line-height: 1.27;
   font-size: 0.72rem;
   color: var(--fate-text-light);
 }
 
 .compact-list li::before {
-  content: '';
+  counter-increment: checklist-step;
+  content: counter(checklist-step);
+  display: grid;
+  place-items: center;
   position: absolute;
-  left: 0.5rem;
-  top: 0.52rem;
-  width: 0.52rem;
-  height: 0.52rem;
-  border: 1.5px solid var(--fate-blue);
-  border-radius: 2px;
-  background: var(--fate-white);
+  left: 0.42rem;
+  top: 0.36rem;
+  width: 0.84rem;
+  height: 0.84rem;
+  border: 1px solid color-mix(in srgb, var(--fate-blue) 40%, var(--fate-light-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fate-blue-light) 55%, var(--fate-white));
+  color: var(--fate-heading);
+  font-size: 0.61rem;
+  font-weight: 700;
+  line-height: 1;
 }
+
 </style>

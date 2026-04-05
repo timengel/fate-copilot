@@ -72,7 +72,7 @@ const props = withDefaults(
   background: var(--fate-white);
   border: 1px solid var(--fate-border);
   border-radius: 10px;
-  padding: 0.95rem;
+  padding: 0.75rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   min-width: 0;
 }
@@ -83,7 +83,7 @@ const props = withDefaults(
 
 @container cheatsheet (max-width: 34rem) {
   .cheat-card-slot {
-    padding: 0.85rem;
+    padding: 0.7rem;
   }
 }
 
@@ -95,7 +95,7 @@ const props = withDefaults(
 
 @container cheatsheet (min-width: 62rem) {
   .cheat-sheet-page {
-    padding: 0.9rem;
+    padding: 0.75rem;
     border: 1px solid color-mix(in srgb, var(--fate-border) 80%, white);
     border-radius: 12px;
     background: color-mix(in srgb, var(--fate-white) 86%, var(--fate-blue-light) 14%);
