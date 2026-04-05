@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/vue';
 import { describe, it, expect } from 'vitest';
 import FateCheatSheet from './FateCheatSheet.vue';
-import { CHECK_LADDER } from '../../types';
+import { CHECK_LADDER } from '@fate/types';
 
 describe('FateCheatSheet', () => {
   it('shows consequences card content only in basic variant', async () => {
