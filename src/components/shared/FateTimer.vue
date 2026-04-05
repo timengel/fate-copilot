@@ -121,6 +121,10 @@ function handleMenuClose() {
 [data-theme='dark'] {
   .timer-pill {
     border-color: var(--fate-text);
+  }
+
+  .timer-pill,
+  .timer-pill--overtime {
     color: var(--fate-text);
   }
 }
@@ -136,7 +140,7 @@ function handleMenuClose() {
 .timer-pill--overtime {
   background: var(--fate-red);
   border-color: color-mix(in srgb, var(--fate-red) 72%, var(--fate-border));
-  color: var(--fate-text);
+  color: var(--fate-white);
 }
 
 .fate-timer {
