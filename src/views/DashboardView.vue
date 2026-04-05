@@ -1532,23 +1532,15 @@ onUnmounted(() => {
   width: 100%;
 }
 
-@media (max-width: 600px) {
-  .cheat-sheet-popover::backdrop {
-    bottom: 56px;
-  }
-
-  .cheat-sheet-hit-surface {
-    bottom: 56px;
-  }
-
+@media (max-width: 1024px) {
   .cheat-sheet-popover:popover-open {
     position: fixed;
     top: 0.75rem;
     left: 0.75rem;
     right: 0.75rem;
-    bottom: auto;
+    bottom: 0.75rem;
     width: auto;
-    height: calc(100dvh - 44px - 1.5rem);
+    height: auto;
     transform: none;
     background: transparent;
     overflow-y: auto;
@@ -1578,6 +1570,20 @@ onUnmounted(() => {
   .cheat-sheet-scroll-area {
     display: block;
     width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .cheat-sheet-popover::backdrop {
+    bottom: 56px;
+  }
+
+  .cheat-sheet-hit-surface {
+    bottom: 56px;
+  }
+
+  .cheat-sheet-popover:popover-open {
+    bottom: calc(44px + 0.75rem);
   }
 }
 
