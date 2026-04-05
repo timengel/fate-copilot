@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import ActionsCard from './cards/ActionsCard.vue';
-import AspektartenCard from './cards/AspektartenCard.vue';
+import AspectTypesCard from './cards/AspectTypesCard.vue';
 import ChallengesCard from './cards/ChallengesCard.vue';
 import CheckLadderCard from './cards/CheckLadderCard.vue';
 import ChancesCard from './cards/ChancesCard.vue';
-import ConsequencesBasicCard from './cards/KonsequenzenBasicCard.vue';
+import ConsequencesBasicCard from './cards/ConsequencesBasicCard.vue';
 import ContestsCard from './cards/ContestsCard.vue';
 import MilestonesCard from './cards/MilestonesCard.vue';
-import NiederlageEinraeumenCard from './cards/NiederlageEinraeumenCard.vue';
+import ConcedeDefeatCard from './cards/ConcedeDefeatCard.vue';
 import SceneSetupChecklistCard from './cards/SceneSetupChecklistCard.vue';
 
 type CheatSheetVariant = 'basic' | 'gm';
@@ -31,8 +31,8 @@ const props = withDefaults(
         <ChancesCard class="cheat-card-slot cheat-card-rule rule-area-chances" />
 
         <template v-if="props.variant === 'basic'">
-          <AspektartenCard class="cheat-card-slot cheat-card-rule rule-area-aspect-types" />
-          <NiederlageEinraeumenCard class="cheat-card-slot cheat-card-rule rule-area-concede" />
+          <AspectTypesCard class="cheat-card-slot cheat-card-rule rule-area-aspect-types" />
+          <ConcedeDefeatCard class="cheat-card-slot cheat-card-rule rule-area-concede" />
           <ConsequencesBasicCard class="cheat-card-slot cheat-card-rule rule-area-consequences-basic" />
         </template>
 
