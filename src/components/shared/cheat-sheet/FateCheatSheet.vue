@@ -12,6 +12,10 @@ import SceneSetupChecklistCard from './cards/SceneSetupChecklistCard.vue';
 
 type CheatSheetVariant = 'basic' | 'gm';
 
+defineEmits<{
+  (e: 'blank-click'): void;
+}>();
+
 const props = withDefaults(
   defineProps<{
     variant?: CheatSheetVariant;
@@ -25,7 +29,7 @@ const props = withDefaults(
 <template>
   <div class="cheat-sheet-page" :class="`cheat-sheet-page-${props.variant}`">
     <div class="sheet-content">
-      <section class="cheat-grid" aria-label="Fate cheat sheet">
+      <section class="cheat-grid" aria-label="Fate cheat sheet" @click.self="$emit('blank-click')">
         <CheckLadderCard class="cheat-card-slot cheat-card-ladder" />
         <ActionsCard class="cheat-card-slot cheat-card-actions" />
         <ChancesCard class="cheat-card-slot cheat-card-rule rule-area-chances" />

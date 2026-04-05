@@ -13,7 +13,7 @@ import FateIcon from '../components/shared/FateIcon.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
-import FateCheatSheet from '../components/shared/FateCheatSheet.vue';
+import FateCheatSheet from '../components/shared/cheat-sheet/FateCheatSheet.vue';
 import { useItemsStore } from '../stores/items';
 import { useCharacterItemsStore } from '../stores/characterItems';
 import { DropdownVariant, type Character, type Item } from '../types';
@@ -978,7 +978,10 @@ onUnmounted(() => {
           <FateButton icon="close" variant="danger" @click="closeCheatSheetPopover()"></FateButton>
         </div>
         <div class="cheat-sheet-scroll-area">
-          <FateCheatSheet :variant="gmModeStore.isGMMode ? 'gm' : 'basic'" />
+          <FateCheatSheet
+            :variant="gmModeStore.isGMMode ? 'gm' : 'basic'"
+            @blank-click="closeCheatSheetPopover"
+          />
         </div>
       </div>
     </div>
@@ -1502,7 +1505,7 @@ onUnmounted(() => {
 }
 
 .cheat-sheet-popover::backdrop {
-  background: var(--fate-overlay);
+  background: rgba(0, 0, 0, 0.62);
 }
 
 .cheat-sheet-popover-panel {
@@ -1545,7 +1548,7 @@ onUnmounted(() => {
     right: 0.75rem;
     bottom: auto;
     width: auto;
-    height: calc(100dvh - 56px - 1.5rem);
+    height: calc(100dvh - 44px - 1.5rem);
     transform: none;
     background: transparent;
     overflow-y: auto;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FateCheatSheet from '../components/shared/FateCheatSheet.vue';
+import FateCheatSheet from '../components/shared/cheat-sheet/FateCheatSheet.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
 import { useGMModeStore } from '../stores/gmMode';
 
