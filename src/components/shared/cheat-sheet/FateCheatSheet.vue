@@ -160,8 +160,8 @@ const props = withDefaults(
     grid-template-columns: minmax(11.5rem, 13rem) repeat(3, minmax(0, 1fr));
     grid-template-areas:
       'leiter aktionen aktionen aktionen'
-      'leiter aspekte aspekte x'
-      'chance y z u';
+      'leiter aspekte aspekte consequences'
+      'chance y z consequences';
   }
 
   .cheat-sheet-page-basic .rule-area-aspect-types {
@@ -177,7 +177,7 @@ const props = withDefaults(
   }
 
   .cheat-sheet-page-basic .rule-area-consequences-basic {
-    grid-area: y;
+    grid-area: consequences;
   }
 }
 </style>
