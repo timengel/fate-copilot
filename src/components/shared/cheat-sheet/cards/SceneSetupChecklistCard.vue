@@ -5,11 +5,9 @@
     </div>
 
     <ul class="compact-list compact-list-tight">
-      <li>Was steht auf dem Spiel?</li>
-      <li>Welche 2-3 Situationsaspekte gibt es?</li>
-      <li>Wie sind die Zonen aufgeteilt?</li>
-      <li>Wer steht wem gegenüber?</li>
-      <li>Ist das ein Konflikt, eine Herausforderung oder nur ein einzelner Wurf?</li>
+      <li><strong class="rule-strong">Was steht auf dem Spiel?!</strong></li>
+      <li>Ist das ein <strong class="rule-strong">Konflikt</strong>, eine <strong class="rule-strong">Challenge</strong> oder nur ein <strong class="rule-strong">einzelner Wurf</strong>?</li>
+      <li>Welche <strong class="rule-strong">Situationsaspekte</strong> gibt es?</li>
     </ul>
   </article>
 </template>
@@ -70,6 +68,11 @@
   font-size: 0.61rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.rule-strong {
+  font-weight: 700;
+  color: var(--fate-heading);
 }
 
 </style>

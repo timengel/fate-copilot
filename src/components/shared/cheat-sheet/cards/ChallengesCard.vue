@@ -1,11 +1,11 @@
 <template>
   <article>
     <div class="card-heading card-heading-compact">
-      <h2>Herausforderungen</h2>
+      <h2>Challenges</h2>
     </div>
 
     <ul class="compact-list compact-list-tight">
-      <li>Herausforderung: <strong class="rule-label">mehrere Überwinden-Aktionen</strong> für eine komplexe Szene.</li>
+      <li>Challenge: <strong class="rule-label">mehrere Überwinden-Aktionen</strong> für eine komplexe Szene.</li>
       <li>Jede Teilaufgabe nutzt eine <strong class="rule-label">andere Fertigkeit</strong>; Ergebnisse am Ende gemeinsam auswerten.</li>
     </ul>
   </article>

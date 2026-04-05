@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import FateCheatSheet from './FateCheatSheet.vue';
 import { CHECK_LADDER } from '../../types';
 
-const GM_HEADINGS = ['4 Aktionen', 'Herausforderungen', 'Wettstreite', 'Meilensteine', 'Szenen-Setup-Checkliste'];
+const GM_HEADINGS = ['4 Aktionen', 'Challenges', 'Wettstreite', 'Meilensteine', 'Szenen-Setup-Checkliste'];
 const BASIC_HEADINGS = ['4 Aktionen', 'Aspektarten', 'Niederlage einräumen', 'Konsequenzen'];
 
 describe('FateCheatSheet', () => {
