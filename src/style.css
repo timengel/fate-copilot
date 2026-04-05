@@ -274,8 +274,8 @@ html[data-theme='dark'] .sheet-section-header {
   --fate-border: #2d4555;
   --fate-light-border: #243344;
 
-  --fate-btn-secondary-bg: #243344;
-  --fate-btn-secondary-hover: #2d4555;
+  --fate-btn-secondary-bg: #2f455e;
+  --fate-btn-secondary-hover: rgb(58, 82, 109);
   --fate-btn-danger-outline-bg: #2d1a19;
   --fate-btn-danger-outline-hover: #3d2220;
   --fate-btn-danger-hover: #c0392b;
@@ -298,44 +298,4 @@ html[data-theme='dark'] .sheet-section-header {
   --fate-btn-primary-bg: #0f4060;
   --fate-scrollbar-thumb: #3f6280;
   --fate-scrollbar-track: #1a2733;
-}
-
-/* System preference fallback — applies dark when no explicit choice is stored */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --fate-bg: #0f1923;
-    --fate-white: #22333f;
-    --fate-blue-light: #0c2438;
-    --fate-hover-bg: #2a3f4e;
-    --fate-card-mix-base: #081825;
-
-    --fate-text: #e8edf0;
-    --fate-text-light: #a0bccc;
-
-    --fate-border: #2d4555;
-    --fate-light-border: #243344;
-
-    --fate-btn-secondary-bg: #243344;
-    --fate-btn-secondary-hover: #2d4555;
-    --fate-btn-danger-outline-bg: #2d1a19;
-    --fate-btn-danger-outline-hover: #3d2220;
-    --fate-btn-danger-hover: #c0392b;
-    --fate-btn-add-bg: #0d2d45;
-    --fate-btn-add-hover: #1a3f5c;
-    --fate-btn-add-color: #5ab8e8;
-
-    --fate-overlay: rgba(0, 0, 0, 0.65);
-
-    --fate-toggle-track-bg: rgba(255, 255, 255, 0.1);
-    --fate-toggle-track-border: rgba(255, 255, 255, 0.18);
-    --fate-toggle-ghost-track: rgba(255, 255, 255, 0.15);
-
-    --fate-header-bg: #1e5a8a;
-    --fate-nav-active-bg: #2a7ab8;
-    --fate-nav-active-color: white;
-
-    --fate-btn-primary-bg: #1e5a8a;
-    --fate-scrollbar-thumb: #3f6280;
-    --fate-scrollbar-track: #1a2733;
-  }
 }

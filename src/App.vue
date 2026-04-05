@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateIcon from './components/shared/FateIcon.vue';
+import FateTimer from './components/shared/FateTimer.vue';
 import FateToast from './components/shared/FateToast.vue';
 import ConfirmDialog from './components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from './stores/gmMode';
+import { useTimerStore } from './stores/timer';
 import { useThemeStore } from './stores/theme';
 import { useConfirmDialog } from './composables/useConfirmDialog';
 import { ToggleVariant } from './types';
@@ -18,9 +20,13 @@ onClickOutside(headerRef, () => { navOpen.value = false; });
 const router = useRouter();
 const route = useRoute();
 const gmModeStore = useGMModeStore();
+const timerStore = useTimerStore();
 const themeStore = useThemeStore();
 const settingsSpinning = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+const timerPopoverRef = ref<HTMLDivElement | null>(null);
+const isTimerOvertimeFlashActive = ref(false);
+let timerOvertimeFlashTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 const themeIcon = computed(() => themeStore.isDark ? 'moon' as const : 'sun' as const);
 const themeLabel = computed(() => themeStore.isDark ? 'Dunkel' : 'Hell');
@@ -44,12 +50,84 @@ function handleSettingsClick() {
   }
 }
 
+function handleTimerPopoverToggle(event: Event) {
+  const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
+  if (toggleEvent.newState === 'open') {
+    if (!timerStore.isPopoverOpen) {
+      timerStore.openPopover();
+    }
+    return;
+  }
+
+  if (toggleEvent.newState === 'closed') {
+    if (timerStore.isPopoverOpen) {
+      timerStore.closePopover();
+    }
+    return;
+  }
+
+  const popoverEl = timerPopoverRef.value;
+  if (!popoverEl) return;
+  const isOpen = popoverEl.matches(':popover-open');
+  if (isOpen) {
+    timerStore.openPopover();
+    return;
+  }
+  timerStore.closePopover();
+}
+
+function triggerTimerOvertimeFlash() {
+  isTimerOvertimeFlashActive.value = true;
+  if (timerOvertimeFlashTimeoutId) {
+    clearTimeout(timerOvertimeFlashTimeoutId);
+  }
+  timerOvertimeFlashTimeoutId = setTimeout(() => {
+    isTimerOvertimeFlashActive.value = false;
+    timerOvertimeFlashTimeoutId = null;
+  }, 650);
+}
+
 watch(
   () => router.currentRoute.value.path,
   () => {
     navOpen.value = false;
   },
 );
+
+watch(
+  () => timerStore.isPopoverOpen,
+  async (isOpen) => {
+    await nextTick();
+    const popoverEl = timerPopoverRef.value;
+    if (!popoverEl) return;
+
+    if (isOpen) {
+      if (typeof popoverEl.showPopover === 'function' && !popoverEl.matches(':popover-open')) {
+        popoverEl.showPopover();
+      }
+      return;
+    }
+
+    if (typeof popoverEl.hidePopover === 'function' && popoverEl.matches(':popover-open')) {
+      popoverEl.hidePopover();
+    }
+  },
+);
+
+watch(
+  () => timerStore.overtimeFlashToken,
+  (newToken, previousToken) => {
+    if (newToken > (previousToken ?? 0)) {
+      triggerTimerOvertimeFlash();
+    }
+  },
+);
+
+onBeforeUnmount(() => {
+  if (timerOvertimeFlashTimeoutId) {
+    clearTimeout(timerOvertimeFlashTimeoutId);
+  }
+});
 </script>
 
 <template>
@@ -119,6 +197,17 @@ watch(
       <main class="app-main">
         <RouterView />
       </main>
+    </div>
+    <div
+      ref="timerPopoverRef"
+      id="global-timer-popover"
+      class="global-timer-popover"
+      popover="auto"
+      role="region"
+      aria-label="Fate Timer"
+      @toggle="handleTimerPopoverToggle"
+    >
+      <FateTimer @close="timerStore.closePopover" />
     </div>
     <FateToast />
     <ConfirmDialog
@@ -481,6 +570,32 @@ watch(
   container-name: main;
 }
 
+.global-timer-popover {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  position: fixed;
+  right: 0.65rem;
+  top: calc(56px + 0.65rem);
+  bottom: auto;
+  left: auto;
+  z-index: 1104;
+}
+
+@keyframes timer-overtime-flash {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(1.08);
+    filter: brightness(1.35);
+  }
+}
+
 
 @media (max-width: 480px) {
   .app-main {
@@ -524,6 +639,13 @@ watch(
   .nav-drawer .nav-gm-toggle-clip {
     order: -1;
     margin-bottom: 0.5rem;
+  }
+
+  .global-timer-popover {
+    right: 0.65rem;
+    left: auto;
+    top: auto;
+    bottom: calc(56px + 0.65rem);
   }
 
 }

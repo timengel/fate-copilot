@@ -9,6 +9,7 @@ import { useGMModeStore } from '../stores/gmMode';
 import { useToastStore } from '../stores/toast';
 import { useCharactersStore } from '../stores/characters';
 import { useCharacterItemsStore } from '../stores/characterItems';
+import { useTimerStore } from '../stores/timer';
 import type { Campaign, Item } from '../types';
 import type { Character } from '../types';
 
@@ -141,14 +142,17 @@ describe('DashboardView floating action menu', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
 
     await fireEvent.click(trigger);
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(getByRole('button', { name: 'Cheat Sheet öffnen' })).toBeTruthy();
+    expect(getByRole('button', { name: 'Timer öffnen' })).toBeTruthy();
 
     await fireEvent.click(trigger);
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
+    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
   });
 
   it('uses popovertarget wiring for the cheat sheet FAB action', async () => {
@@ -172,6 +176,25 @@ describe('DashboardView floating action menu', () => {
   it('uses Popover API auto mode for light-dismiss behavior', () => {
     const { container } = setupFab(true);
     expect(container.querySelector('.cheat-sheet-popover')?.getAttribute('popover')).toBe('auto');
+  });
+
+  it('timer FAB action toggles global timer popover state and closes the menu', async () => {
+    const { getByRole, queryByRole } = setupFab(true);
+    const timerStore = useTimerStore();
+    const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
+
+    expect(timerStore.isPopoverOpen).toBe(false);
+
+    await fireEvent.click(trigger);
+    const timerButton = getByRole('button', { name: 'Timer öffnen' });
+    await fireEvent.click(timerButton);
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+    expect(timerStore.isPopoverOpen).toBe(true);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
+    expect(timerButton.getAttribute('popovertarget')).toBeNull();
+    expect(timerButton.getAttribute('popovertargetaction')).toBeNull();
   });
 
   it('renders the basic cheat sheet variant in non-GM mode', () => {

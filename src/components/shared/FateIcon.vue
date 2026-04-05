@@ -83,6 +83,15 @@ defineProps<{ name: ButtonIcon; size?: number }>();
       <polyline points="20 6 9 17 4 12" />
     </template>
 
+    <template v-else-if="name === 'play'">
+      <polygon points="8 5 19 12 8 19 8 5" />
+    </template>
+
+    <template v-else-if="name === 'pause'">
+      <rect x="7" y="5" width="3" height="14" />
+      <rect x="14" y="5" width="3" height="14" />
+    </template>
+
     <template v-else-if="name === 'info'">
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="16" x2="12" y2="12" />

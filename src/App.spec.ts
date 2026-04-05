@@ -1,19 +1,30 @@
 import { render, screen } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import App from './App.vue';
 import { useGMModeStore } from './stores/gmMode';
+import { useTimerStore } from './stores/timer';
 
 describe('App navigation', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
-  async function setup(initialPath = '/', gmMode = false) {
+  afterEach(() => {
+    vi.useRealTimers();
+    const timerStore = useTimerStore();
+    timerStore.clearTimerInterval();
+    timerStore.reset();
+    timerStore.closePopover();
+  });
+
+  async function setup(initialPath = '/', gmMode = false, timerSetup?: (store: ReturnType<typeof useTimerStore>) => void) {
     const pinia = createPinia();
     setActivePinia(pinia);
     useGMModeStore().isGMMode = gmMode;
+    const timerStore = useTimerStore();
+    timerSetup?.(timerStore);
 
     const router = createRouter({
       history: createMemoryHistory(),
@@ -41,6 +52,11 @@ describe('App navigation', () => {
             FatePlusLogo: { template: '<div>Logo</div>' },
             FateToggle: { template: '<div />' },
             FateIcon: { template: '<div />' },
+            FateTimer: {
+              emits: ['close'],
+              template:
+                '<section aria-label="Timer Popover"><button aria-label="Timer schließen" @click="$emit(\'close\')">X</button></section>',
+            },
             FateToast: { template: '<div />' },
             ConfirmDialog: { template: '<div />' },
           },

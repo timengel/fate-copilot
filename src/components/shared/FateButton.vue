@@ -75,6 +75,17 @@ button {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+[data-theme='dark'] {
+  .fate-btn--secondary {
+    background: var(--fate-btn-secondary-bg);
+    color: var(--fate-text);
+  }
+  .fate-btn--secondary:hover {
+    background: var(--fate-btn-secondary-hover);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+}
+
 .fate-btn--danger-outline {
   background: var(--fate-btn-danger-outline-bg);
   color: var(--fate-red);

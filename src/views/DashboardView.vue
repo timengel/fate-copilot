@@ -16,6 +16,7 @@ import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue'
 import FateCheatSheet from '../components/shared/cheat-sheet/FateCheatSheet.vue';
 import { useItemsStore } from '../stores/items';
 import { useCharacterItemsStore } from '../stores/characterItems';
+import { useTimerStore } from '../stores/timer';
 import { DropdownVariant, type Character, type Item } from '../types';
 
 const campaignsStore = useCampaignsStore();
@@ -24,6 +25,7 @@ const itemsStore = useItemsStore();
 const characterItemsStore = useCharacterItemsStore();
 const gmModeStore = useGMModeStore();
 const toastStore = useToastStore();
+const timerStore = useTimerStore();
 const {
   selectedCampaignFilter,
   showSC,
@@ -294,12 +296,21 @@ function toggleFabMenu() {
 
 function handleCheatSheetFabActionClick() {
   isFabOpen.value = false;
+  timerStore.closePopover();
+}
+
+function handleTimerFabActionClick() {
+  closeCheatSheetPopover();
+  timerStore.togglePopover();
+  isFabOpen.value = false;
 }
 
 function closeCheatSheetPopover() {
   const popoverEl = cheatSheetPopoverRef.value;
   if (!popoverEl) return;
-  popoverEl.hidePopover();
+  if (typeof popoverEl.hidePopover === 'function') {
+    popoverEl.hidePopover();
+  }
   setCheatSheetScrollLock(false);
 }
 
@@ -312,6 +323,7 @@ function handleCheatSheetBackdropClick(event: Event) {
 function handleCheatSheetPopoverToggle(event: Event) {
   const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
   if (toggleEvent.newState === 'open') {
+    timerStore.closePopover();
     setCheatSheetScrollLock(true);
     return;
   }
@@ -348,6 +360,7 @@ watch(
     if (!isEnabled) {
       isFabOpen.value = false;
       closeCheatSheetPopover();
+      timerStore.closePopover();
     }
   },
 );
@@ -992,6 +1005,14 @@ onUnmounted(() => {
           <button
             type="button"
             class="dashboard-fab-action"
+            aria-label="Timer öffnen"
+            @click="handleTimerFabActionClick"
+          >
+            Timer
+          </button>
+          <button
+            type="button"
+            class="dashboard-fab-action"
             aria-label="Cheat Sheet öffnen"
             popovertarget="dashboard-cheat-sheet-popover"
             popovertargetaction="toggle"
@@ -1413,6 +1434,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 0.4rem;
 }
 
 .dashboard-fab-action {
@@ -1420,9 +1442,9 @@ onUnmounted(() => {
   border-radius: 999px;
   background: var(--fate-white);
   color: var(--fate-text);
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 0.95rem;
   box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
   cursor: pointer;
 }
