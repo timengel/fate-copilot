@@ -40,6 +40,11 @@ describe('FateIcon', () => {
       expect(container.querySelectorAll('path').length).toBe(2);
     });
 
+    it('renders grip icon with six dots', () => {
+      const { container } = render(FateIcon, { props: { name: 'grip' } });
+      expect(container.querySelectorAll('circle').length).toBe(6);
+    });
+
     it('renders archive icon with three paths', () => {
       const { container } = render(FateIcon, { props: { name: 'archive' } });
       expect(container.querySelectorAll('path').length).toBe(3);

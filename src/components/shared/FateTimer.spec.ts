@@ -113,6 +113,17 @@ describe('FateTimer', () => {
     expect(screen.getByRole('button', { name: 'Timer öffnen' })).toBeTruthy();
   });
 
+  it('shows drag handle icon on the left side of the pill', async () => {
+    renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    await nextTick();
+
+    expect(screen.getByTestId('timer-pill-drag-handle')).toBeTruthy();
+  });
+
   it('hides pill when timer is not running', () => {
     renderTimer();
 
@@ -159,5 +170,77 @@ describe('FateTimer', () => {
     await fireEvent.click(pill);
 
     expect(timerStore.isPopoverOpen).toBe(true);
+  });
+
+  it('moves pill position when dragging the handle', async () => {
+    renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    await nextTick();
+
+    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const handle = screen.getByTestId('timer-pill-drag-handle');
+    const initialLeft = pill.style.left;
+    const initialTop = pill.style.top;
+
+    await fireEvent.pointerDown(handle, { pointerId: 1, button: 0, clientX: 100, clientY: 80 });
+    await fireEvent.pointerMove(window, { pointerId: 1, clientX: 260, clientY: 220 });
+    await fireEvent.pointerUp(window, { pointerId: 1, clientX: 260, clientY: 220 });
+
+    expect(pill.style.left).not.toBe(initialLeft);
+    expect(pill.style.top).not.toBe(initialTop);
+  });
+
+  it('keeps dragged pill inside viewport bounds', async () => {
+    renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    await nextTick();
+
+    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const handle = screen.getByTestId('timer-pill-drag-handle');
+
+    await fireEvent.pointerDown(handle, { pointerId: 2, button: 0, clientX: 10, clientY: 10 });
+    await fireEvent.pointerMove(window, { pointerId: 2, clientX: -500, clientY: -500 });
+    await fireEvent.pointerUp(window, { pointerId: 2, clientX: -500, clientY: -500 });
+
+    expect(Number.parseFloat(pill.style.left)).toBeGreaterThanOrEqual(0);
+    expect(Number.parseFloat(pill.style.top)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('resets to default placement when component remounts', async () => {
+    const first = renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    await nextTick();
+
+    const firstPill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const handle = screen.getByTestId('timer-pill-drag-handle');
+
+    await fireEvent.pointerDown(handle, { pointerId: 3, button: 0, clientX: 20, clientY: 20 });
+    await fireEvent.pointerMove(window, { pointerId: 3, clientX: 5, clientY: 5 });
+    await fireEvent.pointerUp(window, { pointerId: 3, clientX: 5, clientY: 5 });
+
+    const draggedLeft = firstPill.style.left;
+    const draggedTop = firstPill.style.top;
+
+    first.unmount();
+    timerStore.closePopover();
+    timerStore.reset();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    renderTimer();
+    await nextTick();
+
+    const remountedPill = screen.getByRole('button', { name: 'Timer öffnen' });
+    expect(remountedPill.style.left).not.toBe(draggedLeft);
+    expect(remountedPill.style.top).not.toBe(draggedTop);
   });
 });

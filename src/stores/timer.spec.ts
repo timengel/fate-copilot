@@ -79,4 +79,23 @@ describe('timer store', () => {
     store.closePopover();
     expect(store.isPopoverOpen).toBe(false);
   });
+
+  it('caps added time at 99:59', () => {
+    const store = useTimerStore();
+
+    store.addMinutes(200);
+
+    expect(store.remainingSeconds).toBe(5999);
+    expect(store.formattedTime).toBe('99:59');
+  });
+
+  it('keeps cap when adding minutes near maximum', () => {
+    const store = useTimerStore();
+    store.remainingSeconds = 6000;
+
+    store.addMinutes(5);
+
+    expect(store.remainingSeconds).toBe(5999);
+    expect(store.formattedTime).toBe('99:59');
+  });
 });

@@ -29,6 +29,15 @@ defineProps<{ name: ButtonIcon; size?: number }>();
       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
     </template>
 
+    <template v-else-if="name === 'grip'">
+      <circle cx="9" cy="7" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="7" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="12" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="12" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="17" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="17" r="1.25" fill="currentColor" stroke="none" />
+    </template>
+
     <template v-else-if="name === 'archive'">
       <path
         d="M9 12C9 11.5341 9 11.3011 9.07612 11.1173C9.17761 10.8723 9.37229 10.6776 9.61732 10.5761C9.80109 10.5 10.0341 10.5 10.5 10.5H13.5C13.9659 10.5 14.1989 10.5 14.3827 10.5761C14.6277 10.6776 14.8224 10.8723 14.9239 11.1173C15 11.3011 15 11.5341 15 12C15 12.4659 15 12.6989 14.9239 12.8827C14.8224 13.1277 14.6277 13.3224 14.3827 13.4239C14.1989 13.5 13.9659 13.5 13.5 13.5H10.5C10.0341 13.5 9.80109 13.5 9.61732 13.4239C9.37229 13.3224 9.17761 13.1277 9.07612 12.8827C9 12.6989 9 12.4659 9 12Z"

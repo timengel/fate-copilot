@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Teleport } from 'vue';
+import { Teleport, computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import FateButton from './FateButton.vue';
+import FateIcon from './FateIcon.vue';
 import { useTimerStore } from '../../stores/timer';
 
 defineEmits<{
@@ -8,29 +9,212 @@ defineEmits<{
 }>();
 
 const timerStore = useTimerStore();
+const pillRef = ref<HTMLButtonElement | null>(null);
+const pillPosition = ref<{ x: number; y: number } | null>(null);
+const hasManualPosition = ref(false);
+const isDragging = ref(false);
+const showPill = computed(() => timerStore.isRunning && !timerStore.isPopoverOpen);
+const pillInlineStyle = computed(() => {
+  if (!pillPosition.value) return {};
+  return {
+    left: `${pillPosition.value.x}px`,
+    top: `${pillPosition.value.y}px`,
+    right: 'auto',
+    bottom: 'auto',
+    transform: 'none',
+  };
+});
+
+const DRAG_THRESHOLD = 3;
+let dragPointerId: number | null = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+let dragStartPointerX = 0;
+let dragStartPointerY = 0;
+let dragDidMove = false;
+let suppressNextPillClick = false;
+
+function getRootRemPx() {
+  const value = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return Number.isFinite(value) ? value : 16;
+}
+
+function isMobileLayout() {
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(max-width: 600px)').matches;
+  }
+  return window.innerWidth <= 600;
+}
+
+function getPillSize() {
+  const pillEl = pillRef.value;
+  if (!pillEl) return { width: 0, height: 0 };
+  const rect = pillEl.getBoundingClientRect();
+  return {
+    width: rect.width || pillEl.offsetWidth || 0,
+    height: rect.height || pillEl.offsetHeight || 0,
+  };
+}
+
+function clampPosition(x: number, y: number) {
+  const { width, height } = getPillSize();
+  const maxX = Math.max(0, window.innerWidth - width);
+  const maxY = Math.max(0, window.innerHeight - height);
+
+  return {
+    x: Math.min(Math.max(0, x), maxX),
+    y: Math.min(Math.max(0, y), maxY),
+  };
+}
+
+function setDefaultPillPosition() {
+  const rem = getRootRemPx();
+  const marginX = 0.65 * rem;
+  const desktopTop = 56 + 0.35 * rem;
+  const mobileBottom = 0.85 * rem;
+  const { width, height } = getPillSize();
+
+  if (isMobileLayout()) {
+    const x = (window.innerWidth - width) / 2;
+    const y = window.innerHeight - height - mobileBottom;
+    pillPosition.value = clampPosition(x, y);
+    return;
+  }
+
+  const x = window.innerWidth - width - marginX;
+  pillPosition.value = clampPosition(x, desktopTop);
+}
+
+function removeDragListeners() {
+  window.removeEventListener('pointermove', handleDragMove);
+  window.removeEventListener('pointerup', handleDragEnd);
+  window.removeEventListener('pointercancel', handleDragEnd);
+}
+
+function handleDragStart(event: PointerEvent) {
+  if (event.button !== 0) return;
+  const pillEl = pillRef.value;
+  if (!pillEl) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const rect = pillEl.getBoundingClientRect();
+  if (!pillPosition.value) {
+    pillPosition.value = clampPosition(rect.left, rect.top);
+  }
+
+  dragPointerId = event.pointerId;
+  dragOffsetX = event.clientX - rect.left;
+  dragOffsetY = event.clientY - rect.top;
+  dragStartPointerX = event.clientX;
+  dragStartPointerY = event.clientY;
+  dragDidMove = false;
+  isDragging.value = true;
+
+  window.addEventListener('pointermove', handleDragMove);
+  window.addEventListener('pointerup', handleDragEnd);
+  window.addEventListener('pointercancel', handleDragEnd);
+}
+
+function handleDragMove(event: PointerEvent) {
+  if (!isDragging.value || dragPointerId !== event.pointerId) return;
+
+  const movedX = Math.abs(event.clientX - dragStartPointerX);
+  const movedY = Math.abs(event.clientY - dragStartPointerY);
+  if (movedX > DRAG_THRESHOLD || movedY > DRAG_THRESHOLD) {
+    dragDidMove = true;
+  }
+
+  const nextX = event.clientX - dragOffsetX;
+  const nextY = event.clientY - dragOffsetY;
+  pillPosition.value = clampPosition(nextX, nextY);
+  hasManualPosition.value = true;
+}
+
+function handleDragEnd(event: PointerEvent) {
+  if (dragPointerId !== event.pointerId) return;
+  removeDragListeners();
+  isDragging.value = false;
+  if (dragDidMove) {
+    suppressNextPillClick = true;
+  }
+  dragPointerId = null;
+}
 
 function handlePillClick() {
+  if (suppressNextPillClick) {
+    suppressNextPillClick = false;
+    return;
+  }
   timerStore.openPopover();
 }
 
 function handleMenuClose() {
   timerStore.closePopover();
 }
+
+function handleWindowResize() {
+  if (!showPill.value) return;
+  if (!hasManualPosition.value) {
+    setDefaultPillPosition();
+    return;
+  }
+
+  const position = pillPosition.value;
+  if (!position) return;
+  pillPosition.value = clampPosition(position.x, position.y);
+}
+
+watch(showPill, async (isVisible) => {
+  if (!isVisible) return;
+  await nextTick();
+
+  if (!hasManualPosition.value || !pillPosition.value) {
+    setDefaultPillPosition();
+    return;
+  }
+
+  pillPosition.value = clampPosition(pillPosition.value.x, pillPosition.value.y);
+});
+
+onMounted(async () => {
+  window.addEventListener('resize', handleWindowResize);
+  if (showPill.value) {
+    await nextTick();
+    setDefaultPillPosition();
+  }
+});
+
+onBeforeUnmount(() => {
+  removeDragListeners();
+  window.removeEventListener('resize', handleWindowResize);
+});
 </script>
 
 <template>
   <!-- Timer Pill (teleported outside popover so it always shows when running) -->
   <Teleport to="body">
     <button
-      v-if="timerStore.isRunning && !timerStore.isPopoverOpen"
+      v-if="showPill"
+      ref="pillRef"
       type="button"
       class="timer-pill"
-      :class="{ 'timer-pill--overtime': timerStore.isOvertime }"
+      :class="{ 'timer-pill--overtime': timerStore.isOvertime, 'timer-pill--dragging': isDragging }"
+      :style="pillInlineStyle"
       aria-label="Timer öffnen"
       title="Timer öffnen"
       @click="handlePillClick"
     >
-      {{ timerStore.formattedTime }}
+      <span
+        class="timer-pill__drag-handle"
+        data-testid="timer-pill-drag-handle"
+        title="Timer verschieben"
+        @pointerdown="handleDragStart"
+      >
+        <FateIcon name="grip" :size="18" />
+      </span>
+      <span class="timer-pill__value">{{ timerStore.formattedTime }}</span>
     </button>
   </Teleport>
 
@@ -100,22 +284,23 @@ function handleMenuClose() {
 <style scoped>
 .timer-pill {
   position: fixed;
-  right: 0.65rem;
-  top: calc(56px + 0.35rem);
   z-index: 1105;
   border: 1px solid color-mix(in srgb, var(--fate-blue) 70%, var(--fate-border));
   border-radius: 999px;
   background: var(--fate-white);
   color: var(--fate-blue);
   font-variant-numeric: tabular-nums;
-  font-size: 0.82rem;
+  font-size: 0.96rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1;
-  padding: 0.38rem 0.65rem;
+  padding: 0.4rem 0.8rem 0.4rem 0;
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.3);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: box-shadow 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 [data-theme='dark'] {
@@ -137,10 +322,37 @@ function handleMenuClose() {
   transform: scale(0.98);
 }
 
+.timer-pill--dragging {
+  transition: none;
+}
+
 .timer-pill--overtime {
   background: var(--fate-red);
   border-color: color-mix(in srgb, var(--fate-red) 72%, var(--fate-border));
   color: var(--fate-white);
+}
+
+.timer-pill__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 2.1rem;
+  color: currentColor;
+  cursor: grab;
+  touch-action: none;
+  border-right: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  padding: 0 0.5rem 0 0.55rem;
+  margin-right: 0.15rem;
+}
+
+.timer-pill__drag-handle:active {
+  cursor: grabbing;
+}
+
+.timer-pill__value {
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.15rem;
 }
 
 .fate-timer {
@@ -202,13 +414,4 @@ function handleMenuClose() {
   --btn-size: 36px;
 }
 
-@media (max-width: 600px) {
-  .timer-pill {
-    left: 50%;
-    transform: translateX(-50%);
-    right: auto;
-    top: auto;
-    bottom: 0.85rem;
-  }
-}
 </style>

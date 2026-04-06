@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 
+const MAX_TIMER_SECONDS = 99 * 60 + 59;
+
 export const useTimerStore = defineStore('timer', () => {
   const remainingSeconds = ref(0);
   const isRunning = ref(false);
@@ -10,10 +12,14 @@ export const useTimerStore = defineStore('timer', () => {
   let intervalId: ReturnType<typeof setInterval> | null = null;
 
   const formattedTime = computed(() => {
-    const absSeconds = Math.abs(remainingSeconds.value);
+    const displaySeconds =
+      remainingSeconds.value >= 0
+        ? Math.min(remainingSeconds.value, MAX_TIMER_SECONDS)
+        : remainingSeconds.value;
+    const absSeconds = Math.abs(displaySeconds);
     const minutes = Math.floor(absSeconds / 60);
     const seconds = absSeconds % 60;
-    const sign = remainingSeconds.value < 0 ? '-' : '';
+    const sign = displaySeconds < 0 ? '-' : '';
     return `${sign}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   });
 
@@ -48,7 +54,7 @@ export const useTimerStore = defineStore('timer', () => {
   }
 
   function addMinutes(minutes: number) {
-    remainingSeconds.value += minutes * 60;
+    remainingSeconds.value = Math.min(remainingSeconds.value + minutes * 60, MAX_TIMER_SECONDS);
   }
 
   function start() {
