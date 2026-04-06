@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import type { Consequence, ConsequenceLabel, ConsequenceSeverity, Item, StressTrack as StressTrackModel, Stunt } from '../../types';
-import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import ColorPicker from '../shared/ColorPicker.vue';
@@ -15,6 +14,7 @@ import ConsequenceSlots from './ConsequenceSlots.vue';
 import FateButton from '../shared/FateButton.vue';
 import { useMarkdown } from '../../composables/useMarkdown';
 import { normalizeItemStress } from '../../utils/stressTracks';
+import { createItemFormSnapshot, isItemFormEqual, syncItemFormState } from './itemSheetFormState';
 
 const { renderMarkdown } = useMarkdown();
 
@@ -40,21 +40,42 @@ const emit = defineEmits<{ save: [item: Item]; cancel: [] }>();
 
 const gmModeStore = useGMModeStore();
 
-const form = reactive<Item>(normalizeItemStress(deepClone(props.item)));
-const savedSnapshot = ref(normalizeItemStress(deepClone(props.item)));
+const form = reactive<Item>(createItemFormSnapshot(props.item));
+const savedSnapshot = ref(createItemFormSnapshot(props.item));
+let editRowKeyCounter = 0;
+const aspectRowKeys = ref<string[]>([]);
+const stuntRowKeys = ref<string[]>([]);
+const stressTrackRowKeys = ref<string[]>([]);
+
+function nextEditRowKey(prefix: 'aspect' | 'stunt' | 'stress') {
+  editRowKeyCounter += 1;
+  return `${prefix}-${editRowKeyCounter}`;
+}
+
+function syncEditRowKeys() {
+  aspectRowKeys.value = (form.aspects ?? []).map(() => nextEditRowKey('aspect'));
+  stuntRowKeys.value = (form.stunts ?? []).map(() => nextEditRowKey('stunt'));
+  stressTrackRowKeys.value = (form.stressTracks ?? []).map(() => nextEditRowKey('stress'));
+}
+
+function syncFromItem(item: Item) {
+  const nextSnapshot = syncItemFormState(form, item);
+  savedSnapshot.value = nextSnapshot;
+  syncEditRowKeys();
+}
+
+syncEditRowKeys();
 
 watch(
   () => props.item,
   (item) => {
-    Object.assign(form, normalizeItemStress(deepClone(item)));
-    savedSnapshot.value = normalizeItemStress(deepClone(item));
+    syncFromItem(item);
   },
-  { deep: true },
 );
 
 const isEditing = computed(() => props.mode === 'edit');
 const isDirty = computed(
-  () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
+  () => props.isNew || !isItemFormEqual(form, savedSnapshot.value),
 );
 const data = computed(() => (isEditing.value ? form : normalizeItemStress(props.item)));
 
@@ -136,11 +157,13 @@ function addConsequenceSlot(severity: ConsequenceSeverity, labelKey: Consequence
 function addStunt() {
   if (!form.stunts) form.stunts = [];
   form.stunts.push({ name: '', description: '' });
+  stuntRowKeys.value.push(nextEditRowKey('stunt'));
 }
 
 function removeStunt(index: number) {
   if (!form.stunts) return;
   form.stunts.splice(index, 1);
+  stuntRowKeys.value.splice(index, 1);
 }
 
 function updateStunt(index: number, field: keyof Stunt, value: string) {
@@ -153,10 +176,12 @@ function addStressTrack() {
   const nextIndex = (form.stressTracks?.length ?? 0) + 1;
   if (!form.stressTracks) form.stressTracks = [];
   form.stressTracks.push({ label: `Neuer Stress ${nextIndex}`, boxes: [] });
+  stressTrackRowKeys.value.push(nextEditRowKey('stress'));
 }
 
 function removeStressTrack(index: number) {
   form.stressTracks?.splice(index, 1);
+  stressTrackRowKeys.value.splice(index, 1);
 }
 
 function updateStressTrackLabel(index: number, label: string) {
@@ -191,14 +216,16 @@ function onAspectInput(index: number, e: Event) {
 
 function addAspect() {
   form.aspects.push('');
+  aspectRowKeys.value.push(nextEditRowKey('aspect'));
 }
 
 function removeAspect(index: number) {
   form.aspects.splice(index, 1);
+  aspectRowKeys.value.splice(index, 1);
 }
 
 function save() {
-  const saved = normalizeItemStress(deepClone(form));
+  const saved = createItemFormSnapshot(form);
   emit('save', saved);
   savedSnapshot.value = saved;
 }
@@ -272,7 +299,11 @@ defineExpose({ save });
     <section v-if="show.aspects && (isEditing || data.aspects.some(a => a))" class="sheet-section aspekte span-full">
       <div class="sheet-section-header">ASPEKTE</div>
       <div class="aspect-fields">
-        <div v-for="(aspect, i) in (isEditing ? form.aspects : data.aspects)" :key="i" class="aspect-row">
+        <div
+          v-for="(aspect, i) in (isEditing ? form.aspects : data.aspects)"
+          :key="isEditing ? (aspectRowKeys[i] ?? `aspect-fallback-${i}`) : `aspect-view-${i}`"
+          class="aspect-row"
+        >
           <span v-if="!isEditing" class="aspect-value">{{ aspect }}</span>
           <template v-else>
             <input
@@ -314,7 +345,11 @@ defineExpose({ save });
     >
       <div class="sheet-section-header">STUNTS</div>
       <div v-if="isEditing" class="stunts-list">
-        <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
+        <div
+          v-for="(stunt, i) in form.stunts"
+          :key="stuntRowKeys[i] ?? `stunt-fallback-${i}`"
+          class="stunt-edit-row"
+        >
           <div class="stunt-edit-fields">
             <input
               class="stunt-name-input"
@@ -355,7 +390,7 @@ defineExpose({ save });
           <div v-if="isEditing" class="stress-track-list">
             <div
               v-for="(track, i) in form.stressTracks ?? []"
-              :key="i"
+              :key="stressTrackRowKeys[i] ?? `stress-fallback-${i}`"
               class="stress-track-row"
             >
               <div class="stress-track-wrap">

@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
+import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import ItemSheet from './ItemSheet.vue';
 import { useGMModeStore } from '../../stores/gmMode';
 import type { Item } from '../../types';
+import { isItemFormEqual } from './itemSheetFormState';
 
 function makeItem(overrides: Partial<Item> = {}): Item {
   return {
@@ -363,5 +365,200 @@ describe('ItemSheet', () => {
         false,
       );
     });
+
+    it('does not crash with malformed legacy arrays in existing-item mode', () => {
+      render(ItemSheet, {
+        props: {
+          item: {
+            ...makeItem(),
+            stunts: undefined,
+            aspects: undefined,
+          } as unknown as Item,
+          mode: 'edit',
+          isNew: false,
+        },
+        global: { plugins: [createPinia()] },
+      });
+
+      expect(screen.getByText('Speichern')).toBeTruthy();
+    });
+
+    it('resets local edits and dirty state when item prop reference changes', async () => {
+      const item = makeItem({ id: 'item-1', name: 'Alt' });
+      const { container, rerender } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false },
+        global: { plugins: [createPinia()] },
+      });
+
+      await fireEvent.update(
+        container.querySelector('input[placeholder="Name des Gegenstands"]')!,
+        'Unsaved',
+      );
+      expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+        false,
+      );
+
+      await rerender({ item: makeItem({ id: 'item-2', name: 'Neu' }), mode: 'edit', isNew: false });
+      expect(
+        (container.querySelector('input[placeholder="Name des Gegenstands"]') as HTMLInputElement)
+          .value,
+      ).toBe('Neu');
+      expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+        true,
+      );
+    });
+
+    it('resets nested local edits when item prop reference changes', async () => {
+      const item = makeItem({
+        id: 'item-1',
+        stunts: [{ name: 'Old Stunt', description: 'Old Desc' }],
+      });
+      const { container, rerender } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false },
+        global: { plugins: [createPinia()] },
+      });
+
+      await fireEvent.update(
+        container.querySelector<HTMLInputElement>('.stunt-name-input')!,
+        'Unsaved Stunt',
+      );
+
+      await rerender({
+        item: makeItem({
+          id: 'item-2',
+          stunts: [{ name: 'Fresh Stunt', description: 'Fresh Desc' }],
+        }),
+        mode: 'edit',
+        isNew: false,
+      });
+
+      expect(container.querySelector<HTMLInputElement>('.stunt-name-input')!.value).toBe(
+        'Fresh Stunt',
+      );
+    });
+
+    it('disables save again after saving nested edits', async () => {
+      const item = makeItem({
+        modifiers: [{ label: 'Purer Schaden', value: 1 }],
+      });
+      const onSave = vi.fn();
+      const { container } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false, onSave },
+        global: { plugins: [createPinia()] },
+      });
+
+      const plusButton = container.querySelector<HTMLButtonElement>(
+        '.icon-counter .icon-controls button[aria-label="Erhöhen"]',
+      );
+      await fireEvent.click(plusButton!);
+      expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+        false,
+      );
+
+      await fireEvent.click(screen.getByText('Speichern'));
+      expect(onSave).toHaveBeenCalledOnce();
+      expect((screen.getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(
+        true,
+      );
+    });
+
+    it('keeps stunt input values stable when removing a sibling row', async () => {
+      const item = makeItem({
+        stunts: [
+          { name: 'First', description: 'A' },
+          { name: 'Second', description: 'B' },
+        ],
+      });
+      const { container } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false },
+        global: { plugins: [createPinia()] },
+      });
+
+      const nameInputs = container.querySelectorAll<HTMLInputElement>('.stunt-name-input');
+      await fireEvent.update(nameInputs[1]!, 'Second Edited');
+
+      const removeButtons = container.querySelectorAll<HTMLButtonElement>('.stunt-edit-row .fate-btn');
+      await fireEvent.click(removeButtons[0]!);
+
+      const remainingInput = container.querySelector<HTMLInputElement>('.stunt-name-input')!;
+      expect(remainingInput.value).toBe('Second Edited');
+    });
+
+    it('keeps aspect input values stable when removing a sibling aspect row', async () => {
+      const item = makeItem({
+        aspects: ['First', 'Second'],
+      });
+      const { container } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false },
+        global: { plugins: [createPinia()] },
+      });
+
+      const aspectInputs = container.querySelectorAll<HTMLInputElement>('.aspect-input');
+      await fireEvent.update(aspectInputs[1]!, 'Second Edited');
+
+      const removeButtons = container.querySelectorAll<HTMLButtonElement>('.aspect-row .fate-btn');
+      await fireEvent.click(removeButtons[0]!);
+
+      const remainingInput = container.querySelector<HTMLInputElement>('.aspect-input')!;
+      expect(remainingInput.value).toBe('Second Edited');
+    });
+
+    it('keeps stress track label input stable when removing a sibling track', async () => {
+      const item = makeItem({
+        stressTracks: [
+          { label: 'Track A', boxes: [{ value: 1, checked: false }] },
+          { label: 'Track B', boxes: [{ value: 1, checked: false }] },
+        ],
+      });
+      const { container } = render(ItemSheet, {
+        props: { item, mode: 'edit', isNew: false },
+        global: { plugins: [createPinia()] },
+      });
+
+      const labelInputs = container.querySelectorAll<HTMLInputElement>('.stress-label-input');
+      await fireEvent.update(labelInputs[1]!, 'Track B Edited');
+
+      const removeButtons = container.querySelectorAll<HTMLButtonElement>(
+        '.stress-track-row .stress-ctrl-btn:nth-child(3)',
+      );
+      await fireEvent.click(removeButtons[0]!);
+
+      const remainingLabelInput = container.querySelector<HTMLInputElement>('.stress-label-input')!;
+      expect(remainingLabelInput.value).toBe('Track B Edited');
+    });
+
+    it('exposes save() to parent refs', async () => {
+      const wrapper = mount(ItemSheet, {
+        props: {
+          item: makeItem({ id: 'item-expose' }),
+          mode: 'edit',
+          isNew: false,
+        },
+        global: {
+          plugins: [createPinia()],
+        },
+      });
+
+      const exposed = wrapper.vm as unknown as { save?: () => void };
+      expect(typeof exposed.save).toBe('function');
+
+      await wrapper.find('input[placeholder="Name des Gegenstands"]').setValue('Changed');
+      exposed.save?.();
+      expect(wrapper.emitted('save')).toBeTruthy();
+    });
+  });
+});
+
+describe('Item comparator policy', () => {
+  it('ignores deprecated pureDamage/deflection fields', () => {
+    const base = makeItem({ pureDamage: 1, deflection: 2 } as Partial<Item>);
+    const changed = makeItem({ pureDamage: 9, deflection: -3 } as Partial<Item>);
+    expect(isItemFormEqual(base, changed)).toBe(true);
+  });
+
+  it('tracks compared fields (e.g. hidden and gmNotes) as dirty-relevant', () => {
+    const base = makeItem({ hidden: false, gmNotes: 'A' });
+    expect(isItemFormEqual(base, { ...base, hidden: true })).toBe(false);
+    expect(isItemFormEqual(base, { ...base, gmNotes: 'B' })).toBe(false);
   });
 });

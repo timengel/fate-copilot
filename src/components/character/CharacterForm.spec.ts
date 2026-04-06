@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
+import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { useGMModeStore } from '../../stores/gmMode';
 import { useItemsStore } from '../../stores/items';
@@ -8,6 +9,7 @@ import CharacterSheet from './CharacterSheet.vue';
 import { createDefaultCharacter, createDefaultItem } from '../../composables/useCharacterDefaults';
 import { useSkillsStore } from '../../stores/skills';
 import type { Character, Consequence } from '../../types';
+import { isCharacterFormEqual } from './characterSheetFormState';
 
 const mockPush = vi.fn();
 
@@ -674,6 +676,54 @@ describe('CharacterSheet dirty-state', () => {
     expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
     expect(getByText('Abbrechen')).toBeTruthy();
   });
+
+  it('resets local edits and dirty state when character prop reference changes', async () => {
+    const char = { ...createDefaultCharacter(), id: 'c1', name: 'Existing Hero' };
+    const { container, rerender, getByText } = renderExisting(char);
+    const nameInput = container.querySelector<HTMLInputElement>('input[placeholder]')!;
+
+    await fireEvent.update(nameInput, 'Unsaved Name');
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(false);
+
+    await rerender({
+      character: { ...char, id: 'c2', name: 'Fresh Character' },
+      mode: 'edit',
+      isNew: false,
+    });
+
+    const updatedInput = container.querySelector<HTMLInputElement>('input[placeholder]')!;
+    expect(updatedInput.value).toBe('Fresh Character');
+    expect((getByText('Speichern').closest('button') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('resets nested local edits when character prop reference changes', async () => {
+    const char = {
+      ...createDefaultCharacter(),
+      id: 'c1',
+      name: 'Existing Hero',
+      stunts: [{ name: 'Old Stunt', description: 'Old Desc' }],
+    };
+    const { container, rerender } = renderExisting(char);
+
+    await fireEvent.update(
+      container.querySelector<HTMLInputElement>('.stunt-name-input')!,
+      'Unsaved Stunt',
+    );
+
+    await rerender({
+      character: {
+        ...char,
+        id: 'c2',
+        stunts: [{ name: 'Fresh Stunt', description: 'Fresh Desc' }],
+      },
+      mode: 'edit',
+      isNew: false,
+    });
+
+    expect(container.querySelector<HTMLInputElement>('.stunt-name-input')!.value).toBe(
+      'Fresh Stunt',
+    );
+  });
 });
 
 // ─── MODIFIERS section ───────────────────────────────────────────────────────
@@ -761,5 +811,88 @@ describe('CharacterSheet – modifiers section', () => {
     expect(container.querySelector('.modifiers-section')?.classList.contains('span-full')).toBe(
       false,
     );
+  });
+});
+
+describe('Character comparator policy', () => {
+  it('ignores deprecated pureDamage/deflection fields', () => {
+    const base = { ...createDefaultCharacter(), pureDamage: 1, deflection: 2 } as Character;
+    const changed = { ...base, pureDamage: 99, deflection: -4 } as Character;
+    expect(isCharacterFormEqual(base, changed)).toBe(true);
+  });
+
+  it('tracks compared fields (e.g. gmNotes and archived) as dirty-relevant', () => {
+    const base = { ...createDefaultCharacter(), gmNotes: 'A', archived: false } as Character;
+    expect(isCharacterFormEqual(base, { ...base, gmNotes: 'B' })).toBe(false);
+    expect(isCharacterFormEqual(base, { ...base, archived: true })).toBe(false);
+  });
+});
+
+describe('CharacterSheet integration contract', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
+
+  it('exposes save() and isDirty to parent refs', async () => {
+    const wrapper = mount(CharacterSheet, {
+      props: {
+        character: createDefaultCharacter(),
+        mode: 'edit',
+        isNew: false,
+      },
+      global: {
+        plugins: [createPinia()],
+        stubs: { SkillPyramid: true },
+      },
+    });
+
+    const exposed = wrapper.vm as unknown as { save?: () => void; isDirty?: boolean };
+    expect(typeof exposed.save).toBe('function');
+    expect(exposed.isDirty).toBe(false);
+
+    await wrapper.find('input[placeholder="Charaktername"]').setValue('Changed');
+    expect((wrapper.vm as unknown as { isDirty?: boolean }).isDirty).toBe(true);
+  });
+
+  it('keeps stunt input values stable when removing a sibling row', async () => {
+    const char = {
+      ...createDefaultCharacter(),
+      stunts: [
+        { name: 'First', description: 'A' },
+        { name: 'Second', description: 'B' },
+      ],
+    };
+    const { container } = renderForm(char, { isNew: false });
+
+    const nameInputs = container.querySelectorAll<HTMLInputElement>('.stunt-name-input');
+    await fireEvent.update(nameInputs[1]!, 'Second Edited');
+
+    const removeButtons = container.querySelectorAll<HTMLButtonElement>('.stunt-edit-row .fate-btn');
+    await fireEvent.click(removeButtons[0]!);
+
+    const remainingInput = container.querySelector<HTMLInputElement>('.stunt-name-input')!;
+    expect(remainingInput.value).toBe('Second Edited');
+  });
+
+  it('keeps stress track label input stable when removing a sibling track', async () => {
+    const char = {
+      ...createDefaultCharacter(),
+      stressTracks: [
+        { label: 'Track A', boxes: [{ value: 1, checked: false }] },
+        { label: 'Track B', boxes: [{ value: 1, checked: false }] },
+      ],
+    };
+    const { container } = renderForm(char, { isNew: false });
+
+    const labelInputs = container.querySelectorAll<HTMLInputElement>('.stress-label-input');
+    await fireEvent.update(labelInputs[1]!, 'Track B Edited');
+
+    const removeButtons = container.querySelectorAll<HTMLButtonElement>(
+      '.stress-track-row .stress-ctrl-btn:nth-child(3)',
+    );
+    await fireEvent.click(removeButtons[0]!);
+
+    const remainingLabelInput = container.querySelector<HTMLInputElement>('.stress-label-input')!;
+    expect(remainingLabelInput.value).toBe('Track B Edited');
   });
 });

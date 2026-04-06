@@ -9,7 +9,6 @@ import type {
   StressTrack as StressTrackModel,
   Stunt,
 } from '../../types';
-import { deepClone } from '../../utils/deepClone';
 import { CHARACTER_COLORS } from '../../types';
 import { useGMModeStore } from '../../stores/gmMode';
 import { useCharacterItemsStore } from '../../stores/characterItems';
@@ -30,6 +29,11 @@ import FateIcon from '../shared/FateIcon.vue';
 import { getColorVars } from '../../composables/useColorVars';
 import { useMarkdown } from '../../composables/useMarkdown';
 import { normalizeCharacterStress } from '../../utils/stressTracks';
+import {
+  createCharacterFormSnapshot,
+  isCharacterFormEqual,
+  syncCharacterFormState,
+} from './characterSheetFormState';
 
 const { renderMarkdown } = useMarkdown();
 
@@ -82,21 +86,40 @@ const gmModeStore = useGMModeStore();
 const characterItemsStore = useCharacterItemsStore();
 const router = useRouter();
 
-const form = reactive<Character>(normalizeCharacterStress(deepClone(props.character)));
-const savedSnapshot = ref(normalizeCharacterStress(deepClone(props.character)));
+const form = reactive<Character>(createCharacterFormSnapshot(props.character));
+const savedSnapshot = ref(createCharacterFormSnapshot(props.character));
+let editRowKeyCounter = 0;
+const stuntRowKeys = ref<string[]>([]);
+const stressTrackRowKeys = ref<string[]>([]);
+
+function nextEditRowKey(prefix: 'stunt' | 'stress') {
+  editRowKeyCounter += 1;
+  return `${prefix}-${editRowKeyCounter}`;
+}
+
+function syncEditRowKeys() {
+  stuntRowKeys.value = form.stunts.map(() => nextEditRowKey('stunt'));
+  stressTrackRowKeys.value = (form.stressTracks ?? []).map(() => nextEditRowKey('stress'));
+}
+
+function syncFromCharacter(character: Character) {
+  const nextSnapshot = syncCharacterFormState(form, character);
+  savedSnapshot.value = nextSnapshot;
+  syncEditRowKeys();
+}
+
+syncEditRowKeys();
 
 watch(
   () => props.character,
   (character) => {
-    Object.assign(form, normalizeCharacterStress(deepClone(character)));
-    savedSnapshot.value = normalizeCharacterStress(deepClone(character));
+    syncFromCharacter(character);
   },
-  { deep: true },
 );
 
 const isEditing = computed(() => props.mode === 'edit');
 const formIsDirty = computed(
-  () => props.isNew || JSON.stringify(form) !== JSON.stringify(savedSnapshot.value),
+  () => props.isNew || !isCharacterFormEqual(form, savedSnapshot.value),
 );
 const isDirty = computed(() => formIsDirty.value || !!props.externalDirty);
 
@@ -215,11 +238,13 @@ watch(
 function addStunt() {
   if (!form.stunts) form.stunts = [];
   form.stunts.push({ name: '', description: '' });
+  stuntRowKeys.value.push(nextEditRowKey('stunt'));
 }
 
 function removeStunt(index: number) {
   if (!form.stunts) return;
   form.stunts.splice(index, 1);
+  stuntRowKeys.value.splice(index, 1);
 }
 
 function updateStunt(index: number, field: keyof Stunt, value: string) {
@@ -251,10 +276,12 @@ function addStressTrack() {
   const nextIndex = (form.stressTracks?.length ?? 0) + 1;
   if (!form.stressTracks) form.stressTracks = [];
   form.stressTracks.push({ label: `Neuer Stress ${nextIndex}`, boxes: [] });
+  stressTrackRowKeys.value.push(nextEditRowKey('stress'));
 }
 
 function removeStressTrack(index: number) {
   form.stressTracks?.splice(index, 1);
+  stressTrackRowKeys.value.splice(index, 1);
 }
 
 function updateStressTrackLabel(index: number, label: string) {
@@ -280,7 +307,7 @@ function removeStressBox(index: number) {
 }
 
 function save() {
-  const saved = normalizeCharacterStress(deepClone(form));
+  const saved = createCharacterFormSnapshot(form);
   emit('save', saved);
   savedSnapshot.value = saved;
 }
@@ -499,7 +526,11 @@ defineExpose({ save, isDirty });
           }}</span>
         </div>
         <div v-if="isEditing" v-show="showStunts" class="stunts-list">
-          <div v-for="(stunt, i) in form.stunts" :key="i" class="stunt-edit-row">
+          <div
+            v-for="(stunt, i) in form.stunts"
+            :key="stuntRowKeys[i] ?? `stunt-fallback-${i}`"
+            class="stunt-edit-row"
+          >
             <div class="stunt-edit-fields">
               <input
                 class="stunt-name-input"
@@ -546,7 +577,11 @@ defineExpose({ save, isDirty });
           <div class="sheet-section-header">STRESS</div>
           <div class="stress-content">
             <div v-if="isEditing" class="stress-track-list">
-              <div v-for="(track, i) in form.stressTracks ?? []" :key="i" class="stress-track-row">
+              <div
+                v-for="(track, i) in form.stressTracks ?? []"
+                :key="stressTrackRowKeys[i] ?? `stress-fallback-${i}`"
+                class="stress-track-row"
+              >
                 <div class="stress-track-wrap">
                   <StressTrack
                     :label="track.label"
