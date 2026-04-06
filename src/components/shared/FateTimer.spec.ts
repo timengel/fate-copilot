@@ -202,6 +202,20 @@ describe('FateTimer', () => {
     expect(timerStore.isPopoverOpen).toBe(true);
   });
 
+  it('does not open popover when drag handle is clicked', async () => {
+    renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+
+    await nextTick();
+    expect(timerStore.isPopoverOpen).toBe(false);
+
+    await fireEvent.click(screen.getByTestId('timer-pill-drag-handle'));
+
+    expect(timerStore.isPopoverOpen).toBe(false);
+  });
+
   it('moves pill position when dragging the handle', async () => {
     renderTimer();
     const timerStore = useTimerStore();

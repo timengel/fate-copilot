@@ -119,6 +119,11 @@ function handleDragStart(event: PointerEvent) {
   window.addEventListener('pointercancel', handleDragEnd);
 }
 
+function handleDragHandleClick(event: MouseEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 function handleDragMove(event: PointerEvent) {
   if (!isDragging.value || dragPointerId !== event.pointerId) return;
 
@@ -241,10 +246,13 @@ onBeforeUnmount(() => {
         data-testid="timer-pill-drag-handle"
         title="Timer verschieben"
         @pointerdown="handleDragStart"
+        @click="handleDragHandleClick"
       >
         <FateIcon name="grip" :size="18" />
       </span>
-      <span class="timer-pill__value">{{ timerStore.formattedTime }}</span>
+      <span class="timer-pill__open-hit">
+        <span class="timer-pill__value">{{ timerStore.formattedTime }}</span>
+      </span>
     </button>
   </Teleport>
 
@@ -326,7 +334,8 @@ onBeforeUnmount(() => {
 .timer-pill {
   position: fixed;
   z-index: 1105;
-  border: 1px solid color-mix(in srgb, var(--fate-blue) 70%, var(--fate-border));
+  border: 1px solid var(--fate-blue);
+  box-sizing: border-box;
   border-radius: 999px;
   background: var(--fate-white);
   color: var(--fate-blue);
@@ -335,18 +344,18 @@ onBeforeUnmount(() => {
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1;
-  padding: 0.4rem 0.8rem 0.4rem 0;
+  padding: 0;
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.3);
   cursor: pointer;
   transition: box-shadow 0.15s ease;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0;
 }
 
 [data-theme='dark'] {
   .timer-pill {
-    border-color: var(--fate-text);
+    border: 1px solid var(--fate-text);
   }
 
   .timer-pill,
@@ -373,7 +382,7 @@ onBeforeUnmount(() => {
 
 .timer-pill--overtime {
   background: var(--fate-red);
-  border-color: var(--fate-red);
+  border: none;
   color: var(--fate-white);
 }
 
@@ -392,26 +401,44 @@ onBeforeUnmount(() => {
 }
 
 .timer-pill__drag-handle {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  align-self: stretch;
-  width: 2.1rem;
+  width: auto;
+  height: 2rem;
   color: currentColor;
   cursor: grab;
   touch-action: none;
   border-right: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  padding: 0 0.5rem 0 0.55rem;
-  margin-right: 0.15rem;
+  padding: 0 0.3rem 0 0.5rem;
+  margin-right: 0;
 }
 
 .timer-pill__drag-handle:active {
   cursor: grabbing;
 }
 
+.timer-pill__open-hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-width: 4.2rem;
+  padding: 0 0.8rem 0 0.45rem;
+  border-radius: 0 999px 999px 0;
+  transition: background-color 0.15s ease;
+}
+
+.timer-pill__open-hit:hover {
+  background: color-mix(in srgb, var(--fate-blue) 14%, transparent);
+}
+
+.timer-pill--overtime .timer-pill__open-hit:hover {
+  background: color-mix(in srgb, var(--fate-white) 20%, transparent);
+}
+
 .timer-pill__value {
   font-variant-numeric: tabular-nums;
-  padding-left: 0.15rem;
 }
 
 .fate-timer {
