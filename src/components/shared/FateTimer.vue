@@ -204,10 +204,11 @@ function handleMenuClose() {
 
 @media (max-width: 600px) {
   .timer-pill {
-    right: 0.85rem;
-    left: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
     top: auto;
-    bottom: calc(56px + 0.35rem);
+    bottom: 0.85rem;
   }
 }
 </style>

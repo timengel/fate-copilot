@@ -642,8 +642,8 @@ onBeforeUnmount(() => {
   }
 
   .global-timer-popover {
-    right: 0.65rem;
-    left: auto;
+    left: 0.65rem;;
+    right: auto;
     top: auto;
     bottom: calc(56px + 0.65rem);
   }
