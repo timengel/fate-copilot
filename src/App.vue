@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount, onMounted, createApp, h } from 'vue';
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
+import { getActivePinia } from 'pinia';
 import FatePlusLogo from './components/shared/FatePlusLogo.vue';
 import FateToggle from './components/shared/FateToggle.vue';
 import FateIcon from './components/shared/FateIcon.vue';
 import FateTimer from './components/shared/FateTimer.vue';
+import FateTimerPanel from './components/shared/FateTimerPanel.vue';
 import FateToast from './components/shared/FateToast.vue';
 import ConfirmDialog from './components/shared/ConfirmDialog.vue';
 import { useGMModeStore } from './stores/gmMode';
 import { useTimerStore } from './stores/timer';
 import { useThemeStore } from './stores/theme';
 import { useConfirmDialog } from './composables/useConfirmDialog';
+import { useDocumentPictureInPicture } from './composables/useDocumentPictureInPicture';
 import { ToggleVariant } from './types';
 
 const navOpen = ref(false);
@@ -27,6 +30,7 @@ const { confirmDialog, showConfirmDialog } = useConfirmDialog();
 const timerPopoverRef = ref<HTMLDivElement | null>(null);
 const isTimerOvertimeFlashActive = ref(false);
 let timerOvertimeFlashTimeoutId: ReturnType<typeof setTimeout> | null = null;
+const timerPip = useDocumentPictureInPicture();
 
 const themeIcon = computed(() => themeStore.isDark ? 'moon' as const : 'sun' as const);
 const themeLabel = computed(() => themeStore.isDark ? 'Dunkel' : 'Hell');
@@ -87,6 +91,115 @@ function triggerTimerOvertimeFlash() {
   }, 650);
 }
 
+function syncTimerPipTheme() {
+  const pipDoc = timerPip.pipWindow.value?.document;
+  if (!pipDoc) return;
+  pipDoc.documentElement.setAttribute('data-theme', themeStore.isDark ? 'dark' : 'light');
+}
+
+function closeTimerPip() {
+  timerPip.close();
+}
+
+function bindTimerPipSizeToContent(pipWindow: Window, mountNode: HTMLElement) {
+  if (typeof pipWindow.resizeTo !== 'function') {
+    return () => {};
+  }
+
+  const panelEl = mountNode.firstElementChild as HTMLElement | null;
+  if (!panelEl) {
+    return () => {};
+  }
+
+  const chromePaddingPx = 12;
+  const resizeToContent = () => {
+    if (pipWindow.closed) return;
+    const rect = panelEl.getBoundingClientRect();
+    const width = Math.ceil(rect.width + chromePaddingPx);
+    const height = Math.ceil(rect.height + chromePaddingPx);
+    if (width > 0 && height > 0) {
+      try {
+        pipWindow.resizeTo(width, height);
+      } catch {
+        // Some environments may reject runtime PiP resizing.
+      }
+    }
+  };
+
+  resizeToContent();
+
+  const pipWindowWithResizeObserver = pipWindow as Window & { ResizeObserver?: typeof ResizeObserver };
+  const ResizeObserverCtor =
+    pipWindowWithResizeObserver.ResizeObserver ??
+    (typeof ResizeObserver !== 'undefined' ? ResizeObserver : null);
+  const resizeObserver = ResizeObserverCtor
+    ? new ResizeObserverCtor(() => {
+        resizeToContent();
+      })
+    : null;
+  resizeObserver?.observe(panelEl);
+
+  const fonts = pipWindow.document.fonts;
+  if (fonts) {
+    void fonts.ready.then(() => {
+      resizeToContent();
+    });
+  }
+
+  return () => {
+    resizeObserver?.disconnect();
+  };
+}
+
+async function openTimerPip() {
+  if (!timerStore.isRunning) return;
+  if (document.visibilityState !== 'hidden') return;
+
+  const pinia = getActivePinia();
+  if (!pinia) return;
+
+  await timerPip.open({
+    width: 280,
+    height: 220,
+    title: 'Fate Timer',
+    setupDocument: (pipDoc) => {
+      pipDoc.body.innerHTML = '';
+      pipDoc.body.style.margin = '0';
+      pipDoc.body.style.padding = '0.35rem';
+      pipDoc.body.style.display = 'flex';
+      pipDoc.body.style.alignItems = 'center';
+      pipDoc.body.style.justifyContent = 'center';
+      pipDoc.body.style.background = 'var(--fate-bg, #f5f7fb)';
+      syncTimerPipTheme();
+    },
+    mount: ({ pipWindow, mountNode }) => {
+      const pipApp = createApp({
+        render: () => h(FateTimerPanel, { showCloseButton: false }),
+      });
+      pipApp.use(pinia);
+      pipApp.mount(mountNode);
+      const unbindPipSizing = bindTimerPipSizeToContent(pipWindow, mountNode);
+
+      return () => {
+        unbindPipSizing();
+        pipApp.unmount();
+      };
+    },
+  });
+}
+
+function handleDocumentVisibilityChange() {
+  if (document.visibilityState === 'hidden') {
+    void openTimerPip();
+    return;
+  }
+  closeTimerPip();
+}
+
+function handleAppForegrounded() {
+  closeTimerPip();
+}
+
 watch(
   () => router.currentRoute.value.path,
   () => {
@@ -123,10 +236,40 @@ watch(
   },
 );
 
+watch(
+  () => timerStore.isRunning,
+  (isRunning) => {
+    if (!isRunning) {
+      closeTimerPip();
+      return;
+    }
+    if (document.visibilityState === 'hidden') {
+      void openTimerPip();
+    }
+  },
+);
+
+watch(
+  () => themeStore.isDark,
+  () => {
+    syncTimerPipTheme();
+  },
+);
+
+onMounted(() => {
+  document.addEventListener('visibilitychange', handleDocumentVisibilityChange);
+  window.addEventListener('focus', handleAppForegrounded);
+  window.addEventListener('pageshow', handleAppForegrounded);
+});
+
 onBeforeUnmount(() => {
   if (timerOvertimeFlashTimeoutId) {
     clearTimeout(timerOvertimeFlashTimeoutId);
   }
+  document.removeEventListener('visibilitychange', handleDocumentVisibilityChange);
+  window.removeEventListener('focus', handleAppForegrounded);
+  window.removeEventListener('pageshow', handleAppForegrounded);
+  closeTimerPip();
 });
 </script>
 

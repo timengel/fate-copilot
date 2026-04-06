@@ -7,12 +7,21 @@ import { useGMModeStore } from './stores/gmMode';
 import { useTimerStore } from './stores/timer';
 
 describe('App navigation', () => {
+  let visibilityStateMock: DocumentVisibilityState = 'visible';
+
   beforeEach(() => {
     setActivePinia(createPinia());
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => visibilityStateMock,
+    });
+    visibilityStateMock = 'visible';
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    visibilityStateMock = 'visible';
+    delete (window as Window & { documentPictureInPicture?: unknown }).documentPictureInPicture;
     const timerStore = useTimerStore();
     timerStore.clearTimerInterval();
     timerStore.reset();
@@ -84,5 +93,162 @@ describe('App navigation', () => {
 
     const link = screen.getByRole('link', { name: 'Cheat Sheet' });
     expect(link.classList.contains('router-link-active')).toBe(true);
+  });
+
+  it('opens timer PiP when tab gets hidden while timer is running', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(requestWindow).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not open timer PiP when timer is not running', async () => {
+    const requestWindow = vi.fn();
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = false;
+      store.isRunning = false;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+
+    expect(requestWindow).not.toHaveBeenCalled();
+  });
+
+  it('closes timer PiP when tab becomes visible again', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    visibilityStateMock = 'visible';
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes timer PiP when app window gets focus', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    window.dispatchEvent(new Event('focus'));
+
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes timer PiP when running timer stops', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const timerStore = useTimerStore();
+    timerStore.isRunning = false;
+    await Promise.resolve();
+
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not throw without Document PiP support', async () => {
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    expect(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    }).not.toThrow();
   });
 });
