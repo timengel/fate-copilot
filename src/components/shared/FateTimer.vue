@@ -221,6 +221,7 @@ onBeforeUnmount(() => {
   <!-- Timer Menu (shows when popover is open) -->
   <section v-if="timerStore.isPopoverOpen" class="fate-timer" aria-label="Fate Timer">
     <div class="timer-close-row">
+      Timer
       <FateButton
         icon="close"
         variant="danger-outline"
@@ -240,16 +241,26 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="timer-control-row">
-      <FateButton
-        v-if="!timerStore.hasStarted"
-        icon="play"
-        variant="primary"
-        size="M"
-        aria-label="Timer starten"
-        title="Start"
-        :disabled="!timerStore.canStart"
-        @click="timerStore.start"
-      />
+      <template v-if="!timerStore.hasStarted">
+        <FateButton
+          v-if="timerStore.remainingSeconds > 0"
+          icon="reset"
+          variant="secondary"
+          size="M"
+          aria-label="Timer zurücksetzen"
+          title="Reset"
+          @click="timerStore.reset"
+        />
+        <FateButton
+          icon="play"
+          variant="primary"
+          size="M"
+          aria-label="Timer starten"
+          title="Start"
+          :disabled="!timerStore.canStart"
+          @click="timerStore.start"
+        />
+      </template>
       <FateButton
         v-else-if="timerStore.isRunning"
         icon="pause"
@@ -369,8 +380,14 @@ onBeforeUnmount(() => {
 
 .timer-close-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: -0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fate-text);
 }
 
 .timer-close-row :deep(.fate-btn) {

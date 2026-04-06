@@ -91,6 +91,17 @@ describe('FateTimer', () => {
     expect(screen.getByRole('button', { name: 'Timer starten' })).toBeTruthy();
   });
 
+  it('shows reset before start when time is set and resets without starting', async () => {
+    renderTimer(true);
+
+    await fireEvent.click(screen.getByRole('button', { name: '+5' }));
+    expect(screen.getByRole('button', { name: 'Timer zurücksetzen' })).toBeTruthy();
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Timer zurücksetzen' }));
+    expect(screen.getByText('00:00')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Timer zurücksetzen' })).toBeNull();
+  });
+
   it('continues into negative time after reaching zero', async () => {
     renderTimer(true);
 
