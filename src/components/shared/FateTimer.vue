@@ -13,6 +13,7 @@ const pillRef = ref<HTMLButtonElement | null>(null);
 const pillPosition = ref<{ x: number; y: number } | null>(null);
 const hasManualPosition = ref(false);
 const isDragging = ref(false);
+const isOvertimeFlashActive = ref(false);
 const showPill = computed(() => timerStore.isRunning && !timerStore.isPopoverOpen);
 const pillInlineStyle = computed(() => {
   if (!pillPosition.value) return {};
@@ -33,6 +34,7 @@ let dragStartPointerX = 0;
 let dragStartPointerY = 0;
 let dragDidMove = false;
 let suppressNextPillClick = false;
+let overtimeFlashTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 function getRootRemPx() {
   const value = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -154,6 +156,17 @@ function handleMenuClose() {
   timerStore.closePopover();
 }
 
+function triggerOvertimeFlash() {
+  isOvertimeFlashActive.value = true;
+  if (overtimeFlashTimeoutId) {
+    clearTimeout(overtimeFlashTimeoutId);
+  }
+  overtimeFlashTimeoutId = setTimeout(() => {
+    isOvertimeFlashActive.value = false;
+    overtimeFlashTimeoutId = null;
+  }, 650);
+}
+
 function handleWindowResize() {
   if (!showPill.value) return;
   if (!hasManualPosition.value) {
@@ -178,6 +191,16 @@ watch(showPill, async (isVisible) => {
   pillPosition.value = clampPosition(pillPosition.value.x, pillPosition.value.y);
 });
 
+watch(
+  () => timerStore.overtimeFlashToken,
+  (newToken, previousToken) => {
+    if (!showPill.value) return;
+    if (newToken > (previousToken ?? 0)) {
+      triggerOvertimeFlash();
+    }
+  },
+);
+
 onMounted(async () => {
   window.addEventListener('resize', handleWindowResize);
   if (showPill.value) {
@@ -189,6 +212,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   removeDragListeners();
   window.removeEventListener('resize', handleWindowResize);
+  if (overtimeFlashTimeoutId) {
+    clearTimeout(overtimeFlashTimeoutId);
+  }
 });
 </script>
 
@@ -200,7 +226,11 @@ onBeforeUnmount(() => {
       ref="pillRef"
       type="button"
       class="timer-pill"
-      :class="{ 'timer-pill--overtime': timerStore.isOvertime, 'timer-pill--dragging': isDragging }"
+      :class="{
+        'timer-pill--overtime': timerStore.isOvertime,
+        'timer-pill--dragging': isDragging,
+        'timer-pill--flash': isOvertimeFlashActive,
+      }"
       :style="pillInlineStyle"
       aria-label="Timer öffnen"
       title="Timer öffnen"
@@ -337,10 +367,28 @@ onBeforeUnmount(() => {
   transition: none;
 }
 
+.timer-pill--flash {
+  animation: timer-pill-overtime-flash 0.65s ease-out;
+}
+
 .timer-pill--overtime {
   background: var(--fate-red);
-  border-color: color-mix(in srgb, var(--fate-red) 72%, var(--fate-border));
+  border-color: var(--fate-red);
   color: var(--fate-white);
+}
+
+@keyframes timer-pill-overtime-flash {
+  0%,
+  100% {
+    box-shadow:
+      0 8px 22px rgba(15, 23, 42, 0.3),
+      0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  35% {
+    box-shadow:
+      0 10px 28px rgba(15, 23, 42, 0.42),
+      0 0 0 8px rgba(239, 68, 68, 0.42);
+  }
 }
 
 .timer-pill__drag-handle {

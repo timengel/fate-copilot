@@ -167,6 +167,25 @@ describe('FateTimer', () => {
     expect(pill.classList.contains('timer-pill--overtime')).toBe(true);
   });
 
+  it('applies and clears flash animation class when overtime flash token increments', async () => {
+    renderTimer();
+    const timerStore = useTimerStore();
+    timerStore.addMinutes(1);
+    timerStore.start();
+    await nextTick();
+
+    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    expect(pill.classList.contains('timer-pill--flash')).toBe(false);
+
+    timerStore.overtimeFlashToken += 1;
+    await nextTick();
+    expect(pill.classList.contains('timer-pill--flash')).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(700);
+    await nextTick();
+    expect(pill.classList.contains('timer-pill--flash')).toBe(false);
+  });
+
   it('opens popover when pill is clicked', async () => {
     renderTimer();
     const timerStore = useTimerStore();
