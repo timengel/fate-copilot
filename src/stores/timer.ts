@@ -1,9 +1,11 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { useToastStore } from './toast';
 
 const MAX_TIMER_SECONDS = 99 * 60 + 59;
 
 export const useTimerStore = defineStore('timer', () => {
+  const toastStore = useToastStore();
   const remainingSeconds = ref(0);
   const isRunning = ref(false);
   const hasStarted = ref(false);
@@ -40,6 +42,10 @@ export const useTimerStore = defineStore('timer', () => {
   function tick() {
     const previousSeconds = remainingSeconds.value;
     remainingSeconds.value -= 1;
+
+    if (previousSeconds > 0 && remainingSeconds.value === 0) {
+      toastStore.show('Timer abgelaufen!');
+    }
 
     if (previousSeconds >= 0 && remainingSeconds.value < 0) {
       overtimeFlashToken.value += 1;

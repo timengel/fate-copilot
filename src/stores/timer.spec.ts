@@ -1,6 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTimerStore } from './timer';
+import { useToastStore } from './toast';
 
 describe('timer store', () => {
   beforeEach(() => {
@@ -60,6 +61,22 @@ describe('timer store', () => {
     await vi.advanceTimersByTimeAsync(3000);
     expect(store.remainingSeconds).toBe(-4);
     expect(store.overtimeFlashToken).toBe(1);
+  });
+
+  it('shows "Timer abgelaufen!" when countdown reaches zero', async () => {
+    const store = useTimerStore();
+    const toastStore = useToastStore();
+    const toastSpy = vi.spyOn(toastStore, 'show');
+
+    store.addMinutes(1);
+    store.start();
+
+    await vi.advanceTimersByTimeAsync(60000);
+
+    expect(store.remainingSeconds).toBe(0);
+    expect(toastSpy).toHaveBeenCalledWith('Timer abgelaufen!');
+    expect(toastStore.message).toBe('Timer abgelaufen!');
+    expect(toastStore.visible).toBe(true);
   });
 
   it('opens, closes and toggles popover state', () => {
