@@ -251,7 +251,7 @@ describe('App navigation', () => {
     expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
 
-  it('closes timer PiP when running timer stops', async () => {
+  it('keeps timer PiP open when timer is paused', async () => {
     const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
     const pipWindow = {
       document: pipDoc,
@@ -278,10 +278,79 @@ describe('App navigation', () => {
     await Promise.resolve();
 
     const timerStore = useTimerStore();
-    timerStore.isRunning = false;
+    timerStore.pause();
     await Promise.resolve();
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+  });
+
+  it('keeps timer PiP open when timer is reset', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const timerStore = useTimerStore();
+    timerStore.reset();
+    await Promise.resolve();
+
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+  });
+
+  it('keeps timer PiP open when timer is explicitly stopped', async () => {
+    const pipDoc = document.implementation.createHTMLDocument('Timer PiP');
+    const pipWindow = {
+      document: pipDoc,
+      closed: false,
+      close: vi.fn(function close() {
+        this.closed = true;
+      }),
+      addEventListener: vi.fn(),
+    } as unknown as Window;
+    const requestWindow = vi.fn().mockResolvedValue(pipWindow);
+    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+      requestWindow,
+    };
+
+    await setup('/', false, (store) => {
+      store.remainingSeconds = 60;
+      store.hasStarted = true;
+      store.isRunning = true;
+    });
+
+    visibilityStateMock = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const timerStore = useTimerStore();
+    timerStore.stop();
+    await Promise.resolve();
+
+    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+    expect(timerStore.remainingSeconds).toBe(0);
+    expect(timerStore.isRunning).toBe(false);
+    expect(timerStore.hasStarted).toBe(false);
   });
 
   it('does not throw without Document PiP support', async () => {

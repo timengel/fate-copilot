@@ -4,11 +4,11 @@ import FateIcon from './FateIcon.vue';
 import FateTimerPanel from './FateTimerPanel.vue';
 import { useTimerStore } from '../../stores/timer';
 
-defineEmits<{
-  (e: 'close'): void;
-}>();
-
 const timerStore = useTimerStore();
+const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'stop'): void;
+}>();
 const pillRef = ref<HTMLButtonElement | null>(null);
 const pillPosition = ref<{ x: number; y: number } | null>(null);
 const hasManualPosition = ref(false);
@@ -134,6 +134,11 @@ function handleMenuClose() {
   timerStore.closePopover();
 }
 
+function handleStop() {
+  timerStore.stop();
+  emit('stop');
+}
+
 function triggerOvertimeFlash() {
   isOvertimeFlashActive.value = true;
   if (overtimeFlashTimeoutId) {
@@ -229,7 +234,11 @@ onBeforeUnmount(() => {
     </button>
   </Teleport>
 
-  <FateTimerPanel v-if="timerStore.isPopoverOpen" @close="$emit('close'); handleMenuClose()" />
+  <FateTimerPanel
+    v-if="timerStore.isPopoverOpen"
+    @close="$emit('close'); handleMenuClose()"
+    @stop="handleStop"
+  />
 </template>
 
 <style scoped>

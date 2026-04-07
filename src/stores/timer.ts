@@ -11,6 +11,7 @@ export const useTimerStore = defineStore('timer', () => {
   const hasStarted = ref(false);
   const isPopoverOpen = ref(false);
   const overtimeFlashToken = ref(0);
+  const stopSignal = ref(0);
   let intervalId: ReturnType<typeof setInterval> | null = null;
 
   const formattedTime = computed(() => {
@@ -89,6 +90,11 @@ export const useTimerStore = defineStore('timer', () => {
     clearTimerInterval();
   }
 
+  function stop() {
+    reset();
+    stopSignal.value += 1;
+  }
+
   function openPopover() {
     isPopoverOpen.value = true;
   }
@@ -107,6 +113,7 @@ export const useTimerStore = defineStore('timer', () => {
     hasStarted,
     isPopoverOpen,
     overtimeFlashToken,
+    stopSignal,
     formattedTime,
     canStart,
     isPaused,
@@ -116,6 +123,7 @@ export const useTimerStore = defineStore('timer', () => {
     pause,
     continueTimer,
     reset,
+    stop,
     openPopover,
     closePopover,
     togglePopover,

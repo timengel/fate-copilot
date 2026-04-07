@@ -112,6 +112,10 @@ function closeTimerPip() {
   timerPip.close();
 }
 
+function handleTimerStop() {
+  timerStore.stop();
+}
+
 function bindTimerPipSizeToContent(pipWindow: Window, mountNode: HTMLElement) {
   if (typeof pipWindow.resizeTo !== 'function') {
     return () => {};
@@ -185,7 +189,7 @@ async function openTimerPip() {
     },
     mount: ({ pipWindow, mountNode }) => {
       const pipApp = createApp({
-        render: () => h(FateTimerPanel, { showCloseButton: false }),
+        render: () => h(FateTimerPanel, { showCloseButton: false, onStop: handleTimerStop }),
       });
       pipApp.use(pinia);
       pipApp.mount(mountNode);
@@ -250,12 +254,8 @@ watch(
 
 watch(
   () => timerStore.isRunning,
-  (isRunning) => {
-    if (!isRunning) {
-      closeTimerPip();
-      return;
-    }
-    if (document.visibilityState === 'hidden') {
+  (isRunning, wasRunning) => {
+    if (isRunning && !wasRunning && document.visibilityState === 'hidden') {
       void openTimerPip();
     }
   },
@@ -380,7 +380,7 @@ onBeforeUnmount(() => {
       aria-label="Fate Timer"
       @toggle="handleTimerPopoverToggle"
     >
-      <FateTimer @close="timerStore.closePopover" />
+      <FateTimer @close="timerStore.closePopover" @stop="handleTimerStop" />
     </div>
     <FateToast />
     <ConfirmDialog

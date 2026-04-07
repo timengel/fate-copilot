@@ -11,11 +11,17 @@ withDefaults(
   },
 );
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void;
+  (e: 'stop'): void;
 }>();
 
 const timerStore = useTimerStore();
+
+function handleStopClick() {
+  timerStore.stop();
+  emit('stop');
+}
 </script>
 
 <template>
@@ -76,7 +82,7 @@ const timerStore = useTimerStore();
           size="M"
           aria-label="Timer stoppen"
           title="Stop"
-          @click="timerStore.reset"
+          @click="handleStopClick"
         />
       </template>
       <template v-else>

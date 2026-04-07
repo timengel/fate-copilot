@@ -44,6 +44,21 @@ describe('timer store', () => {
     expect(store.hasStarted).toBe(false);
   });
 
+  it('stop resets timer and increments stop signal', async () => {
+    const store = useTimerStore();
+    store.addMinutes(1);
+    store.start();
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(store.stopSignal).toBe(0);
+
+    store.stop();
+    expect(store.remainingSeconds).toBe(0);
+    expect(store.isRunning).toBe(false);
+    expect(store.hasStarted).toBe(false);
+    expect(store.stopSignal).toBe(1);
+  });
+
   it('increments overtime flash token exactly when crossing below zero', async () => {
     const store = useTimerStore();
 
