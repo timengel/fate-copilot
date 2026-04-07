@@ -75,6 +75,20 @@ function clearAllData() {
       <h2>Oberfläche</h2>
       <div class="settings-row">
         <div class="settings-row-label">
+          <span>GM-Modus</span>
+          <span class="settings-row-description">Aktiviert die GM-Ansicht mit zusätzlichen Informationen und Aktionen.</span>
+        </div>
+        <FateToggle v-model="gmModeStore.isGMMode" :variant="ToggleVariant.Danger" />
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-label">
+          <span>Sichtbarkeit des GM-Modus-Toggle</span>
+          <span class="settings-row-description">Zeigt den GM-Modus-Toggle in der Navigationsleiste an.</span>
+        </div>
+        <FateToggle v-model="gmModeStore.showGMToggle" :variant="ToggleVariant.Danger" />
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-label">
           <span>Erscheinungsbild</span>
           <span class="settings-row-description">Wähle zwischen hellem, dunklem oder systembasiertem Design.</span>
         </div>
@@ -90,13 +104,6 @@ function clearAllData() {
             {{ opt.label }}
           </button>
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-row-label">
-          <span>Sichtbarkeit des GM-Modus-Toggle</span>
-          <span class="settings-row-description">Zeigt den GM-Modus-Toggle in der Navigationsleiste an.</span>
-        </div>
-        <FateToggle v-model="gmModeStore.showGMToggle" :variant="ToggleVariant.Danger" />
       </div>
     </section>
 

@@ -31,24 +31,57 @@ describe('SettingsView', () => {
     });
   }
 
+  function getToggleInRow(container: HTMLElement, rowLabel: string) {
+    const label = screen.getByText(rowLabel);
+    const row = label.closest('.settings-row');
+    expect(row).toBeTruthy();
+    return row!.querySelector('.fate-toggle') as HTMLElement;
+  }
+
+  describe('GM-Modus toggle', () => {
+    it('is off by default', () => {
+      const { container } = setup();
+      const toggle = getToggleInRow(container, 'GM-Modus');
+      const track = toggle.querySelector('.toggle-track')!;
+      expect(track.classList.contains('toggle-track--on')).toBe(false);
+    });
+
+    it('clicking the toggle sets isGMMode to true in the store', async () => {
+      const { container } = setup();
+      const gmModeStore = useGMModeStore();
+      await fireEvent.click(getToggleInRow(container, 'GM-Modus'));
+      expect(gmModeStore.isGMMode).toBe(true);
+    });
+
+    it('clicking the toggle again sets isGMMode back to false', async () => {
+      useGMModeStore().isGMMode = true;
+      const { container } = setup();
+      const gmModeStore = useGMModeStore();
+      await fireEvent.click(getToggleInRow(container, 'GM-Modus'));
+      expect(gmModeStore.isGMMode).toBe(false);
+    });
+  });
+
   describe('GM-Modus toggle visibility', () => {
     it('toggle is off by default', () => {
       const { container } = setup();
-      const track = container.querySelector('.toggle-track')!;
+      const toggle = getToggleInRow(container, 'Sichtbarkeit des GM-Modus-Toggle');
+      const track = toggle.querySelector('.toggle-track')!;
       expect(track.classList.contains('toggle-track--on')).toBe(false);
     });
 
     it('reflects true when the store value is already true', () => {
       useGMModeStore().showGMToggle = true;
       const { container } = setup();
-      const track = container.querySelector('.toggle-track')!;
+      const toggle = getToggleInRow(container, 'Sichtbarkeit des GM-Modus-Toggle');
+      const track = toggle.querySelector('.toggle-track')!;
       expect(track.classList.contains('toggle-track--on')).toBe(true);
     });
 
     it('clicking the toggle sets showGMToggle to true in the store', async () => {
       const { container } = setup();
       const gmModeStore = useGMModeStore();
-      await fireEvent.click(container.querySelector('.fate-toggle')!);
+      await fireEvent.click(getToggleInRow(container, 'Sichtbarkeit des GM-Modus-Toggle'));
       expect(gmModeStore.showGMToggle).toBe(true);
     });
 
@@ -56,7 +89,7 @@ describe('SettingsView', () => {
       useGMModeStore().showGMToggle = true;
       const { container } = setup();
       const gmModeStore = useGMModeStore();
-      await fireEvent.click(container.querySelector('.fate-toggle')!);
+      await fireEvent.click(getToggleInRow(container, 'Sichtbarkeit des GM-Modus-Toggle'));
       expect(gmModeStore.showGMToggle).toBe(false);
     });
   });
