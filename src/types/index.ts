@@ -67,7 +67,8 @@ export type ButtonIcon =
   | 'chevrons-up'
   | 'sun'
   | 'moon'
-  | 'monitor';
+  | 'monitor'
+  | 'clock';
 
 // ============================================================
 // Domain Types

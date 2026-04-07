@@ -39,7 +39,7 @@ function cycleTheme() {
   if (themeStore.mode === 'system') {
     showConfirmDialog(
       'Dynamisches Design deaktivieren?',
-      'Du verwendest gerade das dynamische Design, basierend auf deinen Systemeinstellungen. Möchtest du das dynamische Design deaktivieren? Du kannst es jederzeit in den Einstellungen reaktivieren.',
+      'Du verwendest gerade das dynamische Design, basierend auf deinen Systemeinstellungen. Möchtest du es deaktivieren? Du kannst es jederzeit in den Einstellungen reaktivieren.',
       () => { themeStore.mode = themeStore.isDark ? 'light' : 'dark'; },
     );
   } else {
@@ -52,6 +52,17 @@ function handleSettingsClick() {
     settingsSpinning.value = true;
     setTimeout(() => { settingsSpinning.value = false; }, 500);
   }
+}
+
+function handleTimerNavClick(closeDrawer = false) {
+  timerStore.togglePopover();
+  if (closeDrawer) {
+    navOpen.value = false;
+  }
+}
+
+function setTimerScrollLock(locked: boolean) {
+  document.body.classList.toggle('timer-modal-open', locked);
 }
 
 function handleTimerPopoverToggle(event: Event) {
@@ -210,6 +221,7 @@ watch(
 watch(
   () => timerStore.isPopoverOpen,
   async (isOpen) => {
+    setTimerScrollLock(isOpen);
     await nextTick();
     const popoverEl = timerPopoverRef.value;
     if (!popoverEl) return;
@@ -269,6 +281,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', handleDocumentVisibilityChange);
   window.removeEventListener('focus', handleAppForegrounded);
   window.removeEventListener('pageshow', handleAppForegrounded);
+  setTimerScrollLock(false);
   closeTimerPip();
 });
 </script>
@@ -315,6 +328,23 @@ onBeforeUnmount(() => {
               </span>
               <span class="nav-theme-label">{{ themeLabel }}</span>
             </button>
+            <button
+              class="nav-link nav-timer-toggle nav-timer-toggle-desktop"
+              :class="{ 'nav-timer-toggle--active': timerStore.isPopoverOpen }"
+              aria-label="Timer"
+              @click="handleTimerNavClick()"
+            >
+              <FateIcon name="clock" :size="20" />
+            </button>
+            <button
+              class="nav-link nav-timer-toggle nav-timer-toggle-mobile"
+              :class="{ 'nav-timer-toggle--active': timerStore.isPopoverOpen }"
+              aria-label="Timer (Menü)"
+              @click="handleTimerNavClick(true)"
+            >
+              <FateIcon name="clock" :size="20" />
+              <span class="nav-link-timer-label">Timer</span>
+            </button>
             <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen" @click="handleSettingsClick">
               <FateIcon name="settings" :size="20" :class="{ 'settings-spinning': settingsSpinning }" />
               <span class="nav-link-settings-label">Einstellungen</span>
@@ -346,7 +376,7 @@ onBeforeUnmount(() => {
       id="global-timer-popover"
       class="global-timer-popover"
       popover="auto"
-      role="region"
+      role="dialog"
       aria-label="Fate Timer"
       @toggle="handleTimerPopoverToggle"
     >
@@ -464,6 +494,30 @@ onBeforeUnmount(() => {
   border: none;
   cursor: pointer;
   padding: 0 0.8rem;
+}
+
+.nav-timer-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.8rem;
+  font: inherit;
+  color: inherit;
+}
+
+.nav-timer-toggle--active {
+  background: var(--fate-nav-active-bg);
+  color: var(--fate-nav-active-color) !important;
+}
+
+.nav-timer-toggle-mobile {
+  display: none;
+  gap: 0.6rem;
+}
+
+.nav-link-settings-label,
+.nav-link-timer-label {
+  display: none;
 }
 
 .theme-icon-wrap {
@@ -663,14 +717,24 @@ onBeforeUnmount(() => {
     display: none;
   }
 
+  .nav-drawer .nav-timer-toggle-desktop {
+    display: none;
+  }
+
+  .nav-drawer .nav-timer-toggle-mobile {
+    display: flex;
+    padding: 0.75rem 0.5rem 0.75rem 0.85rem;
+  }
+
+  .nav-drawer .nav-link-settings-label,
+  .nav-drawer .nav-link-timer-label {
+    display: inline;
+  }
+
   /* Settings: show text label and reset alignment */
   .nav-drawer .nav-link-settings {
     padding: 0.75rem 0.5rem 0.75rem 0.85rem;
     gap: 0.6rem;
-  }
-
-  .nav-drawer .nav-link-settings-label {
-    display: inline;
   }
 
   /* GM toggle: separator + full width */
@@ -714,17 +778,26 @@ onBeforeUnmount(() => {
 }
 
 .global-timer-popover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
   overflow: visible;
   position: fixed;
-  right: 0.65rem;
-  top: calc(56px + 0.65rem);
-  bottom: auto;
-  left: auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw - 1.5rem, 420px);
+  max-width: 100%;
   z-index: 1104;
+}
+
+:global(.global-timer-popover::backdrop) {
+  background: rgba(11, 18, 32, 0.42);
+  backdrop-filter: blur(2px);
 }
 
 @keyframes timer-overtime-flash {
@@ -783,13 +856,5 @@ onBeforeUnmount(() => {
     order: -1;
     margin-bottom: 0.5rem;
   }
-
-  .global-timer-popover {
-    left: 0.65rem;;
-    right: auto;
-    top: auto;
-    bottom: calc(56px + 0.65rem);
-  }
-
 }
 </style>

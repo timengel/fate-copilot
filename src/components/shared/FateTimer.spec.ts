@@ -121,7 +121,7 @@ describe('FateTimer', () => {
     await nextTick();
 
     // Should show pill (teleported to body)
-    expect(screen.getByRole('button', { name: 'Timer öffnen' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Timer' })).toBeTruthy();
   });
 
   it('shows drag handle icon on the left side of the pill', async () => {
@@ -139,7 +139,7 @@ describe('FateTimer', () => {
     renderTimer();
 
     // Should not show pill
-    expect(screen.queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Timer' })).toBeNull();
   });
 
   it('shows menu when popover is open', async () => {
@@ -163,7 +163,7 @@ describe('FateTimer', () => {
 
     await vi.runAllTimersAsync();
 
-    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const pill = screen.getByRole('button', { name: 'Timer' });
     expect(pill.classList.contains('timer-pill--overtime')).toBe(true);
   });
 
@@ -174,7 +174,7 @@ describe('FateTimer', () => {
     timerStore.start();
     await nextTick();
 
-    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const pill = screen.getByRole('button', { name: 'Timer' });
     expect(pill.classList.contains('timer-pill--flash')).toBe(false);
 
     timerStore.overtimeFlashToken += 1;
@@ -196,7 +196,7 @@ describe('FateTimer', () => {
 
     expect(timerStore.isPopoverOpen).toBe(false);
 
-    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const pill = screen.getByRole('button', { name: 'Timer' });
     await fireEvent.click(pill);
 
     expect(timerStore.isPopoverOpen).toBe(true);
@@ -224,7 +224,7 @@ describe('FateTimer', () => {
 
     await nextTick();
 
-    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const pill = screen.getByRole('button', { name: 'Timer' });
     const handle = screen.getByTestId('timer-pill-drag-handle');
     const initialLeft = pill.style.left;
     const initialTop = pill.style.top;
@@ -245,7 +245,7 @@ describe('FateTimer', () => {
 
     await nextTick();
 
-    const pill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const pill = screen.getByRole('button', { name: 'Timer' });
     const handle = screen.getByTestId('timer-pill-drag-handle');
 
     await fireEvent.pointerDown(handle, { pointerId: 2, button: 0, clientX: 10, clientY: 10 });
@@ -264,7 +264,7 @@ describe('FateTimer', () => {
 
     await nextTick();
 
-    const firstPill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const firstPill = screen.getByRole('button', { name: 'Timer' });
     const handle = screen.getByTestId('timer-pill-drag-handle');
 
     await fireEvent.pointerDown(handle, { pointerId: 3, button: 0, clientX: 20, clientY: 20 });
@@ -283,7 +283,7 @@ describe('FateTimer', () => {
     renderTimer();
     await nextTick();
 
-    const remountedPill = screen.getByRole('button', { name: 'Timer öffnen' });
+    const remountedPill = screen.getByRole('button', { name: 'Timer' });
     expect(remountedPill.style.left).not.toBe(draggedLeft);
     expect(remountedPill.style.top).not.toBe(draggedTop);
   });

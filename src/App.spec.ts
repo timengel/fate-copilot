@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/vue';
+import { render, screen, fireEvent } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest';
 import { createRouter, createMemoryHistory } from 'vue-router';
@@ -93,6 +93,51 @@ describe('App navigation', () => {
 
     const link = screen.getByRole('link', { name: 'Cheat Sheet' });
     expect(link.classList.contains('router-link-active')).toBe(true);
+  });
+
+  it('renders the desktop timer nav shortcut button', async () => {
+    await setup();
+
+    expect(screen.getByRole('button', { name: 'Timer' })).toBeTruthy();
+  });
+
+  it('toggles timer popover state when clicking the desktop timer nav shortcut', async () => {
+    await setup();
+    const timerStore = useTimerStore();
+    const timerButton = screen.getByRole('button', { name: 'Timer' });
+    const mobileTimerButton = screen.getByRole('button', { name: 'Timer (Menü)' });
+
+    expect(timerStore.isPopoverOpen).toBe(false);
+    expect(timerButton.classList.contains('nav-timer-toggle--active')).toBe(false);
+    expect(mobileTimerButton.classList.contains('nav-timer-toggle--active')).toBe(false);
+    expect(document.body.classList.contains('timer-modal-open')).toBe(false);
+
+    await fireEvent.click(timerButton);
+    expect(timerStore.isPopoverOpen).toBe(true);
+    expect(timerButton.classList.contains('nav-timer-toggle--active')).toBe(true);
+    expect(mobileTimerButton.classList.contains('nav-timer-toggle--active')).toBe(true);
+    expect(document.body.classList.contains('timer-modal-open')).toBe(true);
+
+    await fireEvent.click(timerButton);
+    expect(timerStore.isPopoverOpen).toBe(false);
+    expect(timerButton.classList.contains('nav-timer-toggle--active')).toBe(false);
+    expect(mobileTimerButton.classList.contains('nav-timer-toggle--active')).toBe(false);
+    expect(document.body.classList.contains('timer-modal-open')).toBe(false);
+  });
+
+  it('closes the nav drawer when clicking the mobile timer nav action', async () => {
+    const { container } = await setup();
+    const drawer = container.querySelector('.nav-drawer') as HTMLElement;
+    const hamburger = screen.getByRole('button', { name: 'Navigation öffnen' });
+    const mobileTimerButton = screen.getByRole('button', { name: 'Timer (Menü)' });
+
+    expect(drawer.classList.contains('nav-open')).toBe(false);
+
+    await fireEvent.click(hamburger);
+    expect(drawer.classList.contains('nav-open')).toBe(true);
+
+    await fireEvent.click(mobileTimerButton);
+    expect(drawer.classList.contains('nav-open')).toBe(false);
   });
 
   it('opens timer PiP when tab gets hidden while timer is running', async () => {

@@ -142,17 +142,17 @@ describe('DashboardView floating action menu', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
-    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
+    expect(queryByRole('button', { name: 'Timer' })).toBeNull();
 
     await fireEvent.click(trigger);
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(getByRole('button', { name: 'Cheat Sheet öffnen' })).toBeTruthy();
-    expect(getByRole('button', { name: 'Timer öffnen' })).toBeTruthy();
+    expect(getByRole('button', { name: 'Timer' })).toBeTruthy();
 
     await fireEvent.click(trigger);
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
-    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
+    expect(queryByRole('button', { name: 'Timer' })).toBeNull();
   });
 
   it('uses popovertarget wiring for the cheat sheet FAB action', async () => {
@@ -186,13 +186,13 @@ describe('DashboardView floating action menu', () => {
     expect(timerStore.isPopoverOpen).toBe(false);
 
     await fireEvent.click(trigger);
-    const timerButton = getByRole('button', { name: 'Timer öffnen' });
+    const timerButton = getByRole('button', { name: 'Timer' });
     await fireEvent.click(timerButton);
 
     expect(mockRouterPush).not.toHaveBeenCalled();
     expect(timerStore.isPopoverOpen).toBe(true);
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
-    expect(queryByRole('button', { name: 'Timer öffnen' })).toBeNull();
+    expect(queryByRole('button', { name: 'Timer' })).toBeNull();
     expect(timerButton.getAttribute('popovertarget')).toBeNull();
     expect(timerButton.getAttribute('popovertargetaction')).toBeNull();
   });

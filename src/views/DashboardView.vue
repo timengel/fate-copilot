@@ -1005,7 +1005,7 @@ onUnmounted(() => {
           <button
             type="button"
             class="dashboard-fab-action"
-            aria-label="Timer öffnen"
+            aria-label="Timer"
             @click="handleTimerFabActionClick"
           >
             Timer

@@ -105,7 +105,8 @@ body.dashboard-grid-active .app-main {
   max-width: none;
 }
 
-body.dashboard-cheat-sheet-open .app-scroll-area {
+body.dashboard-cheat-sheet-open .app-scroll-area,
+body.timer-modal-open .app-scroll-area {
   overflow: hidden;
 }
 

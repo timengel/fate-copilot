@@ -39,13 +39,6 @@ function getRootRemPx() {
   return Number.isFinite(value) ? value : 16;
 }
 
-function isMobileLayout() {
-  if (typeof window.matchMedia === 'function') {
-    return window.matchMedia('(max-width: 600px)').matches;
-  }
-  return window.innerWidth <= 600;
-}
-
 function getPillSize() {
   const pillEl = pillRef.value;
   if (!pillEl) return { width: 0, height: 0 };
@@ -69,20 +62,12 @@ function clampPosition(x: number, y: number) {
 
 function setDefaultPillPosition() {
   const rem = getRootRemPx();
-  const marginX = 0.65 * rem;
-  const desktopTop = 56 + 0.35 * rem;
-  const mobileBottom = 0.85 * rem;
+  const isSmallScreen = window.innerWidth <= 600;
+  const bottomOffset = isSmallScreen ? 0.85 * rem : 2 * rem;
   const { width, height } = getPillSize();
-
-  if (isMobileLayout()) {
-    const x = (window.innerWidth - width) / 2;
-    const y = window.innerHeight - height - mobileBottom;
-    pillPosition.value = clampPosition(x, y);
-    return;
-  }
-
-  const x = window.innerWidth - width - marginX;
-  pillPosition.value = clampPosition(x, desktopTop);
+  const x = (window.innerWidth - width) / 2;
+  const y = window.innerHeight - height - bottomOffset;
+  pillPosition.value = clampPosition(x, y);
 }
 
 function removeDragListeners() {
@@ -225,8 +210,8 @@ onBeforeUnmount(() => {
         'timer-pill--flash': isOvertimeFlashActive,
       }"
       :style="pillInlineStyle"
-      aria-label="Timer öffnen"
-      title="Timer öffnen"
+      aria-label="Timer"
+      title="Timer"
       @click="handlePillClick"
     >
       <span
