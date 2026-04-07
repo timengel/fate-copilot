@@ -23,6 +23,9 @@
   --fate-btn-danger-outline-bg: #fde8e6;
   --fate-btn-danger-outline-hover: #f9c8c3;
   --fate-btn-danger-hover: #a93226;
+  --fate-btn-add-bg: #cfe8f8;
+  --fate-btn-add-hover: #b8dcf3;
+  --fate-btn-add-color: #0f5f89;
 
   /* Modal overlay */
   --fate-overlay: rgba(0, 0, 0, 0.4);
@@ -277,12 +280,12 @@ html[data-theme='dark'] .sheet-section-header {
 
   --fate-btn-secondary-bg: #2f455e;
   --fate-btn-secondary-hover: rgb(58, 82, 109);
-  --fate-btn-danger-outline-bg: #2d1a19;
-  --fate-btn-danger-outline-hover: #3d2220;
+  --fate-btn-danger-outline-bg: #4a2a28;
+  --fate-btn-danger-outline-hover: #5b3431;
   --fate-btn-danger-hover: #c0392b;
-  --fate-btn-add-bg: #0d2d45;
-  --fate-btn-add-hover: #1a3f5c;
-  --fate-btn-add-color: #5ab8e8;
+  --fate-btn-add-bg: #173d5b;
+  --fate-btn-add-hover: #1f4e71;
+  --fate-btn-add-color: #73c8f2;
 
   --fate-overlay: rgba(0, 0, 0, 0.65);
 

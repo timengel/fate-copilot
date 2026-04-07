@@ -50,6 +50,7 @@ describe('FateTimer', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Timer starten' }));
 
     expect(screen.getByRole('button', { name: 'Timer pausieren' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Timer stoppen' })).toBeTruthy();
   });
 
   it('shows reset and continue buttons when paused', async () => {
@@ -91,6 +92,18 @@ describe('FateTimer', () => {
     expect(screen.getByRole('button', { name: 'Timer starten' })).toBeTruthy();
   });
 
+  it('stops and resets timer to zero while running', async () => {
+    renderTimer(true);
+
+    await fireEvent.click(screen.getByRole('button', { name: '+1' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Timer starten' }));
+    await vi.advanceTimersByTimeAsync(2000);
+    await fireEvent.click(screen.getByRole('button', { name: 'Timer stoppen' }));
+
+    expect(screen.getByText('00:00')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Timer starten' })).toBeTruthy();
+  });
+
   it('shows reset before start when time is set and resets without starting', async () => {
     renderTimer(true);
 
@@ -98,8 +111,9 @@ describe('FateTimer', () => {
     expect(screen.getByRole('button', { name: 'Timer zurücksetzen' })).toBeTruthy();
 
     await fireEvent.click(screen.getByRole('button', { name: 'Timer zurücksetzen' }));
+    await nextTick();
     expect(screen.getByText('00:00')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Timer zurücksetzen' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Timer starten' })).toBeTruthy();
   });
 
   it('continues into negative time after reaching zero', async () => {

@@ -35,20 +35,20 @@ const timerStore = useTimerStore();
     <p class="timer-value" :class="{ overtime: timerStore.isOvertime }">{{ timerStore.formattedTime }}</p>
 
     <div class="timer-add-row">
-      <FateButton variant="secondary" size="S" title="+1 Minute" @click="timerStore.addMinutes(1)">+1</FateButton>
-      <FateButton variant="secondary" size="S" title="+5 Minuten" @click="timerStore.addMinutes(5)">+5</FateButton>
-      <FateButton variant="secondary" size="S" title="+10 Minuten" @click="timerStore.addMinutes(10)">+10</FateButton>
+      <FateButton variant="add" size="S" title="+1 Minute" @click="timerStore.addMinutes(1)">+1</FateButton>
+      <FateButton variant="add" size="S" title="+5 Minuten" @click="timerStore.addMinutes(5)">+5</FateButton>
+      <FateButton variant="add" size="S" title="+10 Minuten" @click="timerStore.addMinutes(10)">+10</FateButton>
     </div>
 
     <div class="timer-control-row">
       <template v-if="!timerStore.hasStarted">
         <FateButton
-          v-if="timerStore.remainingSeconds > 0"
           icon="reset"
           variant="secondary"
           size="M"
           aria-label="Timer zurücksetzen"
           title="Reset"
+          :disabled="!(timerStore.remainingSeconds > 0)"
           @click="timerStore.reset"
         />
         <FateButton
@@ -61,15 +61,24 @@ const timerStore = useTimerStore();
           @click="timerStore.start"
         />
       </template>
-      <FateButton
-        v-else-if="timerStore.isRunning"
-        icon="pause"
-        variant="secondary"
-        size="M"
-        aria-label="Timer pausieren"
-        title="Pause"
-        @click="timerStore.pause"
-      />
+      <template v-else-if="timerStore.isRunning">
+        <FateButton
+          icon="pause"
+          variant="secondary"
+          size="M"
+          aria-label="Timer pausieren"
+          title="Pause"
+          @click="timerStore.pause"
+        />
+        <FateButton
+          icon="stop"
+          variant="danger-outline"
+          size="M"
+          aria-label="Timer stoppen"
+          title="Stop"
+          @click="timerStore.reset"
+        />
+      </template>
       <template v-else>
         <FateButton
           icon="reset"
@@ -94,15 +103,15 @@ const timerStore = useTimerStore();
 
 <style scoped>
 .fate-timer {
-  width: min(100%, 18.5rem);
+  width: min(100%, 12.5rem);
   border: 1px solid var(--fate-border);
   border-radius: 12px;
   background: var(--fate-white);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
-  padding: 0.75rem;
+  padding: 0.85rem 1rem 1rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .timer-close-row {
@@ -129,7 +138,8 @@ const timerStore = useTimerStore();
   font-weight: 800;
   color: var(--fate-heading);
   text-align: center;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.05em;
+  margin: 0.5rem 0 0.8rem 0;
 }
 
 .timer-value.overtime {
@@ -139,22 +149,25 @@ const timerStore = useTimerStore();
 .timer-add-row {
   display: flex;
   gap: 0.4rem;
+  justify-content: center;
 }
 
 .timer-add-row :deep(.fate-btn) {
-  flex: 1;
+  --btn-size: 40px;
+  min-width: var(--btn-size);
+  height: var(--btn-size);
+  padding: 0 0.35rem;
   justify-content: center;
-  font-size: 0.9rem;
-  height: 28px;
+  font-size: 0.95rem;
 }
 
 .timer-control-row {
   display: flex;
   gap: 0.45rem;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .timer-control-row :deep(.fate-btn) {
-  --btn-size: 36px;
+  --btn-size: 40px;
 }
 </style>

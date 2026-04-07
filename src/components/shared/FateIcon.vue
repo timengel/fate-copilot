@@ -101,6 +101,10 @@ defineProps<{ name: ButtonIcon; size?: number }>();
       <rect x="14" y="5" width="3" height="14" />
     </template>
 
+    <template v-else-if="name === 'stop'">
+      <rect x="5" y="5" width="14" height="14" fill="currentColor" stroke="none" />
+    </template>
+
     <template v-else-if="name === 'info'">
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="16" x2="12" y2="12" />

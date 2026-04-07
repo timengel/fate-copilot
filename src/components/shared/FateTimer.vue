@@ -341,6 +341,7 @@ onBeforeUnmount(() => {
 
 .timer-pill__value {
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
 }
 
 </style>

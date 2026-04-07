@@ -48,6 +48,7 @@ export type ButtonIcon =
   | 'check'
   | 'play'
   | 'pause'
+  | 'stop'
   | 'info'
   | 'arrow-left'
   | 'arrow-right'
