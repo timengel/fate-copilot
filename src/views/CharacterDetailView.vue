@@ -174,6 +174,7 @@ function toggleArchived() {
 }
 
 function deleteCharacter() {
+  if (!gmModeStore.isGMMode) return;
   if (!character.value) return;
   showConfirmDialog(
     'Charakter löschen',

@@ -110,6 +110,7 @@ const tabTotal = computed(() =>
 );
 
 function deleteCharacter(id: string, name: string) {
+  if (!gmModeStore.isGMMode) return;
   showConfirmDialog(
     'Charakter löschen',
     `Charakter "${name || 'Unbenannt'}" wirklich löschen?`,

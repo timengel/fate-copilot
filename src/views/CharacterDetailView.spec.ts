@@ -198,4 +198,33 @@ describe('CharacterDetailView item assignments', () => {
       ['Vorhanden', 'Neu'],
     );
   });
+
+  it('shows archive action but no delete action for non-GM users', () => {
+    const pinia = createPinia();
+    setActivePinia(pinia);
+    useGMModeStore().isGMMode = false;
+
+    const charactersStore = useCharactersStore();
+    charactersStore.addCharacter({ ...createDefaultCharacter(), id: 'char-1', name: 'Iris' });
+
+    const { container } = render(CharacterDetailView, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          CharacterSheet: {
+            template: '<div><slot name="name-bar-actions" /></div>',
+          },
+          FateCampaignSection: { template: '<div />' },
+          ConfirmDialog: true,
+          FateButton: {
+            props: ['icon'],
+            template: '<button :data-icon="icon"><slot /></button>',
+          },
+        },
+      },
+    });
+
+    expect(container.querySelector('[data-icon="archive"]')).toBeTruthy();
+    expect(container.querySelector('[data-icon="delete"]')).toBeNull();
+  });
 });

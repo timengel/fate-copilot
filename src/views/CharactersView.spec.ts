@@ -114,6 +114,11 @@ describe('CharactersView – card interactions', () => {
     expect(getByLabelText('Charakter archivieren')).toBeTruthy();
   });
 
+  it('does not show a delete button in non-GM mode', () => {
+    const { container } = setup();
+    expect(container.querySelector('.fate-btn--danger')).toBeNull();
+  });
+
   it('hides the character tab selector when GM mode is off', () => {
     const { container } = setup();
     expect(container.querySelector('.fate-tab-selector')).toBeNull();
