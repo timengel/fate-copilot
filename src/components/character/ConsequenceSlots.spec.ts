@@ -69,9 +69,9 @@ describe('ConsequenceSlots', () => {
   });
 
   describe('readonly mode', () => {
-    it('hides empty consequence rows', () => {
+    it('shows all consequence rows including empty ones', () => {
       const { container } = render(ConsequenceSlots, { props: { consequences, readonly: true } });
-      expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
+      expect(container.querySelectorAll('.consequence-row')).toHaveLength(4);
       expect(screen.getByText('Broken leg')).toBeTruthy();
     });
 

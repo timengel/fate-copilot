@@ -19,9 +19,7 @@ const LABELS: Record<ConsequenceLabel, string> = {
   extreme: 'Extrem',
 };
 
-const visibleConsequences = computed(() =>
-  props.readonly ? props.consequences.filter((con) => con.value.trim() !== '') : props.consequences,
-);
+const visibleConsequences = computed(() => props.consequences);
 
 function updateValue(index: number, value: string) {
   const updated = props.consequences.map((c, i) => (i === index ? { ...c, value } : c));

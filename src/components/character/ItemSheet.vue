@@ -113,9 +113,7 @@ const CONSEQUENCE_TYPES: { label: string; severity: ConsequenceSeverity; labelKe
   { label: 'Extrem', severity: 8, labelKey: 'extreme' },
 ];
 
-const visibleConsequences = computed(() =>
-  (data.value.consequences ?? []).filter((c: Consequence) => c.value.trim() !== ''),
-);
+const visibleConsequences = computed(() => data.value.consequences ?? []);
 
 const hasVisibleStress = computed(
   () =>
@@ -124,7 +122,7 @@ const hasVisibleStress = computed(
 );
 
 const hasVisibleConsequences = computed(
-  () => isEditing.value || (show.value.consequences && visibleConsequences.value.length > 0),
+  () => isEditing.value || (show.value.consequences && (data.value.consequences ?? []).length > 0),
 );
 const hasVisibleDice = computed(
   () => show.value.dice && (isEditing.value || !!data.value.redDice || !!data.value.blueDice),

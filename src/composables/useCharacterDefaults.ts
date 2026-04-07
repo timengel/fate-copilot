@@ -13,7 +13,6 @@ export function createDefaultCharacter(type: CharacterType = 'sc'): Character {
           { severity: 2, label: 'mild', value: '' },
           { severity: 4, label: 'moderate', value: '' },
           { severity: 6, label: 'severe', value: '' },
-          { severity: 8, label: 'extreme', value: '' },
         ];
   return {
     id: generateId(),

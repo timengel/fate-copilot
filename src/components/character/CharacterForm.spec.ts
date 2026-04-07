@@ -315,7 +315,7 @@ describe('CharacterSheet (view mode)', () => {
     mockPush.mockReset();
   });
 
-  it('hides empty consequence rows', () => {
+  it('shows empty consequence rows', () => {
     const char: Character = {
       ...createDefaultCharacter(),
       consequences: [
@@ -324,11 +324,11 @@ describe('CharacterSheet (view mode)', () => {
       ],
     };
     const { container } = renderView(char);
-    expect(container.querySelectorAll('.consequence-row')).toHaveLength(1);
+    expect(container.querySelectorAll('.consequence-row')).toHaveLength(2);
     expect(screen.getByText('Sprained ankle')).toBeTruthy();
   });
 
-  it('hides the consequences section when all consequences are empty', () => {
+  it('shows the consequences section when all consequences are empty', () => {
     const char: Character = {
       ...createDefaultCharacter(),
       consequences: [
@@ -337,10 +337,10 @@ describe('CharacterSheet (view mode)', () => {
       ],
     };
     renderView(char);
-    expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+    expect(screen.getByText('KONSEQUENZEN')).toBeTruthy();
   });
 
-  it('lets the stress section span the full row when consequences are hidden', () => {
+  it('does not let the stress section span the full row when consequences are present', () => {
     const char: Character = {
       ...createDefaultCharacter(),
       stressTracks: [{ label: 'Körperlich', boxes: [{ value: 1, checked: false }] }],
@@ -350,8 +350,8 @@ describe('CharacterSheet (view mode)', () => {
       ],
     };
     const { container } = renderView(char);
-    expect(container.querySelector('.stress-section')?.classList.contains('span-full')).toBe(true);
-    expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+    expect(container.querySelector('.stress-section')?.classList.contains('span-full')).toBe(false);
+    expect(screen.getByText('KONSEQUENZEN')).toBeTruthy();
   });
 
   it('adds, renames, and removes stress tracks in edit mode', async () => {

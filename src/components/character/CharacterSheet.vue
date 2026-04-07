@@ -124,9 +124,7 @@ const formIsDirty = computed(
 const isDirty = computed(() => formIsDirty.value || !!props.externalDirty);
 
 const data = computed(() => (isEditing.value ? form : normalizeCharacterStress(props.character)));
-const visibleConsequences = computed(() =>
-  data.value.consequences.filter((con) => con.value.trim() !== ''),
-);
+const visibleConsequences = computed(() => data.value.consequences);
 const hasVisibleStress = computed(
   () =>
     isEditing.value ||
@@ -135,7 +133,7 @@ const hasVisibleStress = computed(
 );
 const hasVisibleConsequences = computed(
   () =>
-    isEditing.value || (sectionsEnabled('consequences') && visibleConsequences.value.length > 0),
+    isEditing.value || (sectionsEnabled('consequences') && data.value.consequences.length > 0),
 );
 const hasVisibleDice = computed(
   () =>

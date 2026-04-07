@@ -30,10 +30,10 @@ describe('createDefaultCharacter', () => {
     expect(mentalTrack?.boxes.every((b) => !b.checked)).toBe(true);
   });
 
-  it('returns 4 consequence slots with severities 2/4/6/8', () => {
+  it('returns 3 consequence slots with severities 2/4/6', () => {
     const { consequences } = createDefaultCharacter();
-    expect(consequences).toHaveLength(4);
-    expect(consequences.map((c) => c.severity)).toEqual([2, 4, 6, 8]);
+    expect(consequences).toHaveLength(3);
+    expect(consequences.map((c) => c.severity)).toEqual([2, 4, 6]);
     expect(consequences.every((c) => c.value === '')).toBe(true);
   });
 
@@ -107,10 +107,10 @@ describe('createDefaultCharacter (SC, explicit)', () => {
     expect(mentalTrack?.boxes.map((b) => b.value)).toEqual([1, 2, 3, 4]);
   });
 
-  it('returns 4 consequence slots with severities [2,4,6,8]', () => {
+  it('returns 3 consequence slots with severities [2,4,6]', () => {
     const { consequences } = createDefaultCharacter('sc');
-    expect(consequences).toHaveLength(4);
-    expect(consequences.map((c) => c.severity)).toEqual([2, 4, 6, 8]);
+    expect(consequences).toHaveLength(3);
+    expect(consequences.map((c) => c.severity)).toEqual([2, 4, 6]);
   });
 });
 

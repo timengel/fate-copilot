@@ -303,9 +303,9 @@ describe('ItemSheet', () => {
         expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
       });
 
-      it('hides KONSEQUENZEN section when all consequence values are empty strings', () => {
+      it('shows KONSEQUENZEN section when consequence slots exist even if values are empty', () => {
         renderView(makeItem({ consequences: [{ severity: 2, label: 'mild', value: '' }] }));
-        expect(screen.queryByText('KONSEQUENZEN')).toBeNull();
+        expect(screen.getByText('KONSEQUENZEN')).toBeTruthy();
       });
 
       it('shows KONSEQUENZEN section when at least one consequence has a value', () => {
