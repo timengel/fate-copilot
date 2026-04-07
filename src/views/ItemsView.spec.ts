@@ -460,4 +460,134 @@ describe('ItemsView – card interactions', () => {
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(resetButton.disabled).toBe(true);
   });
+
+  describe('hidden items section', () => {
+    it('shows hidden items in a Versteckt section below regular items in GM mode', () => {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const itemsStore = useItemsStore();
+      const gmStore = useGMModeStore();
+      gmStore.isGMMode = true;
+
+      itemsStore.addItem(makeItem({ id: 'item-1', name: 'Normaler Gegenstand', hidden: false }));
+      itemsStore.addItem(makeItem({ id: 'item-2', name: 'Versteckter Gegenstand', hidden: true }));
+
+      const view = render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+
+      const topGrid = view.container.querySelector('.card-grid');
+      const hiddenSection = view.container.querySelector('.status-group');
+      expect(topGrid?.textContent).toContain('Normaler Gegenstand');
+      expect(topGrid?.textContent).not.toContain('Versteckter Gegenstand');
+      expect(hiddenSection?.textContent).toContain('Versteckt');
+      expect(hiddenSection?.textContent).toContain('Versteckter Gegenstand');
+    });
+
+    it('does not render the Versteckt section when GM mode is off', () => {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const itemsStore = useItemsStore();
+      const gmStore = useGMModeStore();
+      gmStore.isGMMode = false;
+      itemsStore.addItem(makeItem({ id: 'item-hidden', name: 'Hidden Item', hidden: true }));
+
+      const view = render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+
+      expect(view.queryByText('Versteckt')).toBeNull();
+      expect(view.queryByText('Hidden Item')).toBeNull();
+    });
+
+    it('renders hidden item cards only once (no duplicate between top list and section)', () => {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const itemsStore = useItemsStore();
+      const gmStore = useGMModeStore();
+      gmStore.isGMMode = true;
+
+      itemsStore.addItem(makeItem({ id: 'item-hidden', name: 'Einmal', hidden: true }));
+
+      const view = render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+
+      expect(view.queryAllByText('Einmal')).toHaveLength(1);
+    });
+
+    it('does not show an empty state when only hidden items are visible in GM mode', () => {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const itemsStore = useItemsStore();
+      const gmStore = useGMModeStore();
+      gmStore.isGMMode = true;
+
+      itemsStore.addItem(makeItem({ id: 'item-hidden', name: 'Nur Versteckt', hidden: true }));
+
+      const view = render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+
+      expect(view.queryByText('Keine Treffer gefunden.')).toBeNull();
+      expect(view.getByText('Versteckt')).toBeTruthy();
+      expect(view.getByText('Nur Versteckt')).toBeTruthy();
+    });
+
+    it('removes the GM badge from hidden items', () => {
+      const pinia = createPinia();
+      setActivePinia(pinia);
+      const itemsStore = useItemsStore();
+      const gmStore = useGMModeStore();
+      gmStore.isGMMode = true;
+
+      itemsStore.addItem(makeItem({ id: 'item-hidden', name: 'Badge Test', hidden: true }));
+
+      const view = render(ItemsView, {
+        global: {
+          plugins: [pinia],
+          stubs: {
+            FateHeader: { template: '<div><slot /></div>' },
+            FateIcon: true,
+            ConfirmDialog: true,
+            RouterLink: { template: '<a><slot /></a>' },
+          },
+        },
+      });
+
+      expect(view.queryByText('GM')).toBeNull();
+    });
+  });
 });

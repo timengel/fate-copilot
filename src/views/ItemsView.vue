@@ -7,8 +7,8 @@ import { useGMModeStore } from '../stores/gmMode';
 import type { Item, Character } from '../types';
 import { DropdownVariant } from '../types';
 import FateButton from '../components/shared/FateButton.vue';
-import FateCard from '../components/shared/FateCard.vue';
 import FateHeader from '../components/shared/FateHeader.vue';
+import ItemCardsGrid from '../components/shared/item/ItemCardsGrid.vue';
 import ConfirmDialog from '../components/shared/ConfirmDialog.vue';
 import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
@@ -74,6 +74,13 @@ const filtered = computed(() => {
   if (sortOrder.value === 'dice-desc') return [...result].sort((a, b) => (b.redDice + b.blueDice) - (a.redDice + a.blueDice) || a.name.localeCompare(b.name, 'de'));
   return [...result].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 });
+const regularItems = computed(() => filtered.value.filter((item) => item.hidden !== true));
+const hiddenItems = computed(() => filtered.value.filter((item) => item.hidden === true));
+const hasVisibleItems = computed(
+  () =>
+    regularItems.value.length > 0 ||
+    (gmModeStore.isGMMode && hiddenItems.value.length > 0),
+);
 
 const totalItems = computed(() => store.items.length);
 
@@ -188,50 +195,35 @@ function toggleArchived(item: Item) {
       </div>
     </div>
 
-    <div v-if="filtered.length === 0" class="empty-state">
+    <div v-if="!hasVisibleItems" class="empty-state">
       {{ totalItems === 0 ? 'Noch keine Gegenstände vorhanden.' : 'Keine Treffer gefunden.' }}
     </div>
 
-    <div v-else class="card-grid">
-      <FateCard
-        v-for="item in filtered"
-        :key="item.id"
-        :style="`view-transition-name: item-${item.id}`"
-        :color="item.color"
-        :avatar="item.avatar"
-        :title="item.name || 'Unbenannt'"
-        :badge-label="item.archived ? 'ARCHIV' : item.hidden ? 'GM' : undefined"
-        :badge-variant="item.archived ? 'status' : 'gm'"
-        clickable
-        @click="router.push(`/items/${item.id}`)"
-      >
-        <template v-if="item.description">
-          {{ item.description }}
-        </template>
-        <template v-if="item.redDice || item.blueDice || item.modifiers?.some((m) => m.value !== 0)" #meta>
-          <span v-if="item.redDice">{{ item.redDice }} 🟥</span>
-          <span v-if="item.redDice && item.blueDice"> · </span>
-          <span v-if="item.blueDice">{{ item.blueDice }} 🟦</span>
-          <template v-for="(mod, i) in item.modifiers?.filter((m) => m.value !== 0)" :key="i">
-            <span v-if="i === 0 && (item.redDice || item.blueDice)"> · </span>
-            <span v-if="i > 0"> · </span>
-            <span>{{ mod.value > 0 ? '+' + mod.value : mod.value }} {{ mod.label }}</span>
-          </template>
-        </template>
-        <template #actions>
-          <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(item)" />
-          <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/items/${item.id}/edit`)" />
-          <FateButton
-            :icon="item.archived ? 'unarchive' : 'archive'"
-            variant="secondary"
-            size="S"
-            :aria-label="item.archived ? 'Gegenstand entarchivieren' : 'Gegenstand archivieren'"
-            :title="item.archived ? 'Entarchivieren' : 'Archivieren'"
-            @click.stop="toggleArchived(item)"
-          />
-          <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="S" @click.stop="deleteItem(item.id, item.name)" />
-        </template>
-      </FateCard>
+    <ItemCardsGrid
+      v-if="regularItems.length > 0"
+      :items="regularItems"
+      :gm-mode="gmModeStore.isGMMode"
+      @open="router.push(`/items/${$event}`)"
+      @edit="router.push(`/items/${$event}/edit`)"
+      @copy="handleCopy"
+      @toggle-archived="toggleArchived"
+      @delete="deleteItem($event.id, $event.name)"
+    />
+
+    <div
+      v-if="gmModeStore.isGMMode && hiddenItems.length > 0"
+      class="status-group"
+    >
+      <h2 class="status-group-title">Versteckt</h2>
+      <ItemCardsGrid
+        :items="hiddenItems"
+        :gm-mode="gmModeStore.isGMMode"
+        @open="router.push(`/items/${$event}`)"
+        @edit="router.push(`/items/${$event}/edit`)"
+        @copy="handleCopy"
+        @toggle-archived="toggleArchived"
+        @delete="deleteItem($event.id, $event.name)"
+      />
     </div>
   </div>
 
@@ -258,6 +250,21 @@ function toggleArchived(item: Item) {
 .header-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.status-group {
+  margin-top: 2rem;
+}
+
+.status-group-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--fate-heading);
+  color: var(--fate-heading);
 }
 
 @container main (width < 480px) {
