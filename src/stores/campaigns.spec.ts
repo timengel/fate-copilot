@@ -89,6 +89,25 @@ describe('useCampaignsStore', () => {
     expect(store.getById('c1')?.name).toBe('New');
   });
 
+  it('updateCampaignGmNotes updates only gmNotes for the targeted campaign', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1', name: 'Name', notes: 'Public', gmNotes: 'Alt' }));
+    store.updateCampaignGmNotes('c1', '# Nächste Sitzung');
+    expect(store.getById('c1')).toMatchObject({
+      id: 'c1',
+      name: 'Name',
+      notes: 'Public',
+      gmNotes: '# Nächste Sitzung',
+    });
+  });
+
+  it('updateCampaignGmNotes with unknown id does nothing', () => {
+    const store = useCampaignsStore();
+    store.addCampaign(makeCampaign({ id: 'c1', gmNotes: 'Alt' }));
+    store.updateCampaignGmNotes('missing', 'Neu');
+    expect(store.getById('c1')?.gmNotes).toBe('Alt');
+  });
+
   it('updateCampaign with unknown id does nothing', () => {
     const store = useCampaignsStore();
     store.addCampaign(makeCampaign({ id: 'c1', name: 'Old' }));

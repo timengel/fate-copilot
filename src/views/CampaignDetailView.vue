@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useCharactersStore } from '../stores/characters';
@@ -37,7 +37,10 @@ const id = computed(() => {
 const isEditing = ref(props.isNew || props.editMode || false);
 const selectedCharacterId = ref('');
 const selectedItemId = ref('');
+const gmNotesDraft = ref('');
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
+const GM_NOTES_AUTOSAVE_DEBOUNCE_MS = 400;
+let gmNotesSaveTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 const colorVars = computed(() => getColorVars(campaign.value?.color));
 
@@ -62,16 +65,18 @@ const availableSc = computed(() =>
   availableCharacters.value.filter((c) => (c.type ?? 'sc') === 'sc'),
 );
 const availableNsc = computed(() => availableCharacters.value.filter((c) => c.type === 'nsc'));
-const availableCharacterGroups = computed(() => [
-  {
-    label: 'Spielercharaktere (SC)',
-    options: availableSc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
-  },
-  {
-    label: 'Nicht-Spieler-Charaktere (NSC)',
-    options: availableNsc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
-  },
-].filter((group) => group.options.length > 0));
+const availableCharacterGroups = computed(() =>
+  [
+    {
+      label: 'Spielercharaktere (SC)',
+      options: availableSc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
+    },
+    {
+      label: 'Nicht-Spieler-Charaktere (NSC)',
+      options: availableNsc.value.map((c) => ({ value: c.id, label: c.name || 'Unbenannt' })),
+    },
+  ].filter((group) => group.options.length > 0),
+);
 const availableItemOptions = computed(() =>
   availableItems.value.map((i) => ({ value: i.id, label: i.name || 'Unbenannt' })),
 );
@@ -113,7 +118,10 @@ const campaignItems = computed(() => {
 
 const availableItems = computed(() =>
   itemsStore.items.filter(
-    (i) => !i.archived && !campaignItems.value.some((ci) => ci.id === i.id) && (gmModeStore.isGMMode || !i.hidden),
+    (i) =>
+      !i.archived &&
+      !campaignItems.value.some((ci) => ci.id === i.id) &&
+      (gmModeStore.isGMMode || !i.hidden),
   ),
 );
 
@@ -162,24 +170,78 @@ function updateMilestone(milestone: Milestone) {
 function navigateToAssignment(path: string) {
   router.push(path);
 }
+
+function clearGmNotesSaveTimeout() {
+  if (!gmNotesSaveTimeoutId) return;
+  clearTimeout(gmNotesSaveTimeoutId);
+  gmNotesSaveTimeoutId = null;
+}
+
+watch(
+  [campaign, isEditing],
+  ([nextCampaign, editing]) => {
+    if (!nextCampaign || editing || props.isNew) return;
+    clearGmNotesSaveTimeout();
+    gmNotesDraft.value = nextCampaign.gmNotes ?? '';
+  },
+  { immediate: true },
+);
+
+watch(gmNotesDraft, (nextValue) => {
+  const currentCampaign = campaign.value;
+
+  if (!currentCampaign || isEditing.value || props.isNew) return;
+
+  if (nextValue === (currentCampaign.gmNotes ?? '')) return;
+
+  clearGmNotesSaveTimeout();
+  gmNotesSaveTimeoutId = setTimeout(() => {
+    const latestCampaign = campaignsStore.getById(currentCampaign.id);
+    if (!latestCampaign) return;
+    if ((latestCampaign.gmNotes ?? '') === nextValue) return;
+    campaignsStore.updateCampaignGmNotes(currentCampaign.id, nextValue);
+  }, GM_NOTES_AUTOSAVE_DEBOUNCE_MS);
+});
+
+watch(
+  () => id.value,
+  () => {
+    clearGmNotesSaveTimeout();
+  },
+);
+
+onBeforeUnmount(() => {
+  clearGmNotesSaveTimeout();
+});
 </script>
 
 <template>
   <div class="detail-view" :style="colorVars">
     <div v-if="!campaign && !isNew" class="not-found">
       <p class="not-found-title">Kampagne nicht gefunden</p>
-      <FateButton variant="secondary" @click="router.push('/campaigns')">← Zurück zur Übersicht</FateButton>
+      <FateButton variant="secondary" @click="router.push('/campaigns')"
+        >← Zurück zur Übersicht</FateButton
+      >
     </div>
 
     <template v-else-if="campaign">
       <div class="detail-toolbar">
         <div class="back-btn">
-          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/campaigns')"><span class="btn-label">Kampagnen</span></FateButton>
+          <FateButton variant="secondary" icon="arrow-left" @click="router.push('/campaigns')"
+            ><span class="btn-label">Kampagnen</span></FateButton
+          >
         </div>
         <div class="toolbar-actions">
           <template v-if="!isNew && !isEditing">
-            <FateButton variant="secondary" icon="edit" @click="isEditing = true"><span class="btn-label">Bearbeiten</span></FateButton>
-            <FateButton v-if="gmModeStore.isGMMode" variant="danger" icon="delete" @click="deleteCampaign" />
+            <FateButton variant="secondary" icon="edit" @click="isEditing = true"
+              ><span class="btn-label">Bearbeiten</span></FateButton
+            >
+            <FateButton
+              v-if="gmModeStore.isGMMode"
+              variant="danger"
+              icon="delete"
+              @click="deleteCampaign"
+            />
           </template>
         </div>
       </div>
@@ -211,10 +273,16 @@ function navigateToAssignment(path: string) {
             <p>{{ campaign.notes }}</p>
           </div>
 
-          <div v-if="gmModeStore.isGMMode && campaign.gmNotes" class="campaign-gm-notes">
-            <strong>GM-Notizen:</strong>
-            <p>{{ campaign.gmNotes }}</p>
-          </div>
+          <section v-if="gmModeStore.isGMMode" class="sheet-section gm-notes-section">
+            <div class="sheet-section-header">GM NOTIZEN</div>
+            <div class="campaign-gm-notes-editor">
+              <textarea
+                v-model="gmNotesDraft"
+                class="campaign-gm-notes-input"
+                placeholder="Nächste Sitzung planen..."
+              />
+            </div>
+          </section>
 
           <!-- MEILENSTEINE -->
           <section class="sheet-section">
@@ -238,11 +306,7 @@ function navigateToAssignment(path: string) {
               <template v-else>
                 <div class="char-group-header">Spielercharaktere (SC)</div>
                 <div v-if="scCharacters.length === 0" class="empty-text">Keine SC zugeordnet.</div>
-                <div
-                  v-for="char in scCharacters"
-                  :key="char.id"
-                  class="assignment-row"
-                >
+                <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
                   <button
                     type="button"
                     class="assignment-main assignment-main--clickable"
@@ -255,14 +319,21 @@ function navigateToAssignment(path: string) {
                       :background="getColorVars(char.color)['--fate-blue']"
                     />
                     <div class="assignment-info">
-                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
-                    <span v-if="getCharacterPrimaryPreview(char)" class="assignment-concept">{{
+                      <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{
+                        char.name || 'Unbenannt'
+                      }}</strong>
+                      <span v-if="getCharacterPrimaryPreview(char)" class="assignment-concept">{{
                         getCharacterPrimaryPreview(char)
                       }}</span>
                     </div>
                   </button>
                   <div v-if="gmModeStore.isGMMode" class="assignment-actions">
-                    <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"></FateButton>
+                    <FateButton
+                      variant="danger"
+                      size="S"
+                      icon="close"
+                      @click="unassignCharacter(char.id)"
+                    ></FateButton>
                   </div>
                 </div>
 
@@ -271,11 +342,7 @@ function navigateToAssignment(path: string) {
                   <div v-if="nscCharacters.length === 0" class="empty-text">
                     Keine NSC zugeordnet.
                   </div>
-                  <div
-                    v-for="char in nscCharacters"
-                    :key="char.id"
-                    class="assignment-row"
-                  >
+                  <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
                     <button
                       type="button"
                       class="assignment-main assignment-main--clickable"
@@ -288,14 +355,21 @@ function navigateToAssignment(path: string) {
                         :background="getColorVars(char.color)['--fate-blue']"
                       />
                       <div class="assignment-info">
-                        <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{ char.name || 'Unbenannt' }}</strong>
+                        <strong :style="{ color: getColorVars(char.color)['--fate-blue'] }">{{
+                          char.name || 'Unbenannt'
+                        }}</strong>
                         <span v-if="getCharacterPrimaryPreview(char)" class="assignment-concept">{{
                           getCharacterPrimaryPreview(char)
                         }}</span>
                       </div>
                     </button>
                     <div class="assignment-actions">
-                      <FateButton variant="danger" size="S" icon="close" @click="unassignCharacter(char.id)"></FateButton>
+                      <FateButton
+                        variant="danger"
+                        size="S"
+                        icon="close"
+                        @click="unassignCharacter(char.id)"
+                      ></FateButton>
                     </div>
                   </div>
                 </template>
@@ -322,11 +396,7 @@ function navigateToAssignment(path: string) {
               <div v-if="campaignItems.length === 0" class="empty-text">
                 Noch keine Gegenstände zugeordnet.
               </div>
-              <div
-                v-for="item in campaignItems"
-                :key="item.id"
-                class="assignment-row"
-              >
+              <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
                 <button
                   type="button"
                   class="assignment-main assignment-main--clickable"
@@ -339,12 +409,21 @@ function navigateToAssignment(path: string) {
                     :background="getColorVars(item.color)['--fate-blue']"
                   />
                   <div class="assignment-info">
-                    <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{ item.name || 'Unbenannt' }}</strong>
-                    <span v-if="item.description" class="assignment-concept">{{ item.description }}</span>
+                    <strong :style="{ color: getColorVars(item.color)['--fate-blue'] }">{{
+                      item.name || 'Unbenannt'
+                    }}</strong>
+                    <span v-if="item.description" class="assignment-concept">{{
+                      item.description
+                    }}</span>
                   </div>
                 </button>
                 <div v-if="gmModeStore.isGMMode" class="assignment-actions">
-                  <FateButton variant="danger" size="S" icon="close" @click="unassignItem(item.id)"></FateButton>
+                  <FateButton
+                    variant="danger"
+                    size="S"
+                    icon="close"
+                    @click="unassignItem(item.id)"
+                  ></FateButton>
                 </div>
               </div>
 
@@ -459,17 +538,37 @@ function navigateToAssignment(path: string) {
   font-size: 0.875rem;
 }
 
-.campaign-gm-notes {
-  background: #f0f4ff;
-  border-left: 3px solid var(--fate-blue);
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-
 .campaign-characters,
 .campaign-assignments {
   padding: 0.5rem 0.75rem;
+}
+
+.gm-notes-section {
+  margin-bottom: 1rem;
+}
+
+.campaign-gm-notes-editor {
+  padding: 0.5rem 0.75rem;
+}
+
+.campaign-gm-notes-input {
+  width: 100%;
+  min-height: 220px;
+  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fate-text);
+  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
+  resize: vertical;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.campaign-gm-notes-input:focus {
+  border-color: var(--fate-blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, var(--fate-white) 30%);
 }
 
 .assignment-row {
@@ -521,7 +620,6 @@ function navigateToAssignment(path: string) {
 .assignment-actions {
   flex-shrink: 0;
 }
-
 
 .assignment-info strong {
   overflow: hidden;
