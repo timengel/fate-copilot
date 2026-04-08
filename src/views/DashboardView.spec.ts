@@ -85,6 +85,11 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
 const filterStubs = {
   FateButton: { template: '<button><slot /></button>' },
   FateIcon: { template: '<span />' },
+  FateDialog: {
+    props: ['open', 'ariaLabel'],
+    template:
+      '<div v-if="open" class="fate-dialog-stub" role="dialog" :aria-label="ariaLabel"><slot /></div>',
+  },
   FateCheatSheet: {
     props: ['variant'],
     template:
@@ -155,8 +160,8 @@ describe('DashboardView floating action menu', () => {
     expect(queryByRole('button', { name: 'Timer' })).toBeNull();
   });
 
-  it('uses popovertarget wiring for the cheat sheet FAB action', async () => {
-    const { container, getByRole, queryByRole } = setupFab(true);
+  it('opens the cheat sheet dialog from FAB action and closes the menu', async () => {
+    const { getByRole, queryByRole } = setupFab(true);
     const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
 
     await fireEvent.click(trigger);
@@ -166,24 +171,19 @@ describe('DashboardView floating action menu', () => {
     expect(mockRouterPush).not.toHaveBeenCalled();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Cheat Sheet öffnen' })).toBeNull();
-    expect(actionButton.getAttribute('popovertarget')).toBe('dashboard-cheat-sheet-popover');
-    expect(actionButton.getAttribute('popovertargetaction')).toBe('toggle');
-    expect(container.querySelector('#dashboard-cheat-sheet-popover')?.getAttribute('popover')).toBe(
-      'auto',
-    );
+    expect(getByRole('dialog', { name: 'Cheat Sheet Dialog' })).toBeTruthy();
   });
 
-  it('uses Popover API auto mode for light-dismiss behavior', () => {
-    const { container } = setupFab(true);
-    expect(container.querySelector('.cheat-sheet-popover')?.getAttribute('popover')).toBe('auto');
-  });
-
-  it('timer FAB action toggles global timer popover state and closes the menu', async () => {
-    const { getByRole, queryByRole } = setupFab(true);
+  it('timer FAB action closes cheat sheet dialog, opens timer, and closes the menu', async () => {
+    const { getByRole, queryByRole, queryByLabelText } = setupFab(true);
     const timerStore = useTimerStore();
     const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
 
     expect(timerStore.isPopoverOpen).toBe(false);
+
+    await fireEvent.click(trigger);
+    await fireEvent.click(getByRole('button', { name: 'Cheat Sheet öffnen' }));
+    expect(getByRole('dialog', { name: 'Cheat Sheet Dialog' })).toBeTruthy();
 
     await fireEvent.click(trigger);
     const timerButton = getByRole('button', { name: 'Timer' });
@@ -191,17 +191,24 @@ describe('DashboardView floating action menu', () => {
 
     expect(mockRouterPush).not.toHaveBeenCalled();
     expect(timerStore.isPopoverOpen).toBe(true);
+    expect(queryByLabelText('Fate cheat sheet')).toBeNull();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(queryByRole('button', { name: 'Timer' })).toBeNull();
     expect(timerButton.getAttribute('popovertarget')).toBeNull();
     expect(timerButton.getAttribute('popovertargetaction')).toBeNull();
   });
 
-  it('renders the basic cheat sheet variant in non-GM mode', () => {
-    const { container } = setupFab(false);
-    expect(container.querySelector('[aria-label="Fate cheat sheet"]')?.getAttribute('data-variant')).toBe(
-      'basic',
-    );
+  it('renders the basic cheat sheet variant in non-GM mode when dialog is opened', async () => {
+    const { getByRole, container } = setupFab(false);
+    const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
+
+    await fireEvent.click(trigger);
+    await fireEvent.click(getByRole('button', { name: 'Cheat Sheet öffnen' }));
+
+    expect(getByRole('dialog', { name: 'Cheat Sheet Dialog' })).toBeTruthy();
+    expect(
+      container.querySelector('[aria-label="Fate cheat sheet"]')?.getAttribute('data-variant'),
+    ).toBe('basic');
   });
 });
 
@@ -381,7 +388,9 @@ describe('DashboardView character sheet item navigation', () => {
       },
     });
 
-    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.dashboard-entry button')!);
+    await fireEvent.click(
+      view.container.querySelector<HTMLButtonElement>('.dashboard-entry button')!,
+    );
     expect(view.container.querySelector('.assigned')?.textContent).toContain('Schwert');
 
     await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.unassign')!);
@@ -682,9 +691,7 @@ describe('DashboardView character edit switching', () => {
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
     await fireEvent.click(
-      view.container.querySelector<HTMLButtonElement>(
-        '.dialog-overlay .fate-btn--danger-outline',
-      )!,
+      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--danger-outline')!,
     );
 
     expect(charactersStore.getById('character-1')?.name).toBe('Alrik');

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onBeforeUnmount, onMounted, createApp, h } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, onMounted, createApp, h } from 'vue';
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router';
 import { onClickOutside } from '@vueuse/core';
 import { getActivePinia } from 'pinia';
@@ -10,6 +10,7 @@ import FateTimer from './components/shared/FateTimer.vue';
 import FateTimerPanel from './components/shared/FateTimerPanel.vue';
 import FateToast from './components/shared/FateToast.vue';
 import ConfirmDialog from './components/shared/ConfirmDialog.vue';
+import FateDialog from './components/shared/FateDialog.vue';
 import { useGMModeStore } from './stores/gmMode';
 import { useTimerStore } from './stores/timer';
 import { useThemeStore } from './stores/theme';
@@ -19,7 +20,9 @@ import { ToggleVariant } from './types';
 
 const navOpen = ref(false);
 const headerRef = ref<HTMLElement | null>(null);
-onClickOutside(headerRef, () => { navOpen.value = false; });
+onClickOutside(headerRef, () => {
+  navOpen.value = false;
+});
 const router = useRouter();
 const route = useRoute();
 const gmModeStore = useGMModeStore();
@@ -27,20 +30,21 @@ const timerStore = useTimerStore();
 const themeStore = useThemeStore();
 const settingsSpinning = ref(false);
 const { confirmDialog, showConfirmDialog } = useConfirmDialog();
-const timerPopoverRef = ref<HTMLDivElement | null>(null);
 const isTimerOvertimeFlashActive = ref(false);
 let timerOvertimeFlashTimeoutId: ReturnType<typeof setTimeout> | null = null;
 const timerPip = useDocumentPictureInPicture();
 
-const themeIcon = computed(() => themeStore.isDark ? 'moon' as const : 'sun' as const);
-const themeLabel = computed(() => themeStore.isDark ? 'Dunkel' : 'Hell');
+const themeIcon = computed(() => (themeStore.isDark ? ('moon' as const) : ('sun' as const)));
+const themeLabel = computed(() => (themeStore.isDark ? 'Dunkel' : 'Hell'));
 
 function cycleTheme() {
   if (themeStore.mode === 'system') {
     showConfirmDialog(
       'Dynamisches Design deaktivieren?',
       'Du verwendest gerade das dynamische Design, basierend auf deinen Systemeinstellungen. Möchtest du es deaktivieren? Du kannst es jederzeit in den Einstellungen reaktivieren.',
-      () => { themeStore.mode = themeStore.isDark ? 'light' : 'dark'; },
+      () => {
+        themeStore.mode = themeStore.isDark ? 'light' : 'dark';
+      },
     );
   } else {
     themeStore.mode = themeStore.isDark ? 'light' : 'dark';
@@ -50,7 +54,9 @@ function cycleTheme() {
 function handleSettingsClick() {
   if (!settingsSpinning.value) {
     settingsSpinning.value = true;
-    setTimeout(() => { settingsSpinning.value = false; }, 500);
+    setTimeout(() => {
+      settingsSpinning.value = false;
+    }, 500);
   }
 }
 
@@ -63,32 +69,6 @@ function handleTimerNavClick(closeDrawer = false) {
 
 function setTimerScrollLock(locked: boolean) {
   document.body.classList.toggle('timer-modal-open', locked);
-}
-
-function handleTimerPopoverToggle(event: Event) {
-  const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
-  if (toggleEvent.newState === 'open') {
-    if (!timerStore.isPopoverOpen) {
-      timerStore.openPopover();
-    }
-    return;
-  }
-
-  if (toggleEvent.newState === 'closed') {
-    if (timerStore.isPopoverOpen) {
-      timerStore.closePopover();
-    }
-    return;
-  }
-
-  const popoverEl = timerPopoverRef.value;
-  if (!popoverEl) return;
-  const isOpen = popoverEl.matches(':popover-open');
-  if (isOpen) {
-    timerStore.openPopover();
-    return;
-  }
-  timerStore.closePopover();
 }
 
 function triggerTimerOvertimeFlash() {
@@ -143,7 +123,9 @@ function bindTimerPipSizeToContent(pipWindow: Window, mountNode: HTMLElement) {
 
   resizeToContent();
 
-  const pipWindowWithResizeObserver = pipWindow as Window & { ResizeObserver?: typeof ResizeObserver };
+  const pipWindowWithResizeObserver = pipWindow as Window & {
+    ResizeObserver?: typeof ResizeObserver;
+  };
   const ResizeObserverCtor =
     pipWindowWithResizeObserver.ResizeObserver ??
     (typeof ResizeObserver !== 'undefined' ? ResizeObserver : null);
@@ -224,22 +206,8 @@ watch(
 
 watch(
   () => timerStore.isPopoverOpen,
-  async (isOpen) => {
+  (isOpen) => {
     setTimerScrollLock(isOpen);
-    await nextTick();
-    const popoverEl = timerPopoverRef.value;
-    if (!popoverEl) return;
-
-    if (isOpen) {
-      if (typeof popoverEl.showPopover === 'function' && !popoverEl.matches(':popover-open')) {
-        popoverEl.showPopover();
-      }
-      return;
-    }
-
-    if (typeof popoverEl.hidePopover === 'function' && popoverEl.matches(':popover-open')) {
-      popoverEl.hidePopover();
-    }
   },
 );
 
@@ -291,7 +259,7 @@ onBeforeUnmount(() => {
     <header ref="headerRef" class="app-header">
       <nav class="app-nav">
         <RouterLink to="/" class="nav-logo">
-          <FatePlusLogo class="fate-plus-logo"/>
+          <FatePlusLogo class="fate-plus-logo" />
         </RouterLink>
 
         <button
@@ -308,11 +276,36 @@ onBeforeUnmount(() => {
 
         <div class="nav-drawer" :class="{ 'nav-open': navOpen }">
           <div class="nav-links">
-            <RouterLink to="/dashboard" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/dashboard') }">Dashboard</RouterLink>
-            <RouterLink to="/campaigns" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/campaigns') }">Kampagnen</RouterLink>
-            <RouterLink to="/characters" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/characters') }">Charaktere</RouterLink>
-            <RouterLink to="/items" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/items') }">Gegenstände</RouterLink>
-            <RouterLink to="/skills" class="nav-link" :class="{ 'router-link-active': route.path.startsWith('/skills') }">Fertigkeiten</RouterLink>
+            <RouterLink
+              to="/dashboard"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/dashboard') }"
+              >Dashboard</RouterLink
+            >
+            <RouterLink
+              to="/campaigns"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/campaigns') }"
+              >Kampagnen</RouterLink
+            >
+            <RouterLink
+              to="/characters"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/characters') }"
+              >Charaktere</RouterLink
+            >
+            <RouterLink
+              to="/items"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/items') }"
+              >Gegenstände</RouterLink
+            >
+            <RouterLink
+              to="/skills"
+              class="nav-link"
+              :class="{ 'router-link-active': route.path.startsWith('/skills') }"
+              >Fertigkeiten</RouterLink
+            >
             <RouterLink
               to="/cheat-sheet"
               class="nav-link"
@@ -345,8 +338,17 @@ onBeforeUnmount(() => {
               <FateIcon name="clock" :size="20" />
               <span class="nav-link-timer-label">Timer</span>
             </button>
-            <RouterLink to="/settings" class="nav-link nav-link-settings" aria-label="Einstellungen" @click="handleSettingsClick">
-              <FateIcon name="settings" :size="20" :class="{ 'settings-spinning': settingsSpinning }" />
+            <RouterLink
+              to="/settings"
+              class="nav-link nav-link-settings"
+              aria-label="Einstellungen"
+              @click="handleSettingsClick"
+            >
+              <FateIcon
+                name="settings"
+                :size="20"
+                :class="{ 'settings-spinning': settingsSpinning }"
+              />
               <span class="nav-link-settings-label">Einstellungen</span>
             </RouterLink>
           </div>
@@ -358,7 +360,12 @@ onBeforeUnmount(() => {
                 :class="{ 'gm-active': gmModeStore.isGMMode }"
                 @click="gmModeStore.isGMMode = !gmModeStore.isGMMode"
               >
-                <FateToggle v-model="gmModeStore.isGMMode" label="GM" :variant="ToggleVariant.Ghost" @click.stop />
+                <FateToggle
+                  v-model="gmModeStore.isGMMode"
+                  label="GM"
+                  :variant="ToggleVariant.Ghost"
+                  @click.stop
+                />
               </div>
             </div>
           </Transition>
@@ -371,24 +378,24 @@ onBeforeUnmount(() => {
         <RouterView />
       </main>
     </div>
-    <div
-      ref="timerPopoverRef"
-      id="global-timer-popover"
-      class="global-timer-popover"
-      popover="auto"
-      role="dialog"
+    <FateDialog
+      :open="timerStore.isPopoverOpen"
       aria-label="Fate Timer"
-      @toggle="handleTimerPopoverToggle"
+      content-class="timer-dialog-content"
+      @close="timerStore.closePopover()"
     >
       <FateTimer @close="timerStore.closePopover" @stop="handleTimerStop" />
-    </div>
+    </FateDialog>
     <FateToast />
     <ConfirmDialog
       v-if="confirmDialog"
       :title="confirmDialog.title"
       :message="confirmDialog.message"
       confirm-variant="primary"
-      @confirm="confirmDialog.onConfirm(); confirmDialog = null"
+      @confirm="
+        confirmDialog.onConfirm();
+        confirmDialog = null;
+      "
       @cancel="confirmDialog = null"
     />
   </div>
@@ -539,12 +546,24 @@ onBeforeUnmount(() => {
 }
 
 @keyframes theme-icon-in {
-  from { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-  to   { opacity: 1; transform: rotate(0deg) scale(1); }
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
 }
 @keyframes theme-icon-out {
-  from { opacity: 1; transform: rotate(0deg) scale(1); }
-  to   { opacity: 0; transform: rotate(90deg) scale(0.5); }
+  from {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+  }
 }
 
 .nav-theme-label {
@@ -568,8 +587,12 @@ onBeforeUnmount(() => {
 }
 
 @keyframes spin-once {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(180deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
 }
 
 .nav-gm-toggle-clip {
@@ -777,27 +800,9 @@ onBeforeUnmount(() => {
   container-name: main;
 }
 
-.global-timer-popover {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  overflow: visible;
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+.timer-dialog-content {
   width: min(100vw - 1.5rem, 420px);
   max-width: 100%;
-  z-index: 1104;
-}
-
-:global(.global-timer-popover::backdrop) {
-  background: rgba(11, 18, 32, 0.42);
-  backdrop-filter: blur(2px);
 }
 
 @keyframes timer-overtime-flash {
@@ -811,7 +816,6 @@ onBeforeUnmount(() => {
     filter: brightness(1.35);
   }
 }
-
 
 @media (max-width: 480px) {
   .app-main {

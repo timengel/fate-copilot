@@ -28,7 +28,11 @@ describe('App navigation', () => {
     timerStore.closePopover();
   });
 
-  async function setup(initialPath = '/', gmMode = false, timerSetup?: (store: ReturnType<typeof useTimerStore>) => void) {
+  async function setup(
+    initialPath = '/',
+    gmMode = false,
+    timerSetup?: (store: ReturnType<typeof useTimerStore>) => void,
+  ) {
     const pinia = createPinia();
     setActivePinia(pinia);
     useGMModeStore().isGMMode = gmMode;
@@ -61,6 +65,11 @@ describe('App navigation', () => {
             FatePlusLogo: { template: '<div>Logo</div>' },
             FateToggle: { template: '<div />' },
             FateIcon: { template: '<div />' },
+            FateDialog: {
+              props: ['open', 'ariaLabel'],
+              template:
+                '<div v-if="open" class="fate-dialog-stub" role="dialog" :aria-label="ariaLabel"><slot /></div>',
+            },
             FateTimer: {
               emits: ['close'],
               template:
@@ -125,6 +134,20 @@ describe('App navigation', () => {
     expect(document.body.classList.contains('timer-modal-open')).toBe(false);
   });
 
+  it('closes timer dialog when the timer emits close', async () => {
+    await setup();
+    const timerStore = useTimerStore();
+    const timerButton = screen.getByRole('button', { name: 'Timer' });
+
+    await fireEvent.click(timerButton);
+    expect(timerStore.isPopoverOpen).toBe(true);
+    expect(document.body.classList.contains('timer-modal-open')).toBe(true);
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Timer schließen' }));
+    expect(timerStore.isPopoverOpen).toBe(false);
+    expect(document.body.classList.contains('timer-modal-open')).toBe(false);
+  });
+
   it('closes the nav drawer when clicking the mobile timer nav action', async () => {
     const { container } = await setup();
     const drawer = container.querySelector('.nav-drawer') as HTMLElement;
@@ -151,7 +174,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -171,7 +196,9 @@ describe('App navigation', () => {
 
   it('does not open timer PiP when timer is not running', async () => {
     const requestWindow = vi.fn();
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -199,7 +226,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -217,7 +246,7 @@ describe('App navigation', () => {
     visibilityStateMock = 'visible';
     document.dispatchEvent(new Event('visibilitychange'));
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect(pipWindow.close as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledTimes(1);
   });
 
   it('closes timer PiP when app window gets focus', async () => {
@@ -231,7 +260,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -248,7 +279,7 @@ describe('App navigation', () => {
 
     window.dispatchEvent(new Event('focus'));
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect(pipWindow.close as unknown as ReturnType<typeof vi.fn>).toHaveBeenCalledTimes(1);
   });
 
   it('keeps timer PiP open when timer is paused', async () => {
@@ -262,7 +293,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -281,7 +314,7 @@ describe('App navigation', () => {
     timerStore.pause();
     await Promise.resolve();
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+    expect(pipWindow.close as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
   });
 
   it('keeps timer PiP open when timer is reset', async () => {
@@ -295,7 +328,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -314,7 +349,7 @@ describe('App navigation', () => {
     timerStore.reset();
     await Promise.resolve();
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+    expect(pipWindow.close as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
   });
 
   it('keeps timer PiP open when timer is explicitly stopped', async () => {
@@ -328,7 +363,9 @@ describe('App navigation', () => {
       addEventListener: vi.fn(),
     } as unknown as Window;
     const requestWindow = vi.fn().mockResolvedValue(pipWindow);
-    (window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }).documentPictureInPicture = {
+    (
+      window as Window & { documentPictureInPicture?: { requestWindow: typeof requestWindow } }
+    ).documentPictureInPicture = {
       requestWindow,
     };
 
@@ -347,7 +384,7 @@ describe('App navigation', () => {
     timerStore.stop();
     await Promise.resolve();
 
-    expect((pipWindow.close as unknown as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+    expect(pipWindow.close as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
     expect(timerStore.remainingSeconds).toBe(0);
     expect(timerStore.isRunning).toBe(false);
     expect(timerStore.hasStarted).toBe(false);

@@ -14,6 +14,7 @@ import FateCheckbox from '../components/shared/FateCheckbox.vue';
 import FateDropdown from '../components/shared/FateDropdown.vue';
 import FateRadioButtonGroup from '../components/shared/FateRadioButtonGroup.vue';
 import FateCheatSheet from '../components/shared/cheat-sheet/FateCheatSheet.vue';
+import FateDialog from '../components/shared/FateDialog.vue';
 import { useItemsStore } from '../stores/items';
 import { useCharacterItemsStore } from '../stores/characterItems';
 import { useTimerStore } from '../stores/timer';
@@ -72,7 +73,7 @@ const switchCharacterDialog = ref<{
   nextCharacterId: string;
 } | null>(null);
 const isFabOpen = ref(false);
-const cheatSheetPopoverRef = ref<HTMLDivElement | null>(null);
+const isCheatSheetDialogOpen = ref(false);
 
 function setCheatSheetScrollLock(locked: boolean) {
   document.body.classList.toggle('dashboard-cheat-sheet-open', locked);
@@ -295,47 +296,25 @@ function toggleFabMenu() {
 }
 
 function handleCheatSheetFabActionClick() {
+  isCheatSheetDialogOpen.value = true;
   isFabOpen.value = false;
   timerStore.closePopover();
 }
 
 function handleTimerFabActionClick() {
-  closeCheatSheetPopover();
+  closeCheatSheetDialog();
   timerStore.togglePopover();
   isFabOpen.value = false;
 }
 
-function closeCheatSheetPopover() {
-  const popoverEl = cheatSheetPopoverRef.value;
-  if (!popoverEl) return;
-  if (typeof popoverEl.hidePopover === 'function') {
-    popoverEl.hidePopover();
-  }
-  setCheatSheetScrollLock(false);
+function closeCheatSheetDialog() {
+  isCheatSheetDialogOpen.value = false;
 }
 
-function handleCheatSheetBackdropClick(event: Event) {
-  event.preventDefault();
-  event.stopPropagation();
-  closeCheatSheetPopover();
-}
-
-function handleCheatSheetPopoverToggle(event: Event) {
-  const toggleEvent = event as Event & { newState?: 'open' | 'closed' };
-  if (toggleEvent.newState === 'open') {
-    timerStore.closePopover();
-    setCheatSheetScrollLock(true);
-    return;
-  }
-  if (toggleEvent.newState === 'closed') {
-    setCheatSheetScrollLock(false);
-    return;
-  }
-
-  const popoverEl = cheatSheetPopoverRef.value;
-  if (!popoverEl) return;
-  const isOpen = popoverEl.matches(':popover-open');
-  setCheatSheetScrollLock(isOpen);
+function handleCheatSheetBackdropClick(event?: Event) {
+  event?.preventDefault();
+  event?.stopPropagation();
+  closeCheatSheetDialog();
 }
 
 function handleDashboardAssignItem(itemId: string) {
@@ -359,11 +338,15 @@ watch(
   (isEnabled) => {
     if (!isEnabled) {
       isFabOpen.value = false;
-      closeCheatSheetPopover();
+      closeCheatSheetDialog();
       timerStore.closePopover();
     }
   },
 );
+
+watch(isCheatSheetDialogOpen, (isOpen) => {
+  setCheatSheetScrollLock(isOpen);
+});
 
 watch(
   layout,
@@ -971,33 +954,24 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div
-      ref="cheatSheetPopoverRef"
-      id="dashboard-cheat-sheet-popover"
-      class="cheat-sheet-popover"
-      popover="auto"
-      role="dialog"
-      aria-label="Cheat Sheet Popover"
-      @toggle="handleCheatSheetPopoverToggle"
+    <FateDialog
+      :open="isCheatSheetDialogOpen"
+      aria-label="Cheat Sheet Dialog"
+      content-class="cheat-sheet-dialog-content"
+      @close="closeCheatSheetDialog"
     >
-      <div
-        class="cheat-sheet-hit-surface"
-        aria-hidden="true"
-        @pointerdown.prevent.stop
-        @click.prevent.stop="handleCheatSheetBackdropClick"
-      ></div>
-      <div class="cheat-sheet-popover-panel">
+      <div class="cheat-sheet-dialog-panel">
         <div class="cheat-sheet-close-bar">
-          <FateButton icon="close" variant="danger" @click="closeCheatSheetPopover()"></FateButton>
+          <FateButton icon="close" variant="danger" @click="closeCheatSheetDialog()"></FateButton>
         </div>
         <div class="cheat-sheet-scroll-area">
           <FateCheatSheet
             :variant="gmModeStore.isGMMode ? 'gm' : 'basic'"
-            @blank-click="closeCheatSheetPopover"
+            @blank-click="handleCheatSheetBackdropClick"
           />
         </div>
       </div>
-    </div>
+    </FateDialog>
 
     <div class="dashboard-fab">
       <Transition name="fab-actions">
@@ -1014,8 +988,6 @@ onUnmounted(() => {
             type="button"
             class="dashboard-fab-action"
             aria-label="Cheat Sheet öffnen"
-            popovertarget="dashboard-cheat-sheet-popover"
-            popovertargetaction="toggle"
             @click="handleCheatSheetFabActionClick"
           >
             Cheat Sheet
@@ -1032,7 +1004,12 @@ onUnmounted(() => {
         aria-label="Schnellaktionen öffnen"
         @click="toggleFabMenu"
       >
-        <FateIcon name="add" :size="20" class="dashboard-fab-trigger-icon" :class="{ open: isFabOpen }" />
+        <FateIcon
+          name="add"
+          :size="20"
+          class="dashboard-fab-trigger-icon"
+          :class="{ open: isFabOpen }"
+        />
       </button>
     </div>
   </div>
@@ -1511,39 +1488,18 @@ onUnmounted(() => {
   transform: translateY(8px);
 }
 
-.cheat-sheet-popover {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  overflow: visible;
-}
-
-.cheat-sheet-popover:popover-open {
-  position: fixed;
-  inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
+.cheat-sheet-dialog-content {
   width: min(96vw, 1140px);
 }
 
-.cheat-sheet-popover::backdrop {
-  background: rgba(0, 0, 0, 0.62);
-}
-
-.cheat-sheet-popover-panel {
+.cheat-sheet-dialog-panel {
   position: relative;
-  z-index: 1;
   max-height: 92vh;
   overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-end;
-}
-
-.cheat-sheet-hit-surface {
-  position: fixed;
-  inset: 0;
 }
 
 .cheat-sheet-close-bar {
@@ -1555,22 +1511,11 @@ onUnmounted(() => {
 }
 
 @media (max-width: 1024px) {
-  .cheat-sheet-popover:popover-open {
-    position: fixed;
-    top: 0.75rem;
-    left: 0.75rem;
-    right: 0.75rem;
-    bottom: 0.75rem;
-    width: auto;
-    height: auto;
-    transform: none;
-    background: transparent;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+  .cheat-sheet-dialog-content {
+    width: calc(100vw - 1.5rem);
   }
 
-  .cheat-sheet-popover-panel {
+  .cheat-sheet-dialog-panel {
     display: block;
     max-height: none;
     overflow: visible;
@@ -1596,16 +1541,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 600px) {
-  .cheat-sheet-popover::backdrop {
-    bottom: 56px;
-  }
-
-  .cheat-sheet-hit-surface {
-    bottom: 56px;
-  }
-
-  .cheat-sheet-popover:popover-open {
-    bottom: calc(44px + 0.75rem);
+  .cheat-sheet-dialog-content {
+    width: calc(100vw - 1rem);
   }
 }
 
