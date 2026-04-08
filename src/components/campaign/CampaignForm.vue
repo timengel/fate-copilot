@@ -71,7 +71,7 @@ function save() {
       </div>
     </div>
 
-    <div class="form-group">
+    <div v-if="gmModeStore.isGMMode" class="form-group">
       <label class="form-label">Status</label>
       <select class="form-control" v-model="form.status">
         <option value="active">Aktiv</option>
@@ -80,7 +80,7 @@ function save() {
       </select>
     </div>
 
-    <div class="form-group">
+    <div v-if="gmModeStore.isGMMode" class="form-group">
       <label class="form-label" for="campaign-notes">Notizen</label>
       <textarea
         id="campaign-notes"

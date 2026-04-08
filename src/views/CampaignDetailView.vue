@@ -270,7 +270,7 @@ onBeforeUnmount(() => {
 
           <p v-if="campaign.description" class="campaign-description">{{ campaign.description }}</p>
 
-          <div v-if="campaign.notes" class="campaign-notes">
+          <div v-if="campaign.notes && gmModeStore.isGMMode" class="campaign-notes">
             <strong>Notizen:</strong>
             <div
               class="campaign-notes-markdown markdown-content"
