@@ -259,8 +259,22 @@ function toggleArchived(character: Character) {
           <span v-if="getCharacterSecondaryPreview(char)" class="card-trouble"><em>{{ getCharacterSecondaryPreview(char) }}</em></span>
         </template>
         <template #actions>
-          <FateButton icon="copy" variant="secondary" size="S" @click.stop="handleCopy(char)" />
-          <FateButton icon="edit" variant="secondary" size="S" @click.stop="router.push(`/characters/${char.id}/edit`)" />
+          <FateButton
+            icon="copy"
+            variant="secondary"
+            size="S"
+            aria-label="Charakter kopieren"
+            title="Kopieren"
+            @click.stop="handleCopy(char)"
+          />
+          <FateButton
+            icon="edit"
+            variant="secondary"
+            size="S"
+            aria-label="Charakter bearbeiten"
+            title="Bearbeiten"
+            @click.stop="router.push(`/characters/${char.id}/edit`)"
+          />
           <FateButton
             :icon="char.archived ? 'unarchive' : 'archive'"
             variant="secondary"
@@ -269,7 +283,15 @@ function toggleArchived(character: Character) {
             :title="char.archived ? 'Entarchivieren' : 'Archivieren'"
             @click.stop="toggleArchived(char)"
           />
-          <FateButton v-if="gmModeStore.isGMMode" icon="delete" variant="danger" size="S" @click.stop="deleteCharacter(char.id, char.name)" />
+          <FateButton
+            v-if="gmModeStore.isGMMode"
+            icon="delete"
+            variant="danger"
+            size="S"
+            aria-label="Charakter löschen"
+            title="Löschen"
+            @click.stop="deleteCharacter(char.id, char.name)"
+          />
         </template>
       </FateCard>
     </div>

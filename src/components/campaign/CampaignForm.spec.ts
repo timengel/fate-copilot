@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/vue';
-import { createPinia } from 'pinia';
+import { createPinia, setActivePinia } from 'pinia';
 import CampaignForm from './CampaignForm.vue';
 import type { Campaign } from '../../types';
+import { useGMModeStore } from '../../stores/gmMode';
 
 const campaign: Campaign = {
   id: 'c1',
@@ -15,11 +16,17 @@ const campaign: Campaign = {
 };
 
 function renderForm(
-  props: Partial<Campaign & { isNew?: boolean; onSave?: () => void; onCancel?: () => void }> = {},
+  props: Partial<
+    Campaign & { isNew?: boolean; onSave?: () => void; onCancel?: () => void; isGMMode?: boolean }
+  > = {},
 ) {
+  const { isGMMode, ...componentProps } = props;
+  const pinia = createPinia();
+  setActivePinia(pinia);
+  useGMModeStore().isGMMode = isGMMode ?? false;
   return render(CampaignForm, {
-    props: { campaign, isNew: true, ...props },
-    global: { plugins: [createPinia()] },
+    props: { campaign, isNew: true, ...componentProps },
+    global: { plugins: [pinia] },
   });
 }
 
@@ -75,7 +82,7 @@ describe('CampaignForm', () => {
   });
 
   it('uses a taller notes textarea for editing campaign notes', () => {
-    const { getByPlaceholderText } = renderForm();
+    const { getByPlaceholderText } = renderForm({ isGMMode: true });
     const notesTextarea = getByPlaceholderText('Kampagnennotizen') as HTMLTextAreaElement;
     expect(notesTextarea.getAttribute('rows')).toBe('8');
     expect(notesTextarea.classList.contains('form-control--notes')).toBe(true);

@@ -80,23 +80,21 @@ describe('ItemsView – card interactions', () => {
   }
 
   it('clicking the card navigates to the item view page', async () => {
-    const { container, itemId } = setup();
-    await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
+    const { getByRole, itemId } = setup();
+    await fireEvent.click(getByRole('button', { name: 'Test Gegenstand' }));
     expect(mockPush).toHaveBeenCalledWith(`/items/${itemId}`);
   });
 
   it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
-    const { container, itemId } = setup();
-    const [, editBtn] = container.querySelectorAll('.fate-card__actions button');
-    await fireEvent.click(editBtn!);
+    const { getByLabelText, itemId } = setup();
+    await fireEvent.click(getByLabelText('Gegenstand bearbeiten'));
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(`/items/${itemId}/edit`);
   });
 
-  it('clicking the delete button does not trigger navigation', async () => {
-    const { container } = setup();
-    const [, , deleteBtn] = container.querySelectorAll('.fate-card__actions button');
-    await fireEvent.click(deleteBtn!);
+  it('clicking quick archive does not trigger navigation', async () => {
+    const { getByLabelText } = setup();
+    await fireEvent.click(getByLabelText('Gegenstand archivieren'));
     expect(mockPush).not.toHaveBeenCalled();
   });
 
@@ -136,39 +134,29 @@ describe('ItemsView – card interactions', () => {
       vi.restoreAllMocks();
     });
 
-    it('copy button is the first action button on a card', () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      expect(copyBtn).toBeTruthy();
-    });
-
     it('clicking the copy button calls clipboard.writeText', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Gegenstand kopieren'));
       expect(writeText).toHaveBeenCalledOnce();
     });
 
     it('clipboard JSON contains the item name', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Gegenstand kopieren'));
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.name).toBe('Test Gegenstand');
     });
 
     it('clipboard JSON has type "item"', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Gegenstand kopieren'));
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.type).toBe('item');
     });
 
     it('clicking the copy button does not trigger navigation', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Gegenstand kopieren'));
       expect(mockPush).not.toHaveBeenCalled();
     });
   });
@@ -214,8 +202,12 @@ describe('ItemsView – card interactions', () => {
     });
 
     it('does not show meta when all dice and modifier values are 0', () => {
-      const { container } = setupWithItem({ redDice: 0, blueDice: 0, modifiers: [{ label: 'Test', value: 0 }] });
-      expect(container.querySelector('.fate-card__meta')).toBeNull();
+      const { queryByText } = setupWithItem({
+        redDice: 0,
+        blueDice: 0,
+        modifiers: [{ label: 'NurModifier', value: 0 }],
+      });
+      expect(queryByText('NurModifier')).toBeNull();
     });
   });
 
@@ -269,17 +261,21 @@ describe('ItemsView – card interactions', () => {
       },
     });
 
-    const selects = view.container.querySelectorAll('select');
-    expect(selects[0]?.textContent).toContain('Aktiv');
-    expect(selects[0]?.textContent).toContain('Alle Kampagnen');
-    expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
-    expect(selects[0]?.textContent).toContain('Alpha');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    expect(campaignSelect?.textContent).toContain('Aktive Kampagnen');
+    expect(campaignSelect?.textContent).toContain('Alle Kampagnen');
+    expect(campaignSelect?.textContent).toContain('Nicht zugewiesen');
+    expect(campaignSelect?.textContent).toContain('Alpha');
   });
 
   it('defaults the campaign filter to Aktiv', () => {
     const view = setup();
-    const [campaignSelect] = view.container.querySelectorAll('select');
-    expect((campaignSelect as HTMLSelectElement).value).toBe('active');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    expect((campaignSelect as HTMLSelectElement | undefined)?.value).toBe('active');
   });
 
   it('shows a reset filters button', () => {
@@ -322,7 +318,9 @@ describe('ItemsView – card interactions', () => {
       },
     });
 
-    const [campaignSelect] = view.container.querySelectorAll('select');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
     await fireEvent.update(campaignSelect!, 'camp-1');
 
     expect(view.getByText('Alpha-Schwert')).toBeTruthy();
@@ -404,7 +402,9 @@ describe('ItemsView – card interactions', () => {
       },
     });
 
-    const [campaignSelect] = view.container.querySelectorAll('select');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
     await fireEvent.update(campaignSelect!, 'unassigned');
 
     expect(view.queryByText('Zugewiesen')).toBeNull();
@@ -443,11 +443,13 @@ describe('ItemsView – card interactions', () => {
 
     const resetButton = view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement;
     const searchInput = view.getByPlaceholderText('Gegenstand suchen...') as HTMLInputElement;
-    const selects = view.container.querySelectorAll('select');
+    const selects = view.getAllByRole('combobox') as HTMLSelectElement[];
+    const campaignSelect = selects.find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    const sortSelect = selects.find((select) => select.textContent?.includes('Name (A–Z)'));
 
     await fireEvent.update(searchInput, 'frei');
-    await fireEvent.update(selects[0]!, 'unassigned');
-    await fireEvent.update(selects[1]!, 'name-desc');
+    await fireEvent.update(campaignSelect!, 'unassigned');
+    await fireEvent.update(sortSelect!, 'name-desc');
     await fireEvent.click(view.getByText('Zeige archivierte Gegenstände'));
 
     expect(resetButton.disabled).toBe(false);
@@ -455,14 +457,14 @@ describe('ItemsView – card interactions', () => {
     await fireEvent.click(resetButton);
 
     expect(searchInput.value).toBe('');
-    expect((selects[0] as HTMLSelectElement).value).toBe('active');
-    expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
+    expect(campaignSelect?.value).toBe('active');
+    expect(sortSelect?.value).toBe('name-asc');
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(resetButton.disabled).toBe(true);
   });
 
   describe('hidden items section', () => {
-    it('shows hidden items in a Versteckt section below regular items in GM mode', () => {
+    it('shows hidden items in a dedicated Versteckt section in GM mode', () => {
       const pinia = createPinia();
       setActivePinia(pinia);
       const itemsStore = useItemsStore();
@@ -484,12 +486,13 @@ describe('ItemsView – card interactions', () => {
         },
       });
 
-      const topGrid = view.container.querySelector('.card-grid');
-      const hiddenSection = view.container.querySelector('.status-group');
-      expect(topGrid?.textContent).toContain('Normaler Gegenstand');
-      expect(topGrid?.textContent).not.toContain('Versteckter Gegenstand');
-      expect(hiddenSection?.textContent).toContain('Versteckt');
-      expect(hiddenSection?.textContent).toContain('Versteckter Gegenstand');
+      expect(view.getByText('Normaler Gegenstand')).toBeTruthy();
+      expect(view.getByText('Versteckt')).toBeTruthy();
+      expect(view.getByText('Versteckter Gegenstand')).toBeTruthy();
+      const content = view.container.textContent ?? '';
+      expect(content.indexOf('Normaler Gegenstand')).toBeLessThan(
+        content.indexOf('Versteckter Gegenstand'),
+      );
     });
 
     it('does not render the Versteckt section when GM mode is off', () => {

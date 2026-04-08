@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/vue';
+import { render, fireEvent, within } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, defineComponent, h, type PropType } from 'vue';
@@ -199,16 +199,14 @@ describe('DashboardView floating action menu', () => {
   });
 
   it('renders the basic cheat sheet variant in non-GM mode when dialog is opened', async () => {
-    const { getByRole, container } = setupFab(false);
+    const { getByRole, getByLabelText } = setupFab(false);
     const trigger = getByRole('button', { name: 'Schnellaktionen öffnen' });
 
     await fireEvent.click(trigger);
     await fireEvent.click(getByRole('button', { name: 'Cheat Sheet öffnen' }));
 
     expect(getByRole('dialog', { name: 'Cheat Sheet Dialog' })).toBeTruthy();
-    expect(
-      container.querySelector('[aria-label="Fate cheat sheet"]')?.getAttribute('data-variant'),
-    ).toBe('basic');
+    expect(getByLabelText('Fate cheat sheet').getAttribute('data-variant')).toBe('basic');
   });
 });
 
@@ -217,69 +215,91 @@ describe('DashboardView inline filter collapsing', () => {
     setActivePinia(createPinia());
   });
 
+  function getInlineFilters(scope: ReturnType<typeof setupFilters>) {
+    const toggle = scope.getByRole('button', { name: 'Filter' });
+    const panel = toggle.closest('.dashboard-filters-inline');
+    if (!panel) {
+      throw new Error('Inline filter panel not found');
+    }
+    return within(panel);
+  }
+
   it('hides the filters body by default', () => {
-    const { container } = setupFilters();
-    expect(container.querySelector('.filters-body')).toBeNull();
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    expect(inline.queryByRole('button', { name: 'Kampagne' })).toBeNull();
   });
 
   it('shows the filters body when the Filter toggle is clicked', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    expect(container.querySelector('.filters-body')).toBeTruthy();
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByRole('button', { name: 'Filter' }));
+    expect(inline.getByRole('button', { name: 'Kampagne' })).toBeTruthy();
   });
 
   it('hides the filters body again when the Filter toggle is clicked twice', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    expect(container.querySelector('.filters-body')).toBeNull();
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    const toggle = inline.getByRole('button', { name: 'Filter' });
+    await fireEvent.click(toggle);
+    await fireEvent.click(toggle);
+    expect(inline.queryByRole('button', { name: 'Kampagne' })).toBeNull();
   });
 
   it('all sections are collapsed by default when filters are opened', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByRole('button', { name: 'Filter' }));
+    expect(inline.queryByText('SC')).toBeNull();
+    expect(inline.queryByText('Zeige Items')).toBeNull();
   });
 
   it('clicking a section toggle expands only that section', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    const sectionToggles = container.querySelectorAll<HTMLElement>('.filters-section-toggle');
-    await fireEvent.click(sectionToggles[1]!); // Karaktere section
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByRole('button', { name: 'Filter' }));
+    await fireEvent.click(inline.getByRole('button', { name: 'Charaktere' }));
+    expect(inline.getByText('SC')).toBeTruthy();
+    expect(inline.queryByText('Zeige Items')).toBeNull();
   });
 
   it('clicking an expanded section toggle collapses it', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    const toggle = container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!;
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByRole('button', { name: 'Filter' }));
+    const toggle = inline.getByRole('button', { name: 'Kampagne' });
     await fireEvent.click(toggle);
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(1);
+    expect(inline.getByText('Keine Kampagnen.')).toBeTruthy();
     await fireEvent.click(toggle);
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+    expect(inline.queryByText('Keine Kampagnen.')).toBeNull();
   });
 
   it('expand-all button opens the filters panel and expands all sections', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!);
-    expect(container.querySelector('.filters-body')).toBeTruthy();
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(5);
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByTitle('Alle aufklappen'));
+    expect(inline.getByText('Keine Kampagnen.')).toBeTruthy();
+    expect(inline.getByText('SC')).toBeTruthy();
+    expect(inline.getByText('Zeige Items')).toBeTruthy();
+    expect(inline.getByText('Allgemeines')).toBeTruthy();
   });
 
   it('expand-all button becomes collapse-all when at least one section is expanded', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-toggle')!);
-    await fireEvent.click(container.querySelectorAll<HTMLElement>('.filters-section-toggle')[0]!);
-    expect(container.querySelector<HTMLElement>('.filters-expand-all')!.title).toBe(
-      'Alle zuklappen',
-    );
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByRole('button', { name: 'Filter' }));
+    await fireEvent.click(inline.getByRole('button', { name: 'Kampagne' }));
+    expect(inline.getByTitle('Alle zuklappen')).toBeTruthy();
   });
 
   it('collapse-all button collapses all sections', async () => {
-    const { container } = setupFilters();
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!); // expand all
-    await fireEvent.click(container.querySelector<HTMLElement>('.filters-expand-all')!); // collapse all
-    expect(container.querySelectorAll('.filters-section-body').length).toBe(0);
+    const scope = setupFilters();
+    const inline = getInlineFilters(scope);
+    await fireEvent.click(inline.getByTitle('Alle aufklappen'));
+    await fireEvent.click(inline.getByTitle('Alle zuklappen'));
+    expect(inline.queryByText('Keine Kampagnen.')).toBeNull();
+    expect(inline.queryByText('SC')).toBeNull();
+    expect(inline.queryByText('Zeige Items')).toBeNull();
   });
 });
 
@@ -374,12 +394,11 @@ describe('DashboardView character sheet item navigation', () => {
             emits: ['save', 'cancel', 'assign-item', 'unassign-item'],
             template: `
               <div>
-                <span class="character-name">{{ character.name }}</span>
                 <slot v-if="mode !== 'edit'" name="name-bar-actions" />
-                <span class="assigned">{{ (assignedItems || []).map((entry) => entry.name).join(',') }}</span>
-                <span class="dirty">{{ externalDirty ? 'dirty' : 'clean' }}</span>
-                <button v-if="mode === 'edit'" class="save" @click="$emit('save', character)">save-now</button>
-                <button v-if="mode === 'edit'" class="unassign" @click="$emit('unassign-item', 'item-1')">unassign</button>
+                <span aria-label="zugewiesene-gegenstaende">{{ (assignedItems || []).map((entry) => entry.name).join(',') }}</span>
+                <span aria-label="edit-status">{{ externalDirty ? 'dirty' : 'clean' }}</span>
+                <button v-if="mode === 'edit'" @click="$emit('save', character)">save-now</button>
+                <button v-if="mode === 'edit'" @click="$emit('unassign-item', 'item-1')">item-entfernen</button>
               </div>
             `,
           },
@@ -388,30 +407,24 @@ describe('DashboardView character sheet item navigation', () => {
       },
     });
 
-    await fireEvent.click(
-      view.container.querySelector<HTMLButtonElement>('.dashboard-entry button')!,
-    );
-    expect(view.container.querySelector('.assigned')?.textContent).toContain('Schwert');
+    await fireEvent.click(view.getByRole('button', { name: 'Bearbeiten' }));
+    expect(view.getByLabelText('zugewiesene-gegenstaende').textContent).toContain('Schwert');
 
-    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.unassign')!);
-    expect(view.container.querySelector('.assigned')?.textContent).toBe('');
-    expect(view.container.querySelector('.dirty')?.textContent).toBe('dirty');
+    await fireEvent.click(view.getByRole('button', { name: 'item-entfernen' }));
+    expect(view.getByLabelText('zugewiesene-gegenstaende').textContent).toBe('');
+    expect(view.getByLabelText('edit-status').textContent).toBe('dirty');
     expect(
       characterItemsStore.getItemsForCharacter(character.id).map((entry) => entry.name),
     ).toEqual(['Schwert']);
 
-    await fireEvent.click(view.container.querySelector<HTMLButtonElement>('.save')!);
+    await fireEvent.click(view.getByRole('button', { name: 'save-now' }));
     expect(characterItemsStore.getItemsForCharacter(character.id)).toHaveLength(0);
   });
 });
 
 describe('DashboardView archived item filter', () => {
-  function getItemArchivedFilter(container: HTMLElement) {
-    return container.querySelectorAll<HTMLLabelElement>('.sidebar-group .fate-checkbox')[3];
-  }
-
-  function getItemEditButton(container: HTMLElement) {
-    return container.querySelector<HTMLButtonElement>('.item-name-bar-end button');
+  function getItemArchivedFilter(view: ReturnType<typeof render>) {
+    return view.getAllByText('Archiviert')[1]?.closest('label') ?? null;
   }
 
   beforeEach(() => {
@@ -469,7 +482,7 @@ describe('DashboardView archived item filter', () => {
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
 
-    await fireEvent.click(getItemArchivedFilter(view.container as HTMLElement)!);
+    await fireEvent.click(getItemArchivedFilter(view)!);
 
     expect(view.getByText('Altes Schwert')).toBeTruthy();
   });
@@ -477,24 +490,24 @@ describe('DashboardView archived item filter', () => {
   it('still hides hidden archived items for non-GM users even when the archived filter is enabled', async () => {
     const view = setup({ archived: true, hidden: true });
 
-    await fireEvent.click(getItemArchivedFilter(view.container as HTMLElement)!);
+    await fireEvent.click(getItemArchivedFilter(view)!);
 
     expect(view.queryByText('Altes Schwert')).toBeNull();
   });
 
   it('shows an edit button for visible items when editing is enabled', () => {
     const view = setup({}, false, false);
-    expect(getItemEditButton(view.container as HTMLElement)).toBeTruthy();
+    expect(view.getByRole('button', { name: 'Bearbeiten' })).toBeTruthy();
   });
 
   it('switches an item into edit mode and cancels without saving', async () => {
     const view = setup({}, false, false);
-    await fireEvent.click(getItemEditButton(view.container as HTMLElement)!);
+    await fireEvent.click(view.getByRole('button', { name: 'Bearbeiten' }));
     expect(view.getByText('Abbrechen')).toBeTruthy();
     expect(view.getByText('Speichern')).toBeTruthy();
 
     await fireEvent.click(view.getByText('Abbrechen').closest('button') as HTMLButtonElement);
-    expect(getItemEditButton(view.container as HTMLElement)).toBeTruthy();
+    expect(view.getByRole('button', { name: 'Bearbeiten' })).toBeTruthy();
   });
 
   it('saves an edited item inline and shows a success toast', async () => {
@@ -538,7 +551,7 @@ describe('DashboardView archived item filter', () => {
       },
     });
 
-    await fireEvent.click(getItemEditButton(view.container as HTMLElement)!);
+    await fireEvent.click(view.getByRole('button', { name: 'Bearbeiten' }));
     await fireEvent.update(view.getByPlaceholderText('Name des Gegenstands'), 'Neues Schwert');
     await fireEvent.click(view.getByText('Speichern').closest('button') as HTMLButtonElement);
 
@@ -674,9 +687,8 @@ describe('DashboardView character edit switching', () => {
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
-    await fireEvent.click(
-      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--primary')!,
-    );
+    const dialog = view.getByRole('dialog', { name: 'Ungespeicherte Aenderungen' });
+    await fireEvent.click(within(dialog).getByRole('button', { name: 'Speichern' }));
 
     expect(charactersStore.getById('character-1')?.name).toBe('Alrik gespeichert');
     expect(view.getByText('editing-character-2')).toBeTruthy();
@@ -690,9 +702,8 @@ describe('DashboardView character edit switching', () => {
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
-    await fireEvent.click(
-      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--danger-outline')!,
-    );
+    const dialog = view.getByRole('dialog', { name: 'Ungespeicherte Aenderungen' });
+    await fireEvent.click(within(dialog).getByRole('button', { name: 'Verwerfen' }));
 
     expect(charactersStore.getById('character-1')?.name).toBe('Alrik');
     expect(view.getByText('editing-character-2')).toBeTruthy();
@@ -704,9 +715,8 @@ describe('DashboardView character edit switching', () => {
 
     await fireEvent.click(editButtons[0]!);
     await fireEvent.click(editButtons[1]!);
-    await fireEvent.click(
-      view.container.querySelector<HTMLButtonElement>('.dialog-overlay .fate-btn--secondary')!,
-    );
+    const dialog = view.getByRole('dialog', { name: 'Ungespeicherte Aenderungen' });
+    await fireEvent.click(within(dialog).getByRole('button', { name: 'Abbrechen' }));
 
     expect(view.queryByText('Ungespeicherte Aenderungen')).toBeNull();
     expect(view.getByText('editing-character-1')).toBeTruthy();

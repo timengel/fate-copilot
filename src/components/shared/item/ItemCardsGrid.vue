@@ -45,8 +45,22 @@ const emit = defineEmits<{
         </template>
       </template>
       <template #actions>
-        <FateButton icon="copy" variant="secondary" size="S" @click.stop="emit('copy', item)" />
-        <FateButton icon="edit" variant="secondary" size="S" @click.stop="emit('edit', item.id)" />
+        <FateButton
+          icon="copy"
+          variant="secondary"
+          size="S"
+          aria-label="Gegenstand kopieren"
+          title="Kopieren"
+          @click.stop="emit('copy', item)"
+        />
+        <FateButton
+          icon="edit"
+          variant="secondary"
+          size="S"
+          aria-label="Gegenstand bearbeiten"
+          title="Bearbeiten"
+          @click.stop="emit('edit', item.id)"
+        />
         <FateButton
           :icon="item.archived ? 'unarchive' : 'archive'"
           variant="secondary"
@@ -55,7 +69,15 @@ const emit = defineEmits<{
           :title="item.archived ? 'Entarchivieren' : 'Archivieren'"
           @click.stop="emit('toggle-archived', item)"
         />
-        <FateButton v-if="gmMode" icon="delete" variant="danger" size="S" @click.stop="emit('delete', item)" />
+        <FateButton
+          v-if="gmMode"
+          icon="delete"
+          variant="danger"
+          size="S"
+          aria-label="Gegenstand löschen"
+          title="Löschen"
+          @click.stop="emit('delete', item)"
+        />
       </template>
     </FateCard>
   </div>

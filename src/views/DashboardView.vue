@@ -932,7 +932,12 @@ onUnmounted(() => {
     </div>
 
     <div v-if="switchCharacterDialog" class="dialog-overlay" @click.self="cancelCharacterSwitch">
-      <div class="dialog-box dialog-box--switch-character">
+      <div
+        class="dialog-box dialog-box--switch-character"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Ungespeicherte Aenderungen"
+      >
         <div class="dialog-title">Ungespeicherte Aenderungen</div>
         <div class="dialog-message">
           Du bearbeitest gerade „{{ getCharacterName(switchCharacterDialog.currentCharacterId) }}“.

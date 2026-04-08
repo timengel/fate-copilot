@@ -89,23 +89,21 @@ describe('CharactersView – card interactions', () => {
   }
 
   it('clicking the card navigates to the character view page', async () => {
-    const { container, charId } = setup();
-    await fireEvent.click(container.querySelector('.fate-card__main--clickable')!);
+    const { getByRole, charId } = setup();
+    await fireEvent.click(getByRole('button', { name: /Test Charakter/ }));
     expect(mockPush).toHaveBeenCalledWith(`/characters/${charId}`);
   });
 
   it('clicking the edit button navigates to the edit page without triggering card navigation', async () => {
-    const { container, charId } = setup();
-    const [, editBtn] = container.querySelectorAll('.fate-card__actions button');
-    await fireEvent.click(editBtn!);
+    const { getByLabelText, charId } = setup();
+    await fireEvent.click(getByLabelText('Charakter bearbeiten'));
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(`/characters/${charId}/edit`);
   });
 
-  it('clicking the delete button does not trigger navigation', async () => {
-    const { container } = setup();
-    const [, , deleteBtn] = container.querySelectorAll('.fate-card__actions button');
-    await fireEvent.click(deleteBtn!);
+  it('clicking quick archive does not trigger navigation', async () => {
+    const { getByLabelText } = setup();
+    await fireEvent.click(getByLabelText('Charakter archivieren'));
     expect(mockPush).not.toHaveBeenCalled();
   });
 
@@ -120,13 +118,13 @@ describe('CharactersView – card interactions', () => {
   });
 
   it('hides the character tab selector when GM mode is off', () => {
-    const { container } = setup();
-    expect(container.querySelector('.fate-tab-selector')).toBeNull();
+    const { queryByRole } = setup();
+    expect(queryByRole('tablist', { name: 'Charaktertyp' })).toBeNull();
   });
 
   it('shows the character tab selector when GM mode is on', () => {
-    const { container } = setupGM();
-    expect(container.querySelector('.fate-tab-selector')).toBeTruthy();
+    const { getByRole } = setupGM();
+    expect(getByRole('tablist', { name: 'Charaktertyp' })).toBeTruthy();
   });
 
   it('quick archive toggles the archived flag without navigation', async () => {
@@ -160,39 +158,29 @@ describe('CharactersView – card interactions', () => {
       vi.restoreAllMocks();
     });
 
-    it('copy button is the first action button on a card', () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      expect(copyBtn).toBeTruthy();
-    });
-
     it('clicking the copy button calls clipboard.writeText', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Charakter kopieren'));
       expect(writeText).toHaveBeenCalledOnce();
     });
 
     it('clipboard JSON contains the character name', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Charakter kopieren'));
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.name).toBe('Test Charakter');
     });
 
     it('clipboard JSON contains the correct character type', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Charakter kopieren'));
       const parsed = JSON.parse(writeText.mock.calls[0]![0] as string);
       expect(parsed.type).toBe('sc');
     });
 
     it('clicking the copy button does not trigger navigation', async () => {
-      const { container } = setup();
-      const [copyBtn] = container.querySelectorAll('.fate-card__actions button');
-      await fireEvent.click(copyBtn!);
+      const { getByLabelText } = setup();
+      await fireEvent.click(getByLabelText('Charakter kopieren'));
       expect(mockPush).not.toHaveBeenCalled();
     });
   });
@@ -222,17 +210,21 @@ describe('CharactersView – card interactions', () => {
       },
     });
 
-    const selects = view.container.querySelectorAll('select');
-    expect(selects[0]?.textContent).toContain('Aktiv');
-    expect(selects[0]?.textContent).toContain('Alle Kampagnen');
-    expect(selects[0]?.textContent).toContain('Nicht zugewiesen');
-    expect(selects[0]?.textContent).toContain('Alpha');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    expect(campaignSelect?.textContent).toContain('Aktive Kampagnen');
+    expect(campaignSelect?.textContent).toContain('Alle Kampagnen');
+    expect(campaignSelect?.textContent).toContain('Nicht zugewiesen');
+    expect(campaignSelect?.textContent).toContain('Alpha');
   });
 
   it('defaults the campaign filter to Aktiv', () => {
     const view = setup();
-    const [campaignSelect] = view.container.querySelectorAll('select');
-    expect((campaignSelect as HTMLSelectElement).value).toBe('active');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    expect((campaignSelect as HTMLSelectElement | undefined)?.value).toBe('active');
   });
 
   it('shows a reset filters button', () => {
@@ -275,7 +267,9 @@ describe('CharactersView – card interactions', () => {
       },
     });
 
-    const [campaignSelect] = view.container.querySelectorAll('select');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
     await fireEvent.update(campaignSelect!, 'camp-1');
 
     expect(view.getByText('Alpha-Held')).toBeTruthy();
@@ -357,7 +351,9 @@ describe('CharactersView – card interactions', () => {
       },
     });
 
-    const [campaignSelect] = view.container.querySelectorAll('select');
+    const campaignSelect = view
+      .getAllByRole('combobox')
+      .find((select) => select.textContent?.includes('Aktive Kampagnen'));
     await fireEvent.update(campaignSelect!, 'unassigned');
 
     expect(view.queryByText('Zugewiesen')).toBeNull();
@@ -435,11 +431,13 @@ describe('CharactersView – card interactions', () => {
 
     const resetButton = view.getByLabelText('Filter zurücksetzen') as HTMLButtonElement;
     const searchInput = view.getByPlaceholderText('Charakter suchen...') as HTMLInputElement;
-    const selects = view.container.querySelectorAll('select');
+    const selects = view.getAllByRole('combobox') as HTMLSelectElement[];
+    const campaignSelect = selects.find((select) => select.textContent?.includes('Aktive Kampagnen'));
+    const sortSelect = selects.find((select) => select.textContent?.includes('Name (A–Z)'));
 
     await fireEvent.update(searchInput, 'frei');
-    await fireEvent.update(selects[0]!, 'unassigned');
-    await fireEvent.update(selects[1]!, 'name-desc');
+    await fireEvent.update(campaignSelect!, 'unassigned');
+    await fireEvent.update(sortSelect!, 'name-desc');
     await fireEvent.click(view.getByText('Zeige archivierte Charaktere'));
 
     expect(resetButton.disabled).toBe(false);
@@ -447,9 +445,11 @@ describe('CharactersView – card interactions', () => {
     await fireEvent.click(resetButton);
 
     expect(searchInput.value).toBe('');
-    expect((selects[0] as HTMLSelectElement).value).toBe('active');
-    expect((selects[1] as HTMLSelectElement).value).toBe('name-asc');
-    expect(view.container.querySelector('.fate-tab-selector__option--active')?.textContent).toContain('SC');
+    expect(campaignSelect?.value).toBe('active');
+    expect(sortSelect?.value).toBe('name-asc');
+    expect(view.getByRole('button', { name: 'Spieler (SC)' }).getAttribute('aria-selected')).toBe(
+      'true',
+    );
     expect(view.queryByText('Zugewiesen')).toBeNull();
     expect(resetButton.disabled).toBe(true);
   });

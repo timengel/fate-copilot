@@ -62,10 +62,10 @@ describe('CampaignDetailView', () => {
     expect(screen.getByText('ITEMS')).toBeTruthy();
   });
 
-  it('renders campaign notes as markdown in view mode', () => {
+  it('renders campaign notes as markdown for GM mode', () => {
     const campaignsStore = useCampaignsStore();
     campaignsStore.addCampaign(makeCampaign({ notes: '**Wichtig**\n\n- Punkt A\n- Punkt B' }));
-    useGMModeStore().isGMMode = false;
+    useGMModeStore().isGMMode = true;
 
     const { container, getByText } = renderView();
     expect(getByText('Notizen:')).toBeTruthy();
