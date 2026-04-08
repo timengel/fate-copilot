@@ -82,22 +82,31 @@ function save() {
 
     <div class="form-group">
       <label class="form-label">Notizen</label>
-      <textarea class="form-control" v-model="form.notes" placeholder="Kampagnennotizen" rows="4" />
+      <textarea
+        class="form-control form-control--notes"
+        v-model="form.notes"
+        placeholder="Kampagnennotizen"
+        rows="8"
+      />
     </div>
 
     <div v-if="gmModeStore.isGMMode" class="form-group">
       <label class="form-label">GM-Notizen</label>
       <textarea
-        class="form-control"
+        class="form-control form-control--notes"
         v-model="form.gmNotes"
         placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
-        rows="4"
+        rows="8"
       />
     </div>
 
     <div class="form-actions">
-      <FateButton variant="secondary" icon="close" @click="emit('cancel')"><span class="btn-label">Abbrechen</span></FateButton>
-      <FateButton icon="check" :disabled="!isDirty" @click="save"><span class="btn-label">Speichern</span></FateButton>
+      <FateButton variant="secondary" icon="close" @click="emit('cancel')"
+        ><span class="btn-label">Abbrechen</span></FateButton
+      >
+      <FateButton icon="check" :disabled="!isDirty" @click="save"
+        ><span class="btn-label">Speichern</span></FateButton
+      >
     </div>
   </div>
 </template>
@@ -141,6 +150,11 @@ function save() {
 
 .form-control:focus {
   border-color: var(--fate-blue);
+}
+
+.form-control--notes {
+  min-height: 12rem;
+  resize: vertical;
 }
 
 .form-actions {

@@ -114,4 +114,17 @@ describe('CampaignDetailView GM notes section', () => {
     vi.advanceTimersByTime(1);
     expect(campaignsStore.getById('camp-1')?.gmNotes).toBe('ABC');
   });
+
+  it('renders campaign notes as markdown in view mode', () => {
+    const campaignsStore = useCampaignsStore();
+    campaignsStore.addCampaign(makeCampaign({ notes: '**Wichtig**\n\n- Punkt A\n- Punkt B' }));
+    useGMModeStore().isGMMode = false;
+
+    const { container, getByText } = renderView();
+    expect(getByText('Notizen:')).toBeTruthy();
+    const markdownHost = container.querySelector('.campaign-notes-markdown');
+    expect(markdownHost?.innerHTML).toContain('<strong>Wichtig</strong>');
+    expect(markdownHost?.textContent).toContain('Punkt A');
+    expect(markdownHost?.textContent).toContain('Punkt B');
+  });
 });

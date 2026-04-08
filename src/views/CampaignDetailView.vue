@@ -16,6 +16,7 @@ import { CAMPAIGN_STATUS_LABEL, DropdownVariant } from '../types';
 import { getColorVars } from '../composables/useColorVars';
 import { useConfirmDialog } from '../composables/useConfirmDialog';
 import { createDefaultCampaign } from '../composables/useCharacterDefaults';
+import { useMarkdown } from '../composables/useMarkdown';
 import { getCharacterPrimaryPreview } from '../utils/characterPreview';
 
 const props = defineProps<{
@@ -29,6 +30,7 @@ const campaignsStore = useCampaignsStore();
 const charactersStore = useCharactersStore();
 const itemsStore = useItemsStore();
 const gmModeStore = useGMModeStore();
+const { renderMarkdown } = useMarkdown();
 
 const id = computed(() => {
   const param = route.params.id;
@@ -270,7 +272,10 @@ onBeforeUnmount(() => {
 
           <div v-if="campaign.notes" class="campaign-notes">
             <strong>Notizen:</strong>
-            <p>{{ campaign.notes }}</p>
+            <div
+              class="campaign-notes-markdown markdown-content"
+              v-html="renderMarkdown(campaign.notes)"
+            />
           </div>
 
           <section v-if="gmModeStore.isGMMode" class="sheet-section gm-notes-section">
@@ -538,6 +543,10 @@ onBeforeUnmount(() => {
   font-size: 0.875rem;
 }
 
+.campaign-notes-markdown {
+  margin-top: 0.4rem;
+}
+
 .campaign-characters,
 .campaign-assignments {
   padding: 0.5rem 0.75rem;
@@ -553,7 +562,7 @@ onBeforeUnmount(() => {
 
 .campaign-gm-notes-input {
   width: 100%;
-  min-height: 220px;
+  min-height: 280px;
   border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
   border-radius: 4px;
   padding: 0.55rem 0.75rem;
@@ -569,6 +578,47 @@ onBeforeUnmount(() => {
 .campaign-gm-notes-input:focus {
   border-color: var(--fate-blue);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, var(--fate-white) 30%);
+}
+
+.markdown-content :deep(p) {
+  margin: 0 0 0.5em;
+}
+
+.markdown-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  margin: 0.25em 0 0.5em 1.25em;
+  padding: 0;
+}
+
+.markdown-content :deep(li) {
+  margin-bottom: 0.15em;
+}
+
+.markdown-content :deep(strong) {
+  font-weight: 600;
+}
+
+.markdown-content :deep(em) {
+  font-style: italic;
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3) {
+  margin: 0.5em 0 0.25em;
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.markdown-content :deep(code) {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0 3px;
+  border-radius: 2px;
 }
 
 .assignment-row {
@@ -608,6 +658,10 @@ onBeforeUnmount(() => {
 
 .assignment-main--clickable:hover {
   background: var(--fate-hover-bg);
+}
+
+:global(html[data-theme='light']) .assignment-main--clickable:hover {
+  background: #dbeffc;
 }
 
 .assignment-info {

@@ -73,6 +73,13 @@ describe('CampaignForm', () => {
     await fireEvent.click(screen.getByText('Speichern'));
     expect(onSave.mock.calls[0][0].avatar).toBe('🐉');
   });
+
+  it('uses a taller notes textarea for editing campaign notes', () => {
+    const { getByPlaceholderText } = renderForm();
+    const notesTextarea = getByPlaceholderText('Kampagnennotizen') as HTMLTextAreaElement;
+    expect(notesTextarea.getAttribute('rows')).toBe('8');
+    expect(notesTextarea.classList.contains('form-control--notes')).toBe(true);
+  });
 });
 
 describe('CampaignForm dirty-state', () => {
