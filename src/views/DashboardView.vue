@@ -1494,16 +1494,19 @@ onUnmounted(() => {
 
 .cheat-sheet-dialog-panel {
   position: relative;
+  width: min(96vw, 1140px);
+  max-width: 100%;
   max-height: 92vh;
   overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  align-items: flex-end;
+  align-items: stretch;
 }
 
 .cheat-sheet-close-bar {
-  align-self: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .cheat-sheet-scroll-area {
@@ -1516,9 +1519,10 @@ onUnmounted(() => {
   }
 
   .cheat-sheet-dialog-panel {
+    width: calc(100vw - 1.5rem);
     display: block;
-    max-height: none;
-    overflow: visible;
+    max-height: calc(100vh - 1.5rem);
+    overflow: auto;
     background: transparent;
   }
 
@@ -1543,6 +1547,11 @@ onUnmounted(() => {
 @media (max-width: 600px) {
   .cheat-sheet-dialog-content {
     width: calc(100vw - 1rem);
+  }
+
+  .cheat-sheet-dialog-panel {
+    width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
   }
 }
 

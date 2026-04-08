@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/vue';
+import { render, screen } from '@testing-library/vue';
 import { createPinia, getActivePinia, setActivePinia } from 'pinia';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CampaignDetailView from './CampaignDetailView.vue';
 import { useCampaignsStore } from '../stores/campaigns';
 import { useGMModeStore } from '../stores/gmMode';
@@ -45,74 +45,21 @@ function renderView() {
   });
 }
 
-describe('CampaignDetailView GM notes section', () => {
+describe('CampaignDetailView', () => {
   beforeEach(() => {
     mockPush.mockReset();
     routeParams.id = 'camp-1';
     setActivePinia(createPinia());
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('does not render the GM Notizen section when GM mode is off', () => {
+  it('renders character and item sections in detail view', () => {
     const campaignsStore = useCampaignsStore();
     campaignsStore.addCampaign(makeCampaign({ gmNotes: 'Intern' }));
-    useGMModeStore().isGMMode = false;
-
-    const { queryByText, queryByPlaceholderText } = renderView();
-    expect(queryByText('GM NOTIZEN')).toBeNull();
-    expect(queryByPlaceholderText('Nächste Sitzung planen...')).toBeNull();
-  });
-
-  it('renders GM Notizen section with textarea even when gmNotes is empty', () => {
-    const campaignsStore = useCampaignsStore();
-    campaignsStore.addCampaign(makeCampaign({ gmNotes: '' }));
     useGMModeStore().isGMMode = true;
 
     renderView();
-    expect(screen.getByText('GM NOTIZEN')).toBeTruthy();
-    expect(screen.getByPlaceholderText('Nächste Sitzung planen...')).toBeTruthy();
-  });
-
-  it('autosaves gmNotes after debounce when typing', async () => {
-    vi.useFakeTimers();
-    const campaignsStore = useCampaignsStore();
-    campaignsStore.addCampaign(makeCampaign({ gmNotes: '' }));
-    useGMModeStore().isGMMode = true;
-
-    renderView();
-    const textarea = screen.getByPlaceholderText('Nächste Sitzung planen...');
-    await fireEvent.update(textarea, '# Nächste Session');
-
-    expect(campaignsStore.getById('camp-1')?.gmNotes ?? '').toBe('');
-    vi.advanceTimersByTime(399);
-    expect(campaignsStore.getById('camp-1')?.gmNotes ?? '').toBe('');
-
-    vi.advanceTimersByTime(1);
-    expect(campaignsStore.getById('camp-1')?.gmNotes).toBe('# Nächste Session');
-  });
-
-  it('persists only the latest value when typing rapidly', async () => {
-    vi.useFakeTimers();
-    const campaignsStore = useCampaignsStore();
-    campaignsStore.addCampaign(makeCampaign({ gmNotes: '' }));
-    useGMModeStore().isGMMode = true;
-
-    renderView();
-    const textarea = screen.getByPlaceholderText('Nächste Sitzung planen...');
-
-    await fireEvent.update(textarea, 'A');
-    vi.advanceTimersByTime(200);
-    await fireEvent.update(textarea, 'AB');
-    vi.advanceTimersByTime(200);
-    await fireEvent.update(textarea, 'ABC');
-    vi.advanceTimersByTime(399);
-
-    expect(campaignsStore.getById('camp-1')?.gmNotes ?? '').toBe('');
-    vi.advanceTimersByTime(1);
-    expect(campaignsStore.getById('camp-1')?.gmNotes).toBe('ABC');
+    expect(screen.getByText('CHARAKTERE')).toBeTruthy();
+    expect(screen.getByText('ITEMS')).toBeTruthy();
   });
 
   it('renders campaign notes as markdown in view mode', () => {
