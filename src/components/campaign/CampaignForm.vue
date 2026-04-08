@@ -81,21 +81,13 @@ function save() {
     </div>
 
     <div class="form-group">
-      <label class="form-label">Notizen</label>
+      <label class="form-label" for="campaign-notes">Notizen</label>
       <textarea
+        id="campaign-notes"
+        name="notes"
         class="form-control form-control--notes"
         v-model="form.notes"
         placeholder="Kampagnennotizen"
-        rows="8"
-      />
-    </div>
-
-    <div v-if="gmModeStore.isGMMode" class="form-group">
-      <label class="form-label">GM-Notizen</label>
-      <textarea
-        class="form-control form-control--notes"
-        v-model="form.gmNotes"
-        placeholder="Interne Notizen (nur im GM-Modus sichtbar)"
         rows="8"
       />
     </div>
@@ -153,7 +145,7 @@ function save() {
 }
 
 .form-control--notes {
-  min-height: 12rem;
+  min-height: 20rem;
   resize: vertical;
 }
 

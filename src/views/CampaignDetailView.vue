@@ -278,17 +278,6 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <section v-if="gmModeStore.isGMMode" class="sheet-section gm-notes-section">
-            <div class="sheet-section-header">GM NOTIZEN</div>
-            <div class="campaign-gm-notes-editor">
-              <textarea
-                v-model="gmNotesDraft"
-                class="campaign-gm-notes-input"
-                placeholder="Nächste Sitzung planen..."
-              />
-            </div>
-          </section>
-
           <!-- MEILENSTEINE -->
           <section class="sheet-section">
             <div class="sheet-section-header">MEILENSTEINE</div>
@@ -312,10 +301,13 @@ onBeforeUnmount(() => {
                 <div class="char-group-header">Spielercharaktere (SC)</div>
                 <div v-if="scCharacters.length === 0" class="empty-text">Keine SC zugeordnet.</div>
                 <div v-for="char in scCharacters" :key="char.id" class="assignment-row">
-                  <button
-                    type="button"
-                    class="assignment-main assignment-main--clickable"
+                  <div
+                    class="assignment-main"
+                    role="button"
+                    tabindex="0"
                     @click="navigateToAssignment(`/characters/${char.id}`)"
+                    @keydown.enter.prevent="navigateToAssignment(`/characters/${char.id}`)"
+                    @keydown.space.prevent="navigateToAssignment(`/characters/${char.id}`)"
                   >
                     <FateAvatar
                       class="assignment-avatar"
@@ -331,13 +323,13 @@ onBeforeUnmount(() => {
                         getCharacterPrimaryPreview(char)
                       }}</span>
                     </div>
-                  </button>
+                  </div>
                   <div v-if="gmModeStore.isGMMode" class="assignment-actions">
                     <FateButton
                       variant="danger"
                       size="S"
                       icon="close"
-                      @click="unassignCharacter(char.id)"
+                      @click.stop="unassignCharacter(char.id)"
                     ></FateButton>
                   </div>
                 </div>
@@ -348,10 +340,13 @@ onBeforeUnmount(() => {
                     Keine NSC zugeordnet.
                   </div>
                   <div v-for="char in nscCharacters" :key="char.id" class="assignment-row">
-                    <button
-                      type="button"
-                      class="assignment-main assignment-main--clickable"
+                    <div
+                      class="assignment-main"
+                      role="button"
+                      tabindex="0"
                       @click="navigateToAssignment(`/characters/${char.id}`)"
+                      @keydown.enter.prevent="navigateToAssignment(`/characters/${char.id}`)"
+                      @keydown.space.prevent="navigateToAssignment(`/characters/${char.id}`)"
                     >
                       <FateAvatar
                         class="assignment-avatar"
@@ -367,13 +362,13 @@ onBeforeUnmount(() => {
                           getCharacterPrimaryPreview(char)
                         }}</span>
                       </div>
-                    </button>
+                    </div>
                     <div class="assignment-actions">
                       <FateButton
                         variant="danger"
                         size="S"
                         icon="close"
-                        @click="unassignCharacter(char.id)"
+                        @click.stop="unassignCharacter(char.id)"
                       ></FateButton>
                     </div>
                   </div>
@@ -402,10 +397,13 @@ onBeforeUnmount(() => {
                 Noch keine Gegenstände zugeordnet.
               </div>
               <div v-for="item in campaignItems" :key="item.id" class="assignment-row">
-                <button
-                  type="button"
-                  class="assignment-main assignment-main--clickable"
+                <div
+                  class="assignment-main"
+                  role="button"
+                  tabindex="0"
                   @click="navigateToAssignment(`/items/${item.id}`)"
+                  @keydown.enter.prevent="navigateToAssignment(`/items/${item.id}`)"
+                  @keydown.space.prevent="navigateToAssignment(`/items/${item.id}`)"
                 >
                   <FateAvatar
                     class="assignment-avatar"
@@ -421,13 +419,13 @@ onBeforeUnmount(() => {
                       item.description
                     }}</span>
                   </div>
-                </button>
+                </div>
                 <div v-if="gmModeStore.isGMMode" class="assignment-actions">
                   <FateButton
                     variant="danger"
                     size="S"
                     icon="close"
-                    @click="unassignItem(item.id)"
+                    @click.stop="unassignItem(item.id)"
                   ></FateButton>
                 </div>
               </div>
@@ -465,6 +463,14 @@ onBeforeUnmount(() => {
 <style scoped>
 .sheet-section-header {
   background: var(--fate-header-bg);
+}
+
+.detail-view {
+  --campaign-assignment-hover-bg: var(--fate-hover-bg);
+}
+
+:global(html[data-theme='light']) .detail-view {
+  --campaign-assignment-hover-bg: #ff0000;
 }
 
 .back-btn {
@@ -552,32 +558,14 @@ onBeforeUnmount(() => {
   padding: 0.5rem 0.75rem;
 }
 
+.campaign-characters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
 .gm-notes-section {
   margin-bottom: 1rem;
-}
-
-.campaign-gm-notes-editor {
-  padding: 0.5rem 0.75rem;
-}
-
-.campaign-gm-notes-input {
-  width: 100%;
-  min-height: 280px;
-  border: 1px solid color-mix(in srgb, var(--fate-blue-light) 72%, var(--fate-white) 28%);
-  border-radius: 4px;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.875rem;
-  font-family: inherit;
-  color: var(--fate-text);
-  background: color-mix(in srgb, var(--fate-white) 94%, var(--fate-blue-light) 6%);
-  resize: vertical;
-  outline: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.campaign-gm-notes-input:focus {
-  border-color: var(--fate-blue);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fate-blue-light) 70%, var(--fate-white) 30%);
 }
 
 .markdown-content :deep(p) {
@@ -627,11 +615,12 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.4rem;
-  border-bottom: 1px solid var(--fate-blue-light);
+  border-radius: 4px;
+  transition: background 0.12s ease;
 }
 
-.assignment-row:last-of-type {
-  border-bottom: none;
+.assignment-row:hover {
+  background: var(--fate-hover-bg);
 }
 
 .assignment-main {
@@ -640,28 +629,17 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   flex: 1;
   min-width: 0;
-}
-
-.assignment-main--clickable {
-  appearance: none;
-  border: none;
-  background: transparent;
-  width: 100%;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
   font: inherit;
   color: inherit;
-  transition: background 0.1s;
 }
 
-.assignment-main--clickable:hover {
-  background: var(--fate-hover-bg);
-}
-
-:global(html[data-theme='light']) .assignment-main--clickable:hover {
-  background: #dbeffc;
+.assignment-main:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fate-blue) 75%, white);
+  outline-offset: 1px;
 }
 
 .assignment-info {
