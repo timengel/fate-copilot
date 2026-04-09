@@ -69,4 +69,23 @@ describe('FateDialog', () => {
     expect(container.querySelector('.fate-dialog-overlay')).toBeNull();
     expect(container.ownerDocument.body.querySelector('.fate-dialog-overlay')).toBeTruthy();
   });
+
+  it('keeps slot content mounted when keepMounted=true and open=false', () => {
+    const { container } = render(FateDialog, {
+      props: {
+        open: false,
+        keepMounted: true,
+        ariaLabel: 'Test Dialog',
+      },
+      slots: {
+        default: '<div data-testid="persisted-content">Dialog Inhalt</div>',
+      },
+    });
+
+    const overlay = container.ownerDocument.body.querySelector('.fate-dialog-overlay') as HTMLElement;
+    expect(overlay).toBeTruthy();
+    expect(overlay.style.display).toBe('none');
+    expect(container.ownerDocument.body.querySelector('[data-testid=\"persisted-content\"]')).toBeTruthy();
+    expect(screen.queryByRole('dialog', { name: 'Test Dialog' })).toBeNull();
+  });
 });

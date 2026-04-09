@@ -5,6 +5,7 @@ const props = defineProps<{
   open: boolean;
   ariaLabel?: string;
   contentClass?: string;
+  keepMounted?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -38,11 +39,12 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <div
-      v-if="open"
+      v-if="keepMounted || open"
+      v-show="open"
       class="fate-dialog-overlay"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="ariaLabel"
+      :role="open ? 'dialog' : undefined"
+      :aria-modal="open ? 'true' : undefined"
+      :aria-label="open ? ariaLabel : undefined"
       @click.self="emit('close')"
     >
       <div class="fate-dialog-content" :class="contentClass">

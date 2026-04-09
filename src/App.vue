@@ -333,6 +333,7 @@ onBeforeUnmount(() => {
     </div>
     <FateDialog
       :open="timerStore.isPopoverOpen"
+      keep-mounted
       aria-label="Fate Timer"
       content-class="timer-dialog-content"
       @close="timerStore.closePopover()"
